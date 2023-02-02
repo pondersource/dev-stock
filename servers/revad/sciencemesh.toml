@@ -1,0 +1,178 @@
+[log]
+level = "debug"
+
+[shared]
+gatewaysvc = "your.revad.com:19000"
+# gatewaycertfile = "/etc/revad/tls/revanc1.crt"
+
+# [registry]
+# driver = "static"
+#
+# [registry.static]
+# services = ["authprovider","userprovider"]
+#
+# [registry.static.authprovider]
+# bearer = ["localhost:0123"]
+# basic = ["localhost:1234"]
+# publiclink = ["localhost:9876"]
+
+[grpc]
+address = "0.0.0.0:19000"
+# certfile = "/etc/revad/tls/revanc1.crt"
+# keyfile = "/etc/revad/tls/revanc1.key"
+
+[grpc.services.gateway]
+authregistrysvc = "your.revad.com:19000"
+appprovidersvc = "your.revad.com:19000"
+appregistry = "your.revad.com:19000"
+storageregistrysvc = "your.revad.com:19000"
+preferencessvc = "your.revad.com:19000"
+userprovidersvc = "your.revad.com:19000"
+usershareprovidersvc = "your.revad.com:19000"
+publicshareprovidersvc = "your.revad.com:19000"
+ocmcoresvc = "your.revad.com:19000"
+ocmshareprovidersvc = "your.revad.com:19000"
+ocminvitemanagersvc = "your.revad.com:19000"
+ocmproviderauthorizersvc = "your.revad.com:19000"
+commit_share_to_storage_grant = false
+datagateway = "https://your.revad.com/data"
+transfer_expires = 6 # give it a moment
+
+[grpc.services.authregistry]
+driver = "static"
+
+[grpc.services.authregistry.drivers.static.rules]
+basic = "your.revad.com:19000"
+
+[grpc.services.storageregistry]
+driver = "static"
+
+[grpc.services.storageregistry.drivers.static]
+home_provider = "/home"
+
+[grpc.services.storageregistry.drivers.static.rules]
+"/home" = {"address" = "your.revad.com:19000"}
+"123e4567-e89b-12d3-a456-426655440000" = {"address" = "your.revad.com:19000"}
+
+[grpc.services.usershareprovider]
+driver = "memory"
+
+[grpc.services.ocmcore]
+driver = "nextcloud"
+
+[grpc.services.ocmcore.drivers.nextcloud]
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.ocminvitemanager]
+driver = "json"
+
+[grpc.services.ocmshareprovider]
+driver = "nextcloud"
+
+[grpc.services.ocmshareprovider.drivers.nextcloud]
+webdav_host = "https://your.efss.com/"
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.ocmproviderauthorizer]
+driver = "mentix"
+
+[grpc.services.ocmproviderauthorizer.drivers.mentix]
+url = "https://iop.sciencemesh.uni-muenster.de/iop/mentix/cs3"
+verify_request_hostname = false
+insecure = false
+timeout = 10
+refresh = 900
+
+[grpc.services.publicshareprovider]
+driver = "memory"
+
+[grpc.services.appprovider]
+driver = "demo"
+iopsecret = "testsecret"
+wopiurl = "http://0.0.0.0:8880/"
+wopibridgeurl = "http://localhost:8000/wopib"
+
+[grpc.services.appregistry]
+driver = "static"
+
+[grpc.services.appregistry.static.rules]
+"text/plain" = "your.revad.com:19000"
+"text/markdown" = "your.revad.com:19000"
+"application/compressed-markdown" = "your.revad.com:19000"
+"application/vnd.oasis.opendocument.text" = "your.revad.com:19000"
+"application/vnd.oasis.opendocument.spreadsheet" = "your.revad.com:19000"
+"application/vnd.oasis.opendocument.presentation" = "your.revad.com:19000"
+
+[grpc.services.storageprovider]
+driver = "nextcloud"
+expose_data_server = true
+data_server_url = "https://your.revad.com/data"
+enable_home_creation = true
+
+[grpc.services.storageprovider.drivers.nextcloud]
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.authprovider]
+auth_manager = "nextcloud"
+
+[grpc.services.authprovider.auth_managers.nextcloud]
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.userprovider]
+driver = "nextcloud"
+
+[grpc.services.userprovider.drivers.nextcloud]
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[http]
+enabled_services = ["ocmd"]
+enabled_middlewares = ["providerauthorizer", "cors"]
+address = "0.0.0.0:443"
+certfile = "/etc/revad/tls/revanc1.crt"
+keyfile = "/etc/revad/tls/revanc1.key"
+
+[http.services.dataprovider]
+driver = "nextcloud"
+
+[http.services.prometheus]
+[http.services.sysinfo]
+
+[http.services.dataprovider.drivers.nextcloud]
+endpoint = "https://your.efss.com/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[http.services.ocmd]
+prefix = "ocm"
+
+[http.services.ocmd.config]
+host = "your.revad.com"
+provider = "test-revanc1"
+
+[http.middlewares.providerauthorizer]
+driver = "mentix"
+
+[http.middlewares.providerauthorizer.drivers.mentix]
+url = "https://iop.sciencemesh.uni-muenster.de/iop/mentix/cs3"
+verify_request_hostname = false
+insecure = false
+timeout = 10
+refresh = 900
+
+[http.services.ocs]
+prefix = "ocs"
+
+[http.services.ocdav]
+prefix = "ocdav"
+
+[http.middlewares.cors]

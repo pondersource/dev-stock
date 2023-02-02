@@ -1,0 +1,18 @@
+[
+  {	"domain": "revanc1.docker",	"services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revanc1.docker/ocm/" }, "host": "https://revanc1.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://nc1.docker/remote.php/webdav/" }, "host": "https://nc1.docker" }
+  ] },
+  { "domain": "revanc2.docker", "services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revanc2.docker/ocm/" }, "host": "https://revanc2.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://nc2.docker/remote.php/webdav/" }, "host": "https://nc2.docker" }
+  ] },
+  {	"domain": "revaoc1.docker",	"services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revaoc1.docker/ocm/" }, "host": "https://revaoc1.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://oc1.docker/remote.php/webdav/" }, "host": "https://oc1.docker" }
+  ] },
+  { "domain": "revaoc2.docker", "services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revaoc2.docker/ocm/" }, "host": "https://revaoc2.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://oc2.docker/remote.php/webdav/" }, "host": "https://oc2.docker" }
+  ] }
+]
