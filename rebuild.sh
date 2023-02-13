@@ -4,21 +4,15 @@ set -e
 # docker build -t tester .
 
 # image for stub1 and stub2:
-cd ocm-stub
-cp -r ../tls .
-docker build -t stub .
-cd ../servers/ci
-pwd
-# # image for running the tests from Github Actions:
-# cd ../ci
-# cp -r ../../tls .
-# docker build -t ci .
+cd servers/ocmstub
+cp -r ../../tls .
+docker build -t pondersource/build-stock-ocmstub .
 
 # image for revad1, revad2, revanc1, revanc2:
 cd ../revad
 cp -r ../../tls .
 # docker build -t revad --build-arg CACHEBUST=`date +%s` .
-docker build -t revad .
+docker build -t pondersource/build-stock-revad .
 
 # base image for owncloud image:
 cd ../apache-php-7.4
@@ -37,11 +31,11 @@ docker build -t nextcloud .
 
 # image for nc1:
 cd ../nc1
-docker build -t nc1 .
+docker build -t pondersource/build-stock-nc1-sciencemesh .
 
 # image for nc2:
 cd ../nc2
-docker build -t nc2 .
+docker build -t pondersource/build-stock-nc2-sciencemesh .
 
 # base image for oc1 image and oc2 image:
 cd ../owncloud
@@ -49,8 +43,8 @@ docker build -t owncloud .
 
 # image for oc1:
 cd ../oc1
-docker build -t oc1 .
+docker build -t pondersource/build-stock-oc1-sciencemesh .
 
 # image for oc2:
 cd ../oc2
-docker build -t oc2 .
+docker build -t pondersource/build-stock-oc2-sciencemesh .
