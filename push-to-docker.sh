@@ -1,4 +1,6 @@
 #!/bin/bash
+echo Log in as pondersource
+docker login
 docker push pondersource/build-stock-ocmstub
 docker push pondersource/build-stock-revad
 docker push pondersource/build-stock-nc1-sciencemesh
