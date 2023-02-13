@@ -169,3 +169,38 @@ prefix = "ocs"
 prefix = "ocdav"
 
 [http.middlewares.cors]
+
+# example data transfer service configuration
+[grpc.services.datatx]
+# rclone is the default data transfer driver
+txdriver = "rclone"
+# the shares,transfers db file (default: /var/tmp/reva/datatx-shares.json)
+tx_shares_file = ""
+# base folder of the data transfers (default: /home/DataTransfers)
+data_transfers_folder = ""
+
+# rclone data transfer driver
+[grpc.services.datatx.txdrivers.rclone]
+# rclone endpoint
+endpoint = "http://rclone.docker"
+# basic auth is used
+auth_user = "rcloneuser"
+auth_pass = "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
+auth_header = "x-access-token"
+# the transfers(jobs) db file (default: /var/tmp/reva/datatx-transfers.json)
+file = ""
+# check status job interval in milliseconds
+job_status_check_interval = 2000
+# the job timeout in milliseconds (must be long enough for big transfers!)
+job_timeout = 120000
+
+[http.services.ocdav]
+# Rclone supports third-party copy push; for that to work with reva enable this setting
+# enable_http_tpc = true
+# The authentication scheme reva uses for the tpc push call (the call to Destination). 
+# Follows the destination endpoint authentication method.
+# Valid values:
+#   "bearer" (default)    will result in header:   Authorization: "Bearer ...token..."
+#   "x-access-token"      will result in header:   X-Access-Token: "...token..."
+# If not set "bearer" is assumed
+http_tpc_push_auth_header = "x-access-token"
