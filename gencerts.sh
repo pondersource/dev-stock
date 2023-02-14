@@ -27,16 +27,16 @@ openssl req -new -x509 -days 365 \
     -out ./tls/ocm-ca.crt \
     -subj "/C=RO/ST=Bucharest/L=Bucharest/O=IT/CN=ocm-ca"
 
-createCert nc1
-createCert nc2
-createCert oc1
-createCert oc2
-createCert stub1
-createCert stub2
-createCert revad1
-createCert revad2
-createCert revanc1
-createCert revanc2
+# createCert nc1
+# createCert nc2
+# createCert oc1
+# createCert oc2
+# createCert stub1
+# createCert stub2
+# createCert revad1
+# createCert revad2
+# createCert revanc1
+# createCert revanc2
 createCert revaoc1
 createCert revaoc2
 createCert meshdir

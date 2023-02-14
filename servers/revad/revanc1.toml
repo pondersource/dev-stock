@@ -165,9 +165,6 @@ providers = "providers.testnet.json"
 [http.services.ocs]
 prefix = "ocs"
 
-[http.services.ocdav]
-prefix = "ocdav"
-
 [http.middlewares.cors]
 
 # example data transfer service configuration
@@ -195,6 +192,7 @@ job_status_check_interval = 2000
 job_timeout = 120000
 
 [http.services.ocdav]
+prefix = "ocdav"
 # Rclone supports third-party copy push; for that to work with reva enable this setting
 # enable_http_tpc = true
 # The authentication scheme reva uses for the tpc push call (the call to Destination). 
