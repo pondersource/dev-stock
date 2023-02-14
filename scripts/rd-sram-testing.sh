@@ -21,7 +21,7 @@ echo "starting oc1.docker"
 docker run -d --network=testnet --name=oc1.docker \
   -v $REPO_DIR:/var/www/html/apps/rd-sram-integration \
   -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
-  oc1
+  pondersource/dev-stock-oc1-rd-sram
 
 echo "starting maria2.docker"
 docker run -d --network=testnet -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --name=maria2.docker mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
@@ -29,7 +29,7 @@ echo "starting oc2.docker"
 docker run -d --network=testnet --name=oc2.docker \
   -v $REPO_DIR:/var/www/html/apps/rd-sram-integration \
   -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
-  oc2
+  pondersource/dev-stock-oc2-rd-sram
 
 echo "starting firefox tester"
 docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:v1.17.1
