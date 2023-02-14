@@ -3,3 +3,7 @@ php console.php app:disable firstrunwizard
 sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
 sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
 sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
+
+php console.php app:enable sciencemesh
+sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\ScienceMesh\\\\ScienceMeshProviderFactory'," /var/www/html/config/config.php
+sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\ScienceMesh\\\\Plugins\\\\ScienceMeshSearchPlugin'," /var/www/html/config/config.php

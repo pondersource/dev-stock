@@ -1,7 +1,9 @@
 FROM apache-php-7.4
 RUN rm -rf /var/www/html
 USER www-data
-RUN git clone --depth=1 --branch ocm-via-sciencemesh https://github.com/pondersource/core.git --recursive --shallow-submodules
+
+RUN git clone --depth=1 --branch surf-dev https://github.com/pondersource/core.git --recursive --shallow-submodules
+
 WORKDIR /var/www/core
 USER root
 RUN apt update && apt install -y composer curl dirmngr apt-transport-https lsb-release ca-certificates iproute2 curl unzip php-curl
@@ -19,6 +21,14 @@ RUN composer install --no-dev
 RUN make install-nodejs-deps
 ENV PHP_MEMORY_LIMIT="512M"
 ADD init.sh /init.sh
+
+RUN cd apps && git clone https://github.com/owncloud/customgroups
+RUN cd apps/customgroups && composer install --no-dev
+RUN cd apps/customgroups && yarn install
+RUN cd apps/customgroups && yarn build
+RUN cd apps && git clone https://github.com/SURFnet/rd-sram-integration
+RUN cd apps && ln -s rd-sram-integration/federatedgroups
+
 RUN mkdir -p data ; touch data/owncloud.log
 USER root
 CMD /usr/sbin/apache2ctl -DFOREGROUND & tail -f /var/log/apache2/error.log & tail -f data/owncloud.log
