@@ -1,4 +1,4 @@
-php console.php maintenance:install --admin-user $USER --admin-pass $PASS --database "mysql" --database-name "owncloud" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "$DBHOST"
+php console.php maintenance:install --admin-user $USER --admin-pass $PASS --database "mysql" --database-name "efss" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "$DBHOST"
 php console.php app:disable firstrunwizard
 php console.php app:enable sciencemesh
 # sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
