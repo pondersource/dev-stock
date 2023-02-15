@@ -2,3 +2,5 @@ servers/ocmstub/tls
 servers/apache-7.4/tls
 servers/apache-8.0/tls
 servers/revad/tls
+oc-sciencemesh
+nc-sciencemesh
