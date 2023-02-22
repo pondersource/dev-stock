@@ -13,9 +13,7 @@ RUN PATH=$PATH:/usr/local/go/bin make build
 ARG CACHEBUST=1
 RUN git pull
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
-RUN PATH=$PATH:/usr/local/go/bin make deps
-RUN PATH=$PATH:/usr/local/go/bin make build
-# RUN PATH=$PATH:/usr/local/go/bin make test
+RUN PATH=$PATH:/usr/local/go/bin make
 ADD . /etc/revad
 WORKDIR /etc/revad
 # RUN openssl req -new -x509 -days 365 -nodes \
