@@ -77,7 +77,7 @@ file = "/var/tmp/reva/shares_server_1.json"
 driver = "json"
 
 [grpc.services.ocmproviderauthorizer.drivers.json]
-providers = "providers.demo.json"
+providers = "providers.testnet.json"
 verify_request_hostname = true
 
 [grpc.services.publicshareprovider]
@@ -153,7 +153,7 @@ provider = "test-revad2"
 driver = "json"
 
 [http.middlewares.providerauthorizer.drivers.json]
-providers = "providers.demo.json"
+providers = "providers.testnet.json"
 
 [http.services.ocs]
 prefix = "ocs"
