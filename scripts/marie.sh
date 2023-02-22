@@ -1,4 +1,5 @@
 #!/bin/bash
 set -e
 
-docker exec -it revad2.docker /reva/cmd/reva/reva -insecure -host localhost:19000
+# run /reva/cmd/reva/reva inside /bin/bash -c "..." so /root/.reva-token is accessible
+docker exec -it revad2.docker /bin/bash -c "/reva/cmd/reva/reva -insecure -host localhost:19000"
