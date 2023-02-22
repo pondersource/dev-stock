@@ -127,11 +127,13 @@ driver = "json"
 users = "users.testnet.json"
 
 [http]
-enabled_services = ["ocmd"]
+enabled_services = ["ocmd","sciencemesh"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
 certfile = "/etc/revad/tls/revad1.crt"
 keyfile = "/etc/revad/tls/revad1.key"
+
+[http.services.sciencemesh]
 
 [http.services.dataprovider]
 driver = "localhome"
