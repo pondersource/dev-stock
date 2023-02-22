@@ -77,7 +77,7 @@ file = "/var/tmp/reva/shares_server_1.json"
 driver = "json"
 
 [grpc.services.ocmproviderauthorizer.drivers.json]
-providers = "providers.tesnet.json"
+providers = "providers.testnet.json"
 verify_request_hostname = true
 
 [grpc.services.publicshareprovider]
