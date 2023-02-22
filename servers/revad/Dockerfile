@@ -2,17 +2,21 @@ FROM ubuntu:22.04
 # FROM revadbase as base
 # COPY --from=base /etc/ssl/certs/ /etc/ssl/certs/
 # COPY --from=base /usr/bin/revad /usr/bin/revad
-RUN apt update && apt install -y openssl build-essential wget git vim
+RUN apt update && apt install -y openssl build-essential wget git vim curl
 RUN wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.19.linux-amd64.tar.gz
 RUN git clone --depth=1 --branch=sciencemesh https://github.com/pondersource/reva
 WORKDIR /reva
-RUN PATH=$PATH:/usr/local/go/bin make
+RUN PATH=$PATH:/usr/local/go/bin go mod vendor
+SHELL ["/bin/bash", "-c"]
+RUN PATH=$PATH:/usr/local/go/bin make revad
+RUN PATH=$PATH:/usr/local/go/bin make reva
 # see https://github.com/moby/moby/issues/1996#issuecomment-185872769
 ARG CACHEBUST=1
 RUN git pull
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
-RUN PATH=$PATH:/usr/local/go/bin make
+RUN PATH=$PATH:/usr/local/go/bin make revad
+RUN PATH=$PATH:/usr/local/go/bin make reva
 ADD . /etc/revad
 WORKDIR /etc/revad
 # RUN openssl req -new -x509 -days 365 -nodes \
