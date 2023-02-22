@@ -7,8 +7,7 @@ RUN wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.19.linux-amd64.tar.gz
 RUN git clone --depth=1 --branch=sciencemesh https://github.com/pondersource/reva
 WORKDIR /reva
-RUN PATH=$PATH:/usr/local/go/bin make deps
-RUN PATH=$PATH:/usr/local/go/bin make build
+RUN PATH=$PATH:/usr/local/go/bin make
 # see https://github.com/moby/moby/issues/1996#issuecomment-185872769
 ARG CACHEBUST=1
 RUN git pull
