@@ -1,4 +1,12 @@
 [
+  {	"domain": "revad1.docker",	"services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://reva1.docker/ocm/" }, "host": "https://reva1.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://revad1.docker/remote.php/webdav/" }, "host": "https://revad1.docker" }
+  ] },
+  { "domain": "revad2.docker", "services": [
+    { "endpoint": { "type": { "name": "OCM" }, "path": "https://reva2.docker/ocm/" }, "host": "https://reva2.docker" },
+    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://revad2.docker/remote.php/webdav/" }, "host": "https://revad2.docker" }
+  ] }
   {	"domain": "revanc1.docker",	"services": [
     { "endpoint": { "type": { "name": "OCM" }, "path": "https://revanc1.docker/ocm/" }, "host": "https://revanc1.docker" },
     { "endpoint": { "type": { "name": "Webdav" }, "path": "https://nc1.docker/remote.php/webdav/" }, "host": "https://nc1.docker" }
