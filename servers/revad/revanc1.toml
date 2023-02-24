@@ -133,13 +133,14 @@ shared_secret = "shared-secret-1"
 mock_http = false
 
 [http]
-enabled_services = ["ocmd", "sciencemesh"]
+# enabled_services = ["ocmd", "sciencemesh"]
+enabled_services = ["ocmd"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
 certfile = "/etc/revad/tls/revanc1.crt"
 keyfile = "/etc/revad/tls/revanc1.key"
 
-[http.services.sciencemesh]
+# [http.services.sciencemesh]
 
 [http.services.dataprovider]
 driver = "nextcloud"
