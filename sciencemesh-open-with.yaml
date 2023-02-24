@@ -6,8 +6,7 @@
 version: "3.1"
 services:
   wopiserver:
-    #image: cs3org/wopiserver:${WOPIVER}-xrootd
-    image: wopiserver:cern
+    image: cs3org/wopiserver
     container_name: wopiserver
     hostname: cbox-wopiserver
     network_mode: host
@@ -19,7 +18,7 @@ services:
       - etherpad_apikey
     environment:
       - DEBUG_METRICS=false
-      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - HOST_HOSTNAME=wopi.docker
       - XRD_TIMEOUTRESOLUTION=1
     volumes:
       - config:/etc/wopi
@@ -40,7 +39,7 @@ services:
     network_mode: appsnet
     environment:
       - POSTGRES_USER=codimd
-      - POSTGRES_PASSWORD=${DBCODIPWD}
+      - POSTGRES_PASSWORD=DBCODIPWD
       - POSTGRES_DB=codimd
     volumes:
       - database-data:/var/lib/postgresql/data
@@ -54,7 +53,7 @@ services:
     hostname: cbox-codimd-web
     network_mode: appsnet
     environment:
-      - CMD_DB_URL=postgres://codimd:${DBCODIPWD}@codimd-postgres/codimd
+      - CMD_DB_URL=postgres://codimd:DBCODIPWD@codimd-postgres/codimd
       - CMD_AUTO_VERSION_CHECK=false
       - CMD_USECDN=false
       - CMD_ALLOW_ANONYMOUS=true
@@ -66,7 +65,7 @@ services:
       - CMD_ALLOW_GRAVATAR=true
       - CMD_ALLOW_PDF_EXPORT=true
       - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - CMD_DOMAIN=${HOST_HOSTNAME}
+      - CMD_DOMAIN=codi.docker
       - CMD_URL_ADDPORT=true
       - CMD_URL_PATH=
       - CMD_USESSL=true
@@ -93,7 +92,7 @@ services:
     # the cern tag is to be created with the following build command, from a checkout of github.com/ether/etherpad-lite and
     # after having amended the settings.json.docker file with etherpad_settings.json.docker_patch:
     # docker build --build-arg ETHERPAD_PLUGINS="ep_sciencemesh ep_font_size ep_font_family ep_font_color ep_spellcheck ep_table_of_contents ep_subscript_and_superscript ep_mammoth ep_print ep_comments_page ep_embedded_hyperlinks2 ep_auth_session ep_align ep_special_characters ep_markdown ep_image_upload ep_mathjax" --build-arg INSTALL_SOFFICE=True --tag etherpad/etherpad:cern .
-    image: etherpad/etherpad:cern
+    image: etherpad/etherpad
     container_name: etherpad
     hostname: cbox-etherpad
     network_mode: appsnet
@@ -106,7 +105,7 @@ services:
       - DB_HOST=codimd-postgres
       - DB_PORT=5432
       - DB_USER=etherpad
-      - DB_PASS=${DBETHPWD}
+      - DB_PASS=DBETHPWD
       - TITLE=Etherpad for CERNBox
       - DEFAULT_PAD_TEXT=This is Etherpad for CERNBox
       #- LOGLEVEL=DEBUG
@@ -150,13 +149,13 @@ services:
     ports:
       - 9980:9980
     environment:
-      - server_name=${HOST_HOSTNAME}:9980
+      - server_name=collabora.docker:9980
       - domain=wopiqa\.cernbox\.cern\.ch:8443
       - cert_domain=1
       - DONT_GEN_SSL_CERT=1
       - extra_params=--o:ssl.cert_file_path=/var/run/secrets/cert.pem --o:ssl.key_file_path=/var/run/secrets/key.pem --o:ssl.ca_file_path=/var/run/secrets/ca-chain.pem
       - username=admin
-      - password=${CODEADMINPWD}
+      - password=CODEADMINPWD
     secrets:
       - cert.pem
       - key.pem
