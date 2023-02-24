@@ -44,12 +44,12 @@ docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testn
 waitForPort maria1.docker 3306
 # waitForPort ${EFSS1}1.docker 80
 sleep 15
-docker exec nc1.docker php console.php maintenance:install --admin-user einstein --admin-pass relativity --database "mysql" --database-name "efss" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "maria1.docker"
-docker exec nc1.docker php console.php app:disable firstrunwizard
-docker exec nc1.docker sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
-docker exec nc1.docker sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
-docker exec nc1.docker sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
-docker exec nc1.docker php console.php app:enable sciencemesh
+docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php maintenance:install --admin-user einstein --admin-pass relativity --database "mysql" --database-name "efss" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "maria1.docker"
+docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php app:disable firstrunwizard
+docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
+docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
+docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
+docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php app:enable sciencemesh
 
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
@@ -57,12 +57,12 @@ docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi
 
 waitForPort maria2.docker 3306
 # waitForPort ${EFSS2}2.docker 80
-docker exec nc2.docker php console.php maintenance:install --admin-user maria --admin-pass radioactivity --database "mysql" --database-name "efss" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "maria2.docker"
-docker exec nc2.docker php console.php app:disable firstrunwizard
-docker exec nc2.docker sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
-docker exec nc2.docker sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
-docker exec nc2.docker sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
-docker exec nc2.docker php console.php app:enable sciencemesh
+docker exec  -u www-data --workdir /var/www/html nc2.docker php console.php maintenance:install --admin-user maria --admin-pass radioactivity --database "mysql" --database-name "efss" --database-user "root" --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek" --database-host "maria2.docker"
+docker exec  -u www-data --workdir /var/www/html nc2.docker php console.php app:disable firstrunwizard
+docker exec  -u www-data --workdir /var/www/html nc2.docker sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
+docker exec  -u www-data --workdir /var/www/html nc2.docker sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
+docker exec  -u www-data --workdir /var/www/html nc2.docker sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
+docker exec  -u www-data --workdir /var/www/html nc2.docker php console.php app:enable sciencemesh
 
 docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"
 docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-2');"
