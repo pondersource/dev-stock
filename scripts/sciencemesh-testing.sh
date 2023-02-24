@@ -22,7 +22,7 @@ docker run -d --network=testnet --name=reva${EFSS2}2.docker -e HOST=reva${EFSS2}
 docker run -d --network=testnet --name=maria2.docker -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
 docker run -d --network=testnet --name=${EFSS2}2.docker -v $REPO_ROOT/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh pondersource/dev-stock-${EFSS2}2-sciencemesh
 docker run -d --network=testnet --name=meshdir.docker pondersource/dev-stock-ocmstub
-docker run -d --network=testnet --name=rclone.docker rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+# docker run -d --network=testnet --name=rclone.docker rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
 docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:v1.17.1
 
 waitForPort maria1.docker 3306
