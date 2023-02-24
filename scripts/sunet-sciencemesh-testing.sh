@@ -51,7 +51,7 @@ docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php app:
 docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "8 i\      1 => 'nc1.docker'," /var/www/html/config/config.php
 docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "9 i\      2 => 'nc2.docker'," /var/www/html/config/config.php
 docker exec  -u www-data --workdir /var/www/html nc1.docker sed -i "3 i\  'allow_local_remote_servers' => true," config/config.php
-docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php app:enable sciencemesh
+# docker exec  -u www-data --workdir /var/www/html nc1.docker php console.php app:enable sciencemesh
 
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
