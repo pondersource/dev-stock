@@ -12,13 +12,11 @@ RUN git clone --depth=1 --branch=mentix-fixes https://github.com/michielbdejong/
 WORKDIR /reva
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
 SHELL ["/bin/bash", "-c"]
-RUN PATH=$PATH:/usr/local/go/bin make deps
 RUN PATH=$PATH:/usr/local/go/bin make build
 # see https://github.com/moby/moby/issues/1996#issuecomment-185872769
 ARG CACHEBUST=1
 RUN git pull
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
-RUN PATH=$PATH:/usr/local/go/bin make deps
 RUN PATH=$PATH:/usr/local/go/bin make build
 ADD . /etc/revad
 WORKDIR /etc/revad
