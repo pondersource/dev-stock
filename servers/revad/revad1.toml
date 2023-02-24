@@ -77,7 +77,7 @@ file = "/var/tmp/reva/shares_server_1.json"
 driver = "json"
 
 [grpc.services.ocmproviderauthorizer.drivers.json]
-providers = "providers.demo.json"
+providers = "providers.testnet.json"
 verify_request_hostname = true
 
 [grpc.services.publicshareprovider]
@@ -118,20 +118,22 @@ user_layout = "{{.Username}}"
 auth_manager = "json"
 
 [grpc.services.authprovider.auth_managers.json]
-users = "users.demo.json"
+users = "users.testnet.json"
 
 [grpc.services.userprovider]
 driver = "json"
 
 [grpc.services.userprovider.drivers.json]
-users = "users.demo.json"
+users = "users.testnet.json"
 
 [http]
-enabled_services = ["ocmd"]
+enabled_services = ["ocmd","sciencemesh"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
 certfile = "/etc/revad/tls/revad1.crt"
 keyfile = "/etc/revad/tls/revad1.key"
+
+[http.services.sciencemesh]
 
 [http.services.dataprovider]
 driver = "localhome"
@@ -153,7 +155,7 @@ provider = "test-revad1"
 driver = "json"
 
 [http.middlewares.providerauthorizer.drivers.json]
-providers = "providers.demo.json"
+providers = "providers.testnet.json"
 
 [http.services.ocs]
 prefix = "ocs"
@@ -172,7 +174,7 @@ data_transfers_folder = ""
 # rclone data transfer driver
 [grpc.services.datatx.txdrivers.rclone]
 # rclone endpoint
-endpoint = "http://rclone.docker"
+endpoint = "http://rclone1.docker"
 # basic auth is used
 auth_user = "rcloneuser"
 auth_pass = "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
