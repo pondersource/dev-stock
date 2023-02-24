@@ -11,7 +11,8 @@ export EFSS2=nc
 # git clone https://github.com/SUNET/nextcloud-custom
 # cd nextcloud-custom
 # git checkout b9097abdcf6757e34f19442b28de6e4d8d0637e8
-# git build -t sunet-sciencemesh .
+# or to compare: git checkout db6fbc2d56b44f406e3
+# docker build -t sunet-sciencemesh .
 # cd ../dev-stock
 # ./scripts/clean.sh
 # ./scripts/sunet-sciencemesh-testing.sh
