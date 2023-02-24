@@ -5,7 +5,10 @@ FROM ubuntu:22.04
 RUN apt update && apt install -y openssl build-essential wget git vim curl
 RUN wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.19.linux-amd64.tar.gz
-RUN git clone --depth=1 --branch=sciencemesh https://github.com/pondersource/reva
+# For Network Beta:
+#RUN git clone --depth=1 --branch=sciencemesh https://github.com/pondersource/reva
+# For Network Alpha:
+RUN git clone --depth=1 --branch=mentix-fixes https://github.com/michielbdejong/reva
 WORKDIR /reva
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
 SHELL ["/bin/bash", "-c"]
