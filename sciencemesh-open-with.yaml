@@ -1,0 +1,202 @@
+# docker-compose configuration file for WOPI server + Postgres + apps (CodiMD, Etherpad, Onlyoffice), for dev purposes
+#
+# Run with e.g.: HOST_HOSTNAME=`hostname` DBCODIPWD='your_codimd_db_pwd' DBETHPWD=`your_etherpad_db_pwd` CODEADMINPWD=`your_collabora_admin_pwd` WOPIVER=latest docker-compose -f dev_codimd_wopi.yaml up -d
+#
+
+version: "3.1"
+services:
+  wopiserver:
+    #image: cs3org/wopiserver:${WOPIVER}-xrootd
+    image: wopiserver:cern
+    container_name: wopiserver
+    hostname: cbox-wopiserver
+    network_mode: host
+    restart: always
+    secrets:
+      - cboxcert.pem
+      - cboxkey.pem
+      - codimd_apikey
+      - etherpad_apikey
+    environment:
+      - DEBUG_METRICS=false
+      - HOST_HOSTNAME=${HOST_HOSTNAME}
+      - XRD_TIMEOUTRESOLUTION=1
+    volumes:
+      - config:/etc/wopi
+      - logs:/var/log/wopi
+      - wopi_recovery:/var/spool/wopirecovery
+      - wopi_local_storage:/var/wopi_local_storage
+      - /var/lib/sss/pipes:/var/lib/sss/pipes
+    healthcheck:
+      test: ["CMD", "curl", "--insecure", "https://localhost:8443"]
+      interval: 600s
+      timeout: 5s
+      retries: 3
+
+  database:
+    image: postgres:11.6-alpine
+    container_name: codimd-postgres
+    hostname: cbox-codimd-postgres
+    network_mode: appsnet
+    environment:
+      - POSTGRES_USER=codimd
+      - POSTGRES_PASSWORD=${DBCODIPWD}
+      - POSTGRES_DB=codimd
+    volumes:
+      - database-data:/var/lib/postgresql/data
+      - upload-data:/home/hackmd/app/public/uploads
+    restart: always
+
+  codimd:
+    image: gitlab-registry.cern.ch/authoring/notes/codimd:cernbox-integration
+    #image: gitlab-registry.cern.ch/lopresti/codimd:cernbox-integration
+    container_name: codimd-web
+    hostname: cbox-codimd-web
+    network_mode: appsnet
+    environment:
+      - CMD_DB_URL=postgres://codimd:${DBCODIPWD}@codimd-postgres/codimd
+      - CMD_AUTO_VERSION_CHECK=false
+      - CMD_USECDN=false
+      - CMD_ALLOW_ANONYMOUS=true
+      - CMD_ALLOW_ANONYMOUS_EDITS=true
+      - CMD_ALLOW_ANONYMOUS_VIEWS=true
+      - CMD_ALLOW_FREEURL=true
+      - CMD_EMAIL=false
+      - CMD_ALLOW_EMAIL_REGISTER=false
+      - CMD_ALLOW_GRAVATAR=true
+      - CMD_ALLOW_PDF_EXPORT=true
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - CMD_DOMAIN=${HOST_HOSTNAME}
+      - CMD_URL_ADDPORT=true
+      - CMD_URL_PATH=
+      - CMD_USESSL=true
+      - CMD_PROTOCOL_USESSL=true
+      - CMD_APPLIANCE_MODE=true
+      - CMD_API_BODY_LIMIT=210000
+      - CMD_FILEPICKER_URL=https://filepicker-dev.cernbox.cern.ch
+      # this is a workaround for the PDF export
+      - QT_QPA_PLATFORM=
+      # the following must be stored properly, this is a test key
+      - CMD_API_KEY=testsecret
+    secrets:
+      - cert.pem
+      - key.pem
+      - dhparam.pem
+      - codimd_apikey
+    depends_on:
+      - database
+    ports:
+      - 3000:3000
+    restart: always
+
+  etherpad:
+    # the cern tag is to be created with the following build command, from a checkout of github.com/ether/etherpad-lite and
+    # after having amended the settings.json.docker file with etherpad_settings.json.docker_patch:
+    # docker build --build-arg ETHERPAD_PLUGINS="ep_sciencemesh ep_font_size ep_font_family ep_font_color ep_spellcheck ep_table_of_contents ep_subscript_and_superscript ep_mammoth ep_print ep_comments_page ep_embedded_hyperlinks2 ep_auth_session ep_align ep_special_characters ep_markdown ep_image_upload ep_mathjax" --build-arg INSTALL_SOFFICE=True --tag etherpad/etherpad:cern .
+    image: etherpad/etherpad:cern
+    container_name: etherpad
+    hostname: cbox-etherpad
+    network_mode: appsnet
+    restart: always
+    ports:
+      - 9001:9001
+    environment:
+      - SOFFICE=/usr/bin/soffice
+      - DB_TYPE=postgres
+      - DB_HOST=codimd-postgres
+      - DB_PORT=5432
+      - DB_USER=etherpad
+      - DB_PASS=${DBETHPWD}
+      - TITLE=Etherpad for CERNBox
+      - DEFAULT_PAD_TEXT=This is Etherpad for CERNBox
+      #- LOGLEVEL=DEBUG
+    secrets:
+      - cert.pem
+      - key.pem
+      - etherpad_apikey
+    command: ["node", "node_modules/ep_etherpad-lite/node/server.js", "--apikey", "/var/run/secrets/etherpad_apikey"]
+    healthcheck:
+      test: ["CMD", "curl", "-k", "https://localhost:9001"]
+      interval: 600s
+      timeout: 5s
+      retries: 3
+
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: onlyoffice
+    hostname: cbox-onlyoffice
+    network_mode: appsnet
+    restart: always
+    ports:
+      - 8000:443
+      - 8880:80
+    volumes:
+      - oo-data:/var/www/onlyoffice/Data
+      - oo-logs:/var/log/onlyoffice
+    environment:
+      - USE_UNAUTHORIZED_STORAGE="true"
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost"]
+      interval: 600s
+      timeout: 5s
+      retries: 3
+
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    hostname: cbox-collabora
+    network_mode: appsnet
+    restart: always
+    ports:
+      - 9980:9980
+    environment:
+      - server_name=${HOST_HOSTNAME}:9980
+      - domain=wopiqa\.cernbox\.cern\.ch:8443
+      - cert_domain=1
+      - DONT_GEN_SSL_CERT=1
+      - extra_params=--o:ssl.cert_file_path=/var/run/secrets/cert.pem --o:ssl.key_file_path=/var/run/secrets/key.pem --o:ssl.ca_file_path=/var/run/secrets/ca-chain.pem
+      - username=admin
+      - password=${CODEADMINPWD}
+    secrets:
+      - cert.pem
+      - key.pem
+      - ca-chain.pem
+    healthcheck:
+      test: ["CMD", "curl", "-k", "https://localhost:9980"]
+      interval: 600s
+      timeout: 5s
+      retries: 3
+
+
+secrets:
+  cboxcert.pem:
+    file: /etc/grid-security/cernbox-hostcert.pem
+  cboxkey.pem:
+    file: /etc/grid-security/cernbox-hostkey.pem
+  cert.pem:
+    file: /etc/grid-security/hostcert.pem
+  key.pem:
+    file: /etc/grid-security/hostkey.pem
+    # the key file was obtained as:
+    # cd /var/lib/puppet/ssl/private_keys && cp ${HOST_HOSTNAME}.pem ${HOST_HOSTNAME}.key && chmod 644 ${HOST_HOSTNAME}.key
+  dhparam.pem:
+    file: /etc/grid-security/dhparam.pem
+  ca-chain.pem:
+    file: /root/APPS/etc/ca-chain.pem
+  codimd_apikey:
+    file: /etc/wopi/codimd_apikey
+  etherpad_apikey:
+    file: /etc/wopi/etherpad_apikey
+
+volumes:
+  config: {}
+  logs: {}
+  wopi_recovery: {}
+  wopi_local_storage: {}
+  database-data: {}
+  upload-data: {}
+  oo-logs: {}
+  oo-data: {}
+
+networks:
+  appsnet:
