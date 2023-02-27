@@ -130,13 +130,11 @@ driver = "json"
 users = "users.testnet.json"
 
 [http]
-enabled_services = ["ocmd","sciencemesh"]
+enabled_services = ["ocmd"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
 certfile = "/etc/revad/tls/revad1.crt"
 keyfile = "/etc/revad/tls/revad1.key"
-
-[http.services.sciencemesh]
 
 [http.services.dataprovider]
 driver = "localhome"
@@ -166,14 +164,10 @@ prefix = "ocs"
 
 [http.middlewares.cors]
 
-# example data transfer service configuration
-[grpc.services.datatx]
-# rclone is the default data transfer driver
-txdriver = "rclone"
-# the shares,transfers db file (default: /var/tmp/reva/datatx-shares.json)
-tx_shares_file = ""
-# base folder of the data transfers (default: /home/DataTransfers)
-data_transfers_folder = ""
+# [grpc.services.datatx]
+# txdriver = "rclone"
+# tx_shares_file = ""
+# data_transfers_folder = ""
 
 # rclone data transfer driver
 [grpc.services.datatx.txdrivers.rclone]
