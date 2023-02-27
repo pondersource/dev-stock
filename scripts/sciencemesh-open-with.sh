@@ -23,5 +23,5 @@ docker container cp ./sciencemesh-open-with.toml revad1.docker:/etc/revad/revad1
 docker restart revad1.docker
 echo Now log in as einstein/relativity
 docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 login basic
-docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 upload ./example.txt /home/example.txt
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 upload --protocol=simple ./example.txt /home/example.txt
 docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 open-in-app /home/example.txt read
