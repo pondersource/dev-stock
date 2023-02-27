@@ -13,10 +13,13 @@ sudo touch /root/APPS/etc/ca-chain.pem
 sudo mkdir -p /etc/wopi
 sudo touch /etc/wopi/codimd_apikey
 sudo touch /etc/wopi/etherpad_apikey
-docker network create appsnet
+docker network create appsnet || true
 
-docker compose -f ./sciencemesh-open-with.yaml up
+docker compose -f ./sciencemesh-open-with.yaml up -d
 
-docker run -d --network=testnet --name=revad1.docker -e HOST=reva${EFSS1}1 pondersource/dev-stock-revad
+docker run -d --network=testnet --name=revad1.docker -e HOST=revad1 pondersource/dev-stock-revad-network-beta
 docker container cp ./sciencemesh-open-with.toml revad1.docker:/etc/revad/revad1.toml
 docker restart revad1.docker
+echo Now log in as einstein/relativity
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure login basic
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure open-in-app /home/example.txt read
