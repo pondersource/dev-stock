@@ -18,8 +18,10 @@ docker network create appsnet || true
 docker compose -f ./sciencemesh-open-with.yaml up -d
 
 docker run -d --network=testnet --name=revad1.docker -e HOST=revad1 pondersource/dev-stock-revad-network-beta
+docker container cp ./example.txt revad1.docker:/etc/revad/example.txt
 docker container cp ./sciencemesh-open-with.toml revad1.docker:/etc/revad/revad1.toml
 docker restart revad1.docker
 echo Now log in as einstein/relativity
-docker exec -it revad1.docker /reva/cmd/reva/reva -insecure login basic
-docker exec -it revad1.docker /reva/cmd/reva/reva -insecure open-in-app /home/example.txt read
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 login basic
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 upload ./example.txt /home/example.txt
+docker exec -it revad1.docker /reva/cmd/reva/reva -insecure -host localhost:19000 open-in-app /home/example.txt read

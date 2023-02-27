@@ -107,6 +107,8 @@ mount_id = "123e4567-e89b-12d3-a456-426655440000"
 expose_data_server = true
 data_server_url = "http://localhost:19000/data"
 enable_home_creation = true
+
+[grpc.services.storageprovider.localhome]
 disable_tus = true
 
 [grpc.services.storageprovider.mimetypes]
@@ -138,13 +140,13 @@ keyfile = "/etc/revad/tls/revad1.key"
 
 [http.services.dataprovider]
 driver = "localhome"
-disable_tus = true
 
 [http.services.prometheus]
 [http.services.sysinfo]
 
 [http.services.dataprovider.drivers.localhome]
 user_layout = "{{.Username}}"
+disable_tus = true
 
 [http.services.ocmd]
 prefix = "ocm"
