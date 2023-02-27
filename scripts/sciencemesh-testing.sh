@@ -3,6 +3,10 @@ set -e
 
 export REPO_ROOT=`pwd`
 [ ! -d "./scripts" ] && echo "Directory ./scripts DOES NOT exist inside $REPO_ROOT, are you running this from the repo root?" && exit 1
+[ ! -d "./nc-sciencemesh" ] && echo "Directory ./nc-sciencemesh DOES NOT exist inside $REPO_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
+[ ! -d "./nc-sciencemesh/vendor" ] && echo "Directory ./nc-sciencemesh/vendor DOES NOT exist inside $REPO_ROOT. Try: rmdir ./nc-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
+[ ! -d "./oc-sciencemesh" ] && echo "Directory ./oc-sciencemesh DOES NOT exist inside $REPO_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
+[ ! -d "./oc-sciencemesh/vendor" ] && echo "Directory ./oc-sciencemesh/vendor DOES NOT exist inside $REPO_ROOT. Try: rmdir ./oc-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
 
 function waitForPort {
   x=$(docker exec -it $1 ss -tulpn | grep $2 | wc -l)
