@@ -16,3 +16,7 @@ sudo touch /etc/wopi/etherpad_apikey
 docker network create appsnet
 
 docker compose -f ./sciencemesh-open-with.yaml up
+
+docker run -d --network=testnet --name=revad1.docker -e HOST=reva${EFSS1}1 pondersource/dev-stock-revad
+docker container cp ./sciencemesh-open-with.toml revad1.docker:/etc/revad/revad1.toml
+docker restart revad1.docker
