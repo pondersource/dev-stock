@@ -208,3 +208,6 @@ prefix = "ocdav"
 #   "x-access-token"      will result in header:   X-Access-Token: "...token..."
 # If not set "bearer" is assumed
 http_tpc_push_auth_header = "x-access-token"
+
+
+[http.services.appprovider]
