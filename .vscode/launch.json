@@ -10,7 +10,7 @@
             "request": "launch",
             "port": 9003,
             "pathMappings": {
-                "/var/www/html/apps/sciencemesh": "${workspaceFolder}/scripts/nc-sciencemesh"
+                "/var/www/html/apps/sciencemesh": "${workspaceFolder}/nc-sciencemesh"
             }
         }
     ]
