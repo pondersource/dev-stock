@@ -29,6 +29,7 @@ RUN update-ca-certificates
 
 RUN a2enmod ssl
 COPY site.conf /etc/apache2/sites-enabled/000-default.conf
+COPY 20-xdebug.ini /etc/php/8.0/cli/conf.d/20-xdebug.ini
 WORKDIR /var/www
 RUN chown www-data:www-data .
 EXPOSE 443
