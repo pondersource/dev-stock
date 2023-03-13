@@ -12,7 +12,8 @@ function waitForPort {
   echo $1 port $2 is open
 }
 
-export REPO_DIR=`pwd`
+REPO_DIR=$(pwd)
+export REPO_DIR=$REPO_DIR
 echo Repo dir is $REPO_DIR
 
 echo "starting maria1.docker"

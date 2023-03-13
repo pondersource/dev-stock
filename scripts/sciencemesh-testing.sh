@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-export REPO_ROOT=`pwd`
+REPO_ROOT=$(pwd)
+export REPO_ROOT=$REPO_ROOT
 [ ! -d "./scripts" ] && echo "Directory ./scripts DOES NOT exist inside $REPO_ROOT, are you running this from the repo root?" && exit 1
 [ ! -d "./nc-sciencemesh" ] && echo "Directory ./nc-sciencemesh DOES NOT exist inside $REPO_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
 [ ! -d "./nc-sciencemesh/vendor" ] && echo "Directory ./nc-sciencemesh/vendor DOES NOT exist inside $REPO_ROOT. Try: rmdir ./nc-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
@@ -21,7 +22,7 @@ function waitForPort {
 
 docker run -d --network=testnet --name=reva${EFSS1}1.docker -e HOST=reva${EFSS1}1 pondersource/dev-stock-revad
 docker run -d --network=testnet --name=maria1.docker -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
-docker run -d --network=testnet --name=${EFSS1}1.docker -v $REPO_ROOT/$EFSS1-sciencemesh:/var/www/html/apps/sciencemesh  pondersource/dev-stock-${EFSS1}1-sciencemesh
+docker run -d --network=testnet --name=${EFSS1}1.docker --add-host "host.docker.internal:host-gateway" -v $REPO_ROOT/$EFSS1-sciencemesh:/var/www/html/apps/sciencemesh  pondersource/dev-stock-${EFSS1}1-sciencemesh
 docker run -d --network=testnet --name=reva${EFSS2}2.docker -e HOST=reva${EFSS2}2 pondersource/dev-stock-revad
 docker run -d --network=testnet --name=maria2.docker -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
 docker run -d --network=testnet --name=${EFSS2}2.docker -v $REPO_ROOT/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh pondersource/dev-stock-${EFSS2}2-sciencemesh
