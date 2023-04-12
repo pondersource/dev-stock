@@ -2,7 +2,7 @@ FROM apache-php-7.4
 RUN rm -rf /var/www/html
 USER www-data
 
-RUN git clone --depth=1 --branch surf-dev https://github.com/pondersource/core.git --recursive --shallow-submodules
+RUN git clone --depth=1 --branch ocm-cleaning https://github.com/pondersource/core.git --recursive --shallow-submodules
 
 WORKDIR /var/www/core
 USER root
@@ -26,6 +26,8 @@ RUN cd apps && git clone https://github.com/owncloud/customgroups
 RUN cd apps/customgroups && composer install --no-dev
 RUN cd apps/customgroups && yarn install
 RUN cd apps/customgroups && yarn build
+RUN cd apps && git clone https://github.com/pondersource/oc-opencloudmesh
+RUN cd apps && ln -s oc-opencloudmesh/opencloudmesh
 RUN cd apps && git clone https://github.com/SURFnet/rd-sram-integration
 RUN cd apps && ln -s rd-sram-integration/federatedgroups
 

@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 
-[ ! -d "rd-sram-integration" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit 
-[ ! -d "core" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit 
+[ ! -d "rd-sram-integration" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "core" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "oc-opencloudmesh" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it $1 ss -tulpn | grep $2 | wc -l)
@@ -24,6 +25,7 @@ docker run -d --network=testnet -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7
 echo "starting oc1.docker"
 docker run -d --network=testnet --name=oc1.docker \
   -v $REPO_DIR/rd-sram-integration:/var/www/html/apps/rd-sram-integration \
+  -v $REPO_DIR/oc-opencloudmesh:/var/www/html/apps/oc-opencloudmesh \
   -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
   -v $REPO_DIR/core/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing \
   pondersource/dev-stock-oc1-rd-sram

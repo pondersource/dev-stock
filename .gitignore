@@ -4,3 +4,6 @@ servers/apache-php-8.0/tls
 servers/revad/tls
 oc-sciencemesh
 nc-sciencemesh
+core
+rd-sram-integration
+oc-opencloudmesh
