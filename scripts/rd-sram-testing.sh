@@ -54,37 +54,37 @@ docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-d
 # docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss
 
 echo Creating regular group 'federalists' on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('federalists');"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_groups (gid) values ('federalists');"
 echo Adding local user to regular group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein');"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein');"
 echo Adding foreign user to regular group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie#oc2.docker');"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie#oc2.docker');"
 
 echo Creating regular group 'federalists' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('federalists');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_groups (gid) values ('federalists');"
 echo Adding foreign user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein#oc1.docker');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein#oc1.docker');"
 echo Adding local user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie');"
 
 echo Creating regular group 'helpdesk' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('helpdesk');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_groups (gid) values ('helpdesk');"
 echo Adding foreign user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('helpdesk', 'marie');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_group_user (gid, uid) values ('helpdesk', 'marie');"
 
 
 echo Creating custom group 'custard with mustard' on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
 echo Adding local user to custom group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein', 1);"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein', 1);"
 echo Adding foreign user to custom group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie#oc2.docker', 1);"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie#oc2.docker', 1);"
 
 echo Creating custom group 'custard with mustard' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
 echo Adding foreign user to custom group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein#oc1.docker', 1);"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein#oc1.docker', 1);"
 echo Adding local user to custom group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie', 1);"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie', 1);"
 
 echo Now browse to http://\<host\>:5800 to see a Firefox instance that sits inside the Docker testnet.
