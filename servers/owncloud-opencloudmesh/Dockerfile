@@ -2,7 +2,7 @@ FROM apache-php-7.4
 RUN rm -rf /var/www/html
 USER www-data
 
-RUN git clone --depth=1 --branch ocm-cleaning https://github.com/pondersource/core.git --recursive --shallow-submodules
+RUN git clone --depth=1 --branch accept-ocm-to-groups https://github.com/pondersource/core.git --recursive --shallow-submodules
 
 WORKDIR /var/www/core
 USER root
