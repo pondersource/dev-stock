@@ -6,7 +6,7 @@ sed -i "9 i\      2 => 'oc2.docker'," /var/www/html/config/config.php
 
 echo Installing Custom Groups
 php console.php app:enable customgroups
-echo Installing Federated Groups
+echo Installing OpenCloudMesh
 php console.php app:enable opencloudmesh
 echo Editing Config
 sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\OpenCloudMesh\\\\ShareProviderFactory'," /var/www/html/config/config.php
