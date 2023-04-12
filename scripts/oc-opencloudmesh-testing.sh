@@ -28,7 +28,7 @@ docker run -d --network=testnet --name=oc1.docker \
   -v $REPO_DIR/oc-opencloudmesh:/var/www/html/apps/oc-opencloudmesh \
   -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
   -v $REPO_DIR/core/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing \
-  pondersource/dev-stock-oc1-rd-sram
+  pondersource/dev-stock-oc1-opencloudmesh
 
 echo "starting maria2.docker"
 docker run -d --network=testnet -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --name=maria2.docker mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
@@ -36,7 +36,7 @@ echo "starting oc2.docker"
 docker run -d --network=testnet --name=oc2.docker \
   -v $REPO_DIR:/var/www/html/apps/rd-sram-integration \
   -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
-  pondersource/dev-stock-oc2-rd-sram
+  pondersource/dev-stock-oc2-opencloudmesh
 
 echo "starting firefox tester"
 docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:v1.17.1
