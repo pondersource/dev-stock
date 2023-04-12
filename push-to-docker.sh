@@ -11,6 +11,8 @@ docker push pondersource/dev-stock-nc1-sciencemesh
 docker push pondersource/dev-stock-nc2-sciencemesh
 docker push pondersource/dev-stock-oc1-sciencemesh
 docker push pondersource/dev-stock-oc2-sciencemesh
+docker push pondersource/dev-stock-oc1-opencloudmesh
+docker push pondersource/dev-stock-oc2-opencloudmesh
 docker push pondersource/dev-stock-oc1-rd-sram
 docker push pondersource/dev-stock-oc2-rd-sram
 # docker push pondersource/dev-stock-nc1-solid

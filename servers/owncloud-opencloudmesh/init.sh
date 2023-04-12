@@ -7,7 +7,7 @@ sed -i "9 i\      2 => 'oc2.docker'," /var/www/html/config/config.php
 echo Installing Custom Groups
 php console.php app:enable customgroups
 echo Installing Federated Groups
-php console.php app:enable federatedgroups
+php console.php app:enable opencloudmesh
 echo Editing Config
-sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\FederatedGroups\\\\ShareProviderFactory'," /var/www/html/config/config.php
-sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\FederatedGroups\\\\ShareeSearchPlugin'," /var/www/html/config/config.php
+sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\OpenCloudMesh\\\\ShareProviderFactory'," /var/www/html/config/config.php
+sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\OpenCloudMesh\\\\ShareeSearchPlugin'," /var/www/html/config/config.php

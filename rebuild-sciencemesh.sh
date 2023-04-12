@@ -69,27 +69,3 @@ docker build -t pondersource/dev-stock-oc1-sciencemesh .
 echo Building pondersource/dev-stock-oc2-sciencemesh
 cd ../oc2-sciencemesh
 docker build -t pondersource/dev-stock-oc2-sciencemesh .
-
-echo Base image owncloud-opencloudmesh
-cd ../owncloud-opencloudmesh
-docker build -t owncloud-opencloudmesh .
-
-echo Building pondersource/dev-stock-oc1-opencloudmesh
-cd ../oc1-opencloudmesh
-docker build -t pondersource/dev-stock-oc1-opencloudmesh .
-
-echo Building pondersource/dev-stock-oc2-opencloudmesh
-cd ../oc2-opencloudmesh
-docker build -t pondersource/dev-stock-oc2-opencloudmesh .
-
-echo Base image owncloud-rd-sram
-cd ../owncloud-rd-sram
-docker build -t owncloud-rd-sram .
-
-echo Building pondersource/dev-stock-oc1-rd-sram
-cd ../oc1-rd-sram
-docker build -t pondersource/dev-stock-oc1-rd-sram .
-
-echo Building pondersource/dev-stock-oc2-rd-sram
-cd ../oc2-rd-sram
-docker build -t pondersource/dev-stock-oc2-rd-sram .
