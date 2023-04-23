@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
 
 [ ! -d "rd-sram-integration" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
