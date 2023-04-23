@@ -38,3 +38,15 @@ github:
     addBadge: true
     # add a label once the prebuild is ready to pull requests (defaults to false)
     addLabel: true
+
+# Define Ports and how they should be handled
+# Documentation: https://www.gitpod.io/docs/configure/workspaces/ports
+ports:
+  - port: 5800
+    onOpen: open-browser
+    visibility: public
+    name: dev-stock firefox
+    description: firefox used by devstock to test Pondersource apps in browser
+
+tasks:
+  - init: chmod +x ./scripts/gitpod-prebuild.sh && ./scripts/gitpod-prebuild.sh
