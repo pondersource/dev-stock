@@ -6,7 +6,7 @@ docker pull pondersource/dev-stock-nc2-sciencemesh
 docker pull pondersource/dev-stock-oc1-sciencemesh
 docker pull pondersource/dev-stock-oc2-sciencemesh
 docker pull pondersource/dev-stock-ocmstub
-docker pull jlesage/firefox:v1.17.1
+docker pull jlesage/firefox:latest
 docker pull mariadb
 # docker pull rclone/rclone
 [ ! -d "oc-sciencemesh" ] && git clone --branch=oc-10-take-2 https://github.com/pondersource/nc-sciencemesh oc-sciencemesh && docker run -it -v "$(pwd)/oc-sciencemesh:/var/www/html/apps/sciencemesh"  --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-oc1-sciencemesh make composer

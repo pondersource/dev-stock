@@ -39,7 +39,7 @@ docker run -d --network=testnet --name=oc2.docker \
   pondersource/dev-stock-oc2-rd-sram
 
 echo "starting firefox tester"
-docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:v1.17.1
+docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:latest
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
