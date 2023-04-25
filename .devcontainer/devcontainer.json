@@ -1,8 +1,8 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {
-    "ghcr.io/shyim/devcontainers-features/php:0": {
-        "version": "7.4"
+    "ghcr.io/devcontainers/features/php:1": {
+      "version" : "7.4"
     }
   }
 }
