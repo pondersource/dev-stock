@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
+# docker pull rclone/rclone
 docker pull mariadb:latest
 docker pull jlesage/firefox:latest
 
 docker pull pondersource/dev-stock-revad:latest
+docker pull pondersource/dev-stock-ocmstub:latest
+docker pull pondersource/dev-stock-revad-network-beta
 docker pull pondersource/dev-stock-nc1-sciencemesh:latest
 docker pull pondersource/dev-stock-nc2-sciencemesh:latest
 docker pull pondersource/dev-stock-oc1-sciencemesh:latest
 docker pull pondersource/dev-stock-oc2-sciencemesh:latest
-docker pull pondersource/dev-stock-ocmstub:latest
-
-# docker pull rclone/rclone
 
 # Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh" ] && git clone --branch=main         https://github.com/pondersource/nc-sciencemesh nc-sciencemesh && docker run -it -v "$(pwd)/nc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-nc1-sciencemesh make composer
