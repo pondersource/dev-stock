@@ -6,16 +6,16 @@ RUN apt update && apt install -y openssl build-essential wget git vim curl
 RUN wget https://golang.org/dl/go1.19.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.19.linux-amd64.tar.gz
 # For Network Beta:
-RUN git clone --depth=1 --branch=sciencemesh https://github.com/pondersource/reva
+RUN git clone --depth=1 --branch=master https://github.com/cs3org/reva
 WORKDIR /reva
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
 SHELL ["/bin/bash", "-c"]
-RUN PATH=$PATH:/usr/local/go/bin make build
+RUN PATH=$PATH:/usr/local/go/bin make
 # see https://github.com/moby/moby/issues/1996#issuecomment-185872769
 ARG CACHEBUST=1
 RUN git pull
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
-RUN PATH=$PATH:/usr/local/go/bin make build
+RUN PATH=$PATH:/usr/local/go/bin make
 ADD . /etc/revad
 WORKDIR /etc/revad
 # RUN openssl req -new -x509 -days 365 -nodes \
