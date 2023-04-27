@@ -11,6 +11,11 @@ cd ../revad
 cp -r ../../tls .
 docker build -t pondersource/dev-stock-revad .
 
+echo Building pondersource/dev-stock-revad-network-beta 
+cd ../revad-beta
+cp -r ../../tls .
+docker build -t pondersource/dev-stock-revad-network-beta .
+
 echo Base image apache-php-8.0
 cd ../apache-php-8.0
 cp -r ../../tls .
