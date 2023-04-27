@@ -78,6 +78,14 @@ echo Building pondersource/dev-stock-oc2-sciencemesh
 cd ../oc2-sciencemesh
 docker build -t pondersource/dev-stock-oc2-sciencemesh .
 
+echo Building pondersource/dev-stock-oc1-sciencemesh-network-beta
+cd ../oc1-sciencemesh-beta
+docker build -t pondersource/dev-stock-oc1-sciencemesh-network-beta .
+
+echo Building pondersource/dev-stock-oc2-sciencemesh-network-beta
+cd ../oc2-sciencemesh-beta
+docker build -t pondersource/dev-stock-oc2-sciencemesh-network-beta .
+
 echo Base image owncloud-rd-sram
 cd ../owncloud-rd-sram
 docker build -t owncloud-rd-sram .
