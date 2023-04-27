@@ -6,7 +6,6 @@ docker pull jlesage/firefox:latest
 
 docker pull pondersource/dev-stock-revad:latest
 docker pull pondersource/dev-stock-ocmstub:latest
-docker pull pondersource/dev-stock-revad-network-beta
 docker pull pondersource/dev-stock-nc1-sciencemesh:latest
 docker pull pondersource/dev-stock-nc2-sciencemesh:latest
 docker pull pondersource/dev-stock-oc1-sciencemesh:latest

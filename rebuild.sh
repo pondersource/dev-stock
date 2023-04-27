@@ -11,6 +11,11 @@ cd ../revad
 cp -r ../../tls .
 docker build -t pondersource/dev-stock-revad .
 
+echo Building pondersource/dev-stock-revad-network-beta 
+cd ../revad-beta
+cp -r ../../tls .
+docker build -t pondersource/dev-stock-revad-network-beta .
+
 echo Base image apache-php-8.0
 cd ../apache-php-8.0
 cp -r ../../tls .
@@ -77,6 +82,14 @@ docker build -t pondersource/dev-stock-oc1-sciencemesh .
 echo Building pondersource/dev-stock-oc2-sciencemesh
 cd ../oc2-sciencemesh
 docker build -t pondersource/dev-stock-oc2-sciencemesh .
+
+echo Building pondersource/dev-stock-oc1-sciencemesh-network-beta
+cd ../oc1-sciencemesh-beta
+docker build -t pondersource/dev-stock-oc1-sciencemesh-network-beta .
+
+echo Building pondersource/dev-stock-oc2-sciencemesh-network-beta
+cd ../oc2-sciencemesh-beta
+docker build -t pondersource/dev-stock-oc2-sciencemesh-network-beta .
 
 echo Base image owncloud-rd-sram
 cd ../owncloud-rd-sram

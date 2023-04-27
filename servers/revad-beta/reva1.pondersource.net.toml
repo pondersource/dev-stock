@@ -1,0 +1,170 @@
+[log]
+level = "debug"
+
+[shared]
+gatewaysvc = "reva1.pondersource.net:19000"
+# gatewaycertfile = "/etc/revad/tls/server.crt"
+
+# [registry]
+# driver = "static"
+#
+# [registry.static]
+# services = ["authprovider","userprovider"]
+#
+# [registry.static.authprovider]
+# bearer = ["localhost:0123"]
+# basic = ["localhost:1234"]
+# publiclink = ["localhost:9876"]
+
+[grpc]
+address = "0.0.0.0:19000"
+# certfile = "/etc/revad/tls/server.crt"
+# keyfile = "/etc/revad/tls/server.key"
+
+[grpc.services.gateway]
+authregistrysvc = "reva1.pondersource.net:19000"
+appprovidersvc = "reva1.pondersource.net:19000"
+appregistry = "reva1.pondersource.net:19000"
+storageregistrysvc = "reva1.pondersource.net:19000"
+preferencessvc = "reva1.pondersource.net:19000"
+userprovidersvc = "reva1.pondersource.net:19000"
+usershareprovidersvc = "reva1.pondersource.net:19000"
+publicshareprovidersvc = "reva1.pondersource.net:19000"
+ocmcoresvc = "reva1.pondersource.net:19000"
+ocmshareprovidersvc = "reva1.pondersource.net:19000"
+ocminvitemanagersvc = "reva1.pondersource.net:19000"
+ocmproviderauthorizersvc = "reva1.pondersource.net:19000"
+commit_share_to_storage_grant = false
+datagateway = "http://localhost:19001/data"
+transfer_expires = 6 # give it a moment
+
+[grpc.services.authregistry]
+driver = "static"
+
+[grpc.services.authregistry.drivers.static.rules]
+basic = "reva1.pondersource.net:19000"
+
+[grpc.services.storageregistry]
+driver = "static"
+
+[grpc.services.storageregistry.drivers.static]
+home_provider = "/home"
+
+[grpc.services.storageregistry.drivers.static.rules]
+"/home" = {"address" = "reva1.pondersource.net:19000"}
+"123e4567-e89b-12d3-a456-426655440000" = {"address" = "reva1.pondersource.net:19000"}
+
+[grpc.services.usershareprovider]
+driver = "memory"
+
+[grpc.services.ocmcore]
+driver = "nextcloud"
+
+[grpc.services.ocmcore.drivers.nextcloud]
+endpoint = "https://nc1.pondersource.net/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.ocminvitemanager]
+driver = "json"
+
+[grpc.services.ocmshareprovider]
+driver = "nextcloud"
+
+[grpc.services.ocmshareprovider.drivers.nextcloud]
+webdav_host = "https://nc1.docker/"
+endpoint = "https://nc1.pondersource.net/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.ocmproviderauthorizer]
+driver = "json"
+
+[grpc.services.ocmproviderauthorizer.drivers.json]
+providers = "pondersource-demo-providers.json"
+verify_request_hostname = true
+
+[grpc.services.publicshareprovider]
+driver = "memory"
+
+[grpc.services.appprovider]
+driver = "demo"
+iopsecret = "testsecret"
+wopiurl = "http://0.0.0.0:8880/"
+wopibridgeurl = "http://localhost:8000/wopib"
+
+[grpc.services.appregistry]
+driver = "static"
+
+[grpc.services.appregistry.static.rules]
+"text/plain" = "reva1.pondersource.net:19000"
+"text/markdown" = "reva1.pondersource.net:19000"
+"application/compressed-markdown" = "reva1.pondersource.net:19000"
+"application/vnd.oasis.opendocument.text" = "reva1.pondersource.net:19000"
+"application/vnd.oasis.opendocument.spreadsheet" = "reva1.pondersource.net:19000"
+"application/vnd.oasis.opendocument.presentation" = "reva1.pondersource.net:19000"
+
+[grpc.services.storageprovider]
+driver = "nextcloud"
+expose_data_server = true
+data_server_url = "http://localhost:19001/data"
+enable_home_creation = true
+
+
+[grpc.services.storageprovider.drivers.nextcloud]
+endpoint = "https://nc1.pondersource.net/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.authprovider]
+auth_manager = "nextcloud"
+
+[grpc.services.authprovider.auth_managers.nextcloud]
+endpoint = "https://nc1.pondersource.net/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[grpc.services.userprovider]
+driver = "nextcloud"
+
+[grpc.services.userprovider.drivers.nextcloud]
+endpoint = "https://nc1.pondersource.net/index.php/apps/sciencemesh/"
+shared_secret = "shared-secret-1"
+mock_http = false
+
+[http]
+enabled_services = ["ocmd"]
+enabled_middlewares = ["providerauthorizer", "cors"]
+address = "0.0.0.0:443"
+certfile = "/etc/revad/tls/server.crt"
+keyfile = "/etc/revad/tls/server.key"
+
+[http.services.dataprovider]
+driver = "localhome"
+
+[http.services.prometheus]
+[http.services.sysinfo]
+
+[http.services.dataprovider.drivers.localhome]
+user_layout = "{{.Username}}"
+
+[http.services.ocmd]
+prefix = ""
+
+[http.services.ocmd.config]
+host = "reva1.pondersource.net"
+provider = "test-reva1.pondersource.net"
+
+[http.middlewares.providerauthorizer]
+driver = "json"
+
+[http.middlewares.providerauthorizer.drivers.json]
+providers = "pondersource-demo-providers.json"
+
+[http.services.ocs]
+prefix = "ocs"
+
+[http.services.ocdav]
+prefix = "ocdav"
+
+[http.middlewares.cors]
