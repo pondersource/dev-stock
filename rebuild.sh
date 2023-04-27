@@ -41,6 +41,14 @@ echo Building pondersource/dev-stock-nc2-sciencemesh
 cd ../nc2-sciencemesh
 docker build -t pondersource/dev-stock-nc2-sciencemesh .
 
+echo Building pondersource/dev-stock-nc1-sciencemesh-network-beta
+cd ../nc1-sciencemesh-beta
+docker build -t pondersource/dev-stock-nc1-sciencemesh-network-beta .
+
+echo Building pondersource/dev-stock-nc2-sciencemesh-network-beta
+cd ../nc2-sciencemesh-beta
+docker build -t pondersource/dev-stock-nc2-sciencemesh-network-beta .
+
 echo Base image apache-php-7.4
 cd ../apache-php-7.4
 cp -r ../../tls .

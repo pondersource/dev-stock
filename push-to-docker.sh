@@ -9,6 +9,8 @@ docker push pondersource/dev-stock-oc1
 docker push pondersource/dev-stock-oc2
 docker push pondersource/dev-stock-nc1-sciencemesh
 docker push pondersource/dev-stock-nc2-sciencemesh
+docker push pondersource/dev-stock-nc1-sciencemesh-network-beta
+docker push pondersource/dev-stock-nc2-sciencemesh-network-beta
 docker push pondersource/dev-stock-oc1-sciencemesh
 docker push pondersource/dev-stock-oc2-sciencemesh
 docker push pondersource/dev-stock-oc1-rd-sram
