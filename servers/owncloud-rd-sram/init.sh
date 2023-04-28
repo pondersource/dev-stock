@@ -9,5 +9,5 @@ php console.php app:enable customgroups
 echo Installing Federated Groups
 php console.php app:enable federatedgroups
 echo Editing Config
-sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\FederatedGroups\\\\ShareProviderFactory'," /var/www/html/config/config.php
-sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\FederatedGroups\\\\ShareeSearchPlugin'," /var/www/html/config/config.php
+sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\OpenCloudMesh\\\\ShareProviderFactory'," /var/www/html/config/config.php
+sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\OpenCloudMesh\\\\ShareeSearchPlugin'," /var/www/html/config/config.php
