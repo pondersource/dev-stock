@@ -11,7 +11,8 @@ USER www-data
 
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
-ARG CACHEBUST=1
+# $RANDOM returns random number each time.
+ARG CACHEBUST="$(echo $RANDOM)"
 RUN cd apps && git clone --depth=1 https://github.com/SURFnet/rd-sram-integration
 RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups
 

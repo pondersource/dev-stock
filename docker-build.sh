@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
-
 cd docker
 
 echo Building pondersource/dev-stock-ocmstub

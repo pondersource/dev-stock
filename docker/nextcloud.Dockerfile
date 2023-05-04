@@ -14,7 +14,8 @@ ARG REPO_NEXTCLOUD=https://github.com/nextcloud/server.git
 ARG BRANCH_NEXTCLOUD=master
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
-ARG CACHEBUST=1
+# $RANDOM returns random number each time.
+ARG CACHEBUST="$(echo $RANDOM)"
 RUN git clone                       \
     --depth=1                       \
     --recursive                     \

@@ -36,7 +36,8 @@ ARG REPO_REVA=https://github.com/cs3org/reva
 ARG BRANCH_REVA=sciencemesh-dev
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
-ARG CACHEBUST=1
+# $RANDOM returns random number each time.
+ARG CACHEBUST="$(echo $RANDOM)"
 RUN git clone --depth=1 --branch=sciencemesh-dev https://github.com/cs3org/reva reva
 
 WORKDIR /reva
@@ -44,7 +45,8 @@ WORKDIR /reva
 # build revad from source.
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
 SHELL ["/bin/bash", "-c"]
-RUN PATH=$PATH:/usr/local/go/bin make
+# only build reva and revad, leave out test and lint and docs.
+RUN PATH=$PATH:/usr/local/go/bin make revad reva
 
 COPY ./revad /etc/revad
 WORKDIR /etc/revad
