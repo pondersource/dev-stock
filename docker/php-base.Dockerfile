@@ -94,4 +94,9 @@ WORKDIR /var/www
 RUN chown www-data:www-data .
 
 EXPOSE 443
+
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
