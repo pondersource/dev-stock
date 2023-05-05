@@ -66,12 +66,8 @@ RUN apt install --yes       \
     php7.4-sqlite3          \
     php7.4-mbstring
 
-# version management.
-RUN ln --symbolic --force /usr/bin/php8.2 /usr/bin/php.default
-RUN update-alternatives --install /usr/bin/php php /usr/bin/php.default 100
-
 # PHP switcher script.
-COPY ./scripts/switch-php.sh /usr/bin/switch-php.sh 
+COPY ./scripts/switch-php.sh /usr/bin/switch-php.sh
 RUN chmod +x /usr/bin/switch-php.sh 
 
 # copy xdebug configuration and create its link in each PHP version conf directory.

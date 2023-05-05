@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 [ ! -d "./scripts" ] && echo "Directory ./scripts DOES NOT exist inside $REPO_ROOT, are you running this from the repo root?" && exit 1

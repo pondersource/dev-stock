@@ -13,7 +13,7 @@ docker pull pondersource/dev-stock-nextcloud-sciencemesh:latest
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc2-sciencemesh
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
-docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-oc2-sciencemesh
+docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc2-sciencemesh
 
 # Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh" ] && git clone --branch=main         https://github.com/pondersource/nc-sciencemesh nc-sciencemesh && docker run -it -v "$(pwd)/nc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-nc1-sciencemesh make composer

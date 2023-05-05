@@ -45,6 +45,7 @@ RUN make install-nodejs-deps
 
 ENV PHP_MEMORY_LIMIT="512M"
 
+USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init-owncloud.sh /init.sh
