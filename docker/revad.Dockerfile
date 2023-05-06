@@ -30,6 +30,9 @@ ARG GO_VERSION=20.4
 RUN wget https://go.dev/dl/go1.${GO_VERSION}.linux-amd64.tar.gz
 RUN tar --directory=/usr/local --extract --gzip --file=go1.${GO_VERSION}.linux-amd64.tar.gz
 
+# update path to include GO bin directory.
+ENV PATH="${PATH}:/usr/local/go/bin"
+
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
 ARG BRANCH_REVA=sciencemesh-dev
@@ -46,10 +49,10 @@ RUN git clone                   \
 WORKDIR /reva
 
 # build revad from source.
-RUN PATH=$PATH:/usr/local/go/bin go mod vendor
+RUN go mod vendor
 SHELL ["/bin/bash", "-c"]
 # only build reva and revad, leave out test and lint and docs.
-RUN PATH=$PATH:/usr/local/go/bin make revad reva
+RUN make revad reva
 
 COPY ./revad /etc/revad
 WORKDIR /etc/revad

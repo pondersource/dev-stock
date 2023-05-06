@@ -11,7 +11,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc2-sciencemesh
 
 # Nextcloud Sciencemesh source code.
-[ ! -d "nc-sciencemesh" ] && git clone --branch=sciencemesh https://github.com/pondersource/nc-sciencemesh nc-sciencemesh && docker run -it -v "$(pwd)/nc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-nc1-sciencemesh make composer
+[ ! -d "nc-sciencemesh" ] && git clone --branch=sciencemesh  https://github.com/pondersource/nc-sciencemesh nc-sciencemesh && docker run -it -v "$(pwd)/nc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-nc1-sciencemesh make composer
 
 # ownCloud Sciencemesh source code.
 [ ! -d "oc-sciencemesh" ] && git clone --branch=oc-10-take-2 https://github.com/pondersource/nc-sciencemesh oc-sciencemesh && docker run -it -v "$(pwd)/oc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-oc1-sciencemesh make composer
