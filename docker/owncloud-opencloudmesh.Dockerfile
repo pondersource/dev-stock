@@ -13,11 +13,11 @@ USER www-data
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
-RUN cd apps && git clone --depth=1 https://github.com/owncloud/customgroups
+RUN cd apps && git clone --depth 1 https://github.com/owncloud/customgroups
 RUN cd apps/customgroups && composer install --no-dev
 RUN cd apps/customgroups && yarn install
 RUN cd apps/customgroups && yarn build
-RUN cd apps && git clone --depth=1 https://github.com/pondersource/oc-opencloudmesh
+RUN cd apps && git clone --depth 1 https://github.com/pondersource/oc-opencloudmesh
 RUN cd apps && ln --symbolic oc-opencloudmesh/opencloudmesh
 
 # this file can be overrided in docker run or docker compose.yaml. 

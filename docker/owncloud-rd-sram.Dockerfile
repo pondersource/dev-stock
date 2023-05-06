@@ -13,7 +13,7 @@ USER www-data
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
-RUN cd apps && git clone --depth=1 https://github.com/SURFnet/rd-sram-integration
+RUN cd apps && git clone --depth 1 https://github.com/SURFnet/rd-sram-integration
 RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups
 
 # this file can be overrided in docker run or docker compose.yaml. 

@@ -29,7 +29,7 @@ docker run --detach --network=testnet --name="${EFSS1}1.docker" --add-host "host
 
 docker run --detach --network=testnet --name="reva${EFSS2}2.docker" -e HOST="reva${EFSS2}2" pondersource/dev-stock-revad
 docker run --detach --network=testnet --name=maria2.docker -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
-docker run --detach --network=testnet --name="${EFSS2}2.docker" --add-host "host.docker.internal:host-gateway" -e HOST="${EFSS1}2" -e DBHOST="maria2.docker" -e USER="marie" -e PASS="radioactivity" -v "$REPO_ROOT/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh" "pondersource/dev-stock-${EFSS2}2-sciencemesh"
+docker run --detach --network=testnet --name="${EFSS2}2.docker" --add-host "host.docker.internal:host-gateway" -e HOST="${EFSS2}2" -e DBHOST="maria2.docker" -e USER="marie" -e PASS="radioactivity" -v "$REPO_ROOT/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh" "pondersource/dev-stock-${EFSS2}2-sciencemesh"
 
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443

@@ -30,7 +30,6 @@ ARG GO_VERSION=20.4
 RUN wget https://go.dev/dl/go1.${GO_VERSION}.linux-amd64.tar.gz
 RUN tar --directory=/usr/local --extract --gzip --file=go1.${GO_VERSION}.linux-amd64.tar.gz
 
-
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
 ARG BRANCH_REVA=sciencemesh-dev
@@ -38,7 +37,11 @@ ARG BRANCH_REVA=sciencemesh-dev
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
-RUN git clone --depth=1 --branch=sciencemesh-dev https://github.com/cs3org/reva reva
+RUN git clone                   \
+    --depth 1                   \
+    --branch ${BRANCH_REVA}     \
+    ${REPO_REVA}                \
+    reva
 
 WORKDIR /reva
 
@@ -53,8 +56,13 @@ WORKDIR /etc/revad
 
 # Trust all the certificates:
 COPY ./tls /tls
-RUN cp /tls/*.crt /usr/local/share/ca-certificates/
+RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
+
+# create link for all the tls certificates in the revad tls directory.
+RUN mkdir --parents /etc/revad/tls
+RUN ln --symbolic --force /tls/*.crt /etc/revad/tls
+RUN ln --symbolic --force /tls/*.key /etc/revad/tls
 
 RUN mkdir --parents /var/tmp/reva/
 

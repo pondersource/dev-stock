@@ -17,7 +17,7 @@ ARG BRANCH_OWNCLOUD=ocm-via-sciencemesh
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
 RUN git clone                       \
-    --depth=1                       \
+    --depth 1                       \
     --recursive                     \
     --shallow-submodules            \
     --branch ${BRANCH_OWNCLOUD}     \

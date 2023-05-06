@@ -16,7 +16,7 @@ ARG BRANCH_SCIENCEMESH=main
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
 RUN git clone                           \
-    --depth=1                           \
+    --depth 1                           \
     --branch ${BRANCH_SCIENCEMESH}      \
     ${REPO_SCIENCEMESH}                 \
     apps/sciencemesh

@@ -23,7 +23,7 @@ RUN apt install --yes               \
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
-RUN git clone --depth=1 --branch main https://github.com/pondersource/ocm-stub
+RUN git clone --depth 1 --branch main https://github.com/pondersource/ocm-stub
 
 WORKDIR /ocm-stub
 
