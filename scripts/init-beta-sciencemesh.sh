@@ -17,4 +17,7 @@ docker pull pondersource/dev-stock-oc2-sciencemesh-network-beta:latest
 # ownCloud Sciencemesh source code.
 [ ! -d "oc-sciencemesh" ] && git clone --branch=oc-10-take-2 https://github.com/pondersource/nc-sciencemesh oc-sciencemesh && docker run -it -v "$(pwd)/oc-sciencemesh:/var/www/html/apps/sciencemesh" --workdir /var/www/html/apps/sciencemesh pondersource/dev-stock-oc1-sciencemesh make composer
 
+# Reva source code.
+[ ! -d "reva" ] && git clone --branch=sciencemesh-dev https://github.com/cs3org/reva && cd reva && make revad && cd ..
+
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
