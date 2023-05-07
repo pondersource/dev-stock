@@ -2,7 +2,6 @@
 echo Log in as pondersource
 docker login
 docker push pondersource/dev-stock-ocmstub
-docker push pondersource/dev-stock-revad
 docker push pondersource/dev-stock-revad-network-beta
 docker push pondersource/dev-stock-nc1
 docker push pondersource/dev-stock-nc2

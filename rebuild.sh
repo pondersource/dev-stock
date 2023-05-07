@@ -6,11 +6,6 @@ cd servers/ocmstub
 cp -r ../../tls .
 docker build -t pondersource/dev-stock-ocmstub .
 
-echo Building pondersource/dev-stock-revad 
-cd ../revad
-cp -r ../../tls .
-docker build -t pondersource/dev-stock-revad .
-
 echo Building pondersource/dev-stock-revad-network-beta 
 cd ../revad-beta
 cp -r ../../tls .
