@@ -68,6 +68,7 @@ mock_http = false
 
 [grpc.services.ocminvitemanager]
 driver = "json"
+provider_domain = "revanc1.docker"
 
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"

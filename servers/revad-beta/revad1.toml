@@ -66,6 +66,7 @@ file = "/var/tmp/reva/shares_server_1.json"
 
 [grpc.services.ocminvitemanager]
 driver = "json"
+provider_domain = "revad1.docker"
 
 [grpc.services.ocmshareprovider]
 driver = "json"
