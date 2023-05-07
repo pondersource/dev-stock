@@ -70,6 +70,7 @@ provider_domain = "revad1.docker"
 
 [grpc.services.ocmshareprovider]
 driver = "json"
+provider_domain = "revad1.docker"
 
 [grpc.services.ocmshareprovider.drivers.json]
 file = "/var/tmp/reva/shares_server_1.json"
