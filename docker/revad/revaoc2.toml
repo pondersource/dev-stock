@@ -52,7 +52,7 @@ home_provider = "/home"
 
 [grpc.services.storageregistry.drivers.static.rules]
 "/home" = {"address" = "revaoc2.docker:19000"}
-"123e4567-e89b-12d3-a456-426655440000" = {"address" = "revaoc2.docker:19000"}
+"00000000-0000-0000-0000-000000000000" = {"address" = "revaoc2.docker:19000"}
 
 [grpc.services.usershareprovider]
 driver = "memory"
@@ -72,6 +72,7 @@ provider_domain = "revaoc2.docker"
 
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
+provider_domain = "revaoc2.docker"
 
 [grpc.services.ocmshareprovider.drivers.nextcloud]
 webdav_host = "https://oc2.docker/"

@@ -52,7 +52,7 @@ home_provider = "/home"
 
 [grpc.services.storageregistry.drivers.static.rules]
 "/home" = {"address" = "revad1.docker:19000"}
-"123e4567-e89b-12d3-a456-426655440000" = {"address" = "revad1.docker:19000"}
+"00000000-0000-0000-0000-000000000000" = {"address" = "revad1.docker:19000"}
 
 [grpc.services.usershareprovider]
 driver = "memory"
@@ -70,6 +70,7 @@ provider_domain = "revad1.docker"
 
 [grpc.services.ocmshareprovider]
 driver = "json"
+provider_domain = "revad1.docker"
 
 [grpc.services.ocmshareprovider.drivers.json]
 file = "/var/tmp/reva/shares_server_1.json"
