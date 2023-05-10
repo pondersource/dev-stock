@@ -39,4 +39,4 @@ COPY ./scripts/init-nextcloud.sh /nc-init.sh
 RUN mkdir --parents data ; touch data/nextcloud.log
 
 USER root
-CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND", "&", "tail", "--follow", "/var/log/apache2/error.log", "&", "tail", "--follow", "data/nextcloud.log"]
+CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/error.log & tail --follow data/nextcloud.log
