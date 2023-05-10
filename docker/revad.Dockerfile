@@ -34,7 +34,7 @@ RUN tar --directory=/usr/local --extract --gzip --file=go1.${GO_VERSION}.linux-a
 ENV PATH="${PATH}:/usr/local/go/bin"
 
 # fetch revad from source.
-ARG REPO_REVA=https://github.com/cs3org/reva
+ARG REPO_REVA=https://github.com/pondersource/reva
 ARG BRANCH_REVA=sciencemesh-dev
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
@@ -51,13 +51,13 @@ WORKDIR /reva
 # build revad from source.
 RUN go mod vendor
 SHELL ["/bin/bash", "-c"]
-# only build reva and revad, leave out test and lint and docs.
-RUN make revad reva
+# only build revad, leave out reva and test and lint and docs.
+RUN make revad
 
 COPY ./revad /etc/revad
 WORKDIR /etc/revad
 
-# Trust all the certificates:
+# trust all the certificates:
 COPY ./tls /tls
 RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
@@ -69,6 +69,19 @@ RUN ln --symbolic --force /tls/*.key /etc/revad/tls
 
 RUN mkdir --parents /var/tmp/reva/
 
-# see https://github.com/golang/go/issues/22846#issuecomment-380809416
-RUN echo "hosts: files dns" > /etc/nsswitch.conf
-CMD echo "127.0.0.1 $HOST.docker" >> /etc/hosts && /reva/cmd/revad/revad -c /etc/revad/$HOST.toml
+# update path to include revad bin directory.
+ENV PATH="${PATH}:/reva/cmd/revad"
+
+COPY ./scripts/reva-run.sh /usr/bin/reva-run.sh
+RUN chmod +x /usr/bin/reva-run.sh
+
+COPY ./scripts/reva-kill.sh /usr/bin/reva-kill.sh
+RUN chmod +x /usr/bin/reva-kill.sh
+
+COPY ./scripts/reva-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Keep Docker Container Running for Debugging.
+CMD tail --follow /var/log/revad.log
