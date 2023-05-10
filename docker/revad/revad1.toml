@@ -1,5 +1,6 @@
 [log]
 level = "debug"
+output = "/var/log/revad.log"
 
 [shared]
 gatewaysvc = "revad1.docker:19000"
