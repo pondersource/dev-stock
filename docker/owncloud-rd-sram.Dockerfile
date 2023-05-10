@@ -18,6 +18,6 @@ RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud-rd-sram.sh /init.sh
+COPY ./scripts/init-owncloud-rd-sram.sh /oc-init.sh
 
 USER root

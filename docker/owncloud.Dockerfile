@@ -48,8 +48,8 @@ ENV PHP_MEMORY_LIMIT="512M"
 USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud.sh /init.sh
+COPY ./scripts/init-owncloud.sh /oc-init.sh
 RUN mkdir --parents data ; touch data/owncloud.log
 
 USER root
-CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/error.log & tail --follow data/owncloud.log
+CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND", "&", "tail", "--follow", "/var/log/apache2/error.log", "&", "tail", "--follow", "data/owncloud.log"]

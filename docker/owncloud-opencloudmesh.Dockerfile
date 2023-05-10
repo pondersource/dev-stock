@@ -22,6 +22,6 @@ RUN cd apps && ln --symbolic oc-opencloudmesh/opencloudmesh
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud-opencloudmesh.sh /init.sh
+COPY ./scripts/init-owncloud-opencloudmesh.sh /oc-init.sh
 
 USER root

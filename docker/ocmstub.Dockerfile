@@ -34,4 +34,4 @@ RUN update-ca-certificates
 
 RUN npm install
 
-CMD NODE_TLS_REJECT_UNAUTHORIZED=0 node stub.js
+CMD ["NODE_TLS_REJECT_UNAUTHORIZED=0", "node", "stub.js"]
