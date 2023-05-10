@@ -1,6 +1,6 @@
 #!/bin/bash
 echo Log in as pondersource
-docker login
+docker login -u pondersource
 docker push pondersource/dev-stock-ocmstub
 docker push pondersource/dev-stock-revad
 docker push pondersource/dev-stock-nc1
