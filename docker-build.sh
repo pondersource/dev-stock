@@ -39,3 +39,6 @@ docker build --build-arg CACHEBUST="$(date +%s)" --file ./owncloud-opencloudmesh
 
 echo Building pondersource/dev-stock-owncloud-rd-sram
 docker build --build-arg CACHEBUST="$(date +%s)" --file ./owncloud-rd-sram.Dockerfile --tag pondersource/dev-stock-owncloud-rd-sram .
+
+# remove all <none> images.
+docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi --force
