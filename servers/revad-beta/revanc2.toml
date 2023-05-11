@@ -73,6 +73,7 @@ provider_domain = "revanc2.docker"
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
 provider_domain = "revanc2.docker"
+webdav_endpoint = "https://nc2.docker/"
 
 [grpc.services.ocmshareprovider.drivers.nextcloud]
 webdav_host = "https://nc2.docker/"
