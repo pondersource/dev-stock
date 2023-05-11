@@ -10,12 +10,12 @@ RUN git clone --depth=1 --branch=sciencemesh-dev https://github.com/cs3org/reva
 WORKDIR /reva
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
 SHELL ["/bin/bash", "-c"]
-RUN PATH=$PATH:/usr/local/go/bin make
+RUN PATH=$PATH:/usr/local/go/bin make revad
 # see https://github.com/moby/moby/issues/1996#issuecomment-185872769
 ARG CACHEBUST=1
 RUN git pull
 RUN PATH=$PATH:/usr/local/go/bin go mod vendor
-RUN PATH=$PATH:/usr/local/go/bin make
+RUN PATH=$PATH:/usr/local/go/bin make revad
 ADD . /etc/revad
 WORKDIR /etc/revad
 # RUN openssl req -new -x509 -days 365 -nodes \
