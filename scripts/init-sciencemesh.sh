@@ -8,7 +8,7 @@ BRANCH_NEXTCLOUD_APP=sciencemesh
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=oc-10-take-2
 REPO_REVA=https://github.com/pondersource/reva
-BRANCH_REVA=sciencemesh-dev
+BRANCH_REVA=master
 
 # docker pull rclone/rclone
 docker pull mariadb:latest
@@ -23,6 +23,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh" ] &&                                                    \
     git clone                                                                   \
+    --depth 1                                                                   \
     --branch ${BRANCH_NEXTCLOUD_APP}                                            \
     ${REPO_NEXTCLOUD_APP}                                                       \
     nc-sciencemesh                                                              \
@@ -36,6 +37,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # ownCloud Sciencemesh source code.
 [ ! -d "oc-sciencemesh" ] &&                                                    \
     git clone                                                                   \
+    --depth 1                                                                   \
     --branch ${BRANCH_OWNCLOUD_APP}                                             \
     ${REPO_OWNCLOUD_APP}                                                        \
     oc-sciencemesh                                                              \
@@ -49,6 +51,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # reva source code.
 [ ! -d "reva" ] &&                                                              \
     git clone                                                                   \
+    --depth 1                                                                   \
     --branch ${BRANCH_REVA}                                                     \
     ${REPO_REVA}                                                                \
     reva                                                                        \
