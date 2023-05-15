@@ -33,7 +33,7 @@ docker run --detach --network=testnet                                         \
   --skip-innodb-read-only-compressed
 
 docker run --detach --network=testnet                                         \
-  --name="${EFSS1}1-mfa.docker"                                               \
+  --name="${EFSS1}1.docker"                                                   \
   --add-host "host.docker.internal:host-gateway"                              \
   -e HOST="${EFSS1}1"                                                         \
   -e DBHOST="maria1.docker"                                                   \
@@ -52,7 +52,7 @@ docker run --detach --network=testnet                                         \
   --skip-innodb-read-only-compressed
 
 docker run --detach --network=testnet                                         \
-  --name="${EFSS2}2-mfa.docker"                                               \
+  --name="${EFSS2}2.docker"                                                   \
   --add-host "host.docker.internal:host-gateway"                              \
   -e HOST="${EFSS2}2"                                                         \
   -e DBHOST="maria2.docker"                                                   \
@@ -63,17 +63,17 @@ docker run --detach --network=testnet                                         \
 
 # EFSS1
 waitForPort maria1.docker 3306
-waitForPort "${EFSS1}1-mfa.docker" 443
+waitForPort "${EFSS1}1.docker" 443
 
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1-mfa.docker" sh "/${EFSS1}-init.sh"
+docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
 
 # EFSS2
 waitForPort maria2.docker 3306
-waitForPort "${EFSS2}2-mfa.docker" 443
+waitForPort "${EFSS2}2.docker" 443
 
-docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data "${EFSS2}2-mfa.docker" sh "/${EFSS2}-init.sh"
+docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
 
 # instructions.
-echo "Now browse to firefox and inside there to https://${EFSS1}1-mfa.docker"
+echo "Now browse to firefox and inside there to https://${EFSS1}1.docker"
 echo "Log in as einstein / relativity"
-echo "Log in on https://${EFSS2}2-mfa.docker as marie / radioactivity"
+echo "Log in on https://${EFSS2}2.docker as marie / radioactivity"

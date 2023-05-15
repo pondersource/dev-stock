@@ -30,6 +30,7 @@ RUN cd html && patch -p1 < ../mfa_verified.patch
 WORKDIR /var/www/html/apps
 
 RUN wget --quiet "${FILE_ACCESS_CONTROL}"
+RUN wget --quiet "${MFA_ZONES}"
 RUN tar -xvzf ./files_accesscontrol-v1.16.0.tar.gz && rm ./files_accesscontrol-v1.16.0.tar.gz
 RUN tar -xvzf ./mfazones.tar.gz?raw=true && rm ./mfazones.tar.gz?raw=true
 
