@@ -20,7 +20,7 @@ USER www-data
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
 
-RUN wget --queit "${NEXTCLOUD_SERVER}"
+RUN wget --quiet "${NEXTCLOUD_SERVER}"
 RUN wget --quiet "${NEXTCLOUD_PATCH}"
 
 RUN unzip -qq nextcloud-26.0.1-enterprise.zip
