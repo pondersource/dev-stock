@@ -20,6 +20,7 @@ RUN apt install --yes               \
     git                             \
     curl                            \
     wget                            \
+    unzip                           \
     libxml2                         \
     iproute2                        \
     apt-utils                       \
