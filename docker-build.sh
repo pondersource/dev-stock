@@ -28,6 +28,9 @@ docker build --build-arg CACHEBUST="$(date +%s)" --file ./nextcloud.Dockerfile -
 echo Building pondersource/dev-stock-nextcloud-sciencemesh
 docker build --build-arg CACHEBUST="$(date +%s)" --file ./nextcloud-sciencemesh.Dockerfile --tag pondersource/dev-stock-nextcloud-sciencemesh .
 
+echo Building pondersource/dev-stock-nextcloud-mfa
+docker build --build-arg CACHEBUST="$(date +%s)" --file ./nextcloud-mfa.Dockerfile --tag pondersource/dev-stock-nextcloud-mfa .
+
 echo Building pondersource/dev-stock-owncloud
 docker build --build-arg CACHEBUST="$(date +%s)" --file ./owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
 
