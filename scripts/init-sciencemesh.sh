@@ -48,7 +48,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
     pondersource/dev-stock-oc1-sciencemesh                                      \
     make composer
 
-# reva source code.
+# Reva source code.
 [ ! -d "reva" ] &&                                                              \
     git clone                                                                   \
     --depth 1                                                                   \
