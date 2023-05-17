@@ -136,6 +136,7 @@ certfile = "/etc/revad/tls/revad1.crt"
 keyfile = "/etc/revad/tls/revad1.key"
 
 [http.services.sciencemesh]
+invite_link_template = "{{.MeshDirectoryURL}}?token={{.Token}}&providerDomain=revad1.docker"
 
 [http.services.dataprovider]
 driver = "localhome"
