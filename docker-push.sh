@@ -13,6 +13,8 @@ docker push pondersource/dev-stock-php-base
 
 docker push pondersource/dev-stock-nextcloud
 
+docker push pondersource/dev-stock-nextcloud-mfa
+
 docker push pondersource/dev-stock-nextcloud-sciencemesh
 
 docker push pondersource/dev-stock-owncloud .
