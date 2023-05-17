@@ -74,7 +74,7 @@ provider_domain = "revaoc1.docker"
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
 provider_domain = "revaoc1.docker"
-webdav_endpoint = "https://revaoc1.docker/"
+webdav_endpoint = "https://oc1.docker/"
 
 [grpc.services.ocmshareprovider.drivers.nextcloud]
 webdav_host = "https://oc1.docker/"
