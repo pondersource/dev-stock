@@ -13,6 +13,7 @@ BRANCH_REVA=master
 # docker pull rclone/rclone
 docker pull mariadb:latest
 docker pull jlesage/firefox:latest
+docker pull jlesage/firefox:v1.18.0
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh

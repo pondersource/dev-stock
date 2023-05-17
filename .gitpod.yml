@@ -52,4 +52,4 @@ ports:
     description: firefox used by devstock to test Pondersource apps in browser
 
 tasks:
-  - init: chmod +x ./scripts/gitpod-init-prebuild.sh && ./scripts/gitpod-init-prebuild.sh
+  - init: chmod +x ./scripts/init-gitpod-prebuild.sh && ./scripts/init-gitpod-prebuild.sh
