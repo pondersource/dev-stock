@@ -50,6 +50,11 @@ ports:
     visibility: public
     name: dev-stock firefox
     description: firefox used by devstock to test Pondersource apps in browser
+  - port: 5900
+    onOpen: open-browser
+    visibility: public
+    name: dev-stock firefox legacy
+    description: firefox used by devstock to test Pondersource apps in browser
 
 tasks:
   - init: chmod +x ./scripts/init-gitpod-prebuild.sh && ./scripts/init-gitpod-prebuild.sh

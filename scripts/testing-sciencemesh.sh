@@ -30,6 +30,7 @@ chmod +x "$REPO_ROOT/docker/scripts/reva-entrypoint.sh"
 
 docker run --detach --network=testnet --name=meshdir.docker pondersource/dev-stock-ocmstub
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
+docker run --detach --name=firefox-legacy -p 5900:5800 --network=testnet --shm-size 2g jlesage/firefox:v1.18.0
 # docker run --detach --network=testnet --name=rclone.docker rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
 
 # EFSS1
