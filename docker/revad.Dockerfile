@@ -35,7 +35,7 @@ ENV PATH="${PATH}:/usr/local/go/bin"
 
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
-ARG BRANCH_REVA=v2.13.3
+ARG BRANCH_REVA=v1.24.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
