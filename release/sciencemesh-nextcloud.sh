@@ -8,31 +8,31 @@ REPO_ROOT=$(pwd)
 
 # repositories and branches.
 REPO_OWNCLOUD_APP=https://github.com/MahdiBaghbani/nc-sciencemesh
-BRANCH_OWNCLOUD_APP=oc-10-take-2
+BRANCH_OWNCLOUD_APP=sciencemesh
 
 [ ! -d "temp" ] && mkdir --parents temp
 
 # copy init file.
-cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/oc.sh
+cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh  ./temp/nc.sh
 
 # add additional tagging for docker images.
-docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
+docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
 
 # ownCloud Sciencemesh source code.
-[ ! -d "oc-sciencemesh-release" ] &&                                            \
+[ ! -d "nc-sciencemesh-release" ] &&                                            \
     git clone                                                                   \
     --depth 1                                                                   \
     --branch ${BRANCH_OWNCLOUD_APP}                                             \
     ${REPO_OWNCLOUD_APP}                                                        \
-    oc-sciencemesh-release                                                      \
+    nc-sciencemesh-release                                                      \
     &&                                                                          \
     docker run -it                                                              \
-    -v "${REPO_ROOT}/oc-sciencemesh-release:/var/www/html/apps/sciencemesh"     \
+    -v "${REPO_ROOT}/nc-sciencemesh-release:/var/www/html/apps/sciencemesh"     \
     --workdir /var/www/html/apps/sciencemesh                                    \
-    pondersource/dev-stock-oc1-sciencemesh                                      \
+    pondersource/dev-stock-nc1-sciencemesh                                      \
     make composer
 
-"${REPO_ROOT}/release/tag-release.py" oc none oc-sciencemesh-release
+"${REPO_ROOT}/release/tag-release.py" nc none nc-sciencemesh-release
 
 docker run --detach --network=testnet                                           \
   --name=maria1.docker                                                          \
@@ -44,19 +44,19 @@ docker run --detach --network=testnet                                           
   --skip-innodb-read-only-compressed
 
 docker run --detach --network=testnet                                           \
-  --name=oc-release.docker                                                      \
+  --name=nc-release.docker                                                      \
   --add-host "host.docker.internal:host-gateway"                                \
-  -e HOST="oc-release"                                                          \
+  -e HOST="nc-release"                                                          \
   -e DBHOST="maria1.docker"                                                     \
   -e USER="einstein"                                                            \
   -e PASS="relativity"                                                          \
-  -v "${REPO_ROOT}/temp/oc.sh:/oc-init.sh"                                      \
-  -v "${REPO_ROOT}/oc-sciencemesh-release:/var/www/html/apps/sciencemesh"       \
+  -v "${REPO_ROOT}/temp/nc.sh:/nc-init.sh"                                      \
+  -v "${REPO_ROOT}/nc-sciencemesh-release:/var/www/html/apps/sciencemesh"       \
   -v "${REPO_ROOT}/release/sciencemesh.key:/var/www/sciencemesh.key"            \
-  "pondersource/dev-stock-owncloud-sciencemesh"
+  "pondersource/dev-stock-nextcloud-sciencemesh"
 
-docker exec --user root oc-release.docker bash -c "chown www-data:www-data /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
-docker exec --user www-data oc-release.docker bash -c "cd /var/www/html/apps/sciencemesh                \
+docker exec --user root nc-release.docker bash -c "chown www-data:www-data /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
+docker exec --user www-data nc-release.docker bash -c "cd /var/www/html/apps/sciencemesh                \
                                                     &&                                                  \
                                                     mkdir -p build/sciencemesh                          \
                                                     &&                                                  \
@@ -91,7 +91,7 @@ docker exec --user www-data oc-release.docker bash -c "cd /var/www/html/apps/sci
                                                     &&                                                  \
                                                     tar -cf sciencemesh.tar sciencemesh"
 
-docker exec --user root oc-release.docker bash -c "cd /var/www/html/apps/sciencemesh/release            \
+docker exec --user root nc-release.docker bash -c "cd /var/www/html/apps/sciencemesh/release            \
                                                     &&                                                  \
                                                     mv ../build/sciencemesh.tar .                       \
                                                     &&                                                  \
@@ -106,11 +106,11 @@ sudo chown gitpod:gitpod "${REPO_ROOT}/release/sciencemesh.key"
 truncate -s 0 "${REPO_ROOT}/release/sciencemesh.key"
 
 # add new tar.gz to git and push.
-cd "${REPO_ROOT}/oc-sciencemesh-release"
-git add "${REPO_ROOT}/oc-sciencemesh-release/release/sciencemesh.tar.gz"
+cd "${REPO_ROOT}/nc-sciencemesh-release"
+git add "${REPO_ROOT}/nc-sciencemesh-release/release/sciencemesh.tar.gz"
 git commit -m "Update release tarball of the application"
 git push origin
 
 # remove the release folder.
 cd "${REPO_ROOT}"
-sudo rm -rf "${REPO_ROOT}/oc-sciencemesh-release"
+sudo rm -rf "${REPO_ROOT}/nc-sciencemesh-release"
