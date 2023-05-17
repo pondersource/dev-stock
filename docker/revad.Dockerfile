@@ -34,16 +34,16 @@ RUN tar --directory=/usr/local --extract --gzip --file=go1.${GO_VERSION}.linux-a
 ENV PATH="${PATH}:/usr/local/go/bin"
 
 # fetch revad from source.
-ARG REPO_REVA=https://github.com/pondersource/reva
-ARG BRANCH_REVA=sciencemesh-dev
+ARG REPO_REVA=https://github.com/cs3org/reva
+ARG BRANCH_REVA=v2.13.3
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="$(echo $RANDOM)"
-RUN git clone                   \
-    --depth 1                   \
-    --branch ${BRANCH_REVA}     \
-    ${REPO_REVA}                \
+RUN git clone                       \
+    --depth 1                       \
+    --branch ${BRANCH_REVA}         \
+    ${REPO_REVA}                    \
     reva
 
 WORKDIR /reva

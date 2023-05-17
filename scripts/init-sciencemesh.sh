@@ -7,8 +7,8 @@ REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=sciencemesh
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=oc-10-take-2
-REPO_REVA=https://github.com/pondersource/reva
-BRANCH_REVA=master
+REPO_REVA=https://github.com/cs3org/reva
+BRANCH_REVA=v2.13.3
 
 # docker pull rclone/rclone
 docker pull mariadb:latest
