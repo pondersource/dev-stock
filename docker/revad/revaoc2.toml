@@ -74,6 +74,7 @@ provider_domain = "revaoc2.docker"
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
 provider_domain = "revaoc2.docker"
+webdav_endpoint = "https://revaoc2.docker/"
 
 [grpc.services.ocmshareprovider.drivers.nextcloud]
 webdav_host = "https://oc2.docker/"
@@ -144,6 +145,7 @@ certfile = "/etc/revad/tls/revaoc2.crt"
 keyfile = "/etc/revad/tls/revaoc2.key"
 
 [http.services.sciencemesh]
+invite_link_template = "{{.MeshDirectoryURL}}?token={{.Token}}&providerDomain=revaoc2.docker"
 
 [http.services.dataprovider]
 driver = "nextcloud"

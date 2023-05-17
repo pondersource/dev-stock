@@ -74,6 +74,7 @@ provider_domain = "revanc2.docker"
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
 provider_domain = "revanc2.docker"
+webdav_endpoint = "https://revanc2.docker/"
 
 [grpc.services.ocmshareprovider.drivers.nextcloud]
 webdav_host = "https://nc2.docker/"
@@ -144,6 +145,7 @@ certfile = "/etc/revad/tls/revanc2.crt"
 keyfile = "/etc/revad/tls/revanc2.key"
 
 [http.services.sciencemesh]
+invite_link_template = "{{.MeshDirectoryURL}}?token={{.Token}}&providerDomain=revanc2.docker"
 
 [http.services.dataprovider]
 driver = "nextcloud"
@@ -171,7 +173,6 @@ providers = "providers.testnet.json"
 
 [http.services.ocs]
 prefix = "ocs"
-
 
 [http.middlewares.cors]
 

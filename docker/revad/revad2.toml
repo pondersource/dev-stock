@@ -72,6 +72,7 @@ provider_domain = "revad2.docker"
 [grpc.services.ocmshareprovider]
 driver = "json"
 provider_domain = "revad2.docker"
+webdav_endpoint = "https://revad2.docker/"
 
 [grpc.services.ocmshareprovider.drivers.json]
 file = "/var/tmp/reva/shares_server_1.json"
@@ -137,6 +138,7 @@ certfile = "/etc/revad/tls/revad2.crt"
 keyfile = "/etc/revad/tls/revad2.key"
 
 [http.services.sciencemesh]
+invite_link_template = "{{.MeshDirectoryURL}}?token={{.Token}}&providerDomain=revad2.docker"
 
 [http.services.dataprovider]
 driver = "localhome"
