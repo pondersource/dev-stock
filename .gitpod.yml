@@ -48,12 +48,12 @@ ports:
   - port: 5800
     onOpen: open-browser
     visibility: public
-    name: dev-stock firefox
+    name: firefox
     description: firefox used by devstock to test Pondersource apps in browser
   - port: 5900
     onOpen: open-browser
     visibility: public
-    name: dev-stock firefox legacy
+    name: firefox legacy
     description: firefox used by devstock to test Pondersource apps in browser
 
 tasks:
