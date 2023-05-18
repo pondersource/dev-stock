@@ -2,6 +2,7 @@ php console.php maintenance:install --admin-user $USER --admin-pass $PASS --data
 php console.php app:disable firstrunwizard
 sed -i "8 i\      1 => 'oc1.docker'," /var/www/html/config/config.php
 sed -i "9 i\      2 => 'oc2.docker'," /var/www/html/config/config.php
+sed -i "9 i\      3 => \$_SERVER['HTTP_HOST']," /var/www/html/config/config.php
 
 
 echo Installing Custom Groups
