@@ -1,7 +1,7 @@
 #!/bin/bash
 
-bash ./scripts/clean.sh
+./clean.sh
 
-bash ./scripts/init-rd-sram.sh
+./init-rd-sram.sh
 
-bash ./scripts/rd-sram-testing.sh
+./rd-sram-testing.sh
