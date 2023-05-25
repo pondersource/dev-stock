@@ -7,7 +7,7 @@ REPO_ROOT=$(pwd)
 "${REPO_ROOT}/scripts/clean.sh"
 
 # repositories and branches.
-REPO_OWNCLOUD_APP=https://github.com/MahdiBaghbani/nc-sciencemesh
+REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=sciencemesh
 
 [ ! -d "temp" ] && mkdir --parents temp
@@ -55,7 +55,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/release/sciencemesh.key:/var/www/sciencemesh.key"            \
   "pondersource/dev-stock-nextcloud-sciencemesh"
 
-docker exec --user root nc-release.docker bash -c "chown www-data:www-data /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
+docker exec --user root nc-release.docker bash -c "chown www-data:www-data -R /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
 docker exec --user www-data nc-release.docker bash -c "cd /var/www/html/apps/sciencemesh                \
                                                     &&                                                  \
                                                     mkdir -p build/sciencemesh                          \
@@ -80,24 +80,24 @@ docker exec --user www-data nc-release.docker bash -c "cd /var/www/html/apps/sci
                                                     &&                                                  \
                                                     composer install                                    \
                                                     &&                                                  \
-                                                    cd /var/www/html                                    \
-                                                    &&                                                  \
-                                                    ./occ integrity:sign-app                            \
-                                                    --privateKey=/var/www/sciencemesh.key               \
-                                                    --certificate=apps/sciencemesh/sciencemesh.crt      \
-                                                    --path=apps/sciencemesh/build/sciencemesh           \
-                                                    &&                                                  \
-                                                    cd apps/sciencemesh/build                           \
+                                                    cd ..                                               \
                                                     &&                                                  \
                                                     tar -cf sciencemesh.tar sciencemesh"
 
+echo "NextCloud Signature start:"
 docker exec --user root nc-release.docker bash -c "cd /var/www/html/apps/sciencemesh/release            \
                                                     &&                                                  \
                                                     mv ../build/sciencemesh.tar .                       \
                                                     &&                                                  \
                                                     rm -f -- sciencemesh.tar.gz                         \
                                                     &&                                                  \
-                                                    gzip sciencemesh.tar"
+                                                    gzip sciencemesh.tar                                \
+                                                    &&                                                  \
+                                                    openssl dgst                                        \
+                                                    -sha512                                             \
+                                                    -sign /var/www/sciencemesh.key                      \
+                                                    ./sciencemesh.tar.gz | openssl base64"
+echo "NextCloud Signature end"
 
 "${REPO_ROOT}/scripts/clean.sh"
 
@@ -106,6 +106,7 @@ sudo chown gitpod:gitpod "${REPO_ROOT}/release/sciencemesh.key"
 truncate -s 0 "${REPO_ROOT}/release/sciencemesh.key"
 
 # add new tar.gz to git and push.
+sudo chown gitpod:gitpod -R "${REPO_ROOT}/nc-sciencemesh-release"
 cd "${REPO_ROOT}/nc-sciencemesh-release"
 git add "${REPO_ROOT}/nc-sciencemesh-release/release/sciencemesh.tar.gz"
 git commit -m "Update release tarball of the application"

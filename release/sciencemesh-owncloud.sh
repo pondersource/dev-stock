@@ -7,7 +7,7 @@ REPO_ROOT=$(pwd)
 "${REPO_ROOT}/scripts/clean.sh"
 
 # repositories and branches.
-REPO_OWNCLOUD_APP=https://github.com/MahdiBaghbani/nc-sciencemesh
+REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=oc-10-take-2
 
 [ ! -d "temp" ] && mkdir --parents temp
@@ -55,7 +55,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/release/sciencemesh.key:/var/www/sciencemesh.key"            \
   "pondersource/dev-stock-owncloud-sciencemesh"
 
-docker exec --user root oc-release.docker bash -c "chown www-data:www-data /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
+docker exec --user root oc-release.docker bash -c "chown www-data:www-data -R /var/www/html/apps/sciencemesh && chown www-data:www-data /var/www/sciencemesh.key"
 docker exec --user www-data oc-release.docker bash -c "cd /var/www/html/apps/sciencemesh                \
                                                     &&                                                  \
                                                     mkdir -p build/sciencemesh                          \
@@ -106,6 +106,7 @@ sudo chown gitpod:gitpod "${REPO_ROOT}/release/sciencemesh.key"
 truncate -s 0 "${REPO_ROOT}/release/sciencemesh.key"
 
 # add new tar.gz to git and push.
+sudo chown gitpod:gitpod -R "${REPO_ROOT}/oc-sciencemesh-release"
 cd "${REPO_ROOT}/oc-sciencemesh-release"
 git add "${REPO_ROOT}/oc-sciencemesh-release/release/sciencemesh.tar.gz"
 git commit -m "Update release tarball of the application"
