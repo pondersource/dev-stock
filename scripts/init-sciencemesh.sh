@@ -24,7 +24,6 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh" ] &&                                                    \
     git clone                                                                   \
-    --depth 1                                                                   \
     --branch ${BRANCH_NEXTCLOUD_APP}                                            \
     ${REPO_NEXTCLOUD_APP}                                                       \
     nc-sciencemesh                                                              \
@@ -38,7 +37,6 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # ownCloud Sciencemesh source code.
 [ ! -d "oc-sciencemesh" ] &&                                                    \
     git clone                                                                   \
-    --depth 1                                                                   \
     --branch ${BRANCH_OWNCLOUD_APP}                                             \
     ${REPO_OWNCLOUD_APP}                                                        \
     oc-sciencemesh                                                              \
@@ -52,7 +50,6 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # Reva source code.
 [ ! -d "reva" ] &&                                                              \
     git clone                                                                   \
-    --depth 1                                                                   \
     --branch ${BRANCH_REVA}                                                     \
     ${REPO_REVA}                                                                \
     reva                                                                        \
