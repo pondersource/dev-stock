@@ -137,7 +137,6 @@ shared_secret = "shared-secret-1"
 mock_http = false
 
 [http]
-# enabled_services = ["ocmd", "sciencemesh"]
 enabled_services = ["ocmd"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
@@ -211,3 +210,10 @@ prefix = "ocdav"
 #   "x-access-token"      will result in header:   X-Access-Token: "...token..."
 # If not set "bearer" is assumed
 http_tpc_push_auth_header = "x-access-token"
+
+[http.services.ocmprovider]
+provider = "Pondersource dev-stock NC1"
+endpoint = "https://revanc1.docker:19000"
+webdav_root = "/remote.php/dav/ocm"
+enable_webapp = true
+enable_datatx = true

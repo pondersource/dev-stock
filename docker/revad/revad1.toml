@@ -131,7 +131,7 @@ driver = "json"
 users = "users.testnet.json"
 
 [http]
-enabled_services = ["ocmd","sciencemesh"]
+enabled_services = ["ocmd"]
 enabled_middlewares = ["providerauthorizer", "cors"]
 address = "0.0.0.0:443"
 certfile = "/etc/revad/tls/revad1.crt"
@@ -202,3 +202,10 @@ prefix = "ocdav"
 #   "x-access-token"      will result in header:   X-Access-Token: "...token..."
 # If not set "bearer" is assumed
 http_tpc_push_auth_header = "x-access-token"
+
+[http.services.ocmprovider]
+provider = "Pondersource dev-stock Revad1"
+endpoint = "https://revad1.docker:19000"
+webdav_root = "/remote.php/dav/ocm"
+enable_webapp = true
+enable_datatx = true
