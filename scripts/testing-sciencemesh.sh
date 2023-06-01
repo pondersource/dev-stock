@@ -32,6 +32,8 @@ docker run --detach --network=testnet --name=meshdir.docker pondersource/dev-sto
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy -p 5900:5800 --network=testnet --shm-size 2g jlesage/firefox:v1.18.0
 # docker run --detach --network=testnet --name=rclone.docker rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+docker run --name=collabora.docker -t -d --network=testnet -p 9980:9980 -e "extra_params=--o:ssl.enable=false" collabora/code 
+docker run --name=wopi.docker -t -d --network=testnet -p 8880:8880 cs3org/wopiserver:latest
 
 # EFSS1
 docker run --detach --network=testnet                                         \

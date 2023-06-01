@@ -92,22 +92,8 @@ verify_request_hostname = true
 [grpc.services.publicshareprovider]
 driver = "memory"
 
-[grpc.services.appprovider]
-driver = "demo"
-iopsecret = "testsecret"
-wopiurl = "http://0.0.0.0:8880/"
-wopibridgeurl = "http://localhost:8000/wopib"
-
 [grpc.services.appregistry]
 driver = "static"
-
-[grpc.services.appregistry.static.rules]
-"text/plain" = "revanc2.docker:19000"
-"text/markdown" = "revanc2.docker:19000"
-"application/compressed-markdown" = "revanc2.docker:19000"
-"application/vnd.oasis.opendocument.text" = "revanc2.docker:19000"
-"application/vnd.oasis.opendocument.spreadsheet" = "revanc2.docker:19000"
-"application/vnd.oasis.opendocument.presentation" = "revanc2.docker:19000"
 
 [grpc.services.storageprovider]
 driver = "nextcloud"
@@ -217,3 +203,21 @@ endpoint = "https://revanc2.docker:19000"
 webdav_root = "/remote.php/dav/ocm"
 enable_webapp = true
 enable_datatx = true
+
+[grpc.services.appprovider]
+driver = "wopi"
+custom_mime_types_json = "custom-mime-types-demo.json"
+mime_types = ["application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.oasis.opendocument.presentation", "text/rtf"]
+app_provider_url = "localhost:19000"
+language = "en-GB"
+
+[http.services.appprovider]
+insecure = true
+
+[grpc.services.appprovider.drivers.wopi]
+iop_secret = "hello"
+wopi_url = "http://wopi.docker:8880/"
+app_name = "Collabora"
+app_url = "http://collabora.docker:9980"
+app_int_url = "http://collabora.docker:9980"
+folder_base_url = "https://your-reva-frontend.org"
