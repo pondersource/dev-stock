@@ -3,15 +3,24 @@
 set -e
 
 # repositories and branches.
+REPO_NEXTCLOUD=https://github.com/nextcloud/server.git
+BRANCH_NEXTCLOUD=v26.0.1
+
+REPO_OWNCLOUD=https://github.com/pondersource/core.git
+BRANCH_OWNCLOUD=ocm-via-sciencemesh
+
 REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=sciencemesh
+
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=oc-10-take-2
+
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=v1.24.0
 
-# docker pull rclone/rclone
+# pull images.
 docker pull mariadb:latest
+docker pull rclone/rclone:latest
 docker pull jlesage/firefox:latest
 docker pull jlesage/firefox:v1.18.0
 
@@ -20,6 +29,20 @@ docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc2-sciencemesh
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc2-sciencemesh
+
+# Nextcloud source code.
+[ ! -d "nextcloud" ] &&                                                         \
+    git clone                                                                   \
+    --branch ${BRANCH_NEXTCLOUD}                                                \
+    ${REPO_NEXTCLOUD}                                                           \
+    nextcloud
+
+# ownCloud source code.
+[ ! -d "owncloud" ] &&                                                          \
+    git clone                                                                   \
+    --branch ${BRANCH_OWNCLOUD}                                                 \
+    ${REPO_OWNCLOUD}                                                            \
+    owncloud
 
 # Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh" ] &&                                                    \
