@@ -21,8 +21,10 @@ BRANCH_REVA=v1.24.0
 # pull images.
 docker pull mariadb:latest
 docker pull rclone/rclone:latest
+docker pull collabora/code:latest
 docker pull jlesage/firefox:latest
 docker pull jlesage/firefox:v1.18.0
+docker pull cs3org/wopiserver:latest
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
