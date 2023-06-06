@@ -33,6 +33,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # Nextcloud source code.
 [ ! -d "nextcloud" ] &&                                                         \
     git clone                                                                   \
+    --depth 1                                                                   \
     --branch ${BRANCH_NEXTCLOUD}                                                \
     ${REPO_NEXTCLOUD}                                                           \
     nextcloud
@@ -40,6 +41,7 @@ docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-n
 # ownCloud source code.
 [ ! -d "owncloud" ] &&                                                          \
     git clone                                                                   \
+    --depth 1                                                                   \
     --branch ${BRANCH_OWNCLOUD}                                                 \
     ${REPO_OWNCLOUD}                                                            \
     owncloud
