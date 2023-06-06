@@ -3,21 +3,24 @@ image:
 
 vscode:
   extensions:
-    # Docker helper extension
+    # Docker helper extension.
     - ms-azuretools.vscode-docker
 
-    # PHP extension
+    # PHP extension.
     - felixfbecker.php-debug
 
-    # Bash extensions
+    # Bash extensions.
     - timonwong.shellcheck
     - rogalmic.bash-debug
 
-    # Env file highlight
+    # Env file highlight.
     - mikestead.dotenv
 
-    # Github Theme
+    # Github Theme.
     - github.github-vscode-theme
+
+    # Python.
+    - charliermarsh.ruff
 
 github:
   prebuilds:
@@ -25,7 +28,7 @@ github:
     master: true
     main: true
     # enable for all branches in this repo (defaults to false)
-    branches: true
+    branches: false
     # enable for pull requests coming from this repo (defaults to true)
     pullRequests: true
     # enable for pull requests coming from forks (defaults to false)
@@ -45,7 +48,12 @@ ports:
   - port: 5800
     onOpen: open-browser
     visibility: public
-    name: dev-stock firefox
+    name: firefox
+    description: firefox used by devstock to test Pondersource apps in browser
+  - port: 5900
+    onOpen: open-browser
+    visibility: public
+    name: firefox legacy
     description: firefox used by devstock to test Pondersource apps in browser
 
 tasks:

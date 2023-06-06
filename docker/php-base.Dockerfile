@@ -20,7 +20,9 @@ RUN apt install --yes               \
     git                             \
     curl                            \
     wget                            \
+    unzip                           \
     libxml2                         \
+    iproute2                        \
     apt-utils                       \
     libxml2-dev                     \
     lsb-release                     \
@@ -65,23 +67,21 @@ RUN apt install --yes       \
     php7.4-sqlite3          \
     php7.4-mbstring
 
-# version management.
-RUN ln --symbolic --force /usr/bin/php8.2 /usr/bin/php.default
-RUN update-alternatives --install /usr/bin/php php /usr/bin/php.default 100
-
 # PHP switcher script.
-COPY switch-php.sh /usr/bin/switch-php.sh 
+COPY ./scripts/switch-php.sh /usr/bin/switch-php.sh
 RUN chmod +x /usr/bin/switch-php.sh 
 
-# xdebug configurations.
-COPY 20-xdebug.ini /etc/php/7.4/cli/conf.d/20-xdebug.ini
-COPY 20-xdebug.ini /etc/php/8.2/cli/conf.d/20-xdebug.ini
+# copy xdebug configuration and create its link in each PHP version conf directory.
+COPY ./configs/20-xdebug.ini /configs-pondersource/20-xdebug.ini
+RUN ln --symbolic --force /configs-pondersource/20-xdebug.ini /etc/php/7.4/cli/conf.d/20-xdebug.ini
+RUN ln --symbolic --force /configs-pondersource/20-xdebug.ini /etc/php/8.2/cli/conf.d/20-xdebug.ini
 
 # apache config.
-COPY site.conf /etc/apache2/sites-enabled/000-default.conf
+COPY ./configs/site.conf /configs-pondersource/site.conf 
+RUN ln --symbolic --force /configs-pondersource/site.conf /etc/apache2/sites-enabled/000-default.conf
 
 # trust all the certificates:
-ADD tls /tls
+COPY ./tls /tls
 RUN cp /tls/*.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 RUN a2enmod ssl
@@ -91,4 +91,9 @@ WORKDIR /var/www
 RUN chown www-data:www-data .
 
 EXPOSE 443
-CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
+
+COPY ./scripts/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD /usr/sbin/apache2ctl -DFOREGROUND
