@@ -7,8 +7,8 @@ docker pull jlesage/firefox:v1.18.0
 
 docker pull pondersource/dev-stock-revad:latest
 docker pull pondersource/dev-stock-ocmstub:latest
-docker push pondersource/dev-stock-php-base:latest
-docker push pondersource/dev-stock-nextcloud:latest
-docker push pondersource/dev-stock-nextcloud-sciencemesh:latest
-docker push pondersource/dev-stock-owncloud:latest
-docker push pondersource/dev-stock-owncloud-sciencemesh:latest
+docker pull pondersource/dev-stock-php-base:latest
+docker pull pondersource/dev-stock-nextcloud:latest
+docker pull pondersource/dev-stock-nextcloud-sciencemesh:latest
+docker pull pondersource/dev-stock-owncloud:latest
+docker pull pondersource/dev-stock-owncloud-sciencemesh:latest
