@@ -68,8 +68,13 @@ shared_secret = "shared-secret-1"
 mock_http = false
 
 [grpc.services.ocminvitemanager]
-driver = "json"
+driver = "api"
 provider_domain = "revanc1.docker"
+
+[grpc.services.ocminvitemanager.drivers.api]
+base_url = "http://nc1.docker/index.php/apps/sciencemesh"
+api_key = "invite-manager-endpoint"
+gatewaysvc = "revanc1.docker:19000"
 
 [grpc.services.ocmshareprovider]
 driver = "nextcloud"
