@@ -8,7 +8,7 @@ REPO_ROOT=$(pwd)
 
 # repositories and branches.
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_OWNCLOUD_APP=oc-10-take-2
+BRANCH_OWNCLOUD_APP=owncloud
 
 [ ! -d "temp" ] && mkdir --parents temp
 
