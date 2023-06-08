@@ -10,10 +10,10 @@ REPO_OWNCLOUD=https://github.com/pondersource/core.git
 BRANCH_OWNCLOUD=ocm-via-sciencemesh
 
 REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_NEXTCLOUD_APP=sciencemesh
+BRANCH_NEXTCLOUD_APP=nextcloud-dev
 
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_OWNCLOUD_APP=oc-10-take-2
+BRANCH_OWNCLOUD_APP=owncloud-dev
 
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=v1.24.0
