@@ -15,6 +15,8 @@ docker push pondersource/dev-stock-nextcloud
 
 docker push pondersource/dev-stock-nextcloud-mfa
 
+docker push pondersource/dev-stock-nextcloud-solid
+
 docker push pondersource/dev-stock-nextcloud-sciencemesh
 
 docker push pondersource/dev-stock-owncloud
