@@ -18,7 +18,7 @@ ARG CACHEBUST="$(echo $RANDOM)"
 RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_RD_SRAM}          \
-    ${REPO_RD_SRAM}}                    \
+    ${REPO_RD_SRAM}                     \
     apps/rd-sram-integration
 
 RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups

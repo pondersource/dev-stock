@@ -33,7 +33,7 @@ RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_OCM}              \
     ${REPO_OCM}                         \
-    apps/opencloudmesh
+    apps/oc-opencloudmesh
 
 RUN cd apps && ln --symbolic oc-opencloudmesh/opencloudmesh
 
