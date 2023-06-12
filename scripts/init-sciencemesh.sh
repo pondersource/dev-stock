@@ -3,10 +3,10 @@
 set -e
 
 # repositories and branches.
-REPO_NEXTCLOUD=https://github.com/nextcloud/server.git
+REPO_NEXTCLOUD=https://github.com/nextcloud/server
 BRANCH_NEXTCLOUD=v26.0.1
 
-REPO_OWNCLOUD=https://github.com/pondersource/core.git
+REPO_OWNCLOUD=https://github.com/pondersource/core
 BRANCH_OWNCLOUD=ocm-via-sciencemesh
 
 REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
