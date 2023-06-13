@@ -28,13 +28,13 @@ docker pull pondersource/dev-stock-oc2-rd-sram:latest
     ${REPO_OWNCLOUD}                                                            \
     owncloud
 
-[ ! -d "oc-opencloudmesh" ] &&                                                  \
+[ ! -d "ocm" ] &&                                                               \
     git clone                                                                   \
     --branch ${BRANCH_OCM}                                                      \
     ${REPO_OCM}                                                                 \
-    OCM
+    ocm
 
-[ ! -d "rd-sram-integration" ] &&                                               \
+[ ! -d "rd-sram" ] &&                                                           \
     git clone                                                                   \
     --branch ${BRANCH_RD_SRAM}                                                  \
     ${REPO_RD_SRAM}                                                             \
