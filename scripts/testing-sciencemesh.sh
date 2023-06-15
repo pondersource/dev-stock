@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 REPO_ROOT=$(pwd)
-export REPO_ROOT=$REPO_ROOT
+export REPO_ROOT=${REPO_ROOT}
 [ ! -d "./scripts" ] && echo "Directory ./scripts DOES NOT exist inside $REPO_ROOT, are you running this from the repo root?" && exit 1
 [ ! -d "./nc-sciencemesh" ] && echo "Directory ./nc-sciencemesh DOES NOT exist inside $REPO_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
 [ ! -d "./nc-sciencemesh/vendor" ] && echo "Directory ./nc-sciencemesh/vendor DOES NOT exist inside $REPO_ROOT. Try: rmdir ./nc-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
@@ -24,16 +24,18 @@ cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/oc.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
 
 # make sure scripts are executable.
-chmod +x "$REPO_ROOT/docker/scripts/reva-run.sh"
-chmod +x "$REPO_ROOT/docker/scripts/reva-kill.sh"
-chmod +x "$REPO_ROOT/docker/scripts/reva-entrypoint.sh"
+chmod +x "${REPO_ROOT}/docker/scripts/reva-run.sh"
+chmod +x "${REPO_ROOT}/docker/scripts/reva-kill.sh"
+chmod +x "${REPO_ROOT}/docker/scripts/reva-entrypoint.sh"
 
-docker run --detach --network=testnet --name=meshdir.docker pondersource/dev-stock-ocmstub
-docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
-docker run --detach --name=firefox-legacy -p 5900:5800 --network=testnet --shm-size 2g jlesage/firefox:v1.18.0
-# docker run --detach --network=testnet --name=rclone.docker rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
-docker run --name=collabora.docker -t -d --network=testnet -p 9980:9980 -e "extra_params=--o:ssl.enable=false" collabora/code:latest 
-docker run --name=wopi.docker -t -d --network=testnet -p 8880:8880 cs3org/wopiserver:latest
+docker run --detach --name=meshdir.docker   --network=testnet pondersource/dev-stock-ocmstub
+docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
+docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
+docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest 
+docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest
+
+#docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+
 
 sleep 15
 
@@ -41,12 +43,12 @@ sleep 15
 docker run --detach --network=testnet                                         \
   --name="reva${EFSS1}1.docker"                                               \
   -e HOST="reva${EFSS1}1"                                                     \
-  -v "$REPO_ROOT/reva:/reva"                                                  \
-  -v "$REPO_ROOT/docker/revad:/etc/revad"                                     \
-  -v "$REPO_ROOT/docker/tls:/etc/revad/tls"                                   \
-  -v "$REPO_ROOT/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"             \
-  -v "$REPO_ROOT/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"           \
-  -v "$REPO_ROOT/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"            \
+  -v "${REPO_ROOT}/reva:/reva"                                                \
+  -v "${REPO_ROOT}/docker/revad:/etc/revad"                                   \
+  -v "${REPO_ROOT}/docker/tls:/etc/revad/tls"                                 \
+  -v "${REPO_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"           \
+  -v "${REPO_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"         \
+  -v "${REPO_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"          \
   pondersource/dev-stock-revad
 
 docker run --detach --network=testnet                                         \
@@ -65,20 +67,20 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
-  -v "$REPO_ROOT/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                          \
-  -v "$REPO_ROOT/$EFSS1-sciencemesh:/var/www/html/apps/sciencemesh"           \
+  -v "${REPO_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                        \
+  -v "${REPO_ROOT}/$EFSS1-sciencemesh:/var/www/html/apps/sciencemesh"         \
   "pondersource/dev-stock-${EFSS1}1-sciencemesh"
 
 # EFSS2
 docker run --detach --network=testnet                                         \
   --name="reva${EFSS2}2.docker"                                               \
   -e HOST="reva${EFSS2}2"                                                     \
-  -v "$REPO_ROOT/reva:/reva"                                                  \
-  -v "$REPO_ROOT/docker/revad:/etc/revad"                                     \
-  -v "$REPO_ROOT/docker/tls:/etc/revad/tls"                                   \
-  -v "$REPO_ROOT/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"             \
-  -v "$REPO_ROOT/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"           \
-  -v "$REPO_ROOT/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"            \
+  -v "${REPO_ROOT}/reva:/reva"                                                \
+  -v "${REPO_ROOT}/docker/revad:/etc/revad"                                   \
+  -v "${REPO_ROOT}/docker/tls:/etc/revad/tls"                                 \
+  -v "${REPO_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"           \
+  -v "${REPO_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"         \
+  -v "${REPO_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"          \
   pondersource/dev-stock-revad
 
 docker run --detach --network=testnet                                         \
@@ -97,16 +99,17 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria2.docker"                                                   \
   -e USER="marie"                                                             \
   -e PASS="radioactivity"                                                     \
-  -v "$REPO_ROOT/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                          \
-  -v "$REPO_ROOT/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh"           \
+  -v "${REPO_ROOT}/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                        \
+  -v "${REPO_ROOT}/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh"         \
   "pondersource/dev-stock-${EFSS2}2-sciencemesh"
 
 # EFSS1
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
 
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
 
+# run db injections.
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
   -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
 
@@ -123,7 +126,7 @@ docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi
 waitForPort maria2.docker 3306
 waitForPort "${EFSS2}2.docker" 443
 
-docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
+docker exec -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
 
 docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
   -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"

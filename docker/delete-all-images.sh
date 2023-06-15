@@ -10,3 +10,6 @@ docker rm -vf $(docker ps -aq) || true
 
 # delete all images.
 docker rmi -f $(docker images -aq) || true
+
+docker system prune --force
+docker volume prune --force

@@ -1,91 +1,111 @@
 #!/usr/bin/env bash
 
-set -e
-
-[ ! -d "rd-sram-integration" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "core" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "oc-opencloudmesh" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+REPO_ROOT=$(pwd)
+export REPO_ROOT=$REPO_ROOT
+[ ! -d "rd-sram" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "owncloud" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "ocm" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
 
 function waitForPort {
-  x=$(docker exec -it $1 ss -tulpn | grep $2 | wc -l)
-  until [ $x -ne 0 ]
+  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
+  until [ "${x}" -ne 0 ]
   do
-    echo Waiting for $1 to open port $2, this usually takes about 10 seconds ... $x
+    echo Waiting for "${1}" to open port "${2}", this usually takes about 10 seconds ... "${x}"
     sleep 1
-    x=$(docker exec -it $1 ss -tulpn | grep $2 | wc -l)
+    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
   done
-  echo $1 port $2 is open
+  echo "${1}" port "${2}" is open
 }
 
-REPO_DIR=$(pwd)
-export REPO_DIR=$REPO_DIR
-echo Repo dir is $REPO_DIR
-
-echo "starting maria1.docker"
-docker run -d --network=testnet -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --name=maria1.docker mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
-echo "starting oc1.docker"
-docker run -d --network=testnet --name=oc1.docker \
-  -v $REPO_DIR/rd-sram-integration:/var/www/html/apps/rd-sram-integration \
-  -v $REPO_DIR/oc-opencloudmesh:/var/www/html/apps/oc-opencloudmesh \
-  -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
-  -v $REPO_DIR/core/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing \
-  pondersource/dev-stock-oc1-rd-sram
-
-echo "starting maria2.docker"
-docker run -d --network=testnet -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --name=maria2.docker mariadb --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
-echo "starting oc2.docker"
-docker run -d --network=testnet --name=oc2.docker \
-  -v $REPO_DIR:/var/www/html/apps/rd-sram-integration \
-  -v $REPO_DIR/core/apps/files_sharing:/var/www/html/apps/files_sharing \
-  pondersource/dev-stock-oc2-rd-sram
+# copy init files.
+cp --force --recursive ./docker/rd-sram/curls ./temp/curls
+cp --force ./docker/scripts/init-owncloud-rd-sram.sh  ./temp/oc-rd-sram.sh
 
 echo "starting firefox tester"
-docker run -d --name=firefox -p 5800:5800 -v /tmp/shm:/config:rw --network=testnet --shm-size 2g jlesage/firefox:latest
+docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
+docker run --detach --name=firefox-legacy --network=testnet -p 5900:5800 --shm-size 2g jlesage/firefox:v1.18.0
+
+echo "starting maria1.docker"
+docker run --detach --network=testnet                                                               \
+  --name=maria1.docker                                                                              \
+  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                 \
+  mariadb                                                                                           \
+  --transaction-isolation=READ-COMMITTED                                                            \
+  --binlog-format=ROW                                                                               \
+  --innodb-file-per-table=1                                                                         \
+  --skip-innodb-read-only-compressed
+
+echo "starting oc1.docker"
+docker run --detach --network=testnet                                                               \
+  --name=oc1.docker                                                                                 \
+  --publish 8080:80                                                                                 \
+  --add-host "host.docker.internal:host-gateway"                                                    \
+  -e HOST="oc1"                                                                                     \
+  -e DBHOST="maria1.docker"                                                                         \
+  -e USER="einstein"                                                                                \
+  -e PASS="relativity"                                                                              \
+  -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
+  -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
+  -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
+  -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
+  -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
+  -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
+  pondersource/dev-stock-owncloud-rd-sram
+
+echo "starting maria2.docker"
+docker run --detach --network=testnet                                                               \
+  --name=maria2.docker                                                                              \
+  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                 \
+  mariadb                                                                                           \
+  --transaction-isolation=READ-COMMITTED                                                            \
+  --binlog-format=ROW                                                                               \
+  --innodb-file-per-table=1                                                                         \
+  --skip-innodb-read-only-compressed
+
+echo "starting oc2.docker"
+docker run --detach --network=testnet                                                               \
+  --name=oc2.docker                                                                                 \
+  --publish 9080:80                                                                                 \
+  --add-host "host.docker.internal:host-gateway"                                                    \
+  -e HOST="oc2"                                                                                     \
+  -e DBHOST="maria2.docker"                                                                         \
+  -e USER="marie"                                                                                   \
+  -e PASS="radioactivity"                                                                           \
+  -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
+  -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
+  -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
+  -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
+  -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
+  -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
+  pondersource/dev-stock-owncloud-rd-sram
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
+
 echo "executing init.sh on oc1.docker"
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity  -u www-data oc1.docker sh /init.sh
-# docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss
+docker exec -u www-data oc1.docker sh /init.sh
 
 waitForPort maria2.docker 3306
 waitForPort oc2.docker 443
+
 echo "executing init.sh on oc2.docker"
-docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data oc2.docker sh /init.sh
-# docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss
+docker exec -u www-data oc2.docker sh /init.sh
 
-echo Creating regular group 'federalists' on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('federalists');"
-echo Adding local user to regular group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein');"
-echo Adding foreign user to regular group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie#oc2.docker');"
+echo "Setting up SCIM control for Federated Groups"
+docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
+docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
 
-echo Creating regular group 'federalists' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('federalists');"
-echo Adding foreign user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'einstein#oc1.docker');"
-echo Adding local user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('federalists', 'marie');"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc1"
+docker exec -it oc1.docker sh /curls/createGroup.sh oc1.docker
 
-echo Creating regular group 'helpdesk' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_groups (gid) values ('helpdesk');"
-echo Adding foreign user to regular group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_group_user (gid, uid) values ('helpdesk', 'marie');"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc2"
+docker exec -it oc2.docker sh /curls/createGroup.sh oc2.docker
 
+docker exec -it oc1.docker sh /curls/excludeMarie.sh oc1.docker
+docker exec -it oc2.docker sh /curls/excludeMarie.sh oc2.docker
 
-echo Creating custom group 'custard with mustard' on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
-echo Adding local user to custom group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein', 1);"
-echo Adding foreign user to custom group on oc1
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie#oc2.docker', 1);"
-
-echo Creating custom group 'custard with mustard' on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group (group_id, uri, display_name) values (1, 'Custard with Mustard', 'Custard with Mustard');"
-echo Adding foreign user to custom group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'einstein#oc1.docker', 1);"
-echo Adding local user to custom group on oc2
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek owncloud -e "insert into oc_custom_group_member (group_id, user_id, role) values (1, 'marie', 1);"
-
-echo Now browse to http://\<host\>:5800 to see a Firefox instance that sits inside the Docker testnet.
+echo "share something from einstein@oc1.docker to Test Group, then run:"
+echo "$ docker exec -it oc2.docker sh /curls/includeMarie.sh oc2.docker"
+echo "$ docker exec -it oc1.docker sh /curls/includeMarie.sh oc1.docker"
+echo "then log in to oc2.docker as marie, you should not have received the share"
+echo "refresh the oc2.docker page, the share from einstein to Test Group should now also arrive to Marie"
