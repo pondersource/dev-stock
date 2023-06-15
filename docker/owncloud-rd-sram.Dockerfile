@@ -23,6 +23,7 @@ RUN git clone                           \
 
 RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups
 
+COPY ./rd-sram/curls /curls
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init-owncloud-rd-sram.sh /init.sh
