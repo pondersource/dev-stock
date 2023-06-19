@@ -10,13 +10,13 @@ REPO_OWNCLOUD=https://github.com/pondersource/core
 BRANCH_OWNCLOUD=ocm-via-sciencemesh
 
 REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_NEXTCLOUD_APP=nextcloud-dev
+BRANCH_NEXTCLOUD_APP=nextcloud-edge
 
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_OWNCLOUD_APP=owncloud-dev
+BRANCH_OWNCLOUD_APP=owncloud-edge
 
 REPO_REVA=https://github.com/cs3org/reva
-BRANCH_REVA=v1.24.0
+BRANCH_REVA=sciencemesh-testing
 
 # pull images.
 docker pull mariadb:latest

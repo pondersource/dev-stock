@@ -22,6 +22,9 @@ vscode:
     # Python.
     - charliermarsh.ruff
 
+    # toml
+    - bungcip.better-toml
+
 github:
   prebuilds:
     # enable for the master/default branch (defaults to true)
