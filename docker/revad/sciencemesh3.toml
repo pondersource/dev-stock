@@ -1,5 +1,5 @@
 [shared]
-gatewaysvc = "localhost:19000"
+gatewaysvc = "0.0.0.0:19000"
 
 [grpc]
 address = "localhost:19030"
