@@ -3,6 +3,18 @@
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 
+# repositories and branches.
+REPO_NEXTCLOUD=https://github.com/nextcloud/server
+BRANCH_NEXTCLOUD=v26.0.1
+
+# Nextcloud source code.
+[ ! -d "nextcloud" ] &&                                                         \
+    git clone                                                                   \
+    --depth 1                                                                   \
+    --branch ${BRANCH_NEXTCLOUD}                                                \
+    ${REPO_NEXTCLOUD}                                                           \
+    "${REPO_ROOT}/nextcloud"
+
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
   until [ "${x}" -ne 0 ]
@@ -38,6 +50,9 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
+  -v "${REPO_ROOT}/nextcloud/apps/files_sharing:/var/www/html/apps/files_sharing"                   \
+  -v "${REPO_ROOT}/nextcloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"     \
+  -v "${REPO_ROOT}/nextcloud/lib:/var/www/html/apps/lib"                                            \
   pondersource/dev-stock-nextcloud
 
 echo "starting maria2.docker"
@@ -59,6 +74,9 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
+  -v "${REPO_ROOT}/nextcloud/apps/files_sharing:/var/www/html/apps/files_sharing"                   \
+  -v "${REPO_ROOT}/nextcloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"     \
+  -v "${REPO_ROOT}/nextcloud/lib:/var/www/html/apps/lib"                                            \
   pondersource/dev-stock-nextcloud
 
 waitForPort maria1.docker 3306
