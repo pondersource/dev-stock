@@ -37,7 +37,7 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 #docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
 
 
-sleep 15
+sleep 30
 
 # EFSS1
 docker run --detach --network=testnet                                         \
