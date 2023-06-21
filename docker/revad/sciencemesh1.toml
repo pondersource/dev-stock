@@ -108,14 +108,11 @@ shared_secret = "shared-secret-1"
 mock_http = false
 
 [grpc.services.ocmproviderauthorizer]
-driver = "mentix"
+driver = "json"
 
-[grpc.services.ocmproviderauthorizer.drivers.mentix]
-url = "https://iop.sciencemesh.uni-muenster.de/iop/mentix/cs3"
+[grpc.services.ocmproviderauthorizer.drivers.json]
+providers = "providers.testnet.json"
 verify_request_hostname = true
-insecure = false
-timeout = 10
-refresh = 900
 
 [grpc.services.publicshareprovider]
 driver = "memory"
