@@ -29,7 +29,8 @@ RUN apt install --yes               \
     build-essential                 \
     ca-certificates                 \
     apt-transport-https             \
-    software-properties-common   
+    software-properties-common      \
+    vim
 
 # add the Ondrej PPA, which contains all versions of PHP packages for Ubuntu systems.
 RUN LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
