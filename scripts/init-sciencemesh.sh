@@ -18,14 +18,6 @@ BRANCH_OWNCLOUD_APP=owncloud-edge
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=sciencemesh-testing
 
-# pull images.
-docker pull mariadb:latest
-docker pull rclone/rclone:latest
-docker pull collabora/code:latest
-docker pull jlesage/firefox:latest
-docker pull jlesage/firefox:v1.18.0
-docker pull cs3org/wopiserver:latest
-
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc2-sciencemesh
