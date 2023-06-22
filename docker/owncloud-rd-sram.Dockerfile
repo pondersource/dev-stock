@@ -12,9 +12,9 @@ USER www-data
 ARG REPO_RD_SRAM=https://github.com/SURFnet/rd-sram-integration
 ARG BRANCH_RD_SRAM=main
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_RD_SRAM}          \

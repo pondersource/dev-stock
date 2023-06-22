@@ -20,9 +20,9 @@ RUN apt install --yes               \
     vim                             
 
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN git clone --depth 1 --branch main https://github.com/pondersource/ocm-stub
 
 WORKDIR /ocm-stub

@@ -16,9 +16,9 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 
 RUN wget --quiet "${NEXTCLOUD_SERVER}"
 RUN wget --quiet "${NEXTCLOUD_PATCH}"

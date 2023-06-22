@@ -12,9 +12,9 @@ USER www-data
 ARG REPO_SCIENCEMESH=https://github.com/pondersource/nc-sciencemesh
 ARG BRANCH_SCIENCEMESH=main
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_SCIENCEMESH}      \

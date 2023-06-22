@@ -19,9 +19,9 @@ RUN git clone                     \
 RUN cd apps/ && ln -s solid-nextcloud/solid
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN cd apps/solid-nextcloud && git pull
 RUN composer install --working-dir=/var/www/html/apps/solid --no-dev --prefer-dist
     

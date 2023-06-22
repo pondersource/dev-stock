@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 
 set -e
 

@@ -13,9 +13,9 @@ USER www-data
 ARG REPO_OWNCLOUD=https://github.com/pondersource/core.git
 ARG BRANCH_OWNCLOUD=accept-ocm-to-groups
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN git clone                       \
     --depth 1                       \
     --recursive                     \
@@ -57,9 +57,9 @@ ARG BRANCH_CUSTOM_GROUPS=master
 ARG REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 ARG BRANCH_OCM=main
 # CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
-ARG CACHEBUST="$(echo $RANDOM)"
+ARG CACHEBUST="default"
 RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_CUSTOM_GROUPS}    \
