@@ -47,6 +47,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
   -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
   -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
+  -v "${REPO_ROOT}/owncloud/lib:/var/www/html/lib"                                                  \
   pondersource/dev-stock-owncloud-opencloudmesh
 
 echo "starting maria2.docker"
@@ -70,6 +71,7 @@ docker run --detach --network=testnet                                           
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
+  -v "${REPO_ROOT}/owncloud/lib:/var/www/html/lib"                                                  \
   -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
   -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
   pondersource/dev-stock-owncloud-opencloudmesh
