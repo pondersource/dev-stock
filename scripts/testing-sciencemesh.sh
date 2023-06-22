@@ -69,6 +69,8 @@ docker run --detach --network=testnet                                         \
   -e PASS="relativity"                                                        \
   -v "${REPO_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                        \
   -v "${REPO_ROOT}/$EFSS1-sciencemesh:/var/www/html/apps/sciencemesh"         \
+  -v "${REPO_ROOT}/docker/configs/20-xdebug.ini:/etc/php/7.4/cli/conf.d/20-xdebug.ini" \
+  -v "${REPO_ROOT}/docker/configs/20-xdebug.ini:/etc/php/8.2/cli/conf.d/20-xdebug.ini" \
   "pondersource/dev-stock-${EFSS1}1-sciencemesh"
 
 # EFSS2
@@ -101,6 +103,8 @@ docker run --detach --network=testnet                                         \
   -e PASS="radioactivity"                                                     \
   -v "${REPO_ROOT}/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                        \
   -v "${REPO_ROOT}/$EFSS2-sciencemesh:/var/www/html/apps/sciencemesh"         \
+  -v "${REPO_ROOT}/docker/configs/20-xdebug.ini:/etc/php/7.4/cli/conf.d/20-xdebug.ini" \
+  -v "${REPO_ROOT}/docker/configs/20-xdebug.ini:/etc/php/8.2/cli/conf.d/20-xdebug.ini" \
   "pondersource/dev-stock-${EFSS2}2-sciencemesh"
 
 # EFSS1
