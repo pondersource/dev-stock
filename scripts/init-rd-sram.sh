@@ -40,6 +40,10 @@ docker pull pondersource/dev-stock-oc2-rd-sram:latest
     ${REPO_RD_SRAM}                                                             \
     rd-sram
 
+cd owncloud &&                                                                  \
+    make    &&                                                                  \
+    cd ..
+
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
 [ ! -d "temp" ] && mkdir --parents temp

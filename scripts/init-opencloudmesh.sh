@@ -31,6 +31,9 @@ docker pull pondersource/dev-stock-oc2-opencloudmesh:latest
     ${REPO_OCM}                                                                 \
     ocm
 
+cd owncloud &&                                                                  \
+    make    &&                                                                  \
+    cd ..
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
