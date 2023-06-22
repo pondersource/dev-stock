@@ -46,11 +46,6 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
   -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/owncloud/apps/dav:/var/www/html/apps/dav"                                        \
-  -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
-  -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
-  -v "${REPO_ROOT}/owncloud/core:/var/www/html/core"                                                \
-  -v "${REPO_ROOT}/owncloud/lib:/var/www/html/lib"                                                  \
   -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
   pondersource/dev-stock-owncloud-rd-sram
 
@@ -75,11 +70,6 @@ docker run --detach --network=testnet                                           
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/owncloud/apps/dav:/var/www/html/apps/dav"                                        \
-  -v "${REPO_ROOT}/owncloud/apps/files_sharing:/var/www/html/apps/files_sharing"                    \
-  -v "${REPO_ROOT}/owncloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"      \
-  -v "${REPO_ROOT}/owncloud/core:/var/www/html/core"                                                \
-  -v "${REPO_ROOT}/owncloud/lib:/var/www/html/lib"                                                  \
   -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
   pondersource/dev-stock-owncloud-rd-sram
 
