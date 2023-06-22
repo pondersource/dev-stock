@@ -64,6 +64,7 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
+  -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
   pondersource/dev-stock-owncloud-opencloudmesh
 

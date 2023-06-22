@@ -10,8 +10,9 @@ cd docker
 echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
-echo Building pondersource/dev-stock-owncloud
-docker build --build-arg CACHEBUST="default" --file ./owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
+# Our owncloud-opencloudmesh image does not currently depend on our owncloud image
+# echo Building pondersource/dev-stock-owncloud
+# docker build --build-arg CACHEBUST="default" --file ./owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
 
 echo Building pondersource/dev-stock-owncloud-opencloudmesh
 docker build --build-arg CACHEBUST="default" --file ./owncloud-opencloudmesh.Dockerfile --tag pondersource/dev-stock-owncloud-opencloudmesh .
