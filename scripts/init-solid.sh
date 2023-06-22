@@ -6,11 +6,6 @@ set -e
 REPO_SOLID=https://github.com/pdsinterop/solid-nextcloud.git
 BRANCH_SOLID=main
 
-# pull images.
-docker pull mariadb:latest
-docker pull jlesage/firefox:latest
-docker pull pondersource/dev-stock-nextcloud-solid:latest
-
 # Solid-Nextcloud source code.
 [ ! -d "solid-nextcloud" ] &&                                               \
     git clone                                                               \

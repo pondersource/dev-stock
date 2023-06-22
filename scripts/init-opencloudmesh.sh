@@ -9,14 +9,6 @@ BRANCH_OWNCLOUD=ocm-cleaning
 REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
 
-# pull images.
-docker pull mariadb:latest
-docker pull jlesage/firefox:latest
-docker pull jlesage/firefox:v1.18.0
-
-docker pull pondersource/dev-stock-oc1-opencloudmesh:latest
-docker pull pondersource/dev-stock-oc2-opencloudmesh:latest
-
 # ownCloud source code.
 [ ! -d "owncloud" ] &&                                                          \
     git clone                                                                   \

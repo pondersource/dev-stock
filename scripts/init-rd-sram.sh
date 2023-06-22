@@ -12,14 +12,6 @@ BRANCH_OCM=main
 REPO_RD_SRAM=https://github.com/surfnet/rd-sram-integration
 BRANCH_RD_SRAM=main
 
-# pull images.
-docker pull mariadb:latest
-docker pull jlesage/firefox:latest
-docker pull jlesage/firefox:v1.18.0
-
-docker pull pondersource/dev-stock-oc1-rd-sram:latest
-docker pull pondersource/dev-stock-oc2-rd-sram:latest
-
 # ownCloud source code.
 [ ! -d "owncloud" ] &&                                                          \
     git clone                                                                   \
