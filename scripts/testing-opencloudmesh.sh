@@ -2,9 +2,8 @@
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
-[ ! -d "rd-sram" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "owncloud" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "ocm" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "owncloud" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
+[ ! -d "ocm" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
