@@ -4,7 +4,7 @@ set -e
 
 # repositories and branches.
 REPO_OWNCLOUD=https://github.com/pondersource/core
-BRANCH_OWNCLOUD=ocm-cleaning
+BRANCH_OWNCLOUD=accept-ocm-to-groups
 
 REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
