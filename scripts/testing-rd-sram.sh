@@ -3,7 +3,6 @@
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 [ ! -d "rd-sram" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "owncloud" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
 [ ! -d "ocm" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
 
 function waitForPort {
