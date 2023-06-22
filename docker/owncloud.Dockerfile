@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_OWNCLOUD=https://github.com/pondersource/core.git
-ARG BRANCH_OWNCLOUD=ocm-via-sciencemesh
+ARG BRANCH_OWNCLOUD=v10.12.2
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="$(date +%s)" .
 # $RANDOM returns random number each time.
