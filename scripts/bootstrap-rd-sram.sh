@@ -4,4 +4,4 @@
 
 ./init-rd-sram.sh
 
-./rd-sram-testing.sh
+./testing-rd-sram.sh
