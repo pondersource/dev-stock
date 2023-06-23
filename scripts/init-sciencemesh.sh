@@ -6,7 +6,7 @@ set -e
 REPO_NEXTCLOUD=https://github.com/nextcloud/server
 BRANCH_NEXTCLOUD=v26.0.1
 
-REPO_OWNCLOUD=https://github.com/pondersource/core
+REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.12.2
 
 REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
