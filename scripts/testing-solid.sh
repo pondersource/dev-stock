@@ -39,6 +39,7 @@ docker run --detach --network=testnet                                         \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
   -v "$REPO_ROOT/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                          \
+  -v "$REPO_ROOT/solid-nextcloud:/var/www/apps/solid-nextcloud"               \
   "pondersource/dev-stock-nextcloud-solid"
 
 # EFSS1
