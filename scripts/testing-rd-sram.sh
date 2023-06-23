@@ -46,7 +46,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
   -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
+  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
   pondersource/dev-stock-owncloud-rd-sram
 
 echo "starting maria2.docker"
@@ -70,7 +70,7 @@ docker run --detach --network=testnet                                           
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/temp/curls:/curls"                                                               \
+  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
   pondersource/dev-stock-owncloud-rd-sram
 
 waitForPort maria1.docker 3306

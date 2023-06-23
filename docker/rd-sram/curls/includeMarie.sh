@@ -22,6 +22,10 @@ curl --request PUT \
       {
          "display":"einstein@oc1.docker",
          "value":"einstein@oc1.docker"
+      },
+      {
+         "display":"marie@oc2.docker",
+         "value":"marie@oc2.docker"
       }
    ],
    "urn:mace:surf.nl:sram:scim:extension:Group":{
