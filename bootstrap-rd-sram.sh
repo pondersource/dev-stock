@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./clean.sh
+./scripts/clean.sh
 
 ./scripts/init-rd-sram.sh.
 
