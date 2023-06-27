@@ -2,8 +2,7 @@
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
-[ ! -d "rd-sram" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
-[ ! -d "ocm" ] && echo Please run ./scripts/init-rd-sram.sh first! && exit
+[ ! -d "ocm" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
@@ -20,8 +19,8 @@ function waitForPort {
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
 
 # copy init files.
-cp --force --recursive ./docker/rd-sram/curls ./temp/curls
-cp --force ./docker/scripts/init-owncloud-rd-sram.sh  ./temp/oc-rd-sram.sh
+cp --force "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh"  "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
@@ -46,11 +45,9 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
-  -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
+  -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
-  pondersource/dev-stock-owncloud-rd-sram
+  pondersource/dev-stock-owncloud-opencloudmesh
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -62,19 +59,17 @@ docker run --detach --network=testnet                                           
   --innodb-file-per-table=1                                                                         \
   --skip-innodb-read-only-compressed
 
-echo "starting oc2.docker"
+echo "starting nc2.docker"
 docker run --detach --network=testnet                                                               \
-  --name=oc2.docker                                                                                 \
+  --name=nc2.docker                                                                                 \
   --publish 9080:80                                                                                 \
   --add-host "host.docker.internal:host-gateway"                                                    \
-  -e HOST="oc2"                                                                                     \
+  -e HOST="nc2"                                                                                     \
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
-  -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
-  -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
-  pondersource/dev-stock-owncloud-rd-sram
+  -v "${REPO_ROOT}/temp/nc-base.sh:/init.sh"                                                        \
+  pondersource/dev-stock-nextcloud
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
@@ -83,26 +78,7 @@ echo "executing init.sh on oc1.docker"
 docker exec -u www-data oc1.docker sh /init.sh
 
 waitForPort maria2.docker 3306
-waitForPort oc2.docker 443
+waitForPort nc2.docker 443
 
-echo "executing init.sh on oc2.docker"
-docker exec -u www-data oc2.docker sh /init.sh
-
-echo "Setting up SCIM control for Federated Groups"
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
-
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc1"
-docker exec -it oc1.docker sh /curls/createGroup.sh oc1.docker
-
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc2"
-docker exec -it oc2.docker sh /curls/createGroup.sh oc2.docker
-
-docker exec -it oc1.docker sh /curls/excludeMarie.sh oc1.docker
-docker exec -it oc2.docker sh /curls/excludeMarie.sh oc2.docker
-
-echo "share something from einstein@oc1.docker to Test Group, then run:"
-echo "$ docker exec -it oc2.docker sh /curls/includeMarie.sh oc2.docker"
-echo "$ docker exec -it oc1.docker sh /curls/includeMarie.sh oc1.docker"
-echo "then log in to oc2.docker as marie, you should not have received the share"
-echo "refresh the oc2.docker page, the share from einstein to Test Group should now also arrive to Marie"
+echo "executing init.sh on nc2.docker"
+docker exec -u www-data nc2.docker sh /init.sh
