@@ -16,6 +16,9 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
+# create temp dirctory if it doesn't exist.
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+
 # copy init files.
 cp --force --recursive ./docker/rd-sram/curls ./temp/curls
 cp --force ./docker/scripts/init-owncloud-rd-sram.sh  ./temp/oc-rd-sram.sh

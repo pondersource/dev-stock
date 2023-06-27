@@ -3,18 +3,6 @@
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 
-# repositories and branches.
-REPO_NEXTCLOUD=https://github.com/nextcloud/server
-BRANCH_NEXTCLOUD=v26.0.1
-
-# Nextcloud source code.
-[ ! -d "nextcloud" ] &&                                                         \
-    git clone                                                                   \
-    --depth 1                                                                   \
-    --branch ${BRANCH_NEXTCLOUD}                                                \
-    ${REPO_NEXTCLOUD}                                                           \
-    "${REPO_ROOT}/nextcloud"
-
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
   until [ "${x}" -ne 0 ]
@@ -26,7 +14,11 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
+# create temp dirctory if it doesn't exist.
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+
 # copy init files.
+cp --force "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
 
 # echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
@@ -50,9 +42,7 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/nextcloud/apps/files_sharing:/var/www/html/apps/files_sharing"                   \
-  -v "${REPO_ROOT}/nextcloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"     \
-  -v "${REPO_ROOT}/nextcloud/lib:/var/www/html/apps/lib"                                            \
+  -v "${REPO_ROOT}/temp/nc-base.sh:/init.sh"                                                        \
   pondersource/dev-stock-nextcloud
 
 echo "starting maria2.docker"
@@ -73,20 +63,18 @@ docker run --detach --network=testnet                                           
   -e HOST="nc2"                                                                                     \
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
+  -v "${REPO_ROOT}/temp/nc-base.sh:/init.sh"                                                        \
   -e PASS="radioactivity"                                                                           \
-  -v "${REPO_ROOT}/nextcloud/apps/files_sharing:/var/www/html/apps/files_sharing"                   \
-  -v "${REPO_ROOT}/nextcloud/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"     \
-  -v "${REPO_ROOT}/nextcloud/lib:/var/www/html/apps/lib"                                            \
   pondersource/dev-stock-nextcloud
 
 waitForPort maria1.docker 3306
 waitForPort nc1.docker 443
 
 echo "executing init.sh on nc1.docker"
-docker exec -u www-data nc1.docker sh /nc-init.sh
+docker exec -u www-data nc1.docker sh /init.sh
 
 waitForPort maria2.docker 3306
 waitForPort nc2.docker 443
 
 echo "executing init.sh on nc2.docker"
-docker exec -u www-data nc2.docker sh /nc-init.sh
+docker exec -u www-data nc2.docker sh /init.sh

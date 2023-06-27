@@ -19,6 +19,9 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
+# create temp dirctory if it doesn't exist.
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+
 # copy init files.
 cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/oc.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh

@@ -14,6 +14,9 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
+# create temp dirctory if it doesn't exist.
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+
 EFSS1=nc
 
 # copy init files.
@@ -38,8 +41,8 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
-  -v "$REPO_ROOT/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                          \
-  -v "$REPO_ROOT/solid-nextcloud:/var/www/apps/solid-nextcloud"               \
+  -v "${REPO_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                        \
+  -v "${REPO_ROOT}/solid-nextcloud:/var/www/apps/solid-nextcloud"             \
   "pondersource/dev-stock-nextcloud-solid"
 
 # EFSS1
