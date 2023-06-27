@@ -2,6 +2,7 @@
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
+[ ! -d "ocm" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
@@ -19,9 +20,11 @@ function waitForPort {
 
 # copy init files.
 cp --force "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh"  "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
 
-# echo "starting firefox tester"
+echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
+docker run --detach --name=firefox-legacy --network=testnet -p 5900:5800 --shm-size 2g jlesage/firefox:v1.18.0
 
 echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
@@ -33,17 +36,18 @@ docker run --detach --network=testnet                                           
   --innodb-file-per-table=1                                                                         \
   --skip-innodb-read-only-compressed
 
-echo "starting nc1.docker"
+echo "starting oc1.docker"
 docker run --detach --network=testnet                                                               \
-  --name=nc1.docker                                                                                 \
+  --name=oc1.docker                                                                                 \
   --publish 8080:80                                                                                 \
   --add-host "host.docker.internal:host-gateway"                                                    \
-  -e HOST="nc1"                                                                                     \
+  -e HOST="oc1"                                                                                     \
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/temp/nc-base.sh:/init.sh"                                                        \
-  pondersource/dev-stock-nextcloud
+  -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
+  -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
+  pondersource/dev-stock-owncloud-opencloudmesh
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -68,10 +72,10 @@ docker run --detach --network=testnet                                           
   pondersource/dev-stock-nextcloud
 
 waitForPort maria1.docker 3306
-waitForPort nc1.docker 443
+waitForPort oc1.docker 443
 
-echo "executing init.sh on nc1.docker"
-docker exec -u www-data nc1.docker sh /init.sh
+echo "executing init.sh on oc1.docker"
+docker exec -u www-data oc1.docker sh /init.sh
 
 waitForPort maria2.docker 3306
 waitForPort nc2.docker 443
