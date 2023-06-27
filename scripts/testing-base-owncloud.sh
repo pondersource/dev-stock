@@ -2,7 +2,6 @@
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
-[ ! -d "ocm" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
