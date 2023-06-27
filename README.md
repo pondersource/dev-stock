@@ -4,10 +4,14 @@ Docker images we use in development.
 # Note
 If you do build on Codespaces, make sure you set `DOCKER_BUILDKIT=0` .
 
-Nextcloud version:
-upstream: https://github.com/nextcloud/server.git
-branch: v26.0.1
+## Nextcloud version
 
-ownCloud version:
-upstream: https://github.com/pondersource/core.git
-branch: ocm-via-sciencemesh
+upstream: [Nextcloud Server Official](https://github.com/nextcloud/server)
+
+branch: [v26.0.1](https://github.com/nextcloud/server/releases/tag/v26.0.1)
+
+## ownCloud version
+
+upstream: [ownCloud Core Official](https://github.com/owncloud/core)
+
+branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
