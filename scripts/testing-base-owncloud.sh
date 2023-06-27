@@ -16,7 +16,7 @@ function waitForPort {
 }
 
 # copy init files.
-cp --force ./docker/scripts/init-owncloud-opencloudmesh.sh  ./temp/oc-opencloudmesh.sh
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-base.sh" "${REPO_ROOT}/temp/oc-base.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
@@ -41,8 +41,8 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/temp/pure-oc.sh:/init.sh"                                               \
-  owncloud:latest
+  -v "${REPO_ROOT}/temp/oc-base.sh:/init.sh"                                                        \
+  pondersource/dev-stock-owncloud
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -63,8 +63,8 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
-  -v "${REPO_ROOT}/temp/pure-oc.sh:/init.sh"                                               \
-  owncloud:latest
+  -v "${REPO_ROOT}/temp/oc-base.sh.sh:/init.sh"                                                     \
+  pondersource/dev-stock-owncloud
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
