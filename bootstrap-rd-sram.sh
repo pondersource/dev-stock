@@ -2,9 +2,9 @@
 
 ./scripts/clean.sh
 
-./scripts/init-rd-sram.sh.
+./scripts/init-rd-sram.sh
 
-./scripts/testing-rd-sram.sh.
+./scripts/testing-rd-sram.sh
 
 docker exec -it oc2.docker sh /curls/includeMarie.sh oc2.docker
 
