@@ -9,3 +9,6 @@
 docker exec -it oc2.docker sh /curls/includeMarie.sh oc2.docker
 
 docker exec -it oc1.docker sh /curls/includeMarie.sh oc1.docker
+
+docker exec -it oc1.docker sed -i "14 i\      3 => \$_SERVER['HTTP_HOST']," /var/www/html/config/config.php
+docker exec -it oc2.docker sed -i "14 i\      3 => \$_SERVER['HTTP_HOST']," /var/www/html/config/config.php
