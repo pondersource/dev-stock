@@ -14,6 +14,8 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
+mkdir "${REPO_ROOT}/temp"
+
 # copy init files.
 cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-base.sh" "${REPO_ROOT}/temp/oc-base.sh"
 
@@ -62,7 +64,7 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
-  -v "${REPO_ROOT}/temp/oc-base.sh.sh:/init.sh"                                                     \
+  -v "${REPO_ROOT}/temp/oc-base.sh:/init.sh"                                                     \
   pondersource/dev-stock-owncloud
 
 waitForPort maria1.docker 3306
