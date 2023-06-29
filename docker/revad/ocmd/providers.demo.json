@@ -14,11 +14,11 @@
 						"description": "CERNBox Open Cloud Mesh API"
 					},
 					"name": "CERNBox - OCM API",
-					"path": "http://127.0.0.1:19001/ocm/",
+					"path": "http://revad1.docker:19001/ocm/",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:19001"
+				"host": "revad1.docker:19001"
 			},
 			{
 				"endpoint": {
@@ -27,11 +27,11 @@
 						"description": "CERNBox Webdav API"
 					},
 					"name": "CERNBox - Webdav API",
-					"path": "http://127.0.0.1:19001/remote.php/webdav/",
+					"path": "http://revad1.docker:19001/remote.php/webdav/",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:19001"
+				"host": "revad1.docker:19001"
 			},
 			{
 				"endpoint": {
@@ -40,11 +40,11 @@
 						"description": "CERNBox GRPC Gateway"
 					},
 					"name": "CERNBox - GRPC Gateway",
-					"path": "127.0.0.1:19000",
+					"path": "revad1.docker:19000",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:19000"
+				"host": "revad1.docker:19000"
 			}
 		]
 	},
@@ -63,11 +63,11 @@
 						"description": "CESNET Open Cloud Mesh API"
 					},
 					"name": "CESNET - OCM API",
-					"path": "http://127.0.0.1:17001/ocm/",
+					"path": "http://revad2.docker:17001/ocm/",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:17001"
+				"host": "revad2.docker:17001"
 			},
 			{
 				"endpoint": {
@@ -76,11 +76,11 @@
 						"description": "CESNET Webdav API"
 					},
 					"name": "CESNET - Webdav API",
-					"path": "http://127.0.0.1:17001/remote.php/webdav/",
+					"path": "http://revad2.docker:17001/remote.php/webdav/",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:17001"
+				"host": "revad2.docker:17001"
 			},
 			{
 				"endpoint": {
@@ -89,11 +89,11 @@
 						"description": "CESNET GRPC Gateway"
 					},
 					"name": "CESNET - GRPC Gateway",
-					"path": "127.0.0.1:17000",
+					"path": "revad2.docker:17000",
 					"is_monitored": true
 				},
 				"api_version": "0.0.1",
-				"host": "127.0.0.1:17000"
+				"host": "revad2.docker:17000"
 			}
 		]
 	}
