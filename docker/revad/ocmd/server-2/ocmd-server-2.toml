@@ -1,21 +1,21 @@
 [shared]
-gatewaysvc = "localhost:17000"
+gatewaysvc = "revad2.docker:17000"
 
 [grpc]
 address = "0.0.0.0:17000"
 
 [grpc.services.gateway]
-authregistrysvc = "localhost:17000"
-storageregistrysvc = "localhost:17000"
-preferencessvc = "localhost:17000"
-userprovidersvc = "localhost:17000"
-usershareprovidersvc = "localhost:17000"
-publicshareprovidersvc = "localhost:17000"
-ocmcoresvc = "localhost:17000"
-ocmshareprovidersvc = "localhost:17000"
-ocminvitemanagersvc = "localhost:17000"
-ocmproviderauthorizersvc = "localhost:17000"
-datagateway = "http://localhost:17001/data"
+authregistrysvc = "revad2.docker:17000"
+storageregistrysvc = "revad2.docker:17000"
+preferencessvc = "revad2.docker:17000"
+userprovidersvc = "revad2.docker:17000"
+usershareprovidersvc = "revad2.docker:17000"
+publicshareprovidersvc = "revad2.docker:17000"
+ocmcoresvc = "revad2.docker:17000"
+ocmshareprovidersvc = "revad2.docker:17000"
+ocminvitemanagersvc = "revad2.docker:17000"
+ocmproviderauthorizersvc = "revad2.docker:17000"
+datagateway = "http://revad2.docker:17001/data"
 transfer_expires = 6                         # give it a moment
 commit_share_to_storage_grant = true
 commit_share_to_storage_ref = true
@@ -24,9 +24,9 @@ commit_share_to_storage_ref = true
 driver = "static"
 
 [grpc.services.authregistry.drivers.static.rules]
-basic = "localhost:17000"
-machine = "localhost:17030"
-ocmshares = "localhost:17020"
+basic = "revad2.docker:17000"
+machine = "revad2.docker:17030"
+ocmshares = "revad2.docker:17020"
 
 [grpc.services.storageregistry]
 driver = "static"
@@ -35,12 +35,12 @@ driver = "static"
 home_provider = "/home"
 
 [grpc.services.storageregistry.drivers.static.rules]
-"/home" = { "address" = "localhost:17000" }
-"123e4567-e89b-12d3-a456-426655440000" = { "address" = "localhost:17000" }
-"/sciencemesh" = { "address" = "localhost:17010" }
-"sciencemesh" = { "address" = "localhost:17010" }
-"/ocm" = { "address" = "localhost:17020" }
-"ocm" = { "address" = "localhost:17020" }
+"/home" = { "address" = "revad2.docker:17000" }
+"123e4567-e89b-12d3-a456-426655440000" = { "address" = "revad2.docker:17000" }
+"/sciencemesh" = { "address" = "revad2.docker:17010" }
+"sciencemesh" = { "address" = "revad2.docker:17010" }
+"/ocm" = { "address" = "revad2.docker:17020" }
+"ocm" = { "address" = "revad2.docker:17020" }
 
 [grpc.services.usershareprovider]
 driver = "memory"
@@ -61,7 +61,7 @@ file = "/var/tmp/reva/invites_server_2.json"
 
 [grpc.services.ocmshareprovider]
 driver = "json"
-webdav_endpoint = "http://localhost:17001"
+webdav_endpoint = "http://revad2.docker:17001"
 provider_domain = "cesnet.cz"
 
 [grpc.services.ocmshareprovider.drivers.json]
@@ -81,7 +81,7 @@ driver = "localhome"
 mount_path = "/home"
 mount_id = "123e4567-e89b-12d3-a456-426655440000"
 expose_data_server = true
-data_server_url = "http://localhost:17001/data"
+data_server_url = "http://revad2.docker:17001/data"
 enable_home_creation = true
 
 [grpc.services.storageprovider.drivers.localhome]
@@ -115,7 +115,7 @@ user_layout = "{{.Username}}"
 
 [http.services.ocmprovider]
 provider = "reva@cesnet"
-endpoint = "http://localhost:17001"
+endpoint = "http://revad2.docker:17001"
 enable_webapp = true
 enable_datatx = true
 
