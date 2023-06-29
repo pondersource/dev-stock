@@ -28,4 +28,20 @@ docker exec -it revad1.docker bash
 > make revad
 > make reva
 ```
-Then follow e.g. https://reva.link/docs/tutorials/datatx-tutorial/
+
+### Running the ocmd tutorial
+After you've run `make revad` and `make reva` once in one of the two containers as detailed above, to build reva on the host,
+You do:
+* `docker exec -it revad1.docker bash` and then:
+```
+cd /reva/examples/ocmd
+../../cmd/revad/revad -dev-dir server-1
+```
+* `docker exec -it revad2.docker bash` and then:
+```
+cd /reva/examples/ocmd
+../../cmd/revad/revad -dev-dir server-1
+```
+* `docker exec -it revad1.docker bash` again for `/reva/cmd/reva/reva -insecure -host localhost:19000` etc.
+* `docker exec -it revad2.docker bash` again for `/reva/cmd/reva/reva -insecure -host localhost:17000` etc. (notice the port number!)
+* follow the rest of https://reva.link/docs/tutorials/share-tutorial/
