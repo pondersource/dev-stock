@@ -123,10 +123,10 @@ remove_transfer_on_cancel = true
 # rclone driver
 [grpc.services.datatx.txdrivers.rclone]
 # rclone endpoint
-endpoint = "http://..."
+endpoint = "http://rclone.docker"
 # Basic auth is used for authenticating with rclone
-auth_user = "{rclone user}"
-auth_pass = "{rclone user secret}"
+auth_user = "rcloneuser"
+auth_pass = "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
 # The authentication scheme to use in the src and dest requests by rclone (follows the endpoints' authentication methods)
 # Valid values:
 #   "bearer" (default)    will result in rclone using request header:   Authorization: "Bearer ...token..."

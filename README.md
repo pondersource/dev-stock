@@ -33,8 +33,11 @@ branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
 ```
 
 ## Reva-to-reva
+To initialize your development environment and build reva on the host, do:o
 ```
 ./scripts/init-reva.sh
+# passing sleep as the main container command will allow us
+# to run revad interactively later:
 REVA_CMD="sleep 30000" ./scripts/testing-reva.sh
 docker exec -it revad1.docker bash
 > cd /reva
@@ -44,8 +47,7 @@ docker exec -it revad1.docker bash
 ```
 
 ### Running the ocmd tutorial
-After you've run `make revad` and `make reva` once in one of the two containers as detailed above, to build reva on the host,
-You do:
+After you've run `make revad` and `make reva` once in one of the two containers as detailed above, you do:
 * `docker exec -it revad1.docker bash` and then:
 ```
 cd /etc/revad/ocmd
@@ -61,16 +63,15 @@ cd /etc/revad/ocmd
 * follow the rest of https://reva.link/docs/tutorials/share-tutorial/
 
 ### Running the datatx tutorial
-fter you've run `make revad` and `make reva` once in one of the two containers as detailed above, to build reva on the host,
-You do:
+After you've run `make revad` and `make reva` once in one of the two containers as detailed above, you do:
 * `docker exec -it revad1.docker bash` and then:
 ```
-cd /etc/revad/ocmd
+cd /etc/revad/datatx
 /reva/cmd/revad/revad -dev-dir server-1
 ```
 * `docker exec -it revad2.docker bash` and then:
 ```
-cd /etc/revad/ocmd
+cd /etc/revad/datatx
 /reva/cmd/revad/revad -dev-dir server-2
 ```
 * `docker exec -it revad1.docker bash` again for `/reva/cmd/reva/reva -insecure -host localhost:19000` etc.

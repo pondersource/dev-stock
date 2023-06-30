@@ -9,7 +9,11 @@ chmod +x "${REPO_ROOT}/docker/scripts/reva-run.sh"
 chmod +x "${REPO_ROOT}/docker/scripts/reva-kill.sh"
 chmod +x "${REPO_ROOT}/docker/scripts/reva-entrypoint.sh"
 
-docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+# rclone
+docker run --detach --name=rclone.docker --network=testnet  rclone/rclone rcd \                                   \
+  -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek \
+  --rc-addr=0.0.0.0:5572 --server-side-across-configs=true                    \
+  --log-file=/dev/stdout
 
 # revad1
 docker run --detach --network=testnet                                         \
@@ -35,4 +39,3 @@ docker run --detach --network=testnet                                         \
   -v "${REPO_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"         \
   -v "${REPO_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"          \
   pondersource/dev-stock-revad ${REVA_CMD}
-
