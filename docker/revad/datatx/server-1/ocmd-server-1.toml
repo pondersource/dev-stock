@@ -123,7 +123,7 @@ remove_transfer_on_cancel = true
 # rclone driver
 [grpc.services.datatx.txdrivers.rclone]
 # rclone endpoint
-endpoint = "http://rclone.docker"
+endpoint = "http://rclone.docker:5572"
 # Basic auth is used for authenticating with rclone
 auth_user = "rcloneuser"
 auth_pass = "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
