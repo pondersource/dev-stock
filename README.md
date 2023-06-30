@@ -18,6 +18,20 @@ upstream: [ownCloud Core Official](https://github.com/owncloud/core)
 branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
 
 # Debugging
+## RD-SRAM
+```
+./scripts/init-rd-sram.sh
+./scripts/testing-rd-sram.sh
+```
+
+## ScienceMesh
+```
+./script/init-sciencemesh.sh
+./tests/nrro.sh
+./script/clean.sh
+./tests/orro.sh
+```
+
 ## Reva-to-reva
 ```
 ./scripts/init-reva.sh
