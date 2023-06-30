@@ -76,4 +76,4 @@ cd /etc/revad/datatx
 ```
 * `docker exec -it revad1.docker bash` again for `/reva/cmd/reva/reva -insecure -host localhost:19000` etc.
 * `docker exec -it revad2.docker bash` again for `/reva/cmd/reva/reva -insecure -host localhost:17000` etc. (notice the port number!)
-* follow the rest of https://reva.link/docs/tutorials/share-tutorial/
+* follow the rest of https://reva.link/docs/tutorials/datatx-tutorial/#3-create-a-datatx-protocol-type-ocm-share

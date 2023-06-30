@@ -19,7 +19,7 @@ datagateway = "http://revad2.docker:17001/data"
 transfer_expires = 6                         # give it a moment
 commit_share_to_storage_grant = true
 commit_share_to_storage_ref = true
-datatx = "localhost:19000"
+datatx = "localhost:17000"
 # base folder of the data transfers (eg. /home/DataTransfers)
 data_transfers_folder = ""
 
