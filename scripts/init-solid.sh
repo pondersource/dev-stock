@@ -4,7 +4,7 @@ set -e
 
 # repositories and branches.
 REPO_SOLID=https://github.com/pdsinterop/solid-nextcloud.git
-BRANCH_SOLID=main
+BRANCH_SOLID=support-nc-27
 
 # Solid-Nextcloud source code.
 [ ! -d "solid-nextcloud" ] &&                                               \
