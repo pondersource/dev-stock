@@ -4,7 +4,7 @@ set -e
 
 # repositories and branches.
 REPO_NEXTCLOUD=https://github.com/nextcloud/server
-BRANCH_NEXTCLOUD=v26.0.1
+BRANCH_NEXTCLOUD=v27.0.0
 
 REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.12.2
