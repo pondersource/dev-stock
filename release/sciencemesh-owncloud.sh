@@ -13,7 +13,7 @@ BRANCH_OWNCLOUD_APP=owncloud
 [ ! -d "temp" ] && mkdir --parents temp
 
 # copy init file.
-cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/oc.sh
+cp --force ./docker/scripts/init-owncloud-sciencemesh.sh ./temp/oc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
@@ -46,7 +46,7 @@ docker run --detach --network=testnet                                           
 docker run --detach --network=testnet                                           \
   --name=oc-release.docker                                                      \
   --add-host "host.docker.internal:host-gateway"                                \
-  -e HOST="oc-release"                                                          \
+  -e HOST="oc1"                                                                 \
   -e DBHOST="maria1.docker"                                                     \
   -e USER="einstein"                                                            \
   -e PASS="relativity"                                                          \

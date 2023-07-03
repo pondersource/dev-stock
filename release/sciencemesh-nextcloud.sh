@@ -13,7 +13,7 @@ BRANCH_OWNCLOUD_APP=nextcloud
 [ ! -d "temp" ] && mkdir --parents temp
 
 # copy init file.
-cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh  ./temp/nc.sh
+cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
@@ -46,7 +46,7 @@ docker run --detach --network=testnet                                           
 docker run --detach --network=testnet                                           \
   --name=nc-release.docker                                                      \
   --add-host "host.docker.internal:host-gateway"                                \
-  -e HOST="nc-release"                                                          \
+  -e HOST="nc1"                                                                 \
   -e DBHOST="maria1.docker"                                                     \
   -e USER="einstein"                                                            \
   -e PASS="relativity"                                                          \
