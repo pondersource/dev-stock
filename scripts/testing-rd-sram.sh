@@ -21,7 +21,7 @@ function waitForPort {
 
 # copy init files.
 cp --force --recursive ./docker/rd-sram/curls ./temp/curls
-cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh"  "${REPO_ROOT}/temp/oc-rd-sram.sh"
+cp --force ./docker/scripts/init-owncloud-rd-sram.sh  ./temp/oc-rd-sram.sh
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
@@ -72,8 +72,9 @@ docker run --detach --network=testnet                                           
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
+  -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
+  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                     \
   pondersource/dev-stock-owncloud-rd-sram
 
 waitForPort maria1.docker 3306
