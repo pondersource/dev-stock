@@ -16,12 +16,12 @@ function waitForPort {
   echo "${1}" port "${2}" is open
 }
 
-# create temp dirctory if it doesn't exist.
+# create temp directory if it doesn't exist.
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
 
 # copy init files.
 cp --force --recursive ./docker/rd-sram/curls ./temp/curls
-cp --force ./docker/scripts/init-owncloud-rd-sram.sh  ./temp/oc-rd-sram.sh
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${REPO_ROOT}/temp/oc-rd-sram.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
