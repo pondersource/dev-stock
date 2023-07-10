@@ -78,6 +78,7 @@ RUN git clone                           \
     apps/oc-opencloudmesh
 
 RUN cd apps && ln --symbolic oc-opencloudmesh/opencloudmesh
+RUN cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
