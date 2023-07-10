@@ -26,9 +26,9 @@ branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
 
 ## ScienceMesh
 ```
-./script/init-sciencemesh.sh
+./scripts/init-sciencemesh.sh
 ./tests/nrro.sh
-./script/clean.sh
+./scripts/clean.sh
 ./tests/orro.sh
 ```
 
