@@ -33,7 +33,7 @@ branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
 ```
 
 ## Reva-to-reva
-To initialize your development environment and build reva on the host, do:o
+To initialize your development environment and build reva on the host, do:
 ```
 ./scripts/init-reva.sh
 # passing sleep as the main container command will allow us
