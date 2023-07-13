@@ -47,11 +47,9 @@ docker run --detach --network=testnet                                           
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
-  # -v "${REPO_ROOT}/core/apps/files_sharing:/var/www/html/apps/files_sharing"                        \
-  # -v "${REPO_ROOT}/core/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"          \
   -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                     \
+  -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                               \
   pondersource/dev-stock-owncloud-rd-sram
 
 echo "starting maria2.docker"
@@ -74,8 +72,6 @@ docker run --detach --network=testnet                                           
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                     \
-  # -v "${REPO_ROOT}/core/apps/files_sharing:/var/www/html/apps/files_sharing"                        \
-  # -v "${REPO_ROOT}/core/apps/federatedfilesharing:/var/www/html/apps/federatedfilesharing"          \
   -v "${REPO_ROOT}/rd-sram:/var/www/html/apps/rd-sram-integration"                                  \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
   -v "${REPO_ROOT}/docker/rd-sram/curls:/curls"                                                     \
