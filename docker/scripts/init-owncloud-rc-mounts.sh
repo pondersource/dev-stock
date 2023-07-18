@@ -9,4 +9,4 @@ sed -i "8 i\      1 => 'oc1.docker'," /var/www/html/config/config.php
 sed -i "9 i\      2 => 'oc2.docker'," /var/www/html/config/config.php
 
 echo "Installing DAV Token Access"
-php console.php app:enable tokenbasedav
+php console.php app:enable dav_token_access
