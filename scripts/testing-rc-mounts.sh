@@ -44,8 +44,8 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                     \
-  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                            \
+  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
+  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
   pondersource/dev-stock-owncloud-rc-mounts
 
 echo "starting maria2.docker"
@@ -67,8 +67,8 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
-  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                     \
-  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                            \
+  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
+  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
   pondersource/dev-stock-owncloud-rc-mounts
 
 waitForPort maria1.docker 3306
