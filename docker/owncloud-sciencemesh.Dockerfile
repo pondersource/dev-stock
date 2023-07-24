@@ -10,7 +10,7 @@ LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 USER www-data
 
 ARG REPO_SCIENCEMESH=https://github.com/pondersource/nc-sciencemesh
-ARG BRANCH_SCIENCEMESH=main
+ARG BRANCH_SCIENCEMESH=owncloud
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
