@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# create symbolic link (by force)
+ln --symbolic --force /var/www/html/apps/rd-sram-integration/federatedgroups /var/www/html/apps/federatedgroups
+
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
                                     --database-name "efss" --database-user "root" --database-host "$DBHOST"     \
                                     --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"

@@ -21,7 +21,7 @@ RUN git clone                           \
     ${REPO_RD_SRAM}                     \
     apps/rd-sram-integration
 
-RUN cd apps && ln --symbolic rd-sram-integration/federatedgroups
+RUN cd apps && ln --symbolic --force rd-sram-integration/federatedgroups
 
 COPY ./rd-sram/curls /curls
 # this file can be overrided in docker run or docker compose.yaml. 
