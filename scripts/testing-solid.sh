@@ -20,7 +20,7 @@ function waitForPort {
 EFSS1=nc
 
 # copy init files.
-cp --force ./docker/scripts/init-nextcloud-solid.sh ./temp/nc.sh
+cp --force ./docker/scripts/init-nextcloud-solid.sh ./temp/init-nextcloud-solid.sh
 
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
 
@@ -41,7 +41,7 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
-  -v "${REPO_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                        \
+  -v "${REPO_ROOT}/temp/init-nextcloud-solid.sh:/init.sh"                     \
   -v "${REPO_ROOT}/solid-nextcloud:/var/www/html/apps/solid-nextcloud"        \
   "pondersource/dev-stock-nextcloud-solid"
 
@@ -49,7 +49,7 @@ docker run --detach --network=testnet                                         \
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
 
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" sh "/init.sh"
 
 # instructions.
 echo "Now browse to firefox and inside there to https://${EFSS1}1.docker"
