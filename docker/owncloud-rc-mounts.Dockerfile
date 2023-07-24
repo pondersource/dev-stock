@@ -3,7 +3,7 @@ FROM pondersource/dev-stock-owncloud
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="Pondersource ownCloud rc-mounts Image"
+LABEL org.opencontainers.image.title="PonderSource ownCloud rc-mounts Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
@@ -21,7 +21,7 @@ RUN git clone                           \
     ${REPO_DAV_TOKEN}                   \
     apps/rc-mounts
 
-RUN cd apps && ln --symbolic rc-mounts/dav_token_access
+RUN cd apps && ln --symbolic --force rc-mounts/tokenbasedav
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
