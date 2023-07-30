@@ -25,6 +25,15 @@ echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy --network=testnet -p 5900:5800 --shm-size 2g jlesage/firefox:v1.18.0
 
+echo "start keycloak service"
+docker run --detach --network=testnet                                                               \
+  --name keycloak.docker                                                                            \
+  -e KEYCLOAK_ADMIN=admin                                                                           \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin                                                                  \
+  quay.io/keycloak/keycloak:latest                                                                  \
+  start-dev                                                                                         \
+  --http-port=80
+
 echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
   --name=maria1.docker                                                                              \
