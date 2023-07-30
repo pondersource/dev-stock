@@ -572,7 +572,7 @@
       "alwaysDisplayInConsole" : false,
       "clientAuthenticatorType" : "client-secret",
       "secret" : "37Z61yccMTeWBLZelyJAg2L6JLRMkc2u",
-      "redirectUris" : [ "https://oc1.docker" ],
+      "redirectUris" : [ "https://oc1.docker/index.php/apps/openidconnect/redirect" ],
       "webOrigins" : [ "https://oc1.docker" ],
       "notBefore" : 0,
       "bearerOnly" : false,
