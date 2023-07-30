@@ -21,6 +21,7 @@ RUN apt install --yes               \
     vim                             \
     curl                            \
     wget                            \
+    sudo                            \
     unzip                           \
     libxml2                         \
     iproute2                        \
@@ -48,6 +49,7 @@ RUN apt install --yes       \
     php8.2-zip              \
     php8.2-curl             \
     php8.2-intl             \
+    php8.2-redis            \
     php8.2-mysql            \
     php8.2-xdebug           \
     php8.2-opcache          \
@@ -62,6 +64,7 @@ RUN apt install --yes       \
     php7.4-curl             \
     php7.4-intl             \
     php7.4-json             \
+    php8.2-redis            \
     php7.4-mysql            \
     php7.4-xdebug           \
     php7.4-opcache          \
