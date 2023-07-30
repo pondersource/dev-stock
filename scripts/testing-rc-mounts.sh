@@ -25,7 +25,7 @@ echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy --network=testnet -p 5900:5800 --shm-size 2g jlesage/firefox:v1.18.0
 
-echo "start keycloak service"
+echo "starting keycloak.docker service"
 docker run --detach --network=testnet                                                               \
   --name keycloak.docker                                                                            \
   -e KEYCLOAK_ADMIN=admin                                                                           \
@@ -33,6 +33,11 @@ docker run --detach --network=testnet                                           
   quay.io/keycloak/keycloak:latest                                                                  \
   start-dev                                                                                         \
   --http-port=80
+
+echo "starting redis1.docker service"
+docker run --detach --network=testnet                                                               \
+  --name redis1.docker                                                                              \
+  redis
 
 echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
@@ -53,9 +58,16 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
+  -e REDIS_HOST="redis1.docker"                                                                     \
   -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
   -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
+  -v "${REPO_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
   pondersource/dev-stock-owncloud-rc-mounts
+
+echo "starting redis2.docker service"
+docker run --detach --network=testnet                                                               \
+  --name redis2.docker                                                                              \
+  redis
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -76,8 +88,10 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
+  -e REDIS_HOST="redis2.docker"                                                                     \
   -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
   -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
+  -v "${REPO_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
   pondersource/dev-stock-owncloud-rc-mounts
 
 waitForPort maria1.docker 3306
