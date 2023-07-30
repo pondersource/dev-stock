@@ -30,9 +30,14 @@ docker run --detach --network=testnet                                           
   --name keycloak.docker                                                                            \
   -e KEYCLOAK_ADMIN=admin                                                                           \
   -e KEYCLOAK_ADMIN_PASSWORD=admin                                                                  \
+  -v "${REPO_ROOT}/docker/scripts/init-keycloak.sh:/init.sh"                                        \
+  -v "${REPO_ROOT}/docker/configs/keycloak.json:/opt/keycloak_import/keycloak.json"                 \
   quay.io/keycloak/keycloak:latest                                                                  \
   start-dev                                                                                         \
   --http-port=80
+
+echo "importing realms and users into keycloak"
+docker exec -u root keycloak.docker bash /init.sh
 
 echo "starting redis1.docker service"
 docker run --detach --network=testnet                                                               \
