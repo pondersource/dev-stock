@@ -19,7 +19,13 @@ BRANCH_OPENID=master
     git clone                                                                   \
     --branch ${BRANCH_OPENID}                                                   \
     ${REPO_OPENID}                                                              \
-    open-id-connect
+    open-id-connect                                                             \
+    &&                                                                          \
+    docker run -it                                                              \
+    -v "$(pwd)/open-id-connect:/var/www/html/apps/openidconnect"                \
+    --workdir /var/www/html/apps/openidconnect                                  \
+    pondersource/dev-stock-owncloud-rc-mounts                                   \
+    make install-deps
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
