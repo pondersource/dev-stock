@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+docker pull redis:latest
 docker pull mariadb:latest
 docker pull rclone/rclone:latest
 docker pull collabora/code:latest
