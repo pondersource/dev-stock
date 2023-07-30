@@ -64,7 +64,7 @@ RUN apt install --yes       \
     php7.4-curl             \
     php7.4-intl             \
     php7.4-json             \
-    php8.2-redis            \
+    php7.4-redis            \
     php7.4-mysql            \
     php7.4-xdebug           \
     php7.4-opcache          \
