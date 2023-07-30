@@ -37,7 +37,14 @@ docker run --detach --network=testnet                                           
   --http-port=80
 
 echo "importing realms and users into keycloak"
-docker exec -u root keycloak.docker bash /init.sh
+docker exec keycloak.docker bash /init.sh
+
+sleep 2
+
+echo "restart keycloak"
+docker restart keycloak.docker
+
+sleep 2
 
 echo "starting redis1.docker service"
 docker run --detach --network=testnet                                                               \
