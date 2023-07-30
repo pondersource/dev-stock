@@ -65,13 +65,13 @@ docker run --detach --network=testnet                                         \
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
 
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" bash "/${EFSS1}-init.sh"
 
 # EFSS2
 waitForPort maria2.docker 3306
 waitForPort "${EFSS2}2.docker" 443
 
-docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
+docker exec -e DBHOST=maria2.docker -e USER=marie -e PASS=radioactivity -u www-data "${EFSS2}2.docker" bash "/${EFSS2}-init.sh"
 
 # instructions.
 echo "Now browse to firefox and inside there to https://${EFSS1}1.docker"

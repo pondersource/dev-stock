@@ -75,10 +75,10 @@ waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
 
 echo "executing init.sh on oc1.docker"
-docker exec -u www-data oc1.docker sh /init.sh
+docker exec -u www-data oc1.docker bash /init.sh
 
 waitForPort maria2.docker 3306
 waitForPort nc2.docker 443
 
 echo "executing init.sh on nc2.docker"
-docker exec -u www-data nc2.docker sh /init.sh
+docker exec -u www-data nc2.docker bash /init.sh

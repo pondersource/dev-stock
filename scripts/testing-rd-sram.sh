@@ -81,13 +81,13 @@ waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
 
 echo "executing init.sh on oc1.docker"
-docker exec -u www-data oc1.docker sh /init.sh
+docker exec -u www-data oc1.docker bash /init.sh
 
 waitForPort maria2.docker 3306
 waitForPort oc2.docker 443
 
 echo "executing init.sh on oc2.docker"
-docker exec -u www-data oc2.docker sh /init.sh
+docker exec -u www-data oc2.docker bash /init.sh
 
 echo "Setting up SCIM control for Federated Groups"
 docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
