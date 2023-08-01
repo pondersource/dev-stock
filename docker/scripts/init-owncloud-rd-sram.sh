@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-# create symbolic link (by force)
-ln --symbolic --force /var/www/html/apps/rd-sram-integration/federatedgroups /var/www/html/apps/federatedgroups
+# create symbolic link if it doesn't exists.
+if [[ ! -d "/var/www/html/apps/federatedgroups" ]]; then
+    ln --symbolic --force /var/www/html/apps/rd-sram-integration/federatedgroups /var/www/html/apps/federatedgroups
+fi
 
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
                                     --database-name "efss" --database-user "root" --database-host "$DBHOST"     \

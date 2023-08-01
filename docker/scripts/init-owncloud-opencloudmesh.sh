@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-# create symbolic link (by force)
-ln --symbolic --force /var/www/html/apps/oc-opencloudmesh/opencloudmesh /var/www/html/apps/opencloudmesh
+# create symbolic link if it doesn't exists.
+if [[ ! -d "/var/www/html/apps/opencloudmesh" ]]; then
+    ln --symbolic --force /var/www/html/apps/oc-opencloudmesh/opencloudmesh /var/www/html/apps/opencloudmesh
+fi
 
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
                                     --database-name "efss" --database-user "root" --database-host "$DBHOST"     \
