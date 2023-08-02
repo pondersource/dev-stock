@@ -44,7 +44,7 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${REPO_ROOT}/temp/oc-surf-trashbin:/init.sh"                                                  \
+  -v "${REPO_ROOT}/temp/oc-surf-trashbin.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/surf-trashbin-app:/var/www/html/apps/surf-trashbin-app"                          \
   pondersource/dev-stock-owncloud-surf-trashbin
 
