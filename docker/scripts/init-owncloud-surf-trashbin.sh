@@ -112,10 +112,19 @@ do
 done
 
 # biochemistry
-for i in jennifer lucretia sherrie
+for i in lucretia sherrie
 do
     create_user $i biochemistry "0 B"
 
+    f_user=f_biochemistry
+    f_pass=$f_user
+    share_folder_user $f_user $f_pass $i
+done
+
+
+# biochemistry
+for i in jennifer
+do
     f_user=f_biochemistry
     f_pass=$f_user
     share_folder_user $f_user $f_pass $i
