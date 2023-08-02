@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 USER www-data
 
-ARG REPO_SURF_TRASHBIN=https://github.com/pondersource/dav-token-access
+ARG REPO_SURF_TRASHBIN=https://github.com/pondersource/surf-trashbin-app
 ARG BRANCH_SURF_TRASHBIN=master
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
