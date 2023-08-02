@@ -76,7 +76,7 @@ do
     f_user=f_$group
     f_pass=$f_user
     php console.php group:add $group
-    OC_PASS=$f_pass occ user:add --password-from-env $f_user --group $group
+    OC_PASS=$f_pass php console.php user:add --password-from-env $f_user --group $group
     echo "INSERT INTO oc_group_admin SET gid='$group', uid='$f_user';" | $mysql_cmd
 
     # create shared folder
