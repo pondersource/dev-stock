@@ -28,6 +28,7 @@ RUN apt install --yes               \
     apt-utils                       \
     libxml2-dev                     \
     lsb-release                     \
+    mysql-client                    \
     build-essential                 \
     ca-certificates                 \
     apt-transport-https             \
