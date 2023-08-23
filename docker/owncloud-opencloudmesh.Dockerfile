@@ -7,7 +7,6 @@ LABEL org.opencontainers.image.title="PonderSource ownCloud OpenCloudMesh Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
-RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_CUSTOM_GROUPS=https://github.com/owncloud/customgroups
