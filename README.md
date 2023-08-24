@@ -15,7 +15,7 @@ branch: [v27.0.0](https://github.com/nextcloud/server/releases/tag/v27.0.0)
 
 upstream: [ownCloud Core Official](https://github.com/owncloud/core)
 
-branch: [v10.12.2](https://github.com/owncloud/core/releases/tag/v10.12.2)
+branch: [v10.13.0](https://github.com/owncloud/core/releases/tag/v10.13.0)
 
 # Debugging
 ## RD-SRAM
