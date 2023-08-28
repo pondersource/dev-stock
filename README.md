@@ -19,10 +19,7 @@ branch: [v10.13.0](https://github.com/owncloud/core/releases/tag/v10.13.0)
 
 # Debugging
 ## RD-SRAM
-```
-./scripts/init-rd-sram.sh
-./scripts/testing-rd-sram.sh
-```
+See https://github.com/SURFnet/rd-sram-integration#testing-environment for up-to-date instructions.
 
 ## ScienceMesh
 Moved to https://github.com/cs3org/reva/tree/sciencemesh-testing/examples/sciencemesh
