@@ -23,3 +23,6 @@ See https://github.com/SURFnet/rd-sram-integration#testing-environment for up-to
 
 ## ScienceMesh
 Moved to https://github.com/cs3org/reva/tree/sciencemesh-testing/examples/sciencemesh
+
+# Using XDebug
+See https://github.com/pondersource/dev-stock/blob/main/docs/xdebug.md
