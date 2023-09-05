@@ -11,13 +11,20 @@ USER www-data
 
 ARG REPO_SOLID=https://github.com/pdsinterop/solid-nextcloud
 ARG BRANCH_SOLID=main
+# CACHEBUST forces docker to clone fresh source codes from git.
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
+# $RANDOM returns random number each time.
+ARG CACHEBUST="default"
 RUN git clone                     \
     --depth 1                     \
     --branch ${BRANCH_SOLID}      \
     ${REPO_SOLID}                 \
     apps/solid-nextcloud
+
 RUN cd apps/ && ln -s solid-nextcloud/solid
+
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.

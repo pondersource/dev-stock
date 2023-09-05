@@ -26,9 +26,9 @@ RUN apt install --yes               \
     ca-certificates                  
 
 # install Go compiler.
-ARG GO_VERSION=20.4
-RUN wget https://go.dev/dl/go1.${GO_VERSION}.linux-amd64.tar.gz
-RUN tar --directory=/usr/local --extract --gzip --file=go1.${GO_VERSION}.linux-amd64.tar.gz
+ARG GO_VERSION=1.21.0
+RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+RUN tar --directory=/usr/local --extract --gzip --file=go${GO_VERSION}.linux-amd64.tar.gz
 
 # update path to include GO bin directory.
 ENV PATH="${PATH}:/usr/local/go/bin"

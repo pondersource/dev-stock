@@ -5,19 +5,20 @@
 
 set -e
 
-# delete all containers including its volumes.
-docker rm -vf $(docker ps -aq) || true
+# find this scripts location.
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "$SOURCE")
+   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+done
+DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
-# delete all images.
-docker rmi -f $(docker images -aq) || true
-
-cd docker
+cd "$DIR/../dockerfiles"
 
 echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
 echo Building pondersource/dev-stock-nextcloud-mfa
 docker build --build-arg CACHEBUST="default" --file ./nextcloud-mfa.Dockerfile --tag pondersource/dev-stock-nextcloud-mfa .
-
-# remove all <none> images.
-# docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi --force
