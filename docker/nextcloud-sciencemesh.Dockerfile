@@ -55,6 +55,6 @@ RUN cd apps/sciencemesh && make
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init-nextcloud-sciencemesh.sh /init.sh
-RUN mkdir --parents data ; touch data/nextcloud.log
+RUN mkdir -p data ; touch data/nextcloud.log
 
 USER root

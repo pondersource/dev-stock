@@ -29,4 +29,4 @@ BRANCH_OPENID=master
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
-[ ! -d "temp" ] && mkdir --parents temp
+[ ! -d "temp" ] && mkdir -p temp

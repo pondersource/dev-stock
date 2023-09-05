@@ -16,7 +16,7 @@ function waitForPort {
 }
 
 # create temp directory if it doesn't exist.
-[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
 cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-rc-mounts.sh" "${REPO_ROOT}/temp/oc-rc-mounts.sh"
