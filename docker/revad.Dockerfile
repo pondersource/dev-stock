@@ -63,11 +63,11 @@ RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 # create link for all the tls certificates in the revad tls directory.
-RUN mkdir --parents /etc/revad/tls
+RUN mkdir -p /etc/revad/tls
 RUN ln --symbolic --force /tls/*.crt /etc/revad/tls
 RUN ln --symbolic --force /tls/*.key /etc/revad/tls
 
-RUN mkdir --parents /var/tmp/reva/
+RUN mkdir -p /var/tmp/reva/
 
 # update path to include revad bin directory.
 ENV PATH="${PATH}:/reva/cmd/revad"

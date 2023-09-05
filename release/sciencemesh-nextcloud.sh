@@ -10,7 +10,7 @@ REPO_ROOT=$(pwd)
 REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=nextcloud
 
-[ ! -d "temp" ] && mkdir --parents temp
+[ ! -d "temp" ] && mkdir -p temp
 
 # copy init file.
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh

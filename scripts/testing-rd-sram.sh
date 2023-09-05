@@ -17,7 +17,7 @@ function waitForPort {
 }
 
 # create temp directory if it doesn't exist.
-[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
 cp --force --recursive ./docker/rd-sram/curls ./temp/curls

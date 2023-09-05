@@ -20,7 +20,7 @@ function createCert {
 }
 
 rm --recursive --force ../tls
-mkdir --parents ../tls
+mkdir -p ../tls
 
 echo "Generating CA key"
 openssl genrsa -out ../tls/ocm-ca.key 2058

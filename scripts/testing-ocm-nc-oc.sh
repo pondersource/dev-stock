@@ -16,7 +16,7 @@ function waitForPort {
 }
 
 # create temp dirctory if it doesn't exist.
-[ ! -d "${REPO_ROOT}/temp" ] && mkdir --parents "${REPO_ROOT}/temp"
+[ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
 cp --force "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
