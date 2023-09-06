@@ -129,3 +129,24 @@ do
     f_pass=$f_user
     share_folder_user $f_user $f_pass $i
 done
+
+
+# many trashbins for jennifer, to test https://github.com/pondersource/surf-trashbin-app/issues/5
+for group in one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty
+do
+    f_user=f_$group
+    f_pass=$f_user
+    echo Creating group $group $f_user $f_pass
+    php console.php group:add $group
+    OC_PASS=$f_pass php console.php user:add --password-from-env $f_user --group $group
+    echo "INSERT INTO oc_group_admin SET gid='$group', uid='$f_user';" | $mysql_cmd
+
+    echo Creating shared folder $HOST $f_user
+    curl --insecure -u $f_user:$f_pass -X MKCOL "https://$HOST.docker/remote.php/dav/files/$f_user/shared"
+
+   echo share_folder_user $f_user $f_pass jennifer
+    share_folder_user $f_user $f_pass jennifer
+done
+
+# for testing display names
+echo "UPDATE oc_users  SET displayname = CONCAT('Display ', uid)"  | $mysql_cmd
