@@ -149,4 +149,4 @@ do
 done
 
 # for testing display names
-echo "UPDATE oc_users  SET displayname = CONCAT('Display ', uid)"  | $mysql_cmd
+echo "UPDATE oc_accounts SET display_name = CONCAT('Display ', user_id)"  | $mysql_cmd
