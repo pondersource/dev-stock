@@ -21,9 +21,9 @@ RUN apt install --yes               \
     vim                             \
     curl                            \
     wget                            \
-    openssl                         \ 
+    openssl                         \
     build-essential                 \
-    ca-certificates                  
+    ca-certificates
 
 # install Go compiler.
 ARG GO_VERSION=1.21.0
@@ -35,7 +35,7 @@ ENV PATH="${PATH}:/usr/local/go/bin"
 
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
-ARG BRANCH_REVA=v1.24.0
+ARG BRANCH_REVA=v1.26.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
