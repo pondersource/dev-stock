@@ -15,10 +15,10 @@ while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
-cd "$DIR/../dockerfiles"
+cd "$DIR/.."
 
 echo Building pondersource/dev-stock-php-base
-docker build --build-arg CACHEBUST="default" --file ./php-base.Dockerfile --tag pondersource/dev-stock-php-base .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
 echo Building pondersource/dev-stock-nextcloud-mfa
-docker build --build-arg CACHEBUST="default" --file ./nextcloud-mfa.Dockerfile --tag pondersource/dev-stock-nextcloud-mfa .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-mfa.Dockerfile --tag pondersource/dev-stock-nextcloud-mfa .
