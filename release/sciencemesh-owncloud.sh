@@ -7,7 +7,7 @@ REPO_ROOT=$(pwd)
 "${REPO_ROOT}/scripts/clean.sh"
 
 # repositories and branches.
-REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
+REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=owncloud
 
 [ ! -d "temp" ] && mkdir -p temp
