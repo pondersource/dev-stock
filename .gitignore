@@ -1,13 +1,17 @@
+# Jetbrains IDE config files.
 .idea/
+
+ocm
+reva/
+core
+temp
+rd-sram
 owncloud
 nextcloud
 oc-sciencemesh
 nc-sciencemesh
-reva/
-core
-rd-sram-integration
-oc-opencloudmesh
-ocm
-rd-sram
 solid-nextcloud
-temp
+oc-opencloudmesh
+rd-sram-integration
+oc-sciencemesh-release
+nc-sciencemesh-release
