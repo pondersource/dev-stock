@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM golang:1.21.1-bullseye
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -25,13 +25,8 @@ RUN apt install --yes               \
     build-essential                 \
     ca-certificates
 
-# install Go compiler.
-ARG GO_VERSION=1.21.0
-RUN wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-RUN tar --directory=/usr/local --extract --gzip --file=go${GO_VERSION}.linux-amd64.tar.gz
-
-# update path to include GO bin directory.
-ENV PATH="${PATH}:/usr/local/go/bin"
+# go to root directory.
+WORKDIR /
 
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
@@ -46,11 +41,12 @@ RUN git clone                       \
     ${REPO_REVA}                    \
     reva
 
+# change directory to reva
 WORKDIR /reva
 
 # build revad from source.
 RUN go mod vendor
-SHELL ["/bin/bash", "-c"]
+#SHELL ["/bin/bash", "-c"]
 # only build revad, leave out reva and test and lint and docs.
 RUN make revad
 
