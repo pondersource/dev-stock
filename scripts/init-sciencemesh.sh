@@ -82,10 +82,10 @@ BRANCH_REVA=master
     reva                                                                                        \
     &&                                                                                          \
     docker run -it --rm                                                                         \
-    -v "${REPO_ROOT}/reva:/reva"                                                                \
-    --workdir /reva                                                                             \
-    pondersource/pondersource/dev-stock-revad                                                   \
-    bash -c "git config --global --add safe.directory /reva &&go mod vendor && make revad"
+    -v "${REPO_ROOT}/reva:/reva-build"                                                          \
+    --workdir /reva-build                                                                       \
+    golang:1.21.1-bullseye                                                                      \
+    bash -c "git config --global --add safe.directory /reva-build &&go mod vendor && make revad"
 
 # move app to its place inside efss and create symbolic links
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                        \
