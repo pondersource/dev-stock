@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+# find this scripts location.
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "$SOURCE")
+   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+done
+DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+cd "$DIR/.." || exit
+
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
-[ ! -d "./owncloud/owncloud-sciencemesh" ] && echo "Directory ./owncloud-sciencemesh DOES NOT exist inside $ENV_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
-[ ! -d "./nextcloud/nextcloud-sciencemesh" ] && echo "Directory ./nextcloud-sciencemesh DOES NOT exist inside $ENV_ROOT, did you run ./scripts/init-sciencemesh.sh?" && exit 1
-
-[ ! -d "./owncloud-sciencemesh/vendor" ] && echo "Directory ./owncloud-sciencemesh/vendor DOES NOT exist inside $ENV_ROOT. Try: rmdir ./owncloud-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
-[ ! -d "./nextcloud/nextcloud-sciencemesh/vendor" ] && echo "Directory ./nextcloud-sciencemesh/vendor DOES NOT exist inside $ENV_ROOT. Try: rmdir ./nextcloud-sciencemesh ; ./scripts/init-sciencemesh.sh" && exit 1
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
@@ -30,7 +37,7 @@ function waitForCollabora {
   echo "Collabora is ready"
 }
 
-# create temp dirctory if it doesn't exist.
+# create temp directory if it doesn't exist.
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
@@ -104,17 +111,15 @@ docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >
 docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
 
 # run db injections.
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
+mysql1_cmd="docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
 
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
 
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
 
-docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
+
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
 
 # EFSS2
 waitForPort maria2.docker 3306
@@ -126,19 +131,17 @@ docker exec "${EFSS2}2.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >
 
 docker exec -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
 
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"
+mysql2_cmd="docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
 
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"
 
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
 
-docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss                                                               \
-  -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
 
-# reva
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
+
+# Reva
 
 # make sure scripts are executable.
 chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"
@@ -151,8 +154,8 @@ docker run --detach --network=testnet                                         \
   -e HOST="reva${EFSS1}1"                                                     \
   -p 8080:80                                                                  \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/revad:/etc/revad"                                           \
-  -v "${ENV_ROOT}/tls:/etc/revad/tls"                                         \
+  -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
+  -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -163,8 +166,8 @@ docker run --detach --network=testnet                                         \
   -e HOST="reva${EFSS2}2"                                                     \
   -p 8180:80                                                                  \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/revad:/etc/revad"                                           \
-  -v "${ENV_ROOT}/tls:/etc/revad/tls"                                         \
+  -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
+  -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
