@@ -131,7 +131,7 @@ docker exec "${EFSS2}2.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >
 
 docker exec -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
 
-mysql2_cmd="docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
+mysql2_cmd="docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
 
 $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"
 
@@ -174,7 +174,7 @@ docker run --detach --network=testnet                                         \
   pondersource/dev-stock-revad
 
 # instructions.
-echo "Now browse to http://ocmhost:5800 and inside there to https://${EFSS1}1.docker"
+echo "Now browse to http://localhost:5800 and inside there to https://${EFSS1}1.docker"
 echo "Log in as einstein / relativity"
 echo "Go to the ScienceMesh app and generate a token"
 echo "Click it to go to the meshdir server, and choose ${EFSS2}2 there."
