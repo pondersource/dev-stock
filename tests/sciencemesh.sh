@@ -44,10 +44,6 @@ function waitForCollabora {
 cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
 
-# TLS dirs for mounting
-cp --recursive --force ./docker/tls "./temp/${EFSS1}-1-tls"
-cp --recursive --force ./docker/tls "./temp/${EFSS2}-2-tls"
-
 docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
@@ -73,8 +69,9 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
-  -v "${ENV_ROOT}/temp/${EFSS1}-1-tls:/tls"                                   \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                       \
   -v "${ENV_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                         \
+  -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                \
   -v "${ENV_ROOT}/${EFSS1}/apps/sciencemesh:/var/www/html/apps/sciencemesh"   \
   "pondersource/dev-stock-${EFSS1}-sciencemesh"
 
@@ -95,8 +92,9 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria2.docker"                                                   \
   -e USER="marie"                                                             \
   -e PASS="radioactivity"                                                     \
-  -v "${ENV_ROOT}/temp/${EFSS2}-2-tls:/tls"                                   \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                       \
   -v "${ENV_ROOT}/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                         \
+  -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                \
   -v "${ENV_ROOT}/${EFSS2}/apps/sciencemesh:/var/www/html/apps/sciencemesh"   \
   "pondersource/dev-stock-${EFSS2}-sciencemesh"
 
@@ -141,7 +139,7 @@ $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values 
 
 $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
 
-# Reva
+# Reva Setup.
 
 # make sure scripts are executable.
 chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"
