@@ -8,8 +8,8 @@ temp
 rd-sram
 owncloud
 nextcloud
-oc-sciencemesh
-nc-sciencemesh
+owncloud-sciencemesh
+nextcloud-sciencemesh
 solid-nextcloud
 oc-opencloudmesh
 rd-sram-integration
