@@ -89,11 +89,7 @@ BRANCH_REVA=master
 
 # move app to its place inside efss and create symbolic links
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                        \
-    mv nextcloud-sciencemesh nextcloud/apps/sciencemesh                                         \
-    &&                                                                                          \
-    ln -s nextcloud/apps/sciencemesh nextcloud-sciencemesh
+    mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 
 [ ! -d "owncloud/apps/sciencemesh" ] &&                                                         \
-    mv owncloud-sciencemesh owncloud/apps/sciencemesh                                           \
-    &&                                                                                          \
-    ln -s owncloud/apps/sciencemesh owncloud-sciencemesh
+    mv owncloud-sciencemesh owncloud/apps/sciencemesh
