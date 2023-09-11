@@ -51,6 +51,10 @@ BRANCH_REVA=master
     pondersource/dev-stock-nextcloud-sciencemesh                                                \
     make composer
 
+# move app to its place inside efss and create symbolic links
+[ ! -d "nextcloud/apps/sciencemesh" ] &&                                                        \
+    mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
+
 # ownCloud source code.
 [ ! -d "owncloud" ] &&                                                                          \
     git clone                                                                                   \
@@ -72,8 +76,10 @@ BRANCH_REVA=master
     pondersource/dev-stock-owncloud-sciencemesh                                                 \
     composer install
 
+[ ! -d "owncloud/apps/sciencemesh" ] &&                                                         \
+    mv owncloud-sciencemesh owncloud/apps/sciencemesh
 
-# REva source code.
+# Reva source code.
 [ ! -d "reva" ] &&                                                                              \
     git clone                                                                                   \
     --depth 1                                                                                   \
@@ -82,14 +88,7 @@ BRANCH_REVA=master
     reva                                                                                        \
     &&                                                                                          \
     docker run -it --rm                                                                         \
-    -v "${REPO_ROOT}/reva:/reva-build"                                                          \
+    -v "$(pwd)/reva:/reva-build"                                                                \
     --workdir /reva-build                                                                       \
     golang:1.21.1-bullseye                                                                      \
-    bash -c "git config --global --add safe.directory /reva-build &&go mod vendor && make revad"
-
-# move app to its place inside efss and create symbolic links
-[ ! -d "nextcloud/apps/sciencemesh" ] &&                                                        \
-    mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
-
-[ ! -d "owncloud/apps/sciencemesh" ] &&                                                         \
-    mv owncloud-sciencemesh owncloud/apps/sciencemesh
+    bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
