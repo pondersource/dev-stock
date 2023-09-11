@@ -37,7 +37,7 @@ RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=compose
 
 USER www-data
 
-ARG REPO_SCIENCEMESH=https://github.com/pondersource/nc-sciencemesh
+ARG REPO_SCIENCEMESH=https://github.com/sciencemesh/nc-sciencemesh
 ARG BRANCH_SCIENCEMESH=nextcloud
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
