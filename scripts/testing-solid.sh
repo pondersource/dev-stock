@@ -20,7 +20,7 @@ function waitForPort {
 EFSS1=nc
 
 # copy init files.
-cp --force ./docker/scripts/init-nextcloud-solid.sh ./temp/init-nextcloud-solid.sh
+cp -f ./docker/scripts/init-nextcloud-solid.sh ./temp/init-nextcloud-solid.sh
 
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
 

@@ -20,8 +20,8 @@ function waitForPort {
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp --force --recursive ./docker/rd-sram/curls ./temp/curls
-cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${REPO_ROOT}/temp/oc-rd-sram.sh"
+cp -f --recursive ./docker/rd-sram/curls ./temp/curls
+cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${REPO_ROOT}/temp/oc-rd-sram.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest

@@ -18,7 +18,7 @@ EFSS1=nc
 EFSS2=nc
 
 # copy init files.
-cp --force ./docker/scripts/init-nextcloud-mfa.sh ./temp/nc.sh
+cp -f ./docker/scripts/init-nextcloud-mfa.sh ./temp/nc.sh
 
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
 
