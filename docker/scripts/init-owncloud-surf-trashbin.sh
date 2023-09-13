@@ -148,5 +148,7 @@ do
     share_folder_user $f_user $f_pass jennifer
 done
 
+echo Sleeping for 5 seconds to make sure accounts are created
+sleep 5
 # for testing display names
 echo "UPDATE oc_accounts SET display_name = CONCAT('Display ', user_id)"  | $mysql_cmd
