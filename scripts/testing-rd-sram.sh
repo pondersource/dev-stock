@@ -20,7 +20,7 @@ function waitForPort {
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f --recursive ./docker/rd-sram/curls ./temp/curls
+cp -rf ./docker/rd-sram/curls ./temp/curls
 cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${REPO_ROOT}/temp/oc-rd-sram.sh"
 
 echo "starting firefox tester"
