@@ -21,7 +21,7 @@ RUN git clone                           \
     ${REPO_TOKEN_BASED_ACCESS}                   \
     apps/token-based-access
 
-RUN cd apps && ln --symbolic --force token-based-access/tokenbasedav
+RUN cd apps && ln --symbolic --force token-based-access/tokenbaseddav
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
