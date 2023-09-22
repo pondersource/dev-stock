@@ -25,7 +25,7 @@ docker push pondersource/dev-stock-owncloud-sciencemesh
 
 docker push pondersource/dev-stock-owncloud-surf-trashbin
 
-docker push pondersource/dev-stock-owncloud-rc-mounts
+docker push pondersource/dev-stock-owncloud-token-based-access
 
 docker push pondersource/dev-stock-owncloud-opencloudmesh
 

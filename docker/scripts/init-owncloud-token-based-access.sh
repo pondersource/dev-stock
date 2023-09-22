@@ -2,7 +2,7 @@
 
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/tokenbasedav" ]]; then
-    ln --symbolic --force /var/www/html/apps/rc-mounts/tokenbasedav /var/www/html/apps/tokenbasedav
+    ln --symbolic --force /var/www/html/apps/token-based-access/tokenbasedav /var/www/html/apps/tokenbasedav
 fi
 
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \

@@ -37,8 +37,8 @@ docker build --build-arg CACHEBUST="default" --file ./owncloud-sciencemesh.Docke
 echo Building pondersource/dev-stock-owncloud-surf-trashbin
 docker build --build-arg CACHEBUST="default" --file ./owncloud-surf-trashbin.Dockerfile --tag pondersource/dev-stock-owncloud-surf-trashbin .
 
-echo Building pondersource/dev-stock-owncloud-rc-mounts
-docker build --build-arg CACHEBUST="default" --file ./owncloud-rc-mounts.Dockerfile --tag pondersource/dev-stock-owncloud-rc-mounts .
+echo Building pondersource/dev-stock-owncloud-token-based-access
+docker build --build-arg CACHEBUST="default" --file ./owncloud-token-based-access.Dockerfile --tag pondersource/dev-stock-owncloud-token-based-access .
 
 echo Building pondersource/dev-stock-owncloud-opencloudmesh
 docker build --build-arg CACHEBUST="default" --file ./owncloud-opencloudmesh.Dockerfile --tag pondersource/dev-stock-owncloud-opencloudmesh .

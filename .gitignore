@@ -1,4 +1,5 @@
 .idea/
+.DS_Store
 owncloud
 nextcloud
 oc-sciencemesh
@@ -11,4 +12,6 @@ ocm
 rd-sram
 solid-nextcloud
 surf-trashbin-app
+surf-token-based-access
+open-id-connect
 temp

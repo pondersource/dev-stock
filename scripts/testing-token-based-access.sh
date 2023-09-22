@@ -2,7 +2,7 @@
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
-[ ! -d "dav-token-access" ] && echo Please run ./scripts/init-rc-mounts.sh first! && exit
+[ ! -d "surf-token-based-access" ] && echo Please run ./scripts/init-token-based-access.sh first! && exit
 
 function waitForPort {
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
@@ -19,7 +19,7 @@ function waitForPort {
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-rc-mounts.sh" "${REPO_ROOT}/temp/oc-rc-mounts.sh"
+cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-token-based-access.sh" "${REPO_ROOT}/temp/oc-token-based-access.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
@@ -71,10 +71,10 @@ docker run --detach --network=testnet                                           
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
   -e REDIS_HOST="redis1.docker"                                                                     \
-  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
-  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
+  -v "${REPO_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                          \
+  -v "${REPO_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                   \
   -v "${REPO_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
-  pondersource/dev-stock-owncloud-rc-mounts
+  pondersource/dev-stock-owncloud-token-based-access
 
 echo "starting redis2.docker service"
 docker run --detach --network=testnet                                                               \
@@ -101,10 +101,10 @@ docker run --detach --network=testnet                                           
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
   -e REDIS_HOST="redis2.docker"                                                                     \
-  -v "${REPO_ROOT}/temp/oc-rc-mounts.sh:/init.sh"                                                   \
-  -v "${REPO_ROOT}/dav-token-access:/var/www/html/apps/rc-mounts"                                   \
+  -v "${REPO_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                          \
+  -v "${REPO_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                   \
   -v "${REPO_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
-  pondersource/dev-stock-owncloud-rc-mounts
+  pondersource/dev-stock-owncloud-token-based-access
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443

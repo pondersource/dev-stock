@@ -13,8 +13,8 @@ docker build --build-arg CACHEBUST="default" --file ./php-base.Dockerfile --tag 
 echo Building pondersource/dev-stock-owncloud
 docker build --build-arg CACHEBUST="default" --file ./owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
 
-echo Building pondersource/dev-stock-owncloud-rc-mounts
-docker build --build-arg CACHEBUST="default" --file ./owncloud-rc-mounts.Dockerfile --tag pondersource/dev-stock-owncloud-rc-mounts .
+echo Building pondersource/dev-stock-owncloud-token-based-access
+docker build --build-arg CACHEBUST="default" --file ./owncloud-token-based-access.Dockerfile --tag pondersource/dev-stock-owncloud-token-based-access .
 
 # remove all <none> images.
 # docker images -a | grep none | awk '{ print $3; }' | xargs docker rmi --force
