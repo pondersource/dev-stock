@@ -9,16 +9,16 @@ LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 USER www-data
 
-ARG REPO_DAV_TOKEN=https://github.com/pondersource/dav-token-access
-ARG BRANCH_DAV_TOKEN=master
+ARG REPO_TOKEN_BASED_ACCESS=https://github.com/pondersource/surf-token-based-access
+ARG BRANCH_TOKEN_BASED_ACCESS=main
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="default"
 RUN git clone                           \
     --depth 1                           \
-    --branch ${BRANCH_DAV_TOKEN}        \
-    ${REPO_DAV_TOKEN}                   \
+    --branch ${BRANCH_TOKEN_BASED_ACCESS}        \
+    ${REPO_TOKEN_BASED_ACCESS}                   \
     apps/token-based-access
 
 RUN cd apps && ln --symbolic --force token-based-access/tokenbasedav

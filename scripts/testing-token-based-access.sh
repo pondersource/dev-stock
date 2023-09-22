@@ -25,26 +25,26 @@ echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy --network=testnet -p 5900:5800 --shm-size 2g jlesage/firefox:v1.18.0
 
-echo "starting keycloak.docker service"
-docker run --detach --network=testnet                                                               \
-  --name keycloak.docker                                                                            \
-  -e KEYCLOAK_ADMIN=admin                                                                           \
-  -e KEYCLOAK_ADMIN_PASSWORD=admin                                                                  \
-  -v "${REPO_ROOT}/docker/scripts/init-keycloak.sh:/init.sh"                                        \
-  -v "${REPO_ROOT}/docker/configs/keycloak.json:/opt/keycloak_import/keycloak.json"                 \
-  quay.io/keycloak/keycloak:latest                                                                  \
-  start-dev                                                                                         \
-  --http-port=80
+# echo "starting keycloak.docker service"
+# docker run --detach --network=testnet                                                               \
+#   --name keycloak.docker                                                                            \
+#   -e KEYCLOAK_ADMIN=admin                                                                           \
+#   -e KEYCLOAK_ADMIN_PASSWORD=admin                                                                  \
+#   -v "${REPO_ROOT}/docker/scripts/init-keycloak.sh:/init.sh"                                        \
+#   -v "${REPO_ROOT}/docker/configs/keycloak.json:/opt/keycloak_import/keycloak.json"                 \
+#   quay.io/keycloak/keycloak:latest                                                                  \
+#   start-dev                                                                                         \
+#   --http-port=80
 
-echo "importing realms and users into keycloak"
-docker exec keycloak.docker bash /init.sh
+# echo "importing realms and users into keycloak"
+# docker exec keycloak.docker bash /init.sh
 
-sleep 2
+# sleep 2
 
-echo "restart keycloak"
-docker restart keycloak.docker
+# echo "restart keycloak"
+# docker restart keycloak.docker
 
-sleep 2
+# sleep 2
 
 echo "starting redis1.docker service"
 docker run --detach --network=testnet                                                               \

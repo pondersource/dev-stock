@@ -30,8 +30,5 @@ sed -i "50 i\  ],"                                                      /var/www
 # some how above command doesn't have the corrct backslash escaping and we have to do it again! 
 sed -i 's/OCMemcacheRedis/\\OC\\Memcache\\Redis/g' /var/www/html/config/config.php
 
-echo "Installing DAV Token Access"
+echo "Installing Token Based Access"
 php console.php app:enable tokenbasedav
-
-echo "Installing Open ID Connect"
-php console.php app:enable openidconnect
