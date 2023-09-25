@@ -7,8 +7,8 @@ REPO_ROOT=$(pwd)
 "${REPO_ROOT}/scripts/clean.sh"
 
 # repositories and branches.
-REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
-BRANCH_OWNCLOUD_APP=nextcloud
+REPO_NEXTCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
+BRANCH_NEXTCLOUD_APP=nextcloud
 
 [ ! -d "temp" ] && mkdir -p temp
 
@@ -18,12 +18,12 @@ cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
 
-# ownCloud Sciencemesh source code.
+# Nextcloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh-release" ] &&                                            \
     git clone                                                                   \
     --depth 1                                                                   \
-    --branch ${BRANCH_OWNCLOUD_APP}                                             \
-    ${REPO_OWNCLOUD_APP}                                                        \
+    --branch ${BRANCH_NEXTCLOUD_APP}                                            \
+    ${REPO_NEXTCLOUD_APP}                                                       \
     nc-sciencemesh-release                                                      \
     &&                                                                          \
     docker run -it                                                              \
