@@ -47,14 +47,24 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine" \
   "pondersource/dev-stock-nextcloud-sunet"
 
+docker run --detach --network=testnet                                            \
+  --name=sunet-ssp-mdb                                                           \
+  -e MYSQL_ROOT_PASSWORD=r00tp@ssw0rd                                            \
+  -e MYSQL_PASSWORD=sspus3r                                                      \
+  -e MYSQL_USER=sspuser                                                          \
+  -e MYSQL_DATABASE=saml                                                         \
+  mariadb:10.9
+
+docker run --detach --network=testnet                                            \
+  --name=sunet-ssp                                                               \
+  pondersource/dev-stock-simple-saml-php
+
 # EFSS1
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
 
 docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" bash "/init.sh"
 
-echo "Configuring user_saml on nc1.docker"
-docker exec -u www-data nc1.docker ./init-nc2-local-saml.sh
 docker exec -it maria1.docker mysql -u nextcloud -puserp@ssword -h maria1.docker nextcloud -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES \
 (\"user_saml\", \"type\", \"saml\")"
 docker exec -it maria1.docker mysql -u nextcloud -puserp@ssword -h maria1.docker nextcloud -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
@@ -89,6 +99,8 @@ password varbinary(255), \
 display_name varchar(255), \
 mfa_verified boolean \
 )"
+
+waitForPort sunet-ssp-mdb 3306
 docker exec -it sunet-ssp-mdb mysql -u sspuser -psspus3r -h sunet-ssp-mdb saml -e "INSERT INTO users \
 (username, password, display_name, mfa_verified) VALUES \
 (\"usr1\", AES_ENCRYPT(\"pwd1\", \"SECRET\"), \"user 1\", true), \
