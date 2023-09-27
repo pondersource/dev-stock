@@ -8,6 +8,9 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 USER www-data
+RUN git clone https://github.com/nextcloud/files_accesscontrol --depth 1 --branch stable27 apps/files_accesscontrol
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+RUN composer install --working-dir=/var/www/html/apps/files_accesscontrol --no-dev --prefer-dist
 
 ARG REPO_SOLID=https://github.com/pondersource/mfazones
 ARG BRANCH_SOLID=main
