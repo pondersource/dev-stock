@@ -10,9 +10,6 @@ cd docker
 echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
-echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --file ./nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud .
-
 echo Building pondersource/dev-stock-nextcloud-sunet
 docker build --build-arg CACHEBUST="default" --file ./nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
 
