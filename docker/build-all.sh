@@ -25,6 +25,9 @@ docker build --build-arg CACHEBUST="default" --file ./nextcloud-mfa.Dockerfile -
 echo Building pondersource/dev-stock-nextcloud-solid
 docker build --build-arg CACHEBUST="default" --file ./nextcloud-solid.Dockerfile --tag pondersource/dev-stock-nextcloud-solid .
 
+echo Building pondersource/dev-stock-nextcloud-sunet
+docker build --build-arg CACHEBUST="default" --file ./nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
+
 echo Building pondersource/dev-stock-nextcloud-sciencemesh
 docker build --build-arg CACHEBUST="default" --file ./nextcloud-sciencemesh.Dockerfile --tag pondersource/dev-stock-nextcloud-sciencemesh .
 
