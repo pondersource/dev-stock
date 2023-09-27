@@ -17,8 +17,6 @@ BRANCH_MFAZONES=main
     ${REPO_MFAZONES}                                                 \
     mfazones
 
-docker run -it --rm -v "${REPO_ROOT}/mfazones:/var/www/html/apps/mfazones" --workdir /var/www/html/apps/solid-nextcloud/solid "pondersource/dev-stock-nextcloud-sunet"  bash -c "composer install"
-
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
 [ ! -d "temp" ] && mkdir -p temp

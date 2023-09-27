@@ -16,13 +16,11 @@ RUN git clone                     \
     --branch ${BRANCH_SOLID}      \
     ${REPO_SOLID}                 \
     apps/mfazones
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="default"
 RUN cd apps/mfazones && git pull
-RUN composer install --working-dir=/var/www/html/apps/mfazones --no-dev --prefer-dist
     
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
