@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 docker pull redis:latest
 docker pull mariadb:latest

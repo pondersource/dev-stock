@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 docker run -d --network=testnet --name=revad1.docker -v "$(pwd)/../reva:/reva" -e HOST=revad1 pondersource/dev-stock-revad

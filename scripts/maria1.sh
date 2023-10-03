@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 docker exec -it                                     \
     maria1.docker                                   \

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT

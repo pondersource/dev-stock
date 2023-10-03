@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-
-# exit immediately if a command exits with a non-zero status.
 set -e
 
 FILE="/usr/bin/php${1}"

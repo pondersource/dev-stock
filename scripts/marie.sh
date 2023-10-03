@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 # run /reva/cmd/reva/reva inside /bin/bash -c "..." so /root/.reva-token is accessible

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 # add additional tagging for docker images.
