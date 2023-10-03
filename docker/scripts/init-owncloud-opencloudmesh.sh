@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/opencloudmesh" ]]; then

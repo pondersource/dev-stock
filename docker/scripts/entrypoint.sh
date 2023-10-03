@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 ln --symbolic "/tls/${HOST}.crt" /tls/server.cert
 ln --symbolic "/tls/${HOST}.key" /tls/server.key

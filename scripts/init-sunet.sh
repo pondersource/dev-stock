@@ -21,6 +21,10 @@ BRANCH_NC=mrv/mfa-check-rebased
     ${REPO_MFAZONES}                                                 \
     mfazones
 
+cd mfazones
+git pull
+cd ..
+
 # Nextloud source code.
 [ ! -d "server" ] &&                                                 \
     git clone                                                        \
@@ -28,6 +32,10 @@ BRANCH_NC=mrv/mfa-check-rebased
     --branch ${BRANCH_NC}                                            \
     ${REPO_NC}                                                       \
     server
+
+cd server
+git pull
+cd ..
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 

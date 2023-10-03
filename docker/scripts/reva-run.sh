@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # create new dir an compy configs there.
 mkdir -p /revad/configs
