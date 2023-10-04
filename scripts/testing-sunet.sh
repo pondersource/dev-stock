@@ -4,13 +4,15 @@ set -e
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 
-function waitForPort {
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
+function waitForPort () {
+  echo waitForPort $1 $2
+  # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
+  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
     echo Waiting for "${1}" to open port "${2}", this usually takes about 10 seconds ... "${x}"
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
+    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
   echo "${1}" port "${2}" is open
 }
@@ -22,6 +24,8 @@ EFSS1=nc
 
 # copy init files.
 cp -f ./docker/scripts/init-nextcloud-sunet.sh ./temp/init-nextcloud-sunet.sh
+
+echo Starting Docker containers in testnet...
 
 docker run --detach --name=firefox -p 5800:5800 --network=testnet --shm-size 2g jlesage/firefox:latest
 
@@ -60,9 +64,11 @@ docker run --detach --network=testnet                                           
   --name=sunet-ssp                                                               \
   pondersource/dev-stock-simple-saml-php
 
+echo Done starting Docker containers in testnet...
+
 # EFSS1
-waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
+waitForPort maria1.docker 3306
 
 docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" bash "/init.sh"
 

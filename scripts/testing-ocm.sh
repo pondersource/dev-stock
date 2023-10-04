@@ -5,13 +5,15 @@ REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 [ ! -d "ocm" ] && echo Please run ./scripts/init-opencloudmesh.sh first! && exit
 
-function waitForPort {
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
+function waitForPort () {
+  echo waitForPort $1 $2
+  # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
+  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
     echo Waiting for "${1}" to open port "${2}", this usually takes about 10 seconds ... "${x}"
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}")
+    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
   echo "${1}" port "${2}" is open
 }
