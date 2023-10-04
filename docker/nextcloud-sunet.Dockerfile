@@ -37,10 +37,13 @@ RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=compose
 
 USER www-data
 
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 # master branch is currently only for NC 28
 RUN git clone https://github.com/nextcloud/files_accesscontrol --depth 1 --branch master apps/files_accesscontrol
-COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 RUN composer install --working-dir=/var/www/html/apps/files_accesscontrol --no-dev --prefer-dist
+
+RUN git clone https://github.com/nextcloud/user_saml --depth 1 --branch master apps/user_saml
+RUN composer install --working-dir=/var/www/html/apps/user_saml --no-dev --prefer-dist
 
 ARG REPO_SOLID=https://github.com/pondersource/mfazones
 ARG BRANCH_SOLID=main

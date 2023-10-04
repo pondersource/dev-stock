@@ -4,6 +4,8 @@ set -e
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 
+export DOCKER_BUILDKIT=0
+
 cd docker
 
 echo Building pondersource/dev-stock-php-base
