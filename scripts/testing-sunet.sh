@@ -72,9 +72,9 @@ waitForPort maria1.docker 3306
 
 docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" bash "/init.sh"
 
-docker exec -it maria1.docker mysql -u nextcloud -puserp@ssword -h maria1.docker nextcloud -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES \
+docker exec -it maria1.docker mysql -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek -h maria1.docker efss -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES \
 (\"user_saml\", \"type\", \"saml\")"
-docker exec -it maria1.docker mysql -u nextcloud -puserp@ssword -h maria1.docker nextcloud -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
+docker exec -it maria1.docker mysql -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek -h maria1.docker efss -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
 (1, \"samlidp\", \"{\ 
 \\\"general-uid_mapping\\\":\\\"username\\\",\
 \\\"general-idp0_display_name\\\":\\\"samlidp\\\",\
