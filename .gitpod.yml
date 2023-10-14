@@ -46,4 +46,4 @@ ports:
     description: Xdebug client port.
 
 tasks:
-  - init: chmod +x ./scripts/init-gitpod-prebuild.sh && ./scripts/init-gitpod-prebuild.sh
+  - init: chmod +x ./init/gitpod-prebuild.sh && ./init/gitpod-prebuild.sh
