@@ -2,10 +2,9 @@
 
 # @michielbdejong halt on error in docker init scripts
 set -e
-
 # create symbolic link if it doesn't exists.
-if [[ ! -d "/var/www/html/apps/tokenbasedav" ]]; then
-    ln --symbolic --force /var/www/html/apps/rc-mounts/tokenbasedav /var/www/html/apps/tokenbasedav
+if [[ ! -d "/var/www/html/apps/tokenbaseddav" ]]; then
+    ln --symbolic --force /var/www/html/apps/token-based-access/tokenbaseddav /var/www/html/apps/tokenbaseddav
 fi
 
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
@@ -33,8 +32,5 @@ sed -i "50 i\  ],"                                                      /var/www
 # some how above command doesn't have the corrct backslash escaping and we have to do it again! 
 sed -i 's/OCMemcacheRedis/\\OC\\Memcache\\Redis/g' /var/www/html/config/config.php
 
-echo "Installing DAV Token Access"
-php console.php app:enable tokenbasedav
-
-echo "Installing Open ID Connect"
-php console.php app:enable openidconnect
+echo "Installing Token Based Access"
+php console.php app:enable tokenbaseddav
