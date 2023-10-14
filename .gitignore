@@ -1,17 +1,21 @@
 # Jetbrains IDE config files.
 .idea/
+.DS_Store
 
 ocm
-reva/
+reva
 core
 temp
+server
 rd-sram
 owncloud
 nextcloud
 owncloud-sciencemesh
 nextcloud-sciencemesh
+open-id-connect
 solid-nextcloud
 oc-opencloudmesh
 rd-sram-integration
 oc-sciencemesh-release
 nc-sciencemesh-release
+surf-token-based-access
