@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 # create new dir and copy configs there.
 mkdir -p /revad/configs
 cp /etc/revad/sciencemesh*.toml /revad/configs/
