@@ -22,6 +22,6 @@ docker pull pondersource/dev-stock-nextcloud-solid:latest
 docker pull pondersource/dev-stock-owncloud:latest
 docker pull pondersource/dev-stock-owncloud-sciencemesh:latest
 docker pull pondersource/dev-stock-owncloud-surf-trashbin:latest
-docker pull pondersource/dev-stock-owncloud-rc-mounts:latest
+docker pull pondersource/dev-stock-owncloud-token-based-access:latest
 docker pull pondersource/dev-stock-owncloud-opencloudmesh:latest
 docker pull pondersource/dev-stock-owncloud-rd-sram:latest
