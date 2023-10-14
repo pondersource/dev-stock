@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_OWNCLOUD=https://github.com/owncloud/core
-ARG BRANCH_OWNCLOUD=v10.13.0
+ARG BRANCH_OWNCLOUD=v10.13.2
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
@@ -44,7 +44,7 @@ USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init-owncloud.sh /oc-init.sh
-RUN mkdir -p data ; touch data/owncloud.log
+RUN mkdir -p data; touch data/owncloud.log
 
 RUN composer install --no-dev
 RUN make install-nodejs-deps

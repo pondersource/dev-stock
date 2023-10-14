@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_NEXTCLOUD=https://github.com/nextcloud/server
-ARG BRANCH_NEXTCLOUD=v27.0.0
+ARG BRANCH_NEXTCLOUD=v27.1.2
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
@@ -39,7 +39,7 @@ USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init-nextcloud.sh /init.sh
-RUN mkdir -p data ; touch data/nextcloud.log
+RUN mkdir -p data; touch data/nextcloud.log
 
 USER root
 CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow data/nextcloud.log
