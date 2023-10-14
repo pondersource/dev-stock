@@ -18,8 +18,8 @@ cd "$DIR/.." || exit
 REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=nextcloud
 
-REPO_NEXTCLOUD=https://github.com/nextcloud/server.git
-BRANCH_NEXTCLOUD=fix/noid/ocm-controller
+REPO_NEXTCLOUD=https://github.com/nextcloud/server
+BRANCH_NEXTCLOUD=master
 
 REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.13.0
@@ -92,3 +92,7 @@ BRANCH_REVA=master
     --workdir /reva-build                                                                       \
     golang:1.21.1-bullseye                                                                      \
     bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
+
+docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
+
+[ ! -d "temp" ] && mkdir -p temp
