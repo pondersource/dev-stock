@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 docker run -d --network=testnet --name=revad1.docker -v "$(pwd)/../reva:/reva" -e HOST=revad1 pondersource/dev-stock-revad

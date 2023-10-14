@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 REPO_ROOT=$(pwd)
 export REPO_ROOT=$REPO_ROOT
 
