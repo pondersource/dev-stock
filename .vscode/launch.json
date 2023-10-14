@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Nextcloud Sciencemesh Xdebug",
+            "name": "Nextcloud XDebug",
             "type": "php",
             "request": "launch",
             "port": 9003,
             "pathMappings": {
-                "/var/www/html/apps/sciencemesh": "${workspaceFolder}/nc-sciencemesh"
+                "/var/www/html": "${workspaceFolder}/nextcloud"
             }
         },
         {
@@ -19,7 +19,7 @@
             "request": "launch",
             "port": 9003,
             "pathMappings": {
-                "/var/www/html/apps/sciencemesh": "${workspaceFolder}/oc-sciencemesh"
+                "/var/www/html": "${workspaceFolder}/owncloud"
             }
         }
     ]
