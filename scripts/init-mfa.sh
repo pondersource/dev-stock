@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 # add additional tagging for docker images.

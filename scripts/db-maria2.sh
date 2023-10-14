@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 docker exec -it                                     \
     maria2.docker                                   \
     mariadb                                         \

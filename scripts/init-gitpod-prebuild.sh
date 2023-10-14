@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 docker pull redis:latest
 docker pull mariadb:latest
 docker pull rclone/rclone:latest

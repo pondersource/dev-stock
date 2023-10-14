@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 # run /reva/cmd/reva/reva inside /bin/bash -c "..." so /root/.reva-token is accessible

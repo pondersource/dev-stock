@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 # get reva container names. (this assumes only 2 containers with reva in their names exist)
