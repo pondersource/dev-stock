@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/surf_trashbin" ]]; then
     ln --symbolic --force /var/www/html/apps/surf-trashbin-app/surf_trashbin /var/www/html/apps/surf_trashbin

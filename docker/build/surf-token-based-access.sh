@@ -5,6 +5,9 @@
 
 set -e
 
+# @michielbdejong avoid docker buildkit
+export DOCKER_BUILDKIT=0
+
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
 while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
@@ -23,5 +26,5 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Docke
 echo Building pondersource/dev-stock-owncloud
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
 
-echo Building pondersource/dev-stock-owncloud-rc-mounts
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-rc-mounts.Dockerfile --tag pondersource/dev-stock-owncloud-rc-mounts .
+echo Building pondersource/dev-stock-owncloud-token-based-access
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-token-based-access.Dockerfile --tag pondersource/dev-stock-owncloud-token-based-access .

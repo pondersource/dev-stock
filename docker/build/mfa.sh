@@ -5,6 +5,9 @@
 
 set -e
 
+# @michielbdejong avoid docker buildkit
+export DOCKER_BUILDKIT=0
+
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
 while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink

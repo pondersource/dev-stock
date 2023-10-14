@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/opencloudmesh" ]]; then
     ln --symbolic --force /var/www/html/apps/oc-opencloudmesh/opencloudmesh /var/www/html/apps/opencloudmesh

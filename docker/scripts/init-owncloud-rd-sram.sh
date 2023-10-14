@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/federatedgroups" ]]; then
     ln --symbolic --force /var/www/html/apps/rd-sram-integration/federatedgroups /var/www/html/apps/federatedgroups
