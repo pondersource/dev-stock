@@ -24,7 +24,7 @@ vscode:
     - charliermarsh.ruff
 
     # toml
-    - bungcip.better-toml
+    - tamasfe.even-better-toml
 
 # Define Ports and how they should be handled
 # Documentation: https://www.gitpod.io/docs/configure/workspaces/ports
