@@ -23,5 +23,12 @@ cd "$DIR/.."
 echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
-echo Building pondersource/dev-stock-nextcloud-mfa
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-mfa.Dockerfile --tag pondersource/dev-stock-nextcloud-mfa .
+echo Building pondersource/dev-stock-nextcloud-sunet
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
+
+cd simple-saml-php
+
+echo Building pondersource/dev-stock-simple-saml-php
+docker build --tag pondersource/dev-stock-simple-saml-php .
+
+cd ..

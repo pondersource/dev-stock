@@ -13,7 +13,9 @@ docker push pondersource/dev-stock-php-base
 
 docker push pondersource/dev-stock-nextcloud
 
-docker push pondersource/dev-stock-nextcloud-mfa
+docker push pondersource/dev-stock-nextcloud-sunet
+
+docker push pondersource/dev-stock-simple-saml-php
 
 docker push pondersource/dev-stock-nextcloud-solid
 

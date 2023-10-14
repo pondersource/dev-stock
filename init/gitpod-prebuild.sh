@@ -17,7 +17,8 @@ docker pull pondersource/dev-stock-ocmstub:latest
 docker pull pondersource/dev-stock-php-base:latest
 docker pull pondersource/dev-stock-nextcloud:latest
 docker pull pondersource/dev-stock-nextcloud-sciencemesh:latest
-docker pull pondersource/dev-stock-nextcloud-mfa:latest
+docker pull pondersource/dev-stock-nextcloud-sunet:latest
+docker pull pondersource/dev-stock-simple-saml-php:latest
 docker pull pondersource/dev-stock-nextcloud-solid:latest
 docker pull pondersource/dev-stock-owncloud:latest
 docker pull pondersource/dev-stock-owncloud-sciencemesh:latest
