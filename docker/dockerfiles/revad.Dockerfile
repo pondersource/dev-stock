@@ -30,7 +30,7 @@ WORKDIR /
 
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
-ARG BRANCH_REVA=v1.26.1
+ARG BRANCH_REVA=v1.26.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
