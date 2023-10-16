@@ -77,13 +77,14 @@ docker run --detach --network=testnet                                           
   -e USER="einstein"                                                                    \
   -e PASS="relativity"                                                                  \
   -v "${ENV_ROOT}/docker/tls:/tls-host"                                                 \
-  -v "${ENV_ROOT}/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                                   \
+  -v "${ENV_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                                   \
   -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                          \
   -v "${ENV_ROOT}/docker/rd-sram/curls:/curls"                                          \
-  -v "${ENV_ROOT}/${EFSS2}/apps/sciencemesh:/var/www/html/apps/sciencemesh"             \
+  -v "${ENV_ROOT}/${EFSS1}/apps/sciencemesh:/var/www/html/apps/sciencemesh"             \
+  -v "${ENV_ROOT}/${EFSS1}/apps/customgroups:/var/www/html/apps/customgroups"           \
   -v "${ENV_ROOT}/${EFSS1}/apps/opencloudmesh:/var/www/html/apps/opencloudmesh"         \
   -v "${ENV_ROOT}/${EFSS1}/apps/federatedgroups:/var/www/html/apps/federatedgroups"     \
-  "pondersource/dev-stock-${EFSS2}-sciencemesh"
+  "pondersource/dev-stock-${EFSS1}-sciencemesh"
 
 # EFSS2
 docker run --detach --network=testnet                                                   \
@@ -107,8 +108,9 @@ docker run --detach --network=testnet                                           
   -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                          \
   -v "${ENV_ROOT}/docker/rd-sram/curls:/curls"                                          \
   -v "${ENV_ROOT}/${EFSS2}/apps/sciencemesh:/var/www/html/apps/sciencemesh"             \
-  -v "${ENV_ROOT}/${EFSS1}/apps/opencloudmesh:/var/www/html/apps/opencloudmesh"         \
-  -v "${ENV_ROOT}/${EFSS1}/apps/federatedgroups:/var/www/html/apps/federatedgroups"     \
+  -v "${ENV_ROOT}/${EFSS2}/apps/customgroups:/var/www/html/apps/customgroups"           \
+  -v "${ENV_ROOT}/${EFSS2}/apps/opencloudmesh:/var/www/html/apps/opencloudmesh"         \
+  -v "${ENV_ROOT}/${EFSS2}/apps/federatedgroups:/var/www/html/apps/federatedgroups"     \
   "pondersource/dev-stock-${EFSS2}-sciencemesh"
 
 # EFSS1

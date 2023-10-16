@@ -19,6 +19,9 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 # repositories and branches.
+VERSION_CUSTOM_GROUPS=0.7.2
+LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz
+
 REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
 

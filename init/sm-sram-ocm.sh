@@ -25,6 +25,9 @@ BRANCH_OWNCLOUD_APP=owncloud
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=v1.26.0
 
+VERSION_CUSTOM_GROUPS=0.7.2
+LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz
+
 REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
 
@@ -68,6 +71,9 @@ BRANCH_RD_SRAM=main
     --workdir /reva-build                                                                       \
     golang:1.21.1-bullseye                                                                      \
     bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
+
+# CustomGroups source code.
+wget -qO- ${LINK_CUSTOM_GROUPS} | tar xz -C owncloud/apps
 
 # OpenCloudMesh source code.
 [ ! -d "ocm" ] &&                                                                               \
