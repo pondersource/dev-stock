@@ -24,7 +24,7 @@ echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
 echo Building pondersource/dev-stock-nextcloud-sunet
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
 
 cd simple-saml-php
 
