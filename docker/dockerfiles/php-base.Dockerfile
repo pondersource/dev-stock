@@ -62,15 +62,19 @@ RUN apt install --yes       \
     php7.4-gd               \
     php7.4-xml              \
     php7.4-zip              \
+    php7.4-apcu             \
     php7.4-curl             \
     php7.4-intl             \
     php7.4-json             \
     php7.4-redis            \
     php7.4-mysql            \
     php7.4-xdebug           \
+    php7.4-imagick          \
     php7.4-opcache          \
     php7.4-sqlite3          \
-    php7.4-mbstring
+    php7.4-mbstring         \
+    php7.4-memcached
+
 
 # PHP switcher script.
 COPY ./scripts/switch-php.sh /usr/bin/switch-php.sh
