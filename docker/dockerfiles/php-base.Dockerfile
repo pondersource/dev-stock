@@ -13,10 +13,10 @@ RUN ln --symbolic --no-dereference --force /usr/share/zoneinfo/$TZ /etc/localtim
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt update --yes
+RUN apt-get update --yes
 
 # install dependencies.
-RUN apt install --yes               \
+RUN apt-get install --yes           \
     git                             \
     vim                             \
     curl                            \
@@ -38,12 +38,12 @@ RUN apt install --yes               \
 RUN LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
 RUN LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/apache2
 
-RUN apt update --yes
+RUN apt-get update --yes
 
-RUN apt install --yes apache2
+RUN apt-get install --yes apache2
 
 # install php versions
-RUN apt install --yes       \
+RUN apt-get install --yes   \
     php8.2                  \
     php8.2-gd               \
     php8.2-xml              \
@@ -57,7 +57,7 @@ RUN apt install --yes       \
     php8.2-sqlite3          \
     php8.2-mbstring
 
-RUN apt install --yes       \
+RUN apt-get install --yes   \
     php7.4                  \
     php7.4-gd               \
     php7.4-xml              \
