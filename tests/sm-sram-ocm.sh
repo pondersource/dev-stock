@@ -161,10 +161,10 @@ $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values 
 $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
 
 
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc1"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on owncloud1"
 docker exec -it "${EFSS1}1.docker" sh /curls/createGroup.sh "${EFSS1}1.docker"
 
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on oc2"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on owncloud2"
 docker exec -it "${EFSS2}2.docker" sh /curls/createGroup.sh "${EFSS2}2.docker"
 
 docker exec -it "${EFSS1}1.docker" sh /curls/excludeMarie.sh "${EFSS1}1.docker"
@@ -210,8 +210,8 @@ echo "Go to the ScienceMesh app and generate a token"
 echo "Click it to go to the meshdir server, and choose ${EFSS2}2 there."
 echo "Log in on https://${EFSS2}2.docker as marie / radioactivity"
 
-echo "share something from einstein@oc1.docker to Test Group, then run:"
-echo "$ docker exec -it oc2.docker sh /curls/includeMarie.sh oc2.docker"
-echo "$ docker exec -it oc1.docker sh /curls/includeMarie.sh oc1.docker"
-echo "then log in to oc2.docker as marie, you should not have received the share"
-echo "refresh the oc2.docker page, the share from einstein to Test Group should now also arrive to Marie"
+echo "share something from einstein@owncloud1.docker to Test Group, then run:"
+echo "$ docker exec -it owncloud2.docker sh /curls/includeMarie.sh owncloud2.docker"
+echo "$ docker exec -it owncloud1.docker sh /curls/includeMarie.sh owncloud1.docker"
+echo "then log in to owncloud2.docker as marie, you should not have received the share"
+echo "refresh the owncloud2.docker page, the share from einstein to Test Group should now also arrive to Marie"
