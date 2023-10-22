@@ -1,0 +1,14 @@
+diff --git a/apps/files_external/lib/Service/UserStoragesService.php b/apps/files_external/lib/Service/UserStoragesService.php
+index 6cf34000ab0..47a6e919853 100644
+--- a/apps/files_external/lib/Service/UserStoragesService.php
++++ b/apps/files_external/lib/Service/UserStoragesService.php
+@@ -127,6 +127,9 @@ class UserStoragesService extends StoragesService {
+ 	 * @throws NotFoundException if the given storage does not exist in the config
+ 	 */
+ 	public function updateStorage(StorageConfig $updatedStorage) {
++
++		$this->getStorage($updatedStorage->getId());
++
+ 		$updatedStorage->setApplicableUsers([$this->getUser()->getUID()]);
+ 		return parent::updateStorage($updatedStorage);
+ 	}

@@ -1,0 +1,154 @@
+--- a/apps/workflowengine/composer/composer/autoload_classmap.php
++++ b/apps/workflowengine/composer/composer/autoload_classmap.php
+@@ -19,6 +19,7 @@ return array(
+     'OCA\\WorkflowEngine\\Check\\RequestURL' => $baseDir . '/../lib/Check/RequestURL.php',
+     'OCA\\WorkflowEngine\\Check\\RequestUserAgent' => $baseDir . '/../lib/Check/RequestUserAgent.php',
+     'OCA\\WorkflowEngine\\Check\\TFileCheck' => $baseDir . '/../lib/Check/TFileCheck.php',
++    'OCA\\WorkflowEngine\\Check\\MfaVerified' => $baseDir . '/../lib/Check/MfaVerified.php',
+     'OCA\\WorkflowEngine\\Check\\UserGroupMembership' => $baseDir . '/../lib/Check/UserGroupMembership.php',
+     'OCA\\WorkflowEngine\\Command\\Index' => $baseDir . '/../lib/Command/Index.php',
+     'OCA\\WorkflowEngine\\Controller\\AWorkflowController' => $baseDir . '/../lib/Controller/AWorkflowController.php',
+--- a/apps/workflowengine/composer/composer/autoload_static.php
++++ b/apps/workflowengine/composer/composer/autoload_static.php
+@@ -35,6 +35,7 @@ class ComposerStaticInitWorkflowEngine
+         'OCA\\WorkflowEngine\\Check\\RequestUserAgent' => __DIR__ . '/..' . '/../lib/Check/RequestUserAgent.php',
+         'OCA\\WorkflowEngine\\Check\\TFileCheck' => __DIR__ . '/..' . '/../lib/Check/TFileCheck.php',
+         'OCA\\WorkflowEngine\\Check\\UserGroupMembership' => __DIR__ . '/..' . '/../lib/Check/UserGroupMembership.php',
++        'OCA\\WorkflowEngine\\Check\\MfaVerified' => __DIR__ . '/..' . '/../lib/Check/MfaVerified.php',
+         'OCA\\WorkflowEngine\\Command\\Index' => __DIR__ . '/..' . '/../lib/Command/Index.php',
+         'OCA\\WorkflowEngine\\Controller\\AWorkflowController' => __DIR__ . '/..' . '/../lib/Controller/AWorkflowController.php',
+         'OCA\\WorkflowEngine\\Controller\\GlobalWorkflowsController' => __DIR__ . '/..' . '/../lib/Controller/GlobalWorkflowsController.php',
+--- /dev/null
++++ b/apps/workflowengine/lib/Check/MfaVerified.php
+@@ -0,0 +1,90 @@
++<?php
++/**
++ * @copyright Copyright (c) 2016 Joas Schilling <coding@schilljs.com>
++ *
++ * @author Arthur Schiwon <blizzz@arthur-schiwon.de>
++ * @author Christoph Wurst <christoph@winzerhof-wurst.at>
++ * @author Joas Schilling <coding@schilljs.com>
++ * @author Julius Härtl <jus@bitgrid.net>
++ * @author Richard Steinmetz <richard@steinmetz.cloud>
++ *
++ * @license GNU AGPL version 3 or any later version
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Affero General Public License as
++ * published by the Free Software Foundation, either version 3 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU Affero General Public License for more details.
++ *
++ * You should have received a copy of the GNU Affero General Public License
++ * along with this program. If not, see <http://www.gnu.org/licenses/>.
++ *
++ */
++namespace OCA\WorkflowEngine\Check;
++
++use OCP\IL10N;
++use OCP\WorkflowEngine\ICheck;
++use OCP\ISession;
++
++class MfaVerified implements ICheck{
++	protected IL10N $l;
++	protected ISession $session;
++
++	/**
++	 * @param IL10N $l
++	 * @param ISession $session
++	 */
++	public function __construct(IL10N $l, ISession $session) {
++		$this->l = $l;
++		$this->session = $session;
++	}
++
++	/**
++	 * @param string $operator
++	 * @param string $value
++	 * @return bool
++	 */
++	public function executeCheck($operator, $value): bool {
++		$mfaVerified = '0';
++		if (!empty($this->session->get('globalScale.userData'))) {
++			$attr = $this->session->get('globalScale.userData')["userData"];
++			$mfaVerified = $attr["mfaVerified"];
++		}
++		if (!empty($this->session->get('user_saml.samlUserData'))) {
++			$attr = $this->session->get('user_saml.samlUserData');
++			$mfaVerified = $attr["mfa_verified"][0];
++		}
++		if (!empty($this->session->get("two_factor_auth_passed"))){
++			$mfaVerified = '1';
++		}
++
++		if ($operator === 'is') {
++			return $mfaVerified === '1'; // checking whether the current user is MFA-verified
++		} else {
++			return $mfaVerified !== '1'; // checking whether the current user is not MFA-verified
++		}
++	}
++
++	/**
++	 * @param string $operator
++	 * @param string $value
++	 * @throws \UnexpectedValueException
++	 */
++	public function validateCheck($operator, $value): void {
++		if (!in_array($operator, ['is', '!is'])) {
++			throw new \UnexpectedValueException($this->l->t('The given operator is invalid'), 1);
++		}
++	}
++
++	public function supportedEntities(): array {
++		return [];
++	}
++
++	public function isAvailableForScope(int $scope): bool {
++		return true;
++	}
++}
+\ No newline at end of file
+--- a/apps/workflowengine/lib/Manager.php
++++ b/apps/workflowengine/lib/Manager.php
+@@ -36,6 +36,7 @@ use OCA\WorkflowEngine\Check\FileMimeType;
+ use OCA\WorkflowEngine\Check\FileName;
+ use OCA\WorkflowEngine\Check\FileSize;
+ use OCA\WorkflowEngine\Check\FileSystemTags;
++use OCA\WorkflowEngine\Check\MfaVerified;
+ use OCA\WorkflowEngine\Check\RequestRemoteAddress;
+ use OCA\WorkflowEngine\Check\RequestTime;
+ use OCA\WorkflowEngine\Check\RequestURL;
+@@ -486,6 +487,13 @@ class Manager implements IManager {
+ 		return $result;
+ 	}
+ 
++	/**
++	 * @param string $entity
++	 * @param array $events
++	 * @param IOperation $operation
++	 * @return void
++	 * @throws \UnexpectedValueException
++	*/
+ 	protected function validateEvents(string $entity, array $events, IOperation $operation) {
+ 		try {
+ 			/** @var IEntity $instance */
+@@ -769,6 +777,7 @@ class Manager implements IManager {
+ 				$this->container->query(FileName::class),
+ 				$this->container->query(FileSize::class),
+ 				$this->container->query(FileSystemTags::class),
++				$this->container->query(MfaVerified::class),
+ 				$this->container->query(RequestRemoteAddress::class),
+ 				$this->container->query(RequestTime::class),
+ 				$this->container->query(RequestURL::class),
+--- /dev/null
++++ b/apps/workflowengine/src/components/Checks/MfaVerifiedValue.vue
+@@ -0,0 +1,5 @@
++<template>
++	<div>
++		<!-- Only to remove the default input -->
++	</div>
++</template>
