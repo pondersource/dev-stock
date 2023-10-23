@@ -43,38 +43,37 @@ cp -f ./docker/scripts/init-nextcloud-sunet.sh ./temp/init-nextcloud-sunet.sh
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
 
-docker run --detach --network=testnet                                            \
-  --name=maria1.docker                                                           \
-  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek              \
-  mariadb                                                                        \
-  --transaction-isolation=READ-COMMITTED                                         \
-  --binlog-format=ROW                                                            \
-  --innodb-file-per-table=1                                                      \
+docker run --detach --network=testnet                                             \
+  --name=maria1.docker                                                            \
+  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek               \
+  mariadb                                                                         \
+  --transaction-isolation=READ-COMMITTED                                          \
+  --binlog-format=ROW                                                             \
+  --innodb-file-per-table=1                                                       \
   --skip-innodb-read-only-compressed
 
-docker run --detach --network=testnet                                            \
-  --name="${EFSS1}1.docker"                                                      \
-  --add-host "host.docker.internal:host-gateway"                                 \
-  -e HOST="${EFSS1}1"                                                            \
-  -e DBHOST="maria1.docker"                                                      \
-  -e USER="einstein"                                                             \
-  -e PASS="relativity"                                                           \
-  -v "${ENV_ROOT}/temp/init-nextcloud-sunet.sh:/init.sh"                        \
-  -v "${ENV_ROOT}/mfazones:/var/www/html/apps/mfazones"                         \
-  -v "${ENV_ROOT}/server/dist:/var/www/html/dist"                               \
-  -v "${ENV_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine" \
+docker run --detach --network=testnet                                             \
+  --name="${EFSS1}1.docker"                                                       \
+  --add-host "host.docker.internal:host-gateway"                                  \
+  -e HOST="${EFSS1}1"                                                             \
+  -e DBHOST="maria1.docker"                                                       \
+  -e USER="einstein"                                                              \
+  -e PASS="relativity"                                                            \
+  -v "${ENV_ROOT}/temp/init-nextcloud-sunet.sh:/init.sh"                          \
+  -v "${ENV_ROOT}/mfazones:/var/www/html/apps/mfazones"                           \
+  -v "${ENV_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine"   \
   "pondersource/dev-stock-nextcloud-sunet"
 
-docker run --detach --network=testnet                                            \
-  --name=sunet-ssp-mdb                                                           \
-  -e MYSQL_ROOT_PASSWORD=r00tp@ssw0rd                                            \
-  -e MYSQL_PASSWORD=sspus3r                                                      \
-  -e MYSQL_USER=sspuser                                                          \
-  -e MYSQL_DATABASE=saml                                                         \
+docker run --detach --network=testnet                                             \
+  --name=sunet-ssp-mdb                                                            \
+  -e MYSQL_ROOT_PASSWORD=r00tp@ssw0rd                                             \
+  -e MYSQL_PASSWORD=sspus3r                                                       \
+  -e MYSQL_USER=sspuser                                                           \
+  -e MYSQL_DATABASE=saml                                                          \
   mariadb:10.9
 
-docker run --detach --network=testnet                                            \
-  --name=sunet-ssp                                                               \
+docker run --detach --network=testnet                                             \
+  --name=sunet-ssp                                                                \
   pondersource/dev-stock-simple-saml-php
 
 echo Done starting Docker containers in testnet...
