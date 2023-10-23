@@ -17,5 +17,3 @@ php console.php app:enable user_saml
 php console.php app:enable files_accesscontrol
 php console.php app:enable mfazones
 # php console.php app:enable twofactor_totp
-
-echo configured
