@@ -67,6 +67,7 @@ RUN set -ex; \
   curl \
   gnupg2 \
   make \
+  iproute2 \
   mariadb-client \
   npm \
   patch \
