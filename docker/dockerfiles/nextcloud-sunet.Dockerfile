@@ -1,5 +1,18 @@
 FROM php:8.2-rc-apache-bullseye
 
+# keys for oci taken from:
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.title="PonderSource SUNET Image"
+LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
+LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
+
+# set timezone.
+ENV TZ=UTC
+RUN ln --symbolic --no-dereference --force /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+ENV DEBIAN_FRONTEND noninteractive
+
 # Set Nextcloud download url here
 ARG nc_download_url=https://download.nextcloud.com/.customers/server/26.0.7-153512ec/nextcloud-26.0.7-enterprise.zip
 
@@ -130,8 +143,6 @@ RUN sed 's/^ServerSignature On/ServerSignature Off/' /etc/apache2/conf-available
 RUN chmod -R 777 ${APACHE_RUN_DIR} ${APACHE_LOCK_DIR} ${APACHE_LOG_DIR} ${APACHE_DOCUMENT_ROOT}
 
 # Should be no need to modify beyond this point, unless you need to patch something or add more apps
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
 RUN wget -q https://downloads.rclone.org/rclone-current-linux-amd64.deb \
   && dpkg -i ./rclone-current-linux-amd64.deb \
   && rm ./rclone-current-linux-amd64.deb && rm -rf /var/lib/apt/lists/*
@@ -216,3 +227,29 @@ RUN usermod -a -G tty www-data
 # CLEAN UP
 RUN apt remove -y wget curl make npm patch && apt autoremove -y
 RUN rm -rf /tmp/*.tar.* && chown -R www-data:root /var/www/html
+
+# trust all the certificates:
+COPY ./tls /tls
+RUN cp /tls/*.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+# app directory.
+WORKDIR /var/www/html
+
+USER www-data
+
+# this file can be overrided in docker run or docker compose.yaml. 
+# example: docker run --volume new-init.sh:/init.sh:ro
+COPY ./scripts/init-nextcloud-sunet.sh /init.sh
+RUN mkdir -p data; touch data/nextcloud.log
+
+USER root
+
+EXPOSE 443
+
+COPY ./sunet/entrypoint.sh /entrypoint.sh
+RUN chmod +x /init.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow "${APACHE_LOG_DIR}/access.log" & tail --follow "${APACHE_LOG_DIR}/error.log" & tail --follow data/nextcloud.log
