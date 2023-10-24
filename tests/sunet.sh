@@ -43,37 +43,41 @@ cp -f ./docker/scripts/init-nextcloud-sunet.sh ./temp/init-nextcloud-sunet.sh
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
 
-docker run --detach --network=testnet                                             \
-  --name=maria1.docker                                                            \
-  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek               \
-  mariadb                                                                         \
-  --transaction-isolation=READ-COMMITTED                                          \
-  --binlog-format=ROW                                                             \
-  --innodb-file-per-table=1                                                       \
+docker run --detach --network=testnet                                                                                             \
+  --name=maria1.docker                                                                                                            \
+  -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                               \
+  mariadb                                                                                                                         \
+  --transaction-isolation=READ-COMMITTED                                                                                          \
+  --binlog-format=ROW                                                                                                             \
+  --innodb-file-per-table=1                                                                                                       \
   --skip-innodb-read-only-compressed
 
-docker run --detach --network=testnet                                             \
-  --name="${EFSS1}1.docker"                                                       \
-  --add-host "host.docker.internal:host-gateway"                                  \
-  -e HOST="${EFSS1}1"                                                             \
-  -e DBHOST="maria1.docker"                                                       \
-  -e USER="einstein"                                                              \
-  -e PASS="relativity"                                                            \
-  -v "${ENV_ROOT}/temp/init-nextcloud-sunet.sh:/init.sh"                          \
-  -v "${ENV_ROOT}/mfazones:/var/www/html/apps/mfazones"                           \
-  -v "${ENV_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine"   \
+docker run --detach --network=testnet                                                                                             \
+  --name="${EFSS1}1.docker"                                                                                                       \
+  --add-host "host.docker.internal:host-gateway"                                                                                  \
+  -e HOST="${EFSS1}1"                                                                                                             \
+  -e DBHOST="maria1.docker"                                                                                                       \
+  -e USER="einstein"                                                                                                              \
+  -e PASS="relativity"                                                                                                            \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                                                                           \
+  -v "${ENV_ROOT}/docker/sunet/entrypoint:/entrypoint"                                                                            \
+  -v "${ENV_ROOT}/temp/init-nextcloud-sunet.sh:/init.sh"                                                                          \
+  -v "${ENV_ROOT}/mfazones:/var/www/html/apps/mfazones"                                                                           \
+  -v "${ENV_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine"                                                   \
+  -v "${ENV_ROOT}/server/dist/workflowengine-workflowengine.js:/var/www/html/dist/workflowengine-workflowengine.js"               \
+  -v "${ENV_ROOT}/server/dist/workflowengine-workflowengine.js.map:/var/www/html/dist/workflowengine-workflowengine.js.map"       \
   "pondersource/dev-stock-nextcloud-sunet"
 
-docker run --detach --network=testnet                                             \
-  --name=sunet-ssp-mdb                                                            \
-  -e MYSQL_ROOT_PASSWORD=r00tp@ssw0rd                                             \
-  -e MYSQL_PASSWORD=sspus3r                                                       \
-  -e MYSQL_USER=sspuser                                                           \
-  -e MYSQL_DATABASE=saml                                                          \
-  mariadb:10.9
+docker run --detach --network=testnet                                                                                             \
+  --name=sunet-ssp-mdb                                                                                                            \
+  -e MYSQL_ROOT_PASSWORD=r00tp@ssw0rd                                                                                             \
+  -e MYSQL_PASSWORD=sspus3r                                                                                                       \
+  -e MYSQL_USER=sspuser                                                                                                           \
+  -e MYSQL_DATABASE=saml                                                                                                          \
+  mariadb
 
-docker run --detach --network=testnet                                             \
-  --name=sunet-ssp                                                                \
+docker run --detach --network=testnet                                                                                             \
+  --name=sunet-ssp                                                                                                                \
   pondersource/dev-stock-simple-saml-php
 
 echo Done starting Docker containers in testnet...
@@ -81,17 +85,23 @@ echo Done starting Docker containers in testnet...
 # EFSS1
 waitForPort "${EFSS1}1.docker" 443
 waitForPort maria1.docker 3306
+waitForPort sunet-ssp-mdb 3306
 
 docker exec "${EFSS1}1.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
 docker exec "${EFSS1}1.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"
 docker exec "${EFSS1}1.docker" update-ca-certificates
 docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"
 
-docker exec -e DBHOST=maria1.docker -e USER=einstein -e PASS=relativity -u www-data "${EFSS1}1.docker" bash "/init.sh"
+docker exec -u www-data "${EFSS1}1.docker" bash "/init.sh"
 
-docker exec -it maria1.docker mysql -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek -h maria1.docker efss -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES \
+# run db injections.
+mysql1_cmd="docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
+mysql2_cmd="docker exec sunet-ssp-mdb mariadb -u sspuser -psspus3r saml"
+
+$mysql1_cmd -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES \
 (\"user_saml\", \"type\", \"saml\")"
-docker exec -it maria1.docker mysql -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek -h maria1.docker efss -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
+
+$mysql1_cmd -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
 (1, \"samlidp\", \"{\ 
 \\\"general-uid_mapping\\\":\\\"username\\\",\
 \\\"general-idp0_display_name\\\":\\\"samlidp\\\",\
@@ -118,16 +128,14 @@ IIKsVDQgUIDr+KPqQbC4OEsGUCW8bybibdwNdtYgNpDYwysgYHgWDsRdmDmkh5Ly\
 Q8CODPPBMk+mAN+xC5hX\\\",\
 \\\"saml-attribute-mapping-displayName_mapping\\\":\\\"display_name\\\"}\")"
 
-docker exec -it maria1.docker mysql -u sspuser -psspus3r -h sunet-ssp-mdb saml -e "CREATE TABLE users (\
+$mysql2_cmd -e "CREATE TABLE users (\
 username varchar(255), \
 password varbinary(255), \
 display_name varchar(255), \
 mfa_verified boolean \
 )"
 
-waitForPort sunet-ssp-mdb 3306
-
-docker exec -it sunet-ssp-mdb mysql -u sspuser -psspus3r -h sunet-ssp-mdb saml -e "INSERT INTO users \
+$mysql2_cmd -e "INSERT INTO users \
 (username, password, display_name, mfa_verified) VALUES \
 (\"usr1\", AES_ENCRYPT(\"pwd1\", \"SECRET\"), \"user 1\", true), \
 (\"usr2\", AES_ENCRYPT(\"pwd2\", \"SECRET\"), \"user 2\", false)"
