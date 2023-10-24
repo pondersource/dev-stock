@@ -14,7 +14,7 @@ BRANCH_OWNCLOUD_APP=release
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh" "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh" "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
 
 # ownCloud opencloudmesh source code.
 [ ! -d "oc-ocm-release" ] &&                                                    \

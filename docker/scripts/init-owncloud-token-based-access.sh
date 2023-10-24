@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-set -e
 
+# @michielbdejong halt on error in docker init scripts
+set -e
 # create symbolic link if it doesn't exists.
 if [[ ! -d "/var/www/html/apps/tokenbaseddav" ]]; then
     ln --symbolic --force /var/www/html/apps/token-based-access/tokenbaseddav /var/www/html/apps/tokenbaseddav

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
+
+# @michielbdejong halt on error in docker init scripts
 set -e
 
-ln --symbolic "/tls/${HOST}.crt" /tls/server.cert
-ln --symbolic "/tls/${HOST}.key" /tls/server.key
+mkdir -p /tls
+ln --symbolic --force "/tls-host/${HOST}.crt" /tls/server.cert
+ln --symbolic --force "/tls-host/${HOST}.key" /tls/server.key
 
 # This will exec the CMD from your Dockerfile, i.e. "npm start"
 exec "$@"

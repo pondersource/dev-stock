@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \

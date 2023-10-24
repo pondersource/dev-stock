@@ -7,13 +7,13 @@ REPO_ROOT=$(pwd)
 "${REPO_ROOT}/scripts/clean.sh"
 
 # repositories and branches.
-REPO_OWNCLOUD_APP=https://github.com/pondersource/nc-sciencemesh
+REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=nextcloud
 
 [ ! -d "temp" ] && mkdir -p temp
 
 # copy init file.
-cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
+cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh

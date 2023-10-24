@@ -14,7 +14,7 @@ BRANCH_OWNCLOUD_APP=release
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh"  "${REPO_ROOT}/temp/oc-rd-sram.sh"
+cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh"  "${REPO_ROOT}/temp/oc-rd-sram.sh"
 
 # ownCloud federatedgroups source code.
 [ ! -d "rd-sram-release" ] &&                                                   \

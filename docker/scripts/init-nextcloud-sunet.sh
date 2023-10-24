@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 php console.php maintenance:install --admin-user "$USER" --admin-pass "$PASS" --database "mysql"                \
@@ -15,5 +17,3 @@ php console.php app:enable user_saml
 php console.php app:enable files_accesscontrol
 php console.php app:enable mfazones
 # php console.php app:enable twofactor_totp
-
-echo configured

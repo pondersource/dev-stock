@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-set -e
 
-# exit immediately if a command exits with a non-zero status.
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 FILE="/usr/bin/php${1}"

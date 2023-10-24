@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# @michielbdejong halt on error in docker init scripts
 set -e
 
 # create symbolic link if it doesn't exists.
@@ -130,26 +132,3 @@ do
     f_pass=$f_user
     share_folder_user $f_user $f_pass $i
 done
-
-
-# many trashbins for jennifer, to test https://github.com/pondersource/surf-trashbin-app/issues/5
-for group in one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty
-do
-    f_user=f_$group
-    f_pass=$f_user
-    echo Creating group $group $f_user $f_pass
-    php console.php group:add $group
-    OC_PASS=$f_pass php console.php user:add --password-from-env $f_user --group $group
-    echo "INSERT INTO oc_group_admin SET gid='$group', uid='$f_user';" | $mysql_cmd
-
-    echo Creating shared folder $HOST $f_user
-    curl --insecure -u $f_user:$f_pass -X MKCOL "https://$HOST.docker/remote.php/dav/files/$f_user/shared"
-
-   echo share_folder_user $f_user $f_pass jennifer
-    share_folder_user $f_user $f_pass jennifer
-done
-
-echo Sleeping for 5 seconds to make sure accounts are created
-sleep 5
-# for testing display names
-echo "UPDATE oc_accounts SET display_name = CONCAT('Display ', user_id)"  | $mysql_cmd
