@@ -51,16 +51,25 @@ function waitForCollabora {
 # copy init files.
 cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
-rm --force "${ENV_ROOT}/temp/.X11-unix"
+sudo rm --force --recursive "${ENV_ROOT}/temp/.X11-unix"
 
 docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
-docker run --detach --name=vnc-server       --network=testnet -p 5700:8080  -e RUN_XTERM=no -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix" theasp/novnc:latest
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
 docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest 
 docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest
 
 #docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+
+# VNC server.
+docker run --detach --network=testnet                                         \
+  --name=vnc-server                                                           \
+  -p 5700:8080                                                                \
+  -e RUN_XTERM=no                                                             \
+  -e DISPLAY_WIDTH=1080                                                       \
+  -e DISPLAY_HEIGHT=720                                                       \
+  -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
+  theasp/novnc:latest
 
 # EFSS1
 docker run --detach --network=testnet                                         \
