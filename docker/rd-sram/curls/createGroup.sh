@@ -12,20 +12,20 @@ curl --request POST \
    "externalId":"3f938b6b-cbe0-4856-beb3-91dffa773c15@sram.surf.nl",
    "members":[
       {
-         "display":"oc1 user with email",
-         "value":"some-super-long-email-user-name@some-super-long-email-domain-where-this-user-has-their-email-hosting.nl@oc1.docker"
+         "display":"owncloud1 user with email",
+         "value":"some-super-long-email-user-name@some-super-long-email-domain-where-this-user-has-their-email-hosting.nl@owncloud1.docker"
       },
       {
-         "display":"oc2 user with email",
-         "value":"some-super-long-email-user-name@some-super-long-email-domain-where-this-user-has-their-email-hosting.nl@oc2.docker"
+         "display":"owncloud2 user with email",
+         "value":"some-super-long-email-user-name@some-super-long-email-domain-where-this-user-has-their-email-hosting.nl@owncloud2.docker"
       },
       {
-         "display":"einstein@oc1.docker",
-         "value":"einstein@oc1.docker"
+         "display":"einstein@owncloud1.docker",
+         "value":"einstein@owncloud1.docker"
       },
       {
-         "display":"marie@oc2.docker",
-         "value":"marie@oc2.docker"
+         "display":"marie@owncloud2.docker",
+         "value":"marie@owncloud2.docker"
       }
    ],
    "urn:mace:surf.nl:sram:scim:extension:Group":{
