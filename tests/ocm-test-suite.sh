@@ -51,7 +51,7 @@ function waitForCollabora {
 # copy init files.
 cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
-rm --force -v "${ENV_ROOT}/temp/.X11-unix"
+rm --force "${ENV_ROOT}/temp/.X11-unix"
 
 docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
 docker run --detach --name=vnc-server       --network=testnet -p 5700:8080  -e RUN_XTERM=no -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix" theasp/novnc:latest
