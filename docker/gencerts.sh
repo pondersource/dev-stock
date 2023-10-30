@@ -31,7 +31,7 @@ function createCert {
     -out "./tls/${1}.crt" -extfile "./tls/${1}.cnf"
 }
 
-rm --recursive --force ./tls
+rm -rf ./tls
 mkdir -p ./tls
 
 echo "Generating CA key"
