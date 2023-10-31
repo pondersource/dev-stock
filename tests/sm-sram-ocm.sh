@@ -161,10 +161,10 @@ $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values 
 $mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"
 
 
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on owncloud1"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on ${EFSS1}1"
 docker exec -it "${EFSS1}1.docker" sh /curls/createGroup.sh "${EFSS1}1.docker"
 
-echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on owncloud2"
+echo "Creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on ${EFSS2}2"
 docker exec -it "${EFSS2}2.docker" sh /curls/createGroup.sh "${EFSS2}2.docker"
 
 docker exec -it "${EFSS1}1.docker" sh /curls/excludeMarie.sh "${EFSS1}1.docker"
@@ -204,14 +204,19 @@ docker run --detach --network=testnet                                         \
 
 # instructions.
 echo "Now browse to http://localhost:5800 and inside there to https://${EFSS1}1.docker"
-
+echo ""
+echo ""
+echo "ScienceMesh app instructions:"
 echo "Log in as einstein / relativity"
 echo "Go to the ScienceMesh app and generate a token"
 echo "Click it to go to the meshdir server, and choose ${EFSS2}2 there."
 echo "Log in on https://${EFSS2}2.docker as marie / radioactivity"
 
-echo "share something from einstein@owncloud1.docker to Test Group, then run:"
-echo "$ docker exec -it owncloud2.docker sh /curls/includeMarie.sh owncloud2.docker"
-echo "$ docker exec -it owncloud1.docker sh /curls/includeMarie.sh owncloud1.docker"
-echo "then log in to owncloud2.docker as marie, you should not have received the share"
-echo "refresh the owncloud2.docker page, the share from einstein to Test Group should now also arrive to Marie"
+echo ""
+echo ""
+echo "RD-SRAM app instructions:"
+echo "share something from einstein@${EFSS1}1.docker to Test Group, then run:"
+echo "$ docker exec -it ${EFSS2}2.docker sh /curls/includeMarie.sh ${EFSS2}2.docker"
+echo "$ docker exec -it ${EFSS1}1.docker sh /curls/includeMarie.sh ${EFSS1}1.docker"
+echo "then log in to ${EFSS2}2.docker as marie, you should not have received the share"
+echo "refresh the ${EFSS2}2.docker page, the share from einstein to Test Group should now also arrive to Marie"
