@@ -15,10 +15,10 @@ DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
 cd "$DIR/.." || exit
 
-ENV_ROOT=$(pwd)
-export ENV_ROOT=${ENV_ROOT}
-
 # repositories and branches.
+REPO_OWNCLOUD=https://github.com/owncloud/core
+BRANCH_OWNCLOUD=v10.13.0
+
 VERSION_CUSTOM_GROUPS=0.7.2
 LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz
 
@@ -28,17 +28,48 @@ BRANCH_OCM=main
 REPO_RD_SRAM=https://github.com/surfnet/rd-sram-integration
 BRANCH_RD_SRAM=main
 
-[ ! -d "ocm" ] &&                                                               \
-    git clone                                                                   \
-    --branch ${BRANCH_OCM}                                                      \
-    ${REPO_OCM}                                                                 \
+# ownCloud source code.
+[ ! -d "owncloud" ] &&                                                                          \
+    git clone                                                                                   \
+    --depth 1                                                                                   \
+    --branch ${BRANCH_OWNCLOUD}                                                                 \
+    ${REPO_OWNCLOUD}                                                                            \
+    owncloud
+
+# CustomGroups source code.
+wget -qO- ${LINK_CUSTOM_GROUPS} | tar xz -C owncloud/apps
+
+# OpenCloudMesh source code.
+[ ! -d "ocm" ] &&                                                                               \
+    git clone                                                                                   \
+    --branch ${BRANCH_OCM}                                                                      \
+    ${REPO_OCM}                                                                                 \
     ocm
 
-[ ! -d "rd-sram" ] &&                                                           \
-    git clone                                                                   \
-    --branch ${BRANCH_RD_SRAM}                                                  \
-    ${REPO_RD_SRAM}                                                             \
+[ ! -d "owncloud/apps/ocm-git-repo" ] &&                                                        \
+    mv ocm owncloud/apps/ocm-git-repo                                                           \
+    &&                                                                                          \
+    cd owncloud/apps                                                                            \
+    &&                                                                                          \
+    ln --symbolic --force  ocm-git-repo/opencloudmesh opencloudmesh                             \
+    &&                                                                                          \
+    cd ../..
+
+# RD-SRAM source code.
+[ ! -d "rd-sram" ] &&                                                                           \
+    git clone                                                                                   \
+    --branch ${BRANCH_RD_SRAM}                                                                  \
+    ${REPO_RD_SRAM}                                                                             \
     rd-sram
+
+[ ! -d "owncloud/apps/rd-sram-git-repo" ] &&                                                    \
+    mv rd-sram owncloud/apps/rd-sram-git-repo                                                   \
+    &&                                                                                          \
+    cd owncloud/apps                                                                            \
+    &&                                                                                          \
+    ln --symbolic --force  rd-sram-git-repo/federatedgroups federatedgroups                     \
+    &&                                                                                          \
+    cd ../..
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 

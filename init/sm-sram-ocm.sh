@@ -34,72 +34,80 @@ REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
 
 REPO_RD_SRAM=https://github.com/surfnet/rd-sram-integration
-BRANCH_RD_SRAM=main
+BRANCH_RD_SRAM=compatibility-with-sciencemesh
 
 # ownCloud source code.
-[ ! -d "owncloud" ] &&                                                                          \
-    git clone                                                                                   \
-    --depth 1                                                                                   \
-    --branch ${BRANCH_OWNCLOUD}                                                                 \
-    ${REPO_OWNCLOUD}                                                                            \
+[ ! -d "owncloud" ] &&                                                                              \
+    git clone                                                                                       \
+    --depth 1                                                                                       \
+    --branch ${BRANCH_OWNCLOUD}                                                                     \
+    ${REPO_OWNCLOUD}                                                                                \
     owncloud
 
 # ownCloud Sciencemesh source code.
-[ ! -d "owncloud-sciencemesh" ] &&                                                              \
-    git clone                                                                                   \
-    --branch ${BRANCH_OWNCLOUD_APP}                                                             \
-    ${REPO_OWNCLOUD_APP}                                                                        \
-    owncloud-sciencemesh                                                                        \
-    &&                                                                                          \
-    docker run -it --rm                                                                         \
-    -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                             \
-    --workdir /var/www/html/apps/sciencemesh                                                    \
-    pondersource/dev-stock-owncloud-sciencemesh                                                 \
+[ ! -d "owncloud-sciencemesh" ] &&                                                                  \
+    git clone                                                                                       \
+    --branch ${BRANCH_OWNCLOUD_APP}                                                                 \
+    ${REPO_OWNCLOUD_APP}                                                                            \
+    owncloud-sciencemesh                                                                            \
+    &&                                                                                              \
+    docker run -it --rm                                                                             \
+    -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
+    --workdir /var/www/html/apps/sciencemesh                                                        \
+    pondersource/dev-stock-owncloud-sciencemesh                                                     \
     composer install
 
-[ ! -d "owncloud/apps/sciencemesh" ] &&                                                         \
+[ ! -d "owncloud/apps/sciencemesh" ] &&                                                             \
     mv owncloud-sciencemesh owncloud/apps/sciencemesh
 
 # Reva source code.
-[ ! -d "reva" ] &&                                                                              \
-    git clone                                                                                   \
-    --depth 1                                                                                   \
-    --branch ${BRANCH_REVA}                                                                     \
-    ${REPO_REVA}                                                                                \
-    reva                                                                                        \
-    &&                                                                                          \
-    docker run -it --rm                                                                         \
-    -v "$(pwd)/reva:/reva-build"                                                                \
-    --workdir /reva-build                                                                       \
-    golang:1.21.1-bullseye                                                                      \
+[ ! -d "reva" ] &&                                                                                  \
+    git clone                                                                                       \
+    --depth 1                                                                                       \
+    --branch ${BRANCH_REVA}                                                                         \
+    ${REPO_REVA}                                                                                    \
+    reva                                                                                            \
+    &&                                                                                              \
+    docker run -it --rm                                                                             \
+    -v "$(pwd)/reva:/reva-build"                                                                    \
+    --workdir /reva-build                                                                           \
+    golang:1.21.1-bullseye                                                                          \
     bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
 
 # CustomGroups source code.
 wget -qO- ${LINK_CUSTOM_GROUPS} | tar xz -C owncloud/apps
 
 # OpenCloudMesh source code.
-[ ! -d "ocm" ] &&                                                                               \
-    git clone                                                                                   \
-    --branch ${BRANCH_OCM}                                                                      \
-    ${REPO_OCM}                                                                                 \
+[ ! -d "ocm" ] &&                                                                                   \
+    git clone                                                                                       \
+    --branch ${BRANCH_OCM}                                                                          \
+    ${REPO_OCM}                                                                                     \
     ocm
 
-[ ! -d "owncloud/apps/opencloudmesh" ] &&                                                       \
-    mv ocm/opencloudmesh owncloud/apps/opencloudmesh                                            \
-    &&                                                                                          \
-    rm -rf ocm
+[ ! -d "owncloud/apps/ocm-git-repo" ] &&                                                            \
+    mv ocm owncloud/apps/ocm-git-repo                                                               \
+    &&                                                                                              \
+    cd owncloud/apps                                                                                \
+    &&                                                                                              \
+    ln --symbolic --force  ocm-git-repo/opencloudmesh opencloudmesh                                 \
+    &&                                                                                              \
+    cd ../..
 
 # RD-SRAM source code.
-[ ! -d "rd-sram" ] &&                                                                           \
-    git clone                                                                                   \
-    --branch ${BRANCH_RD_SRAM}                                                                  \
-    ${REPO_RD_SRAM}                                                                             \
+[ ! -d "rd-sram" ] &&                                                                               \
+    git clone                                                                                       \
+    --branch ${BRANCH_RD_SRAM}                                                                      \
+    ${REPO_RD_SRAM}                                                                                 \
     rd-sram
 
-[ ! -d "owncloud/apps/federatedgroups" ] &&                                                     \
-    mv rd-sram/federatedgroups owncloud/apps/federatedgroups                                    \
-    &&                                                                                          \
-    rm -rf rd-sram
+[ ! -d "owncloud/apps/rd-sram-git-repo" ] &&                                                        \
+    mv rd-sram owncloud/apps/rd-sram-git-repo                                                       \
+    &&                                                                                              \
+    cd owncloud/apps                                                                                \
+    &&                                                                                              \
+    ln --symbolic --force  rd-sram-git-repo/federatedgroups federatedgroups                         \
+    &&                                                                                              \
+    cd ../..
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
