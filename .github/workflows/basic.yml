@@ -1,7 +1,7 @@
 name: Basic Workflow for Testing
 
-'on':
-  push:
+on:
+  workflow_call:
     branches:
       - master
 
