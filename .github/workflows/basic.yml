@@ -1,13 +1,11 @@
-name: Basic Workflow for Testing
+name: Basic workflow for testing GitHub Actions and act.
 
 on:
-  workflow_call:
-    branches:
-      - master
+  workflow_dispatch
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  basic:
+    runs-on: ubuntu-22.04
     steps:
       - name: Hello, World!
         run: echo "Hello, World!"
