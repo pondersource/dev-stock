@@ -31,6 +31,12 @@ BRANCH_OWNCLOUD_APP=owncloud
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=v1.26.0
 
+# TODO will be dropped in favour of Reva directly serving the UI
+CBOX_WEB=https://github.com/cernbox/web-release/releases/latest/download
+
+REPO_WOPISERVER=https://github.com/cs3org/wopiserver
+TAG_WOPISERVER=master
+
 # Nextcloud source code.
 [ ! -d "nextcloud" ] &&                                                                             \
     git clone                                                                                       \
@@ -93,6 +99,31 @@ BRANCH_REVA=v1.26.0
     --workdir /reva-build                                                                           \
     golang:1.21.1-bullseye                                                                          \
     bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
+
+# CERNBox web and extensions sources: uid=101 is nginx in the nginx container.
+# TODO the extensions are temporarily extracted from a tgz
+[ ! -d "cernbox-web-sciencemesh" ] &&                                                               \
+    mkdir -p temp/cernbox-1-conf temp/cernbox-2-conf &&                                             \
+    cp docker/cernbox/nginx/* temp/cernbox-1-conf &&                                                \
+    cp docker/cernbox/nginx/* temp/cernbox-2-conf &&                                                \
+    mkdir cernbox-web-sciencemesh &&                                                                \
+    cd cernbox-web-sciencemesh &&                                                                   \
+    mkdir -p ./web && mkdir -p ./cernbox &&                                                         \
+    wget ${CBOX_WEB}/web.tar.gz &&                                                                  \
+    tar xf web.tar.gz -C ./web --strip-components=1 &&                                              \
+    rm -rf web.tar.gz &&                                                                            \
+    tar xf ../cernbox/cernbox-extensions-bundle.tgz &&                                              \
+    chmod -R 755 ./* && chown -R 101:101 ./* &&                                                     \
+    cd -
+
+# wopiserver source code for the config.
+[ ! -d "wopi-sciencemesh" ] &&                                                                      \
+    git clone --branch ${TAG_WOPISERVER} ${REPO_WOPISERVER} wopi-sciencemesh &&                     \
+    mkdir -p temp/wopi-1-conf temp/wopi-2-conf &&                                                   \
+    cp wopi-sciencemesh/wopiserver.conf temp/wopi-1-conf/wopiserver.defaults.conf &&                \
+    echo "shared-secret-2" > temp/wopi-1-conf/iopsecret &&                                          \
+    echo "wopisecret" > temp/wopi-1-conf/wopisecret &&                                              \
+    cp temp/wopi-1-conf/* temp/wopi-2-conf/
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
