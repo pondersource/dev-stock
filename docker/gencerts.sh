@@ -34,30 +34,35 @@ function createCert {
 rm --recursive --force ./tls
 mkdir -p ./tls
 
-echo "Generating CA key"
-openssl genrsa -out ./tls/ocm-ca.key 2058
+# Don't need this anymore as we store ocm-ca in separate folder and copy it back into tls.
+# I'm keeping this code commented for future use.
 
-echo "Generate CA self-signed certificate"
-openssl req -new -x509 -days 3650 \
-    -key ./tls/ocm-ca.key \
-    -out ./tls/ocm-ca.crt \
-    -subj "/C=RO/ST=Bucharest/L=Bucharest/O=IT/CN=ocm-ca"
+# echo "Generating CA key"
+# openssl genrsa -out ./tls/ocm-ca.key 2058
 
-createCert nc1
-createCert nc2
-createCert nextcloud1
-createCert nextcloud2
-createCert oc1
-createCert oc2
-createCert owncloud1
-createCert owncloud2
+# echo "Generate CA self-signed certificate"
+# openssl req -new -x509 -days 3650 \
+#     -key ./tls/ocm-ca.key \
+#     -out ./tls/ocm-ca.crt \
+#     -subj "/C=RO/ST=Bucharest/L=Bucharest/O=IT/CN=ocm-ca"
+
+echo "Copying CA certificate and CA browser db"
+cp ./ca/* ./tls
+
+createCert idp
+sudo chown 1000:root ./tls/idp.*
+
+createCert meshdir
 createCert stub1
 createCert stub2
 createCert revad1
 createCert revad2
-createCert revanextcloud1
-createCert revanextcloud2
-createCert revaowncloud1
-createCert revaowncloud2
-createCert stub1
-createCert stub2
+
+for efss in owncloud nextcloud cernbox nc oc; do
+  createCert ${efss}1
+  createCert ${efss}2
+  createCert reva${efss}1
+  createCert reva${efss}2
+  createCert wopi${efss}1
+  createCert wopi${efss}2
+done
