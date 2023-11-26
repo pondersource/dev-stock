@@ -197,13 +197,16 @@ docker run --detach --network=testnet                                         \
 docker run --detach --network=testnet                                         \
   --name="cypress.docker"                                                     \
   -e DISPLAY=vnc-server:0.0                                                   \
-  -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
-  -v "${ENV_ROOT}/tests/e2e:/e2e"                                             \
+  -v "${ENV_ROOT}/docker/tls:/tls"                                            \
+  -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                     \
   -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
-  -w /e2e                                                                     \
+  -w /ocm                                                                     \
   --entrypoint cypress                                                        \
   cypress/included:13.3.2                                                     \
   open --project .
+
+docker exec "cypress.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
+docker exec "cypress.docker" update-ca-certificates
 
 # instructions.
 echo "Now browse to http://localhost:5800 and inside there to https://${EFSS1}1.docker"
