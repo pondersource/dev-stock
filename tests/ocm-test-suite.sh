@@ -66,8 +66,8 @@ docker run --detach --network=testnet                                         \
   --name=vnc-server                                                           \
   -p 5700:8080                                                                \
   -e RUN_XTERM=no                                                             \
-  -e DISPLAY_WIDTH=1080                                                       \
-  -e DISPLAY_HEIGHT=720                                                       \
+  -e DISPLAY_WIDTH=1920                                                       \
+  -e DISPLAY_HEIGHT=1080                                                      \
   -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
   theasp/novnc:latest
 
@@ -197,6 +197,7 @@ docker run --detach --network=testnet                                         \
 docker run --detach --network=testnet                                         \
   --name="cypress.docker"                                                     \
   -e DISPLAY=vnc-server:0.0                                                   \
+  -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
   -v "${ENV_ROOT}/tests/e2e:/e2e"                                             \
   -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
   -w /e2e                                                                     \
