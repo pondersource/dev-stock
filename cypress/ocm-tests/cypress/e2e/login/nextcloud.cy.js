@@ -2,7 +2,7 @@
 
 describe('Login Nextcloud', () => {
   it('Login test for Nextcloud', () => {
-    // Given I visit the Home page
+    	// Given I visit the Home page
 		cy.visit('https://nextcloud1.docker')
 
 		// I see the login page
