@@ -30,7 +30,7 @@ jobs:
 
       - name: Initalize OCM tests dependencies
         shell: bash
-        run: ./init/ocm-test-suite.sh
+        run: ./ci/ocm-test-suite-init-deps.sh
 
       - name: Run tests
         shell: bash
