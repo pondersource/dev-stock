@@ -47,7 +47,7 @@ BRANCH_REVA=v1.26.0
     nextcloud-sciencemesh                                                                           \
     &&                                                                                              \
     docker run -it --rm                                                                             \
-    -t -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                             \
+    -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
     make composer
@@ -72,7 +72,7 @@ BRANCH_REVA=v1.26.0
     owncloud-sciencemesh                                                                            \
     &&                                                                                              \
     docker run -it --rm                                                                             \
-    -t -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                              \
+    -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-owncloud-sciencemesh                                                     \
     composer install
@@ -89,7 +89,7 @@ BRANCH_REVA=v1.26.0
     reva                                                                                            \
     &&                                                                                              \
     docker run -it --rm                                                                             \
-    -t -v "$(pwd)/reva:/reva-build"                                                                 \
+    -v "$(pwd)/reva:/reva-build"                                                                    \
     --workdir /reva-build                                                                           \
     golang:1.21.1-bullseye                                                                          \
     bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
