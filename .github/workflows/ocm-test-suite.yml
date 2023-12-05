@@ -35,3 +35,60 @@ jobs:
       - name: Run tests
         shell: bash
         run: ./ci/ocm-test-suite.sh chrome
+  edge:
+    runs-on: ubuntu-22.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull images
+        shell: bash
+        run: ./ci/ocm-test-suite-pull-images.sh
+
+      - name: Initalize OCM tests dependencies
+        shell: bash
+        run: ./ci/ocm-test-suite-init-deps.sh
+
+      - name: Run tests
+        shell: bash
+        run: ./ci/ocm-test-suite.sh edge
+  firefox:
+    runs-on: ubuntu-22.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull images
+        shell: bash
+        run: ./ci/ocm-test-suite-pull-images.sh
+
+      - name: Initalize OCM tests dependencies
+        shell: bash
+        run: ./ci/ocm-test-suite-init-deps.sh
+
+      - name: Run tests
+        shell: bash
+        run: ./ci/ocm-test-suite.sh firefox
+  electron:
+    runs-on: ubuntu-22.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull images
+        shell: bash
+        run: ./ci/ocm-test-suite-pull-images.sh
+
+      - name: Initalize OCM tests dependencies
+        shell: bash
+        run: ./ci/ocm-test-suite-init-deps.sh
+
+      - name: Run tests
+        shell: bash
+        run: ./ci/ocm-test-suite.sh electron
