@@ -1,0 +1,19 @@
+name: ocm-test-suite
+run-name: Open Cloud Mesh Test Suite
+
+on:
+  - workflow_dispatch
+  - pull_request
+
+jobs:
+  chrome:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Pull images
+        run: ./ci/ocm-test-suite-pull-images.sh
+      - name: Initalize OCM tests dependencies
+        run: ./init/ocm-test-suite.sh
+      - name: Run tests
+        run: ./ci/ocm-test-suite.sh chrome
