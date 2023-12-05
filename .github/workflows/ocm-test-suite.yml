@@ -98,7 +98,7 @@ jobs:
 
        # Test run video was always captured, so this action uses "always()" condition
       - name: Upload Cypress video artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: cypress-videos
