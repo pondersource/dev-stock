@@ -46,7 +46,7 @@ BRANCH_REVA=v1.26.0
     ${REPO_NEXTCLOUD_APP}                                                                           \
     nextcloud-sciencemesh                                                                           \
     &&                                                                                              \
-    docker run --rm                                                                                 \
+    docker run --rm -t                                                                              \
     -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
@@ -71,7 +71,7 @@ BRANCH_REVA=v1.26.0
     ${REPO_OWNCLOUD_APP}                                                                            \
     owncloud-sciencemesh                                                                            \
     &&                                                                                              \
-    docker run --rm                                                                                 \
+    docker run --rm -t                                                                              \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-owncloud-sciencemesh                                                     \
@@ -88,7 +88,7 @@ BRANCH_REVA=v1.26.0
     ${REPO_REVA}                                                                                    \
     reva                                                                                            \
     &&                                                                                              \
-    docker run --rm                                                                                 \
+    docker run --rm -t                                                                              \
     -v "$(pwd)/reva:/reva-build"                                                                    \
     --workdir /reva-build                                                                           \
     golang:1.21.1-bullseye                                                                          \
