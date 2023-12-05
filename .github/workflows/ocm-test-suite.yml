@@ -1,19 +1,31 @@
 name: ocm-test-suite
 run-name: Open Cloud Mesh Test Suite
 
+# Controls when the action will run. 
 on:
-  - workflow_dispatch
-  - pull_request
+  # Triggers the workflow on push or pull request events but only for the specified branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ocm]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
   chrome:
     runs-on: ubuntu-22.04
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Pull images
         run: ./ci/ocm-test-suite-pull-images.sh
+
       - name: Initalize OCM tests dependencies
         run: ./init/ocm-test-suite.sh
+
       - name: Run tests
         run: ./ci/ocm-test-suite.sh chrome
