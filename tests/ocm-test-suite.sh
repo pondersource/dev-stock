@@ -202,7 +202,7 @@ docker run --detach --network=testnet                                         \
   -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
   -w /ocm                                                                     \
   --entrypoint cypress                                                        \
-  cypress/included:13.3.2                                                     \
+  cypress/included:13.3.0                                                     \
   open --project .
 
 docker exec "cypress.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
