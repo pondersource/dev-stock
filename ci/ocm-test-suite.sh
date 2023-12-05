@@ -41,15 +41,6 @@ function waitForPort () {
   done
 }
 
-function waitForCollabora {
-  x=$(docker logs collabora.docker | grep -c "Ready")
-  until [ "${x}" -ne 0 ]
-  do
-    sleep 1
-    x=$(docker logs collabora.docker | grep -c "Ready")
-  done
-}
-
 # create temp directory if it doesn't exist.
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
@@ -61,17 +52,6 @@ docker run --detach --network=testnet                                         \
   --name=meshdir.docker                                                       \
   -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                   \
   pondersource/dev-stock-ocmstub                                              \
-  >/dev/null 2>&1
-
-docker run --detach --network=testnet                                         \
-  --name=collabora.docker                                                     \
-  -e "extra_params=--o:ssl.enable=false"                                      \
-  collabora/code:latest                                                       \
-  >/dev/null 2>&1
-
-docker run --detach --network=testnet                                         \
-  --name=wopi.docker                                                          \
-  cs3org/wopiserver:latest                                                    \
   >/dev/null 2>&1
 
 # EFSS1
@@ -166,13 +146,13 @@ chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"
 chmod +x "${ENV_ROOT}/docker/scripts/reva-kill.sh"
 chmod +x "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh"
 
-waitForCollabora
 docker run --detach --network=testnet                                         \
   --name="reva${EFSS1}1.docker"                                               \
   -e HOST="reva${EFSS1}1"                                                     \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
   -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
+  -v "${ENV_ROOT}/ci/sciencemesh.toml:/etc/revad/sciencemesh.toml"            \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -185,6 +165,7 @@ docker run --detach --network=testnet                                         \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
   -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
+  -v "${ENV_ROOT}/ci/sciencemesh.toml:/etc/revad/sciencemesh.toml"            \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -194,8 +175,6 @@ docker run --detach --network=testnet                                         \
 # Cypress Setup.
 docker run --network=testnet                                                  \
   --name="cypress.docker"                                                     \
-  -v "${ENV_ROOT}/docker/tls:/tls"                                            \
   -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                     \
   -w /ocm                                                                     \
-  --user 1001                                                                 \
   cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
