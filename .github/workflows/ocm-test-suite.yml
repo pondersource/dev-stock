@@ -4,7 +4,6 @@ run-name: Open Cloud Mesh Test Suite
 on:
   - workflow_dispatch
   - pull_request
-  - push
 
 jobs:
   chrome:
