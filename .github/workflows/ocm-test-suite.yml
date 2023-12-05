@@ -25,10 +25,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Pull images
+        shell: bash
         run: ./ci/ocm-test-suite-pull-images.sh
 
       - name: Initalize OCM tests dependencies
+        shell: bash
         run: ./init/ocm-test-suite.sh
 
       - name: Run tests
+        shell: bash
         run: ./ci/ocm-test-suite.sh chrome

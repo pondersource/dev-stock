@@ -48,7 +48,6 @@ BRANCH_REVA=v1.26.0
     &&                                                                                              \
     docker run --rm                                                                                 \
     -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
-    -v "$(pwd)/ci/sciencemesh-patched.Makefile:/var/www/html/apps/sciencemesh/Makefile"             \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
     make composer
@@ -74,7 +73,6 @@ BRANCH_REVA=v1.26.0
     &&                                                                                              \
     docker run --rm                                                                                 \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
-    -v "$(pwd)/ci/sciencemesh-patched.Makefile:/var/www/html/apps/sciencemesh/Makefile"             \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-owncloud-sciencemesh                                                     \
     composer install
