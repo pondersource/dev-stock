@@ -5,6 +5,7 @@
 # 2. doesn't have Firefox 
 # 3. doesn't have port mappings from container to host
 # 4. doesn't detach Cypress and Cypress runs in headless mode.
+# 5. docker runs SHOULD NOT contain -t flag. (This is a real pain in somewhere)
 
 # @michielbdejong halt on error in docker init scripts
 set -e
@@ -32,11 +33,11 @@ export ENV_ROOT=${ENV_ROOT}
 
 function waitForPort () {
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
+  x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
+    x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
 }
 
@@ -64,12 +65,12 @@ docker run --detach --network=testnet                                         \
 
 docker run --detach --network=testnet                                         \
   --name=collabora.docker                                                     \
-  -t -e "extra_params=--o:ssl.enable=false"                                   \
+  -e "extra_params=--o:ssl.enable=false"                                      \
   collabora/code:latest                                                       \
   >/dev/null 2>&1
 
 docker run --detach --network=testnet                                         \
-  --name=wopi.docker -t                                                       \
+  --name=wopi.docker                                                          \
   cs3org/wopiserver:latest                                                    \
   >/dev/null 2>&1
 
