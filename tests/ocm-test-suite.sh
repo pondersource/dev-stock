@@ -205,9 +205,6 @@ docker run --detach --network=testnet                                         \
   cypress/included:13.3.0                                                     \
   open --project .
 
-docker exec "cypress.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
-docker exec "cypress.docker" update-ca-certificates
-
 # instructions.
 echo "Now browse to http://localhost:5800 and inside there to https://${EFSS1}1.docker"
 echo "Log in as einstein / relativity"
