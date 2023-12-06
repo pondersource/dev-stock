@@ -1,4 +1,6 @@
 # dev-stock
+[![ocm-test-suite](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml/badge.svg)](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml)
+
 Docker images we use in development.
 
 # Note
