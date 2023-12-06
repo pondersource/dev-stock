@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
+# This script has some is different than tests/ocm-test-suite.sh in:
+# 1. doesn't have VNC GUI
+# 2. doesn't have Firefox 
+# 3. doesn't have port mappings from container to host
+# 4. doesn't detach Cypress and Cypress runs in headless mode.
+# 5. docker runs SHOULD NOT contain -t flag. (This is a real pain in somewhere)
+
 # @michielbdejong halt on error in docker init scripts
 set -e
+
+# get testing platform from arguments. default is chrome.
+TEST_PLATFORM=${1:-"chrome"}
 
 export EFSS1=nextcloud
 export EFSS2=owncloud
@@ -22,27 +32,13 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 function waitForPort () {
-  echo waitForPort ${1} ${2}
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
+  x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
-    echo Waiting for "${1}" to open port "${2}", this usually takes about 10 seconds ... "${x}"
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
+    x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
-  echo "${1}" port "${2}" is open
-}
-
-function waitForCollabora {
-  x=$(docker logs collabora.docker | grep -c "Ready")
-  until [ "${x}" -ne 0 ]
-  do
-    echo Waiting for Collabora to be ready, this usually takes about 10 seconds ... "${x}"
-    sleep 1
-    x=$(docker logs collabora.docker | grep -c "Ready")
-  done
-  echo "Collabora is ready"
 }
 
 # create temp directory if it doesn't exist.
@@ -51,25 +47,12 @@ function waitForCollabora {
 # copy init files.
 cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
 cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
-sudo rm --force --recursive "${ENV_ROOT}/temp/.X11-unix"
 
-docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
-docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
-docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
-docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest 
-docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest
-
-#docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
-
-# VNC server.
 docker run --detach --network=testnet                                         \
-  --name=vnc-server                                                           \
-  -p 5700:8080                                                                \
-  -e RUN_XTERM=no                                                             \
-  -e DISPLAY_WIDTH=1920                                                       \
-  -e DISPLAY_HEIGHT=1080                                                      \
-  -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
-  theasp/novnc:latest
+  --name=meshdir.docker                                                       \
+  -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                   \
+  pondersource/dev-stock-ocmstub                                              \
+  >/dev/null 2>&1
 
 # EFSS1
 docker run --detach --network=testnet                                         \
@@ -79,7 +62,8 @@ docker run --detach --network=testnet                                         \
   --transaction-isolation=READ-COMMITTED                                      \
   --binlog-format=ROW                                                         \
   --innodb-file-per-table=1                                                   \
-  --skip-innodb-read-only-compressed
+  --skip-innodb-read-only-compressed                                          \
+  >/dev/null 2>&1
 
 docker run --detach --network=testnet                                         \
   --name="${EFSS1}1.docker"                                                   \
@@ -92,7 +76,8 @@ docker run --detach --network=testnet                                         \
   -v "${ENV_ROOT}/temp/${EFSS1}.sh:/${EFSS1}-init.sh"                         \
   -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                \
   -v "${ENV_ROOT}/${EFSS1}/apps/sciencemesh:/var/www/html/apps/sciencemesh"   \
-  "pondersource/dev-stock-${EFSS1}-sciencemesh"
+  "pondersource/dev-stock-${EFSS1}-sciencemesh"                               \
+  >/dev/null 2>&1
 
 # EFSS2
 docker run --detach --network=testnet                                         \
@@ -102,7 +87,8 @@ docker run --detach --network=testnet                                         \
   --transaction-isolation=READ-COMMITTED                                      \
   --binlog-format=ROW                                                         \
   --innodb-file-per-table=1                                                   \
-  --skip-innodb-read-only-compressed
+  --skip-innodb-read-only-compressed                                          \
+  >/dev/null 2>&1
 
 docker run --detach --network=testnet                                         \
   --name="${EFSS2}2.docker"                                                   \
@@ -115,50 +101,43 @@ docker run --detach --network=testnet                                         \
   -v "${ENV_ROOT}/temp/${EFSS2}.sh:/${EFSS2}-init.sh"                         \
   -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                \
   -v "${ENV_ROOT}/${EFSS2}/apps/sciencemesh:/var/www/html/apps/sciencemesh"   \
-  "pondersource/dev-stock-${EFSS2}-sciencemesh"
+  "pondersource/dev-stock-${EFSS2}-sciencemesh"                               \
+  >/dev/null 2>&1
 
 # EFSS1
 waitForPort maria1.docker 3306
 waitForPort "${EFSS1}1.docker" 443
 
-docker exec "${EFSS1}1.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
-docker exec "${EFSS1}1.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"
-docker exec "${EFSS1}1.docker" update-ca-certificates
-docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"
+docker exec "${EFSS1}1.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/" >/dev/null 2>&1
+docker exec "${EFSS1}1.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/" >/dev/null 2>&1
+docker exec "${EFSS1}1.docker" update-ca-certificates >/dev/null 2>&1
+docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt" >/dev/null 2>&1
 
-docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh" >/dev/null 2>&1
 
 # run db injections.
 mysql1_cmd="docker exec maria1.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
-
-$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');"
-
-$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
-
-$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
-
-$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS1}1.docker/');" >/dev/null 2>&1
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');" >/dev/null 2>&1
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');" >/dev/null 2>&1
+$mysql1_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');" >/dev/null 2>&1
 
 # EFSS2
 waitForPort maria2.docker 3306
 waitForPort "${EFSS2}2.docker" 443
 
-docker exec "${EFSS2}2.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"
-docker exec "${EFSS2}2.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"
-docker exec "${EFSS2}2.docker" update-ca-certificates
-docker exec "${EFSS2}2.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"
+docker exec "${EFSS2}2.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/" >/dev/null 2>&1
+docker exec "${EFSS2}2.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/" >/dev/null 2>&1
+docker exec "${EFSS2}2.docker" update-ca-certificates >/dev/null 2>&1
+docker exec "${EFSS2}2.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt" >/dev/null 2>&1
 
-docker exec -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh"
+docker exec -u www-data "${EFSS2}2.docker" sh "/${EFSS2}-init.sh" >/dev/null 2>&1
 
-mysql2_cmd="docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
-
-$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');"
-
-$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"
-
-$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"
-
-$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"
+mysql2_cmd="docker exec maria2.docker mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss" 
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${EFSS2}2.docker/');" >/dev/null 2>&1
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');" >/dev/null 2>&1
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');" >/dev/null 2>&1
+$mysql2_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');" >/dev/null 2>&1
 
 # Reva Setup.
 
@@ -167,47 +146,35 @@ chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"
 chmod +x "${ENV_ROOT}/docker/scripts/reva-kill.sh"
 chmod +x "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh"
 
-waitForCollabora
 docker run --detach --network=testnet                                         \
   --name="reva${EFSS1}1.docker"                                               \
   -e HOST="reva${EFSS1}1"                                                     \
-  -p 8080:80                                                                  \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
   -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
+  -v "${ENV_ROOT}/ci/sciencemesh.toml:/etc/revad/sciencemesh.toml"            \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
-  pondersource/dev-stock-revad
+  pondersource/dev-stock-revad                                                \
+  >/dev/null 2>&1
 
 docker run --detach --network=testnet                                         \
   --name="reva${EFSS2}2.docker"                                               \
   -e HOST="reva${EFSS2}2"                                                     \
-  -p 8180:80                                                                  \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
   -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
+  -v "${ENV_ROOT}/ci/sciencemesh.toml:/etc/revad/sciencemesh.toml"            \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
-  pondersource/dev-stock-revad
-
+  pondersource/dev-stock-revad                                                \
+  >/dev/null 2>&1
 
 # Cypress Setup.
-docker run --detach --network=testnet                                         \
+docker run --network=testnet                                                  \
   --name="cypress.docker"                                                     \
-  -e DISPLAY=vnc-server:0.0                                                   \
-  -v "${ENV_ROOT}/docker/tls:/tls"                                            \
   -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                     \
-  -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
   -w /ocm                                                                     \
-  --entrypoint cypress                                                        \
-  cypress/included:13.3.0                                                     \
-  open --project .
-
-# instructions.
-echo "Now browse to http://localhost:5800 and inside there to https://${EFSS1}1.docker"
-echo "Log in as einstein / relativity"
-echo "Go to the ScienceMesh app and generate a token"
-echo "Click it to go to the meshdir server, and choose ${EFSS2}2 there."
-echo "Log in on https://${EFSS2}2.docker as marie / radioactivity"
+  cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
