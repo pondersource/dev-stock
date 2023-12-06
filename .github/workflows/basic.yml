@@ -1,0 +1,11 @@
+name: Basic workflow for testing GitHub Actions and act.
+
+on:
+  workflow_dispatch
+
+jobs:
+  basic:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Hello, World!
+        run: echo "Hello, World!"

@@ -5,10 +5,12 @@ set -e
 
 docker pull redis:latest
 docker pull mariadb:latest
+docker pull theasp/novnc:latest
 docker pull rclone/rclone:latest
 docker pull collabora/code:latest
 docker pull jlesage/firefox:latest
 docker pull jlesage/firefox:v1.18.0
+docker pull cypress/included:13.3.2
 docker pull cs3org/wopiserver:latest
 docker pull quay.io/keycloak/keycloak:latest
 

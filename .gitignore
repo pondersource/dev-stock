@@ -21,3 +21,4 @@ surf-trashbin-app
 oc-sciencemesh-release
 nc-sciencemesh-release
 surf-token-based-access
+cypress/ocm-tests/cypress/videos/*
