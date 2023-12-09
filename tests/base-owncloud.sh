@@ -35,7 +35,7 @@ function waitForPort () {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
-cp --force "${ENV_ROOT}/docker/scripts/init-owncloud.sh" "${ENV_ROOT}/temp/oc-base.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud.sh" "${ENV_ROOT}/temp/oc-base.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest

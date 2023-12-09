@@ -38,7 +38,7 @@ function waitForPort () {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
-cp --force "${ENV_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${ENV_ROOT}/temp/oc-rd-sram.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${ENV_ROOT}/temp/oc-rd-sram.sh"
 
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0

@@ -45,8 +45,8 @@ function waitForPort () {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
-cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
+cp -f ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
+cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
 
 docker run --detach --network=testnet                                         \
   --name=meshdir.docker                                                       \

@@ -13,7 +13,7 @@ BRANCH_OWNCLOUD_APP=owncloud
 [ ! -d "temp" ] && mkdir -p temp
 
 # copy init file.
-cp --force ./docker/scripts/init-owncloud-sciencemesh.sh ./temp/oc.sh
+cp -f ./docker/scripts/init-owncloud-sciencemesh.sh ./temp/oc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
