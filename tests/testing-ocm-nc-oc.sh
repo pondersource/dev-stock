@@ -22,8 +22,8 @@ function waitForPort {
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp --force "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
-cp --force "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh"  "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
+cp -f "${REPO_ROOT}/docker/scripts/init-nextcloud.sh" "${REPO_ROOT}/temp/nc-base.sh"
+cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh"  "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
 
 echo "starting firefox tester"
 docker run --detach --name=firefox        --network=testnet -p 5800:5800 --shm-size 2g jlesage/firefox:latest

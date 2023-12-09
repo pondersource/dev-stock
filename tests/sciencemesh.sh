@@ -46,8 +46,8 @@ function waitForCollabora {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp --force ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
-cp --force ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
+cp -f ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
+cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
 
 docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
