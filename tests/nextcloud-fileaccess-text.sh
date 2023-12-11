@@ -62,7 +62,6 @@ docker run --detach --network=testnet                                           
   -e PASS="relativity"                                                                              \
   -v "${ENV_ROOT}/temp/nc-base.sh:/init.sh"                                                         \
   -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
-
   pondersource/dev-stock-nextcloud
 
 echo "starting maria2.docker"
