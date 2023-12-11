@@ -60,7 +60,9 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria1.docker"                                                                         \
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
-  -v "${ENV_ROOT}/temp/oc-base.sh:/init.sh"                                                        \
+  -v "${ENV_ROOT}/temp/oc-base.sh:/init.sh"                                                         \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
+
   pondersource/dev-stock-owncloud
 
 echo "starting maria2.docker"
@@ -82,7 +84,9 @@ docker run --detach --network=testnet                                           
   -e DBHOST="maria2.docker"                                                                         \
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
-  -v "${ENV_ROOT}/temp/oc-base.sh:/init.sh"                                                     \
+  -v "${ENV_ROOT}/temp/oc-base.sh:/init.sh"                                                         \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
+
   pondersource/dev-stock-owncloud
 
 waitForPort maria1.docker 3306

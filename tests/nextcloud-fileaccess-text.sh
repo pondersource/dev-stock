@@ -38,8 +38,8 @@ function waitForPort () {
 cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh" "${ENV_ROOT}/temp/nc-base.sh"
 
 # echo "starting firefox tester"
-docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
-docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
+# docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
+# docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
 
 echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
@@ -62,7 +62,7 @@ docker run --detach --network=testnet                                           
   -e PASS="relativity"                                                                              \
   -v "${ENV_ROOT}/temp/nc-base.sh:/init.sh"                                                         \
   -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
-  pondersource/dev-stock-nextcloud
+  pondersource/dev-stock-nextcloud-fileaccess-text
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -85,7 +85,7 @@ docker run --detach --network=testnet                                           
   -e PASS="radioactivity"                                                                           \
   -v "${ENV_ROOT}/temp/nc-base.sh:/init.sh"                                                         \
   -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
-  pondersource/dev-stock-nextcloud
+  pondersource/dev-stock-nextcloud-fileaccess-text
 
 waitForPort maria1.docker 3306
 waitForPort nc1.docker 443
