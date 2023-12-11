@@ -20,17 +20,14 @@ DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
 
 cd "$DIR/.."
 
-echo Building pondersource/dev-stock-php-base
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
+# echo Building pondersource/dev-stock-php-base
+# docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
 
-echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud .
+# echo Building pondersource/dev-stock-nextcloud
+# docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud .
 
-echo Building pondersource/dev-stock-nextcloud-fileaccess-text
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-fileaccess-text.Dockerfile --tag pondersource/dev-stock-nextcloud-fileaccess-text .
-
-echo Building pondersource/dev-stock-owncloud
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
+echo Building pondersource/dev-stock-nextcloud-sunet
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
 
 echo Building pondersource/dev-stock-nextcloud-fileaccess-text
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-fileaccess-text.Dockerfile --tag pondersource/dev-stock-nextcloud-fileaccess-text .

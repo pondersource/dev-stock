@@ -38,8 +38,8 @@ function waitForPort () {
 cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh" "${ENV_ROOT}/temp/nc-base.sh"
 
 # echo "starting firefox tester"
-docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
-docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
+# docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
+# docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
 
 echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
