@@ -42,4 +42,7 @@ See https://github.com/pondersource/surf-trashbin-app
 
 # Using XDebug
 
-See https://github.com/pondersource/dev-stock/blob/main/docs/xdebug.md
+See [docs](./docs/xdebug.md)
+
+# SOLID RemoteStorage
+for development see [docs](./docs/solid-remotestorage.md) 
