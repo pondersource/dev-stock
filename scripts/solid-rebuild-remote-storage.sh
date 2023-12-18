@@ -17,6 +17,12 @@ cd "$DIR/.." || exit
 
 REPO_ROOT=$(pwd)
 
+# install node lts/gallium (v16)
+# TODO: check if nvm is installed or not
+source /home/${USER}/.nvm/nvm.sh
+nvm install lts/gallium
+nvm use lts/gallium
+
 cd remotestorage
 npm run build:dev
 cd ../remotestorage-dev
