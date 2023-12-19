@@ -20,5 +20,19 @@ export ENV_ROOT=${ENV_ROOT}
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
+# install node lts/gallium (v16)
+# TODO: check if nvm is installed or not
+source /home/${USER}/.nvm/nvm.sh
+nvm install lts/gallium
+nvm use lts/gallium
+
+cd remotestorage
+npm run dev &
+cd ..
+
+cd remotestorage-widget
+npm run dev &
+cd ..
+
 cd remotestorage-dev
 http-server .

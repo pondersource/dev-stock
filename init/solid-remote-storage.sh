@@ -62,12 +62,11 @@ npm run build
 cd ..
 
 mkdir remotestorage-dev
+
+ln -sf "${PWD}/remotestorage/release/remotestorage.js" remotestorage-dev/remotestorage.js
+ln -sf "${PWD}/remotestorage-widget/build/widget.js" remotestorage-dev/widget.js
+
 cd remotestorage-dev 
-npm init my-app --yes
-
-cp ../remotestorage/release/remotestorage.js .
-cp ../remotestorage-widget/build/widget.js .
-
 cat > index.html <<EOF
 <html>
     <head>
