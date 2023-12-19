@@ -27,11 +27,11 @@ nvm install lts/gallium
 nvm use lts/gallium
 
 cd remotestorage
-npm run dev &
+npm run dev >/dev/null 2>&1 &
 cd ..
 
 cd remotestorage-widget
-npm run dev &
+npm run dev >/dev/null 2>&1 &
 cd ..
 
 cd remotestorage-dev
