@@ -17,6 +17,9 @@ solid-nextcloud
 oc-opencloudmesh
 rd-sram-integration
 mfazones
+remotestorage
+remotestorage-dev
+remotestorage-widget
 surf-trashbin-app
 oc-sciencemesh-release
 nc-sciencemesh-release
