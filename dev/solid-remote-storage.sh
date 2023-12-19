@@ -31,7 +31,7 @@ npm run dev >/dev/null 2>&1 &
 cd ..
 
 cd remotestorage-widget
-npm run dev >/dev/null 2>&1 &
+node_modules/.bin/webpack --mode=development -w >/dev/null 2>&1 &
 cd ..
 
 cd remotestorage-dev
