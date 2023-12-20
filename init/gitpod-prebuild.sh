@@ -10,7 +10,7 @@ docker pull rclone/rclone:latest
 docker pull collabora/code:latest
 docker pull jlesage/firefox:latest
 docker pull jlesage/firefox:v1.18.0
-docker pull cypress/included:13.3.2
+docker pull cypress/included:13.3.0
 docker pull cs3org/wopiserver:latest
 docker pull quay.io/keycloak/keycloak:latest
 
