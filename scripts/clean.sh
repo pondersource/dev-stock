@@ -6,15 +6,15 @@ set -e
 running=$(docker ps -q)
 # we actually need globbing and word spliting in this case.
 # shellcheck disable=SC2086
-[ -z "$running" ] || docker kill $running
+[ -z "$running" ] || docker kill $running   >/dev/null 2>&1
 
 existing=$(docker ps -qa)
 # we actually need globbing and word spliting in this case.
 # shellcheck disable=SC2086
-[ -z "$existing" ] || docker rm $existing
+[ -z "$existing" ] || docker rm $existing   >/dev/null 2>&1
 
-docker network remove testnet || true   >/dev/null 2>&1
-docker network create testnet           >/dev/null 2>&1
+docker network remove testnet || true       >/dev/null 2>&1
+docker network create testnet               >/dev/null 2>&1
 
 # I want a clean terminal xD
 clear
