@@ -140,7 +140,7 @@ cp -f ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
 cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
 
 # make sure network exists.
-docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
+docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
 docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest  >/dev/null 2>&1
 docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest  >/dev/null 2>&1
