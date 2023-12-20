@@ -4,8 +4,17 @@
 set -e
 
 running=$(docker ps -q)
-([ -z "$running" ] && echo "no running containers!") || docker kill $running
+# we actually need globbing and word spliting in this case.
+# shellcheck disable=SC2086
+[ -z "$running" ] || docker kill $running
+
 existing=$(docker ps -qa)
-([ -z "$existing" ] && echo "no existing containers!") || docker rm $existing
-docker network remove testnet || true
-docker network create testnet
+# we actually need globbing and word spliting in this case.
+# shellcheck disable=SC2086
+[ -z "$existing" ] || docker rm $existing
+
+docker network remove testnet || true   >/dev/null 2>&1
+docker network create testnet           >/dev/null 2>&1
+
+# I want a clean terminal xD
+clear
