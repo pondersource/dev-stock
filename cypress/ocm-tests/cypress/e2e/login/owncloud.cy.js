@@ -3,7 +3,7 @@
 describe('Login ownCloud', () => {
   it('Login test for ownCloud', () => {
     	// Given I visit the Home page
-		cy.visit('https://owncloud2.docker')
+		cy.visit('https://owncloud1.docker')
 
 		// I see the login page
 		cy.get('form[name="login"]').should('be.visible')
