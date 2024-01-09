@@ -6,10 +6,10 @@
 set -e
 
 # delete all containers including its volumes.
-docker rm -vf $(docker ps -aq) || true
+docker rm -vf $(docker ps -aq) >/dev/null 2>&1 || true
 
 # delete all images.
-docker rmi -f $(docker images -aq) || true
+docker rmi -f $(docker images -aq) >/dev/null 2>&1 || true
 
 docker system prune --force
 docker volume prune --force
