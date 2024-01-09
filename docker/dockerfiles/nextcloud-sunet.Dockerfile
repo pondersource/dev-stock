@@ -160,8 +160,11 @@ RUN php /var/www/html/occ integrity:check-core
 ## AND HERE, OR CODE INTEGRITY CHECK MIGHT FAIL, AND IMAGE WILL NOT BUILD
 
 ## VARIOUS PATCHES COMES HERE IF NEEDED
-COPY ./sunet/40235.diff /var/www/html/40235.diff
-RUN cd /var/www/html/ && patch -p 1 < 40235.diff
+
+# This patch for the MFAVerified WorkFlow Check is no longer needed but the COPY dist lines below still are.
+# See https://github.com/pondersource/nextcloud-mfa-awareness/issues/107#issuecomment-1882591600
+# COPY ./sunet/40235.diff /var/www/html/40235.diff
+# RUN cd /var/www/html/ && patch -p 1 < 40235.diff
 
 COPY ./sunet/workflowengine-workflowengine.js /var/www/html/dist/workflowengine-workflowengine.js
 COPY ./sunet/workflowengine-workflowengine.js.map /var/www/html/dist/workflowengine-workflowengine.js.map
