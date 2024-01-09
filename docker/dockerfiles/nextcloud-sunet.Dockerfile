@@ -161,13 +161,14 @@ RUN php /var/www/html/occ integrity:check-core
 
 ## VARIOUS PATCHES COMES HERE IF NEEDED
 
-# This patch for the MFAVerified WorkFlow Check is no longer needed but the COPY dist lines below still are.
+# This patch for the MFAVerified WorkFlow Check and the COPY dist statements below are no longer needed
 # See https://github.com/pondersource/nextcloud-mfa-awareness/issues/107#issuecomment-1882591600
 # COPY ./sunet/40235.diff /var/www/html/40235.diff
 # RUN cd /var/www/html/ && patch -p 1 < 40235.diff
 
-COPY ./sunet/workflowengine-workflowengine.js /var/www/html/dist/workflowengine-workflowengine.js
-COPY ./sunet/workflowengine-workflowengine.js.map /var/www/html/dist/workflowengine-workflowengine.js.map
+# And https://github.com/pondersource/nextcloud-mfa-awareness/pull/106#issuecomment-1882753554
+# COPY ./sunet/workflowengine-workflowengine.js /var/www/html/dist/workflowengine-workflowengine.js
+# COPY ./sunet/workflowengine-workflowengine.js.map /var/www/html/dist/workflowengine-workflowengine.js.map
 
 COPY ./sunet/39411.diff /var/www/html/39411.diff
 RUN cd /var/www/html/ && patch -p 1 < 39411.diff
