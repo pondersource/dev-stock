@@ -5,6 +5,11 @@
 
 set -e
 
+# use docker buildkit. you can disable buildkit by providing 0 as first argument.
+USE_BUILDKIT=${1:-"1"}
+
+export DOCKER_BUILDKIT="${USE_BUILDKIT}"
+
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
 while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink

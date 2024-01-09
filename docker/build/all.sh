@@ -5,8 +5,10 @@
 
 set -e
 
-# @michielbdejong avoid docker buildkit
-export DOCKER_BUILDKIT=0
+# use docker buildkit. you can disable buildkit by providing 0 as first argument.
+USE_BUILDKIT=${1:-"1"}
+
+export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
