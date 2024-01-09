@@ -67,3 +67,6 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-openc
 
 echo Building pondersource/dev-stock-owncloud-rd-sram
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-rd-sram.Dockerfile --tag pondersource/dev-stock-owncloud-rd-sram .
+
+echo Building pondersource/dev-stock-owncloud-ocm-test-suite
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-ocm-test-suite.Dockerfile --tag pondersource/dev-stock-ocm-test-suite .
