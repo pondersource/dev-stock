@@ -59,8 +59,9 @@ docker run --detach --network=testnet                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
   -e PASS="relativity"                                                        \
-  -v "${ENV_ROOT}/temp/init-nextcloud-solid.sh:/init.sh"                     \
-  -v "${ENV_ROOT}/solid-nextcloud:/var/www/html/apps/solid-nextcloud"        \
+  -v "${ENV_ROOT}/temp/init-nextcloud-solid.sh:/init.sh"                      \
+  -v "${ENV_ROOT}/solid-nextcloud:/var/www/html/apps/solid-nextcloud"         \
+  -v "${ENV_ROOT}/docker/tls:/tls-host"                                       \
   "pondersource/dev-stock-nextcloud-solid"
 
 # EFSS1
@@ -72,7 +73,7 @@ docker exec "${EFSS1}1.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-c
 docker exec "${EFSS1}1.docker" update-ca-certificates
 docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"
 
-docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+# docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
 
 # instructions.
 echo "Now browse to firefox and inside there to https://${EFSS1}1.docker"

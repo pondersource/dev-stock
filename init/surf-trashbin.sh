@@ -22,7 +22,7 @@ export ENV_ROOT=${ENV_ROOT}
 REPO_SURF_TRASHBIN=https://github.com/pondersource/surf-trashbin-app
 BRANCH_SURF_TRASHBIN=master
 
-[ ! -d "dav-token-access" ] &&                                                  \
+[ ! -d "surf-trashbin-app" ] &&                                                 \
     git clone                                                                   \
     --branch ${BRANCH_SURF_TRASHBIN}                                            \
     ${REPO_SURF_TRASHBIN}                                                       \
