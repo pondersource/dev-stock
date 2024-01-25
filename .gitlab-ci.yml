@@ -14,6 +14,7 @@ ocm-test-suite:
     - docker:dind
   script:
     - apk add bash
+    - apk add git
     - ./ci/ocm-test-suite-pull-images.sh
     - ./ci/ocm-test-suite-init-deps.sh
     - ./ci/ocm-test-suite.sh $BROWSER
