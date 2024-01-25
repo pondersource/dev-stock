@@ -9,7 +9,7 @@ stages:
 ocm-test-suite:
   extends: .parallel-hidden-job
   stage: test
-  image: docker
+  image: gitpod/workspace-full:latest
   services: 
     - docker:dind
   script:
