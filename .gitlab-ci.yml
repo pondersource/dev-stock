@@ -9,7 +9,7 @@ stages:
 ocm-test-suite:
   extends: .parallel-hidden-job
   stage: test
-  image: ubuntu:22.04
+  image: gitpod/workspace-full:latest
   script:
     - ./ci/ocm-test-suite-pull-images.sh
     - ./ci/ocm-test-suite-init-deps.sh
