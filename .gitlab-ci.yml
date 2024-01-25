@@ -1,8 +1,3 @@
-rules:
-  - if: '$CI_COMMIT_BRANCH == "main"'
-  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "ocm"'
-
 stages:
   - test
 
@@ -23,3 +18,7 @@ ocm-test-suite:
     paths:
       - ./cypress/ocm-tests/cypress/videos
     expire_in: 1 week
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "ocm"'
