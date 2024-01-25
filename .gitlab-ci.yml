@@ -1,0 +1,28 @@
+stages:
+  - test
+
+.parallel-hidden-job:
+  parallel:
+    matrix:
+      - BROWSER: [chrome, edge, firefox, electron]
+  
+ocm-test-suite:
+  extends: .parallel-hidden-job
+  stage: test
+  image: docker
+  services: 
+    - docker:dind
+  script:
+    - apk add bash
+    - apk add git
+    - ./ci/ocm-test-suite-pull-images.sh
+    - ./ci/ocm-test-suite-init-deps.sh
+    - ./ci/ocm-test-suite.sh $BROWSER
+  artifacts:
+    paths:
+      - ./cypress/ocm-tests/cypress/videos
+    expire_in: 1 week
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "main"'
+  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+  - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "ocm"'
