@@ -55,6 +55,7 @@ docker run --detach --network=testnet                                         \
 docker run --detach --network=testnet                                         \
   --name="${EFSS1}1.docker"                                                   \
   --add-host "host.docker.internal:host-gateway"                              \
+  --publish 4433:443                                                          \
   -e HOST="${EFSS1}1"                                                         \
   -e DBHOST="maria1.docker"                                                   \
   -e USER="einstein"                                                          \
