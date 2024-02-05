@@ -73,7 +73,7 @@ docker exec "${EFSS1}1.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-c
 docker exec "${EFSS1}1.docker" update-ca-certificates
 docker exec "${EFSS1}1.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"
 
-# docker exec -u www-data "${EFSS1}1.docker" sh "/${EFSS1}-init.sh"
+docker exec -u www-data "${EFSS1}1.docker" sh "/init.sh"
 
 # instructions.
 echo "Now browse to firefox and inside there to https://${EFSS1}1.docker"
