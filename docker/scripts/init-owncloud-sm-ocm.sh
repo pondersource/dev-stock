@@ -24,7 +24,7 @@ echo "Installing ScienceMesh"
 php console.php app:enable sciencemesh
 
 echo "Editing Config"
-sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\OpenCloudMesh\\\\SmOcmShareProviderFactory'," /var/www/html/config/config.php
-sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\OpenCloudMesh\\\\Plugins\\\\SmOcmSearchPlugin'," /var/www/html/config/config.php
+sed -i "3 i\  'sharing.managerFactory' => 'OCA\\\\ScienceMesh\\\\SmOcmShareProviderFactory'," /var/www/html/config/config.php
+sed -i "4 i\  'sharing.remoteShareesSearch' => 'OCA\\\\ScienceMesh\\\\Plugins\\\\SmFgOcmSearchPlugin'," /var/www/html/config/config.php
 sed -i "5 i\  'sharing.ocmController' => 'OCA\\\\OpenCloudMesh\\\\Controller\\\\OcmController'," /var/www/html/config/config.php
 sed -i "6 i\  'sharing.groupExternalManager' => 'OCA\\\\OpenCloudMesh\\\\GroupExternalManager'," /var/www/html/config/config.php
