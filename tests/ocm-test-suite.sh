@@ -5,21 +5,21 @@ set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink
+  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "${SOURCE}")
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
-DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-cd "$DIR/.." || exit
+cd "${DIR}/.." || exit
 
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 function waitForPort () {
-  echo waitForPort ${1} ${2}
+  echo waitForPort "${1}" "${2}"
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
   x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
@@ -43,12 +43,13 @@ function waitForCollabora() {
 }
 
 function createEfss() {
-  local platform=${1}
-  local number=${2}
-  local user=${3}
-  local password=${4}
+  local platform="${1}"
+  local number="${2}"
+  local user="${3}"
+  local password="${4}"
+  local image="${5}"
 
-  echo "creating efss ${platform} ${number}" 
+  echo "creating efss ${platform} ${number}"
 
   docker run --detach --network=testnet                                           \
     --name="maria${platform}${number}.docker"                                     \
@@ -58,7 +59,7 @@ function createEfss() {
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
     --skip-innodb-read-only-compressed                                            \
-    >/dev/null 2>&1
+
 
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
@@ -71,8 +72,8 @@ function createEfss() {
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "pondersource/dev-stock-${platform}-sciencemesh"                              \
-    >/dev/null 2>&1
+    "pondersource/dev-stock-${platform}-${image}"                                 \
+
 
     # wait for hostname port to be open
     waitForPort "maria${platform}${number}.docker"  3306
@@ -85,17 +86,17 @@ function createEfss() {
     docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
 
     # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh" >/dev/null 2>&1
+    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
 
-    echo "" 
+    echo ""
 }
 
 function createReva() {
-  local platform=${1}
-  local number=${2}
-  local port=${3}
+  local platform="${1}"
+  local number="${2}"
+  local port="${3}"
 
-  echo "creating reva for ${platform} ${number}" 
+  echo "creating reva for ${platform} ${number}"
 
   # make sure scripts are executable.
   chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"           >/dev/null 2>&1
@@ -119,15 +120,15 @@ function createReva() {
 }
 
 function sciencemeshInsertIntoDB() {
-  local platform=${1}
-  local number=${2}
+  local platform="${1}"
+  local number="${2}"
 
-  echo "configuring ScienceMesh app for efss ${platform} ${number}" 
+  echo "configuring ScienceMesh app for efss ${platform} ${number}"
 
   # run db injections.
   mysql_cmd="docker exec "maria${platform}${number}.docker" mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${platform}${number}.docker/');"          >/dev/null 2>&1
-  $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"                         >/dev/null 2>&1 
+  $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"                         >/dev/null 2>&1
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"          >/dev/null 2>&1
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"              >/dev/null 2>&1
 }
@@ -136,7 +137,7 @@ function sciencemeshInsertIntoDB() {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f ./docker/scripts/init-owncloud-sciencemesh.sh  ./temp/owncloud.sh
+cp -f ./docker/scripts/init-owncloud-sm-ocm.sh  ./temp/owncloud.sh
 cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
 
 # make sure network exists.
@@ -153,19 +154,19 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 # syntax:
 # createEfss platform number username password
 #
-# 
+#
 # platform:   owncloud, nextcloud.
-# number:     should be unique for each platform, you cannot have two nextclouds with same number.
+# number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
 
 # ownClouds
-createEfss owncloud 1 marie radioactivity
-createEfss owncloud 2 mahdi baghbani
+createEfss owncloud   1   marie     radioactivity     ocm-test-suite
+createEfss owncloud   2   mahdi     baghbani          ocm-test-suite
 
 # Nextclouds
-createEfss nextcloud 1 einstein relativity
-createEfss nextcloud 2 michiel  dejong
+createEfss nextcloud  1   einstein  relativity        sciencemesh
+createEfss nextcloud  2   michiel   dejong            sciencemesh
 
 ############
 ### Reva ###
@@ -176,8 +177,8 @@ createEfss nextcloud 2 michiel  dejong
 #
 # 
 # platform:   owncloud, nextcloud.
-# number:     should be unique for each platform, you cannot have two nextclouds with same number.
-# port:       maps a port on local host to port 80 of reva, for `curl` puposes! should be unique.
+# number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
+# port:       maps a port on local host to port 80 of reva, for `curl` purposes! should be unique.
 #             for all createReva commands, if the port is not unique or is already in use by another.
 #             program, script would halt!
 
@@ -196,7 +197,7 @@ createReva nextcloud 2 4504
 #
 # 
 # platform:   owncloud, nextcloud.
-# number:     should be unique for each platform, you cannot have two nextclouds with same number.
+# number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
 sciencemeshInsertIntoDB owncloud 1
 sciencemeshInsertIntoDB owncloud 2
