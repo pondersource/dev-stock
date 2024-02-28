@@ -8,13 +8,13 @@ Docker images we use in development.
 
 upstream: [Nextcloud Server Official](https://github.com/nextcloud/server)
 
-branch: [v27.1.2](https://github.com/nextcloud/server/releases/tag/v27.1.2)
+branch: [v28.0.2](https://github.com/nextcloud/server/releases/tag/v28.0.2)
 
 ## ownCloud version
 
 upstream: [ownCloud Core Official](https://github.com/owncloud/core)
 
-branch: [v10.13.2](https://github.com/owncloud/core/releases/tag/v10.13.2)
+branch: [v10.14.0](https://github.com/owncloud/core/releases/tag/v10.14.0)
 
 # Debugging
 ## RD-SRAM
