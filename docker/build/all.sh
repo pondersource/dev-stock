@@ -34,15 +34,15 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Docke
 echo Building pondersource/dev-stock-nextcloud
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud .
 
-echo Building pondersource/dev-stock-nextcloud-sunet
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
+# echo Building pondersource/dev-stock-nextcloud-sunet
+# docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
 
-cd simple-saml-php
+# cd simple-saml-php
 
-echo Building pondersource/dev-stock-simple-saml-php
-docker build --tag pondersource/dev-stock-simple-saml-php .
+# echo Building pondersource/dev-stock-simple-saml-php
+# docker build --tag pondersource/dev-stock-simple-saml-php .
 
-cd ..
+# cd ..
 
 echo Building pondersource/dev-stock-nextcloud-solid
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-solid.Dockerfile --tag pondersource/dev-stock-nextcloud-solid .
