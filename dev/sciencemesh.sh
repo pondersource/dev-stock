@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
   DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
   SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
   [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
 DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
@@ -49,6 +49,12 @@ function createEfss() {
   local password="${4}"
   local image="${5}"
 
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
+
   echo "creating efss ${platform} ${number}"
 
   docker run --detach --network=testnet                                           \
@@ -58,7 +64,7 @@ function createEfss() {
     --transaction-isolation=READ-COMMITTED                                        \
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
-    --skip-innodb-read-only-compressed                                            \
+    --skip-innodb-read-only-compressed
 
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
@@ -71,9 +77,9 @@ function createEfss() {
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "pondersource/dev-stock-${platform}-${image}"                                 \
+    "${image}"
 
-    # wait for hostname port to be open
+    # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
     waitForPort "${platform}${number}.docker"       443
 
@@ -151,20 +157,20 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 ############
 
 # syntax:
-# createEfss platform number username password image
+# createEfss platform number username password image.
 #
 #
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
-# image:      which image variation to use for container
+# image:      which image variation to use for container.
 
-# ownClouds
+# ownClouds.
 createEfss owncloud   1   marie     radioactivity     sciencemesh
 createEfss owncloud   2   mahdi     baghbani          sciencemesh
 
-# Nextclouds
+# Nextclouds.
 createEfss nextcloud  1   einstein  relativity        sciencemesh
 createEfss nextcloud  2   michiel   dejong            sciencemesh
 
@@ -173,7 +179,7 @@ createEfss nextcloud  2   michiel   dejong            sciencemesh
 ############
 
 # syntax:
-# createReva platform number port
+# createReva platform number port.
 #
 # 
 # platform:   owncloud, nextcloud.
@@ -193,7 +199,7 @@ createReva nextcloud 2 4504
 ###################
 
 # syntax:
-# sciencemeshInsertIntoDB platform number
+# sciencemeshInsertIntoDB platform number.
 #
 # 
 # platform:   owncloud, nextcloud.
