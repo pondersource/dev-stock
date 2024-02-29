@@ -13,11 +13,7 @@ const USER = `einstein`;
 const PROVIDER_ID = SERVER_HOST;
 const MESH_PROVIDER = SERVER_HOST;
 
-// const HTTPS_OPTIONS = {
-//   key: fs.readFileSync(`/etc/letsencrypt/live/${SERVER_HOST}/privkey.pem`),
-//   cert: fs.readFileSync(`/etc/letsencrypt/live/${SERVER_HOST}/cert.pem`),
-//   ca: fs.readFileSync(`/etc/letsencrypt/live/${SERVER_HOST}/chain.pem`)
-// }
+
 const HTTPS_OPTIONS = {
   key: fs.readFileSync(`/tls/${SERVER_NAME}.key`),
   cert: fs.readFileSync(`/tls/${SERVER_NAME}.crt`)
@@ -45,9 +41,7 @@ async function getServerConfig(otherUser) {
   }
   console.log('fetching', `${otherServer}ocm-provider/`);
   const configResult = await fetch(`${otherServer}ocm-provider/`);
-// const text = await configResult.text();
-// console.log({ text });
-// JSON.parse(text);
+
   return { config: await configResult.json(), otherServer };
 }
 
