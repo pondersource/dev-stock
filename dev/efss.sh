@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
   DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
   SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
   [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
 DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
@@ -46,7 +46,7 @@ function createEfss() {
     --transaction-isolation=READ-COMMITTED                                        \
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
-    --skip-innodb-read-only-compressed                                            \
+    --skip-innodb-read-only-compressed
 
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
@@ -58,9 +58,9 @@ function createEfss() {
     -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
-    "pondersource/dev-stock-${platform}"                                          \
+    "pondersource/dev-stock-${platform}"
 
-    # wait for hostname port to be open
+    # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
     waitForPort "${platform}${number}.docker"       443
 
@@ -86,16 +86,12 @@ cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh"  "${ENV_ROOT}/temp/nextclou
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
-# get platform from cli arguments.
-EFSS1="${1-nextcloud}"
-EFSS2="${2-owncloud}"
-
 ############
 ### EFSS ###
 ############
 
 # syntax:
-# createEfss platform number username password
+# createEfss platform number username password.
 #
 #
 # platform:   owncloud, nextcloud.
@@ -103,8 +99,13 @@ EFSS2="${2-owncloud}"
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
 
-createEfss "${EFSS1}"   1   einstein  relativity
-createEfss "${EFSS2}"   2   marie     radioactivity
+# ownClouds.
+createEfss owncloud     1   marie     radioactivity
+createEfss owncloud     2   mahdi     baghbani
+
+# Nextclouds.
+createEfss nextcloud    1   einstein  relativity
+createEfss nextcloud    2   michiel   dejong
 
 ###############
 ### Firefox ###
@@ -117,12 +118,13 @@ docker run --detach --network=testnet                                          \
   jlesage/firefox:latest                                                       \
   >/dev/null 2>&1
 
-
 # print instructions.
 clear
 echo "Now browse to :"
-echo "Embedded Firefox          -> http://localhost:5800"
+echo "Embedded Firefox            -> http://localhost:5800"
 echo ""
 echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-echo "https://${EFSS1}1.docker  -> username: einstein   password: relativity"
-echo "https://${EFSS2}2.docker  -> username: marie      password: radioactivity"
+echo "https://owncloud1.docker    -> username: marie      password: radioactivity"
+echo "https://owncloud2.docker    -> username: mahdi      password: baghbani"
+echo "https://nextcloud1.docker   -> username: einstein   password: relativity"
+echo "https://nextcloud2.docker   -> username: michiel    password: dejong"
