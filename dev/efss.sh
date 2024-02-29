@@ -71,7 +71,7 @@ function createEfss() {
     docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
 
     # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
+    docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
 
     echo ""
 }

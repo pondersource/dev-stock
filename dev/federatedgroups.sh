@@ -82,7 +82,7 @@ function createEfss() {
     docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
 
     # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
+    docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
 
     echo ""
 }
@@ -169,5 +169,5 @@ echo ""
 echo "share something from einstein@owncloud1.docker to Test Group, then run:"
 echo "$ docker exec -it owncloud2.docker sh /curls/includeMarie.sh owncloud2.docker"
 echo "$ docker exec -it owncloud1.docker sh /curls/includeMarie.sh owncloud1.docker"
-echo "then log in to owncloud2.docker as marie, you should not have received the share"
-echo "refresh the owncloud2.docker page, the share from einstein to Test Group should now also arrive to Marie"
+echo "then log in to https://owncloud2.docker as marie, you should not have received the share"
+echo "refresh the https://owncloud2.docker page, the share from einstein to Test Group should now also arrive to Marie"
