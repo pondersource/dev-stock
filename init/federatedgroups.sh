@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
+  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "${SOURCE}")
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
+  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
-DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-cd "$DIR/.." || exit
+cd "${DIR}/.." || exit
 
 # repositories and branches.
 REPO_OWNCLOUD=https://github.com/owncloud/core
-BRANCH_OWNCLOUD=v10.13.0
+BRANCH_OWNCLOUD=v10.14.0
 
 VERSION_CUSTOM_GROUPS=0.7.2
 LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz

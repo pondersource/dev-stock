@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
+  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "${SOURCE}")
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
+  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
-DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-cd "$DIR/.." || exit
+cd "${DIR}/.." || exit
 
 # repositories and branches.
 REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=nextcloud
 
 REPO_NEXTCLOUD=https://github.com/nextcloud/server
-BRANCH_NEXTCLOUD=master
+BRANCH_NEXTCLOUD=v28.0.2
 
 REPO_OWNCLOUD=https://github.com/owncloud/core
-BRANCH_OWNCLOUD=v10.13.0
+BRANCH_OWNCLOUD=v10.14.0
 
 REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=owncloud
@@ -52,7 +52,7 @@ BRANCH_REVA=v1.26.0
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
     make composer
 
-# move app to its place inside efss and create symbolic links
+# move app to its place inside efss and create symbolic links.
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                            \
     mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 

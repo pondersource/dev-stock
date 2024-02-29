@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
   DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
   SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
   [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
 DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
@@ -49,6 +49,12 @@ function createEfss() {
   local password="${4}"
   local image="${5}"
 
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
+
   echo "creating efss ${platform} ${number}"
 
   docker run --detach --network=testnet                                           \
@@ -58,7 +64,7 @@ function createEfss() {
     --transaction-isolation=READ-COMMITTED                                        \
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
-    --skip-innodb-read-only-compressed                                            \
+    --skip-innodb-read-only-compressed
 
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
@@ -71,9 +77,9 @@ function createEfss() {
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "pondersource/dev-stock-${platform}-${image}"                                 \
+    "${image}"
 
-    # wait for hostname port to be open
+    # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
     waitForPort "${platform}${number}.docker"       443
 
@@ -84,7 +90,7 @@ function createEfss() {
     docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
 
     # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
+    docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
 
     echo ""
 }
@@ -135,7 +141,7 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
 cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
@@ -150,20 +156,20 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 ############
 
 # syntax:
-# createEfss platform number username password image
+# createEfss platform number username password image.
 #
 #
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
-# image:      which image variation to use for container
+# image:      which image variation to use for container.
 
-# ownClouds
-createEfss owncloud   1   marie     radioactivity     ocm-test-suite
-createEfss owncloud   2   mahdi     baghbani          ocm-test-suite
+# ownClouds.
+createEfss owncloud   1   marie     radioactivity     sciencemesh
+createEfss owncloud   2   mahdi     baghbani          sciencemesh
 
-# Nextclouds
+# Nextclouds.
 createEfss nextcloud  1   einstein  relativity        sciencemesh
 createEfss nextcloud  2   michiel   dejong            sciencemesh
 
@@ -172,7 +178,7 @@ createEfss nextcloud  2   michiel   dejong            sciencemesh
 ############
 
 # syntax:
-# createReva platform number port
+# createReva platform number port.
 #
 # 
 # platform:   owncloud, nextcloud.
@@ -192,14 +198,14 @@ createReva nextcloud 2 4504
 ###################
 
 # syntax:
-# sciencemeshInsertIntoDB platform number
+# sciencemeshInsertIntoDB platform number.
 #
 # 
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
-sciencemeshInsertIntoDB owncloud 1
-sciencemeshInsertIntoDB owncloud 2
+sciencemeshInsertIntoDB owncloud  1
+sciencemeshInsertIntoDB owncloud  2
 
 sciencemeshInsertIntoDB nextcloud 1
 sciencemeshInsertIntoDB nextcloud 2
@@ -222,48 +228,12 @@ docker run --detach --network=testnet                                          \
   jlesage/firefox:latest                                                       \
   >/dev/null 2>&1
 
-##################
-### VNC Server ###
-##################
-
-# remove previous x11 unix socket file, avoid any problems while mounting new one.
-sudo rm -rf "${ENV_ROOT}/temp/.X11-unix"
-
-# try to change DISPLAY_WIDTH, DISPLAY_HEIGHT to make it fit in your screen,
-# NOTE: please do not commit any change related to resolution.
-docker run --detach --network=testnet                                         \
-  --name=vnc-server                                                           \
-  -p 5700:8080                                                                \
-  -e RUN_XTERM=no                                                             \
-  -e DISPLAY_WIDTH=1920                                                       \
-  -e DISPLAY_HEIGHT=1080                                                      \
-  -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
-  theasp/novnc:latest
-
-###############
-### Cypress ###
-###############
-
-# create cypress and attach its display to the VNC server container. 
-# this way you can view inside cypress container through vnc server.
-docker run --detach --network=testnet                                         \
-  --name="cypress.docker"                                                     \
-  -e DISPLAY=vnc-server:0.0                                                   \
-  -v "${ENV_ROOT}/docker/tls:/tls"                                            \
-  -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                     \
-  -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                              \
-  -w /ocm                                                                     \
-  --entrypoint cypress                                                        \
-  cypress/included:13.3.0                                                     \
-  open --project .
-
 # print instructions.
 clear
 echo "Now browse to :"
-echo "Cypress inside VNC Server -> http://localhost:5700"
 echo "Embedded Firefox          -> http://localhost:5800"
 echo ""
-echo "Credentials:"
+echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
 echo "https://owncloud1.docker  -> username: marie      password: radioactivity"
 echo "https://owncloud2.docker  -> username: mahdi      password: baghbani"
 echo "https://nextcloud1.docker -> username: einstein   password: relativity"

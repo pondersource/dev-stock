@@ -34,11 +34,6 @@ ports:
     visibility: public
     name: firefox
     description: firefox used by devstock to test Pondersource apps in browser
-  - port: 5900
-    onOpen: ignore
-    visibility: public
-    name: firefox legacy
-    description: firefox used by devstock to test Pondersource apps in browser
   - port: 9003
     onOpen: ignore
     visibility: public
