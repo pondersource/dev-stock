@@ -100,7 +100,7 @@ function federatedGroupsInsertIntoDB() {
   echo "creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on ${platform}${number}"
   docker exec -it "${platform}${number}.docker" sh /curls/createGroup.sh "${platform}${number}.docker"
 
-  docker exec -it "${platform}${number}.docker" sh /curls/excludeMarie.sh "${platform}${number}.docker"
+  docker exec -it "${platform}${number}.docker" sh /curls/includeMarie.sh "${platform}${number}.docker"
 }
 
 
@@ -166,8 +166,5 @@ echo "Inside Embedded Firefox browse to EFSS hostname and enter the related cred
 echo "https://owncloud1.docker  -> username: einstein   password: relativity"
 echo "https://owncloud2.docker  -> username: marie      password: radioactivity"
 echo ""
-echo "share something from einstein@owncloud1.docker to Test Group, then run:"
-echo "$ docker exec -it owncloud2.docker sh /curls/includeMarie.sh owncloud2.docker"
-echo "$ docker exec -it owncloud1.docker sh /curls/includeMarie.sh owncloud1.docker"
-echo "then log in to https://owncloud2.docker as marie, you should not have received the share"
-echo "refresh the https://owncloud2.docker page, the share from einstein to Test Group should now also arrive to Marie"
+echo "share something from einstein@owncloud1.docker to Test Group"
+echo "then log in to https://owncloud2.docker as marie, you should have received the share."
