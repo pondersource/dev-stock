@@ -23,7 +23,7 @@ REPO_NEXTCLOUD=https://github.com/nextcloud/server
 BRANCH_NEXTCLOUD=v28.0.2
 
 REPO_OWNCLOUD=https://github.com/owncloud/core
-BRANCH_OWNCLOUD=v10.13.0
+BRANCH_OWNCLOUD=v10.14.0
 
 REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=owncloud
