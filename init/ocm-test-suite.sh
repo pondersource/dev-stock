@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
@@ -52,7 +52,7 @@ BRANCH_REVA=v1.26.0
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
     make composer
 
-# move app to its place inside efss and create symbolic links
+# move app to its place inside efss and create symbolic links.
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                            \
     mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 

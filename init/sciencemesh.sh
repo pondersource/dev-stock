@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink.
   DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
   SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
   [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
 done
 DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
@@ -52,7 +52,7 @@ BRANCH_REVA=v1.26.0
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
     make composer
 
-# move app to its place inside efss and create symbolic links
+# move app to its place inside efss and create symbolic links.
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                            \
     mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 
