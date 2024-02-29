@@ -5,15 +5,15 @@ set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink.
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
+  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "${SOURCE}")
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
+  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
-DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-cd "$DIR/.." || exit
+cd "${DIR}/.." || exit
 
 # repositories and branches.
 REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
