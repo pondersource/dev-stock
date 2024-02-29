@@ -60,7 +60,6 @@ function createEfss() {
     --innodb-file-per-table=1                                                     \
     --skip-innodb-read-only-compressed                                            \
 
-
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
     --add-host "host.docker.internal:host-gateway"                                \
@@ -73,7 +72,6 @@ function createEfss() {
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
     "pondersource/dev-stock-${platform}-${image}"                                 \
-
 
     # wait for hostname port to be open
     waitForPort "maria${platform}${number}.docker"  3306
@@ -133,12 +131,12 @@ function sciencemeshInsertIntoDB() {
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"              >/dev/null 2>&1
 }
 
-# create temp directory if it doesn't exist.
-[ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
+# delete and create temp directory.
+rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f ./docker/scripts/init-owncloud-sm-ocm.sh  ./temp/owncloud.sh
-cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nextcloud.sh
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
@@ -152,13 +150,14 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 ############
 
 # syntax:
-# createEfss platform number username password
+# createEfss platform number username password image
 #
 #
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
+# image:      which image variation to use for container
 
 # ownClouds
 createEfss owncloud   1   marie     radioactivity     ocm-test-suite
