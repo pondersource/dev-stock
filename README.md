@@ -31,7 +31,7 @@ The scripts for ScienceMesh still exist here but are not guaranteed to work as e
 
 upstream: [Reva](https://github.com/cs3org/reva)
 
-branch: [v1.26.0](https://github.com/owncloud/core/releases/tag/v1.26.0)
+branch: [v1.28.0](https://github.com/owncloud/core/releases/tag/v1.28.0)
 
 ## Trashbin
 
