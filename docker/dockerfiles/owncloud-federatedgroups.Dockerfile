@@ -3,7 +3,7 @@ FROM pondersource/dev-stock-owncloud-opencloudmesh
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="PonderSource ownCloud rd-sram Image"
+LABEL org.opencontainers.image.title="PonderSource ownCloud federatedgroups Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
@@ -19,14 +19,14 @@ RUN git clone                           \
     --depth 1                           \
     --branch ${BRANCH_RD_SRAM}          \
     ${REPO_RD_SRAM}                     \
-    apps/rd-sram-integration
+    apps/federatedgroups-git-repo
 
-RUN cd apps && ln --symbolic --force rd-sram-integration/federatedgroups
+RUN cd apps && ln --symbolic --force federatedgroups-git-repo/federatedgroups federatedgroups
 
 COPY ./rd-sram/curls /curls
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud-rd-sram.sh /init.sh
+COPY ./scripts/init-owncloud-federatedgroups.sh /init.sh
 
 USER root

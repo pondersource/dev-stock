@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 echo "Log in as pondersource"
@@ -31,4 +32,4 @@ docker push pondersource/dev-stock-owncloud-token-based-access
 
 docker push pondersource/dev-stock-owncloud-opencloudmesh
 
-docker push pondersource/dev-stock-owncloud-rd-sram
+docker push pondersource/dev-stock-owncloud-federatedgroups

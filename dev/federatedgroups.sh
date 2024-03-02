@@ -63,7 +63,7 @@ function createEfss() {
     -e USER="${user}"                                                                                     \
     -e PASS="${password}"                                                                                 \
     -v "${ENV_ROOT}/docker/tls:/tls-host"                                                                 \
-    -v "${ENV_ROOT}/temp/curls:/curls"                                                                    \
+    -v "${ENV_ROOT}/temp/federatedgroups:/curls"                                                          \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                                             \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                          \
     -v "${ENV_ROOT}/${platform}/apps/customgroups:/var/www/html/apps/customgroups"                        \
@@ -108,8 +108,8 @@ function federatedGroupsInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -Rf "${ENV_ROOT}/docker/rd-sram/curls"                   "${ENV_ROOT}/temp/curls"
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-rd-sram.sh" "${ENV_ROOT}/temp/owncloud.sh"
+cp -Rf "${ENV_ROOT}/docker/scripts/federatedgroups"                 "${ENV_ROOT}/temp/federatedgroups"
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-federatedgroups.sh" "${ENV_ROOT}/temp/owncloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
@@ -129,8 +129,8 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # image:      which image variation to use for container.
 
 # ownClouds.
-createEfss owncloud   1   einstein  relativity        rd-sram
-createEfss owncloud   2   marie     radioactivity     rd-sram
+createEfss owncloud   1   einstein  relativity        federatedgroups
+createEfss owncloud   2   marie     radioactivity     federatedgroups
 
 ########################
 ### Federated Groups ###
