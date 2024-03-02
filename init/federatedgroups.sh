@@ -19,14 +19,14 @@ cd "${DIR}/.." || exit
 REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.14.0
 
-VERSION_CUSTOM_GROUPS=0.7.2
+VERSION_CUSTOM_GROUPS=0.9.0
 LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz
 
 REPO_OCM=https://github.com/pondersource/oc-opencloudmesh
 BRANCH_OCM=main
 
-REPO_RD_SRAM=https://github.com/surfnet/rd-sram-integration
-BRANCH_RD_SRAM=main
+REPO_FEDERATEDGROUPS=https://github.com/surfnet/rd-sram-integration
+BRANCH_FEDERATEDGROUPS=main
 
 # ownCloud source code.
 [ ! -d "owncloud" ] &&                                                                          \
@@ -40,34 +40,34 @@ BRANCH_RD_SRAM=main
 wget -qO- ${LINK_CUSTOM_GROUPS} | tar xz -C owncloud/apps
 
 # OpenCloudMesh source code.
-[ ! -d "ocm" ] &&                                                                               \
+[ ! -d "opencloudmesh-git-repo" ] &&                                                            \
     git clone                                                                                   \
     --branch ${BRANCH_OCM}                                                                      \
     ${REPO_OCM}                                                                                 \
-    ocm
+    opencloudmesh-git-repo
 
-[ ! -d "owncloud/apps/ocm-git-repo" ] &&                                                        \
-    mv ocm owncloud/apps/ocm-git-repo                                                           \
+[ ! -d "owncloud/apps/opencloudmesh-git-repo" ] &&                                              \
+    mv opencloudmesh-git-repo owncloud/apps/opencloudmesh-git-repo                              \
     &&                                                                                          \
     cd owncloud/apps                                                                            \
     &&                                                                                          \
-    ln --symbolic --force  ocm-git-repo/opencloudmesh opencloudmesh                             \
+    ln --symbolic --force opencloudmesh-git-repo/opencloudmesh opencloudmesh                    \
     &&                                                                                          \
     cd ../..
 
-# RD-SRAM source code.
-[ ! -d "rd-sram" ] &&                                                                           \
+# FederatedGroups source code.
+[ ! -d "federatedgroups-git-repo" ] &&                                                          \
     git clone                                                                                   \
-    --branch ${BRANCH_RD_SRAM}                                                                  \
-    ${REPO_RD_SRAM}                                                                             \
-    rd-sram
+    --branch ${BRANCH_FEDERATEDGROUPS}                                                          \
+    ${REPO_FEDERATEDGROUPS}                                                                     \
+    federatedgroups-git-repo
 
-[ ! -d "owncloud/apps/rd-sram-git-repo" ] &&                                                    \
-    mv rd-sram owncloud/apps/rd-sram-git-repo                                                   \
+[ ! -d "owncloud/apps/federatedgroups-git-repo" ] &&                                            \
+    mv federatedgroups-git-repo owncloud/apps/federatedgroups-git-repo                          \
     &&                                                                                          \
     cd owncloud/apps                                                                            \
     &&                                                                                          \
-    ln --symbolic --force  rd-sram-git-repo/federatedgroups federatedgroups                     \
+    ln --symbolic --force federatedgroups-git-repo/federatedgroups federatedgroups              \
     &&                                                                                          \
     cd ../..
 

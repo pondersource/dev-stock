@@ -1,26 +1,27 @@
 #!/usr/bin/env bash
 
-# CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="default" .
-
+# @michielbdejong halt on error in docker init scripts.
 set -e
+
+# find this scripts location.
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
+  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+  SOURCE=$(readlink "${SOURCE}")
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
+  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
+done
+DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+
+cd "${DIR}/.." || exit
 
 # use docker buildkit. you can disable buildkit by providing 0 as first argument.
 USE_BUILDKIT=${1:-"1"}
 
 export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 
-# find this scripts location.
-SOURCE=${BASH_SOURCE[0]}
-while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "$SOURCE")
-   # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-  [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE
-done
-DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
-
-cd "$DIR/.."
+# CACHEBUST forces docker to clone fresh source codes from git.
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
 
 echo Building pondersource/dev-stock-ocmstub
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/ocmstub.Dockerfile --tag pondersource/dev-stock-ocmstub .
@@ -65,8 +66,8 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-token
 echo Building pondersource/dev-stock-owncloud-opencloudmesh
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-opencloudmesh.Dockerfile --tag pondersource/dev-stock-owncloud-opencloudmesh .
 
-echo Building pondersource/dev-stock-owncloud-rd-sram
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-rd-sram.Dockerfile --tag pondersource/dev-stock-owncloud-rd-sram .
+echo Building pondersource/dev-stock-owncloud-federatedgroups
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-federatedgroups.Dockerfile --tag pondersource/dev-stock-owncloud-federatedgroups .
 
 echo Building pondersource/dev-stock-owncloud-ocm-test-suite
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-ocm-test-suite.Dockerfile --tag pondersource/dev-stock-owncloud-ocm-test-suite .
