@@ -1,20 +1,30 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
-# create new dir and copy configs there.
-mkdir -p /revad/configs
-cp /etc/revad/sciencemesh*.toml /revad/configs/
-cp /etc/revad/providers.testnet.json /revad/configs/providers.testnet.json
+# create new dir and copy relevant configs there.
+rm -rf                                                                                  /etc/revad
+mkdir -p                                                                                /etc/revad
+cp /configs/revad/*                                                                     /etc/revad/
+if [ "${HOST::-1}" == "revacernbox" ]; then
+  cp /configs/cernbox/*                                                                 /etc/revad/
+  rm /etc/revad/sciencemesh*.toml
+fi
 
-# substitute placeholders with correct names.
-sed -i "s/your.revad.ssl/${HOST}/g" /revad/configs/sciencemesh*.toml
-sed -i "s/your.revad.com/${HOST}.docker/g" /revad/configs/sciencemesh*.toml
-sed -i "s/your.efss.com/${HOST//reva/}.docker/g" /revad/configs/sciencemesh*.toml
+# substitute placeholders and "external" values with valid ones for the testnet.
+sed -i "s/your.revad.ssl/${HOST}/g"                                                     /etc/revad/*.toml
+sed -i "s/your.revad.org/${HOST}.docker/"                                               /etc/revad/*.toml
+sed -i "s/localhost/${HOST}.docker/"                                                    /etc/revad/*.toml
+sed -i "s/your.efss.org/${HOST//reva/}.docker/"                                         /etc/revad/*.toml
+sed -i "s/your.nginx.org/${HOST//reva/}.docker/"                                        /etc/revad/*.toml
+# sed: -e expression #1, char 22: unknown option to `s'
+# sed -i "s/your.wopi.org/${HOST/reva/wopi/}.docker/"                                     /etc/revad/*.toml
+sed -i "s/debug/trace/"                                                                 /etc/revad/*.toml
 
-cp /etc/revad/tls/*.crt /usr/local/share/ca-certificates/
+# update OS certificate store.
+cp /etc/tls/*.crt /usr/local/share/ca-certificates/
 update-ca-certificates
 
 # run revad.
-revad --dev-dir "/revad/configs" &
+revad --dev-dir "/etc/revad" &

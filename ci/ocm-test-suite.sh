@@ -109,8 +109,8 @@ function createReva() {
   -e HOST="reva${platform}${number}"                                          \
   -p "${port}:80"                                                             \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/docker/revad:/etc/revad"                                    \
-  -v "${ENV_ROOT}/docker/tls:/etc/revad/tls"                                  \
+  -v "${ENV_ROOT}/docker/tls:/etc/tls"                                        \
+  -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
