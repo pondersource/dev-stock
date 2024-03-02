@@ -95,6 +95,7 @@ docker exec --user www-data oc-release.docker bash -c "cd /var/www/html/apps/sci
                                                       tar -cf sciencemesh.tar sciencemesh"
 
 docker exec --user root oc-release.docker bash -c "mkdir -p /var/www/html/apps/sciencemesh/release                \
+                                                  &&                                                              \
                                                   cd /var/www/html/apps/sciencemesh/release                       \
                                                   &&                                                              \
                                                   mv ../build/sciencemesh.tar .                                   \
