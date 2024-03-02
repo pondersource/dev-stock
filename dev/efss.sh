@@ -36,6 +36,13 @@ function createEfss() {
   local number="${2}"
   local user="${3}"
   local password="${4}"
+  local image="${5}"
+
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
 
   echo "creating efss ${platform} ${number}"
 
@@ -58,7 +65,7 @@ function createEfss() {
     -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
-    "pondersource/dev-stock-${platform}"
+    "${image}"
 
     # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
