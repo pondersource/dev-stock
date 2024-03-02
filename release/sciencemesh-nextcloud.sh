@@ -89,6 +89,7 @@ docker exec --user www-data nc-release.docker bash -c "cd /var/www/html/apps/sci
 
 echo "NextCloud Signature start:"
 docker exec --user root nc-release.docker bash -c "mkdir -p /var/www/html/apps/sciencemesh/release                \
+                                                  &&                                                              \
                                                   cd /var/www/html/apps/sciencemesh/release                       \
                                                   &&                                                              \
                                                   mv ../build/sciencemesh.tar .                                   \
