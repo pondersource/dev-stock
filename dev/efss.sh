@@ -62,7 +62,7 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                  \
     -e USER="${user}"                                                             \
     -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
+    -v "${ENV_ROOT}/docker/tls/certificates:/tls-host"                            \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     "${image}"
@@ -118,11 +118,16 @@ createEfss nextcloud    2   michiel   dejong
 ### Firefox ###
 ###############
 
-docker run --detach --network=testnet                                          \
-  --name=firefox                                                               \
-  -p 5800:5800                                                                 \
-  --shm-size 2g                                                                \
-  jlesage/firefox:latest                                                       \
+docker run --detach --network=testnet                                                                     \
+  --name=firefox                                                                                          \
+  -p 5800:5800                                                                                            \
+  --shm-size 2g                                                                                           \
+  -e USER_ID="${UID}"                                                                                     \
+  -e GROUP_ID="${UID}"                                                                                    \
+  -e DARK_MODE=1                                                                                          \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
+  jlesage/firefox:latest                                                                                  \
   >/dev/null 2>&1
 
 # print instructions.

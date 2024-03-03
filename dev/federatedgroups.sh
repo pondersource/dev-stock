@@ -150,11 +150,14 @@ federatedGroupsInsertIntoDB owncloud  2
 ### Firefox ###
 ###############
 
-docker run --detach --network=testnet                                          \
-  --name=firefox                                                               \
-  -p 5800:5800                                                                 \
-  --shm-size 2g                                                                \
-  jlesage/firefox:latest                                                       \
+docker run --detach --network=testnet                                                                     \
+  --name=firefox                                                                                          \
+  -p 5800:5800                                                                                            \
+  --shm-size 2g                                                                                           \
+  -e DARK_MODE=1                                                                                          \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
+  jlesage/firefox:latest                                                                                  \
   >/dev/null 2>&1
 
 # print instructions.
