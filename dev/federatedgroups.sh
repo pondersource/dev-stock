@@ -62,8 +62,9 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                                          \
     -e USER="${user}"                                                                                     \
     -e PASS="${password}"                                                                                 \
-    -v "${ENV_ROOT}/docker/tls:/tls-host"                                                                 \
     -v "${ENV_ROOT}/temp/federatedgroups:/curls"                                                          \
+    -v "${ENV_ROOT}/docker/tls/certificates:/tls-host"                                                    \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                              \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                                             \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                          \
     -v "${ENV_ROOT}/${platform}/apps/customgroups:/var/www/html/apps/customgroups"                        \
@@ -76,8 +77,9 @@ function createEfss() {
     waitForPort "${platform}${number}.docker"       443
 
     # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-    docker exec "${platform}${number}.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"                                         >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"                                    >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp /tls/*.crt                             /usr/local/share/ca-certificates/"             >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp /certificate-authority/*.crt           /usr/local/share/ca-certificates/"             >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp /tls/*.crt                             /usr/local/share/ca-certificates/"             >/dev/null 2>&1
     docker exec "${platform}${number}.docker" update-ca-certificates                                                                            >/dev/null 2>&1
     docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
 

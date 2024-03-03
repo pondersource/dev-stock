@@ -23,7 +23,15 @@ sed -i "s/your.nginx.org/${HOST//reva/}.docker/"                                
 sed -i "s/debug/trace/"                                                                 /etc/revad/*.toml
 
 # update OS certificate store.
-cp /etc/tls/*.crt /usr/local/share/ca-certificates/
+[ -d "/tls-host" ] &&                                                                               \
+  cp /tls-host/*.crt                  /usr/local/share/ca-certificates/
+
+[ -d "/certificate-authority" ] &&                                                                  \
+  cp /certificate-authority/*.crt     /usr/local/share/ca-certificates/
+
+[ -d "/etc/tls" ] &&                                                                                \
+  cp /etc/tls/*.crt                   /usr/local/share/ca-certificates/
+
 update-ca-certificates
 
 # run revad.
