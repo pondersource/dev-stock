@@ -27,9 +27,9 @@ function createCertificate {
     -subj   "/C=RO/ST=Bucharest/L=Bucharest/O=IT/CN=${1}.docker"
 
   echo Creating extfile
-  echo "subjectAltName = @alt_names"                                                       >   "./tls/${1}.cnf"
-  echo "[alt_names]"                                                                       >>  "./tls/${1}.cnf"
-  echo "DNS.1 = ${1}.docker"                                                               >>  "./tls/${1}.cnf"
+  echo "subjectAltName = @alt_names"                                   >   "${ENV_ROOT}/certificates/${1}.cnf"
+  echo "[alt_names]"                                                   >>  "${ENV_ROOT}/certificates/${1}.cnf"
+  echo "DNS.1 = ${1}.docker"                                           >>  "${ENV_ROOT}/certificates/${1}.cnf"
 
   echo "Signing CSR for ${1}.docker, creating cert."
 
@@ -46,35 +46,20 @@ function createCertificate {
 rm -rf "${ENV_ROOT}/certificates"
 mkdir -p "${ENV_ROOT}/certificates"
 
-createCertificate nc1
-createCertificate nc2
-createCertificate nextcloud1
-createCertificate nextcloud2
-createCertificate oc1
-createCertificate oc2
-createCertificate owncloud1
-createCertificate owncloud2
-createCertificate revad1
-createCertificate revad2
-createCertificate revanextcloud1
-createCertificate revanextcloud2
-createCertificate revaowncloud1
-createCertificate revaowncloud2
-
-createCert idp
+createCertificate idp
 sudo chown 1000:root "${ENV_ROOT}"/certificates/idp.*
 
-createCert meshdir
-createCert stub1
-createCert stub2
-createCert revad1
-createCert revad2
+createCertificate meshdir
+createCertificate stub1
+createCertificate stub2
+createCertificate revad1
+createCertificate revad2
 
 for efss in owncloud nextcloud cernbox ocis nc oc; do
-  createCert ${efss}1
-  createCert ${efss}2
-  createCert reva${efss}1
-  createCert reva${efss}2
-  createCert wopi${efss}1
-  createCert wopi${efss}2
+  createCertificate ${efss}1
+  createCertificate ${efss}2
+  createCertificate reva${efss}1
+  createCertificate reva${efss}2
+  createCertificate wopi${efss}1
+  createCertificate wopi${efss}2
 done
