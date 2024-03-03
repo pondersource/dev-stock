@@ -18,6 +18,7 @@ cd "${DIR}/.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
+
 function waitForPort () {
   echo waitForPort "${1}" "${2}"
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
@@ -65,6 +66,7 @@ function createEfss() {
     -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
+    -v "${ENV_ROOT}/nextcloud/apps/solid:/var/www/html/apps/solid"                \
     "${image}"
 
     # wait for hostname port to be open.
@@ -87,8 +89,7 @@ function createEfss() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud.sh"   "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-solid.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
@@ -106,13 +107,8 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
 
-# ownClouds.
-createEfss owncloud     1   marie     radioactivity
-createEfss owncloud     2   mahdi     baghbani
-
 # Nextclouds.
-createEfss nextcloud    1   einstein  relativity
-createEfss nextcloud    2   michiel   dejong
+createEfss nextcloud    1   einstein  relativity  solid
 
 ###############
 ### Firefox ###
@@ -131,7 +127,4 @@ echo "Now browse to :"
 echo "Embedded Firefox            -> http://localhost:5800"
 echo ""
 echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-echo "https://owncloud1.docker    -> username: marie      password: radioactivity"
-echo "https://owncloud2.docker    -> username: mahdi      password: baghbani"
 echo "https://nextcloud1.docker   -> username: einstein   password: relativity"
-echo "https://nextcloud2.docker   -> username: michiel    password: dejong"

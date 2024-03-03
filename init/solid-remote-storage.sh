@@ -30,14 +30,14 @@ REPO_REMOTE_STORAGE_WIDGET=https://github.com/pondersource/remotestorage-widget
 BRANCH_REMOTE_STORAGE_WIDGET=master
 
 # remotestorage source code.
-[ ! -d "remotestorage" ] &&                                                                            \
+[ ! -d "remotestorage" ] &&                                                                        \
     git clone                                                                                      \
     --branch ${BRANCH_REMOTE_STORAGE}                                                              \
     ${REPO_REMOTE_STORAGE}                                                                         \
     remotestorage
 
 # remotestorage-widget source code.
-[ ! -d "remotestorage-widget" ] &&                                                                            \
+[ ! -d "remotestorage-widget" ] &&                                                                 \
     git clone                                                                                      \
     --branch ${BRANCH_REMOTE_STORAGE_WIDGET}                                                       \
     ${REPO_REMOTE_STORAGE_WIDGET}                                                                  \
