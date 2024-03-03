@@ -21,7 +21,7 @@ RUN git clone                     \
     ${REPO_SOLID}                 \
     apps/solid-nextcloud
 
-RUN cd apps/ && ln -s solid-nextcloud/solid
+RUN cd apps && ln --symbolic --force solid-nextcloud/solid solid
 
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
