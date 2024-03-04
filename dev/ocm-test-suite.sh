@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink
+while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
   DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
   SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
   [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
 done
 DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
@@ -49,6 +49,12 @@ function createEfss() {
   local password="${4}"
   local image="${5}"
 
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
+
   echo "creating efss ${platform} ${number}"
 
   docker run --detach --network=testnet                                           \
@@ -67,21 +73,23 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                  \
     -e USER="${user}"                                                             \
     -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "pondersource/dev-stock-${platform}-${image}"                                 \
+    "${image}"
 
-    # wait for hostname port to be open
+    # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
     waitForPort "${platform}${number}.docker"       443
 
     # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-    docker exec "${platform}${number}.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"                                         >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"                                    >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" update-ca-certificates                                                                            >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
     # run init script inside efss.
     docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
@@ -108,7 +116,8 @@ function createReva() {
   -e HOST="reva${platform}${number}"                                          \
   -p "${port}:80"                                                             \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/docker/tls:/etc/tls"                                        \
+  -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
+  -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
   -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
@@ -150,14 +159,14 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 ############
 
 # syntax:
-# createEfss platform number username password image
+# createEfss platform number username password image.
 #
 #
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
-# image:      which image variation to use for container
+# image:      which image variation to use for container.
 
 # ownClouds
 createEfss owncloud   1   marie     radioactivity     ocm-test-suite
@@ -172,7 +181,7 @@ createEfss nextcloud  2   michiel   dejong            sciencemesh
 ############
 
 # syntax:
-# createReva platform number port
+# createReva platform number port.
 #
 # 
 # platform:   owncloud, nextcloud.
@@ -192,7 +201,7 @@ createReva nextcloud 2 4504
 ###################
 
 # syntax:
-# sciencemeshInsertIntoDB platform number
+# sciencemeshInsertIntoDB platform number.
 #
 # 
 # platform:   owncloud, nextcloud.
@@ -207,6 +216,7 @@ sciencemeshInsertIntoDB nextcloud 2
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                         \
   --name=meshdir.docker                                                       \
+  -e HOST="meshdir"                                                           \
   -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                   \
   pondersource/dev-stock-ocmstub                                              \
   >/dev/null 2>&1
@@ -215,11 +225,16 @@ docker run --detach --network=testnet                                         \
 ### Firefox ###
 ###############
 
-docker run --detach --network=testnet                                          \
-  --name=firefox                                                               \
-  -p 5800:5800                                                                 \
-  --shm-size 2g                                                                \
-  jlesage/firefox:latest                                                       \
+docker run --detach --network=testnet                                                                     \
+  --name=firefox                                                                                          \
+  -p 5800:5800                                                                                            \
+  --shm-size 2g                                                                                           \
+  -e USER_ID="${UID}"                                                                                     \
+  -e GROUP_ID="${UID}"                                                                                    \
+  -e DARK_MODE=1                                                                                          \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
+  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
+  jlesage/firefox:latest                                                                                  \
   >/dev/null 2>&1
 
 ##################
@@ -263,7 +278,7 @@ echo "Now browse to :"
 echo "Cypress inside VNC Server -> http://localhost:5700"
 echo "Embedded Firefox          -> http://localhost:5800"
 echo ""
-echo "Credentials:"
+echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
 echo "https://owncloud1.docker  -> username: marie      password: radioactivity"
 echo "https://owncloud2.docker  -> username: mahdi      password: baghbani"
 echo "https://nextcloud1.docker -> username: einstein   password: relativity"
