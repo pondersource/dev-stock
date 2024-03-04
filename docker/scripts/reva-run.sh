@@ -25,14 +25,14 @@ sed -i "s/debug/trace/"                                                         
 # update OS certificate store.
 mkdir -p /tls
 
-[ -d "/tls-host" ] &&                                                           \
-  cp -f /tls-host/*.crt                   /tls/                                 \
-  &&                                                                            \
-  cp -f /tls-host/*.key                   /tls/
+[ -d "/certificates" ] &&                                                             \
+  cp -f /certificates/*.crt                   /tls/                                   \
+  &&                                                                                  \
+  cp -f /certificates/*.key                   /tls/
 
-[ -d "/certificate-authority" ] &&                                              \
-  cp -f /certificate-authority/*.crt      /tls/                                 \
-  &&                                                                            \
+[ -d "/certificate-authority" ] &&                                                    \
+  cp -f /certificate-authority/*.crt      /tls/                                       \
+  &&                                                                                  \
   cp -f /certificate-authority/*.key      /tls/
 
 cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true

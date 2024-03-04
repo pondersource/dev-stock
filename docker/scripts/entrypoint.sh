@@ -5,10 +5,10 @@ set -e
 
 mkdir -p /tls
 
-[ -d "/tls-host" ] &&                                                           \
-  cp -f /tls-host/*.crt                   /tls/                                 \
+[ -d "/certificates" ] &&                                                           \
+  cp -f /certificates/*.crt                   /tls/                                 \
   &&                                                                            \
-  cp -f /tls-host/*.key                   /tls/
+  cp -f /certificates/*.key                   /tls/
 
 ln --symbolic --force "/tls/${HOST}.crt"    /tls/server.crt
 ln --symbolic --force "/tls/${HOST}.key"    /tls/server.key

@@ -62,7 +62,7 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                  \
     -e USER="${user}"                                                             \
     -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls/certificates:/tls-host"                            \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
     -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
@@ -73,7 +73,7 @@ function createEfss() {
     waitForPort "${platform}${number}.docker"       443
 
     # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-    docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
     docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
     docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
     docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
