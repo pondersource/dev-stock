@@ -90,8 +90,9 @@ COPY ./configs/site.conf /configs-pondersource/site.conf
 RUN ln --symbolic --force /configs-pondersource/site.conf /etc/apache2/sites-enabled/000-default.conf
 
 # trust all the certificates:
-COPY ./tls /tls
-RUN cp /tls/*.crt /usr/local/share/ca-certificates/
+COPY ./tls/certificates/*                                       /tls/
+COPY ./tls/certificate-authority/*                              /tls/
+RUN ln --symbolic --force /tls/*.crt                            /usr/local/share/ca-certificates
 RUN update-ca-certificates
 RUN a2enmod ssl
 

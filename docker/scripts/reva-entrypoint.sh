@@ -4,7 +4,7 @@
 set -e
 
 # see https://github.com/golang/go/issues/22846#issuecomment-380809416
-echo "hosts: files dns" > /etc/nsswitch.conf
+echo "hosts: files dns"         > /etc/nsswitch.conf
 echo "127.0.0.1 ${HOST}.docker" >> /etc/hosts
 
 # create log file.

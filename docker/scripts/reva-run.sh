@@ -7,13 +7,13 @@ set -e
 rm -rf                                                                                  /etc/revad
 mkdir -p                                                                                /etc/revad
 cp /configs/revad/*                                                                     /etc/revad/
+
 if [ "${HOST::-1}" == "revacernbox" ]; then
   cp /configs/cernbox/*                                                                 /etc/revad/
   rm /etc/revad/sciencemesh*.toml
 fi
 
 # substitute placeholders and "external" values with valid ones for the testnet.
-sed -i "s/your.revad.ssl/${HOST}/g"                                                     /etc/revad/*.toml
 sed -i "s/your.revad.org/${HOST}.docker/"                                               /etc/revad/*.toml
 sed -i "s/localhost/${HOST}.docker/"                                                    /etc/revad/*.toml
 sed -i "s/your.efss.org/${HOST//reva/}.docker/"                                         /etc/revad/*.toml
@@ -23,8 +23,23 @@ sed -i "s/your.nginx.org/${HOST//reva/}.docker/"                                
 sed -i "s/debug/trace/"                                                                 /etc/revad/*.toml
 
 # update OS certificate store.
-cp /etc/tls/*.crt /usr/local/share/ca-certificates/
+mkdir -p /tls
+
+[ -d "/certificates" ] &&                                                             \
+  cp -f /certificates/*.crt                   /tls/                                   \
+  &&                                                                                  \
+  cp -f /certificates/*.key                   /tls/
+
+[ -d "/certificate-authority" ] &&                                                    \
+  cp -f /certificate-authority/*.crt      /tls/                                       \
+  &&                                                                                  \
+  cp -f /certificate-authority/*.key      /tls/
+
+cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true
 update-ca-certificates
+
+ln --symbolic --force "/tls/${HOST}.crt" /tls/server.crt
+ln --symbolic --force "/tls/${HOST}.key" /tls/server.key
 
 # run revad.
 revad --dev-dir "/etc/revad" &

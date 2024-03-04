@@ -27,8 +27,8 @@ machine_api_key = "machine-api-key"
 efss_shared_secret = "shared-secret-1"
 
 [http]
-certfile = "/etc/tls/your.revad.ssl.crt"
-keyfile = "/etc/tls/your.revad.ssl.key"
+certfile = "/tls/server.crt"
+keyfile = "/tls/server.key"
 
 [log]
 level = "debug"

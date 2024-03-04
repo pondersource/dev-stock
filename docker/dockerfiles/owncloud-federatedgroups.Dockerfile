@@ -23,7 +23,7 @@ RUN git clone                           \
 
 RUN cd apps && ln --symbolic --force federatedgroups-git-repo/federatedgroups federatedgroups
 
-COPY ./rd-sram/curls /curls
+COPY ./scripts/federatedgroups /curls
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
