@@ -216,6 +216,7 @@ sciencemeshInsertIntoDB nextcloud 2
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                         \
   --name=meshdir.docker                                                       \
+  -e HOST="meshdir"                                                           \
   -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                   \
   pondersource/dev-stock-ocmstub                                              \
   >/dev/null 2>&1
