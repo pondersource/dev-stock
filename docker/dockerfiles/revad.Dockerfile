@@ -49,18 +49,14 @@ RUN go mod vendor
 # only build revad, leave out reva and test and lint and docs.
 RUN make revad
 
-COPY ./revad /etc/revad
-WORKDIR /etc/revad
+COPY ./revad /configs/revad
+WORKDIR /configs/revad
 
 # trust all the certificates:
-COPY ./tls /tls
-RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates
+COPY ./tls/certificates/*                                       /tls/
+COPY ./tls/certificate-authority/*                              /tls/
+RUN ln --symbolic --force /tls/*.crt                            /usr/local/share/ca-certificates
 RUN update-ca-certificates
-
-# create link for all the tls certificates in the revad tls directory.
-RUN mkdir -p /etc/revad/tls
-RUN ln --symbolic --force /tls/*.crt /etc/revad/tls
-RUN ln --symbolic --force /tls/*.key /etc/revad/tls
 
 RUN mkdir -p /var/tmp/reva/
 

@@ -27,9 +27,10 @@ RUN git clone --depth 1 --branch main https://github.com/pondersource/ocm-stub
 
 WORKDIR /ocm-stub
 
-# Trust all the certificates:
-ADD ./tls /tls
-RUN cp /tls/*.crt /usr/local/share/ca-certificates/
+# trust all the certificates:
+COPY ./tls/certificates/*                                       /tls/
+COPY ./tls/certificate-authority/*                              /tls/
+RUN ln --symbolic --force /tls/*.crt                            /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 RUN npm install
