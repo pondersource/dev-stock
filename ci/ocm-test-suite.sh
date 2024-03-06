@@ -48,10 +48,17 @@ function waitForCollabora() {
 }
 
 function createEfss() {
-  local platform=${1}
-  local number=${2}
-  local user=${3}
-  local password=${4}
+  local platform="${1}"
+  local number="${2}"
+  local user="${3}"
+  local password="${4}"
+  local image="${5}"
+
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
 
   echo "creating efss ${platform} ${number}"
 
@@ -63,7 +70,6 @@ function createEfss() {
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
     --skip-innodb-read-only-compressed                                            \
-    >/dev/null 2>&1
 
   docker run --detach --network=testnet                                           \
     --name="${platform}${number}.docker"                                          \
@@ -72,31 +78,34 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                  \
     -e USER="${user}"                                                             \
     -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls:/tls-host"                                         \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "pondersource/dev-stock-${platform}-sciencemesh"                              \
-    >/dev/null 2>&1
+    "${image}"
 
-    # wait for hostname port to be open
+    # wait for hostname port to be open.
     waitForPort "maria${platform}${number}.docker"  3306
     waitForPort "${platform}${number}.docker"       443
 
     # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-    docker exec "${platform}${number}.docker" bash -c "cp /tls/*.crt /usr/local/share/ca-certificates/"                                         >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cp /tls-host/*.crt /usr/local/share/ca-certificates/"                                    >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" update-ca-certificates                                                                            >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"  >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
+    docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
     # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh" >/dev/null 2>&1
+    docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
+
+    echo ""
 }
 
 function createReva() {
-  local platform=${1}
-  local number=${2}
-  local port=${3}
+  local platform="${1}"
+  local number="${2}"
+  local port="${3}"
 
   echo "creating reva for ${platform} ${number}"
 
@@ -105,15 +114,13 @@ function createReva() {
   chmod +x "${ENV_ROOT}/docker/scripts/reva-kill.sh"          >/dev/null 2>&1
   chmod +x "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh"    >/dev/null 2>&1
 
-  # TODO: remember to uncomment this line when collabora is integrated into ci
-  # waitForCollabora
-
   docker run --detach --network=testnet                                       \
   --name="reva${platform}${number}.docker"                                    \
   -e HOST="reva${platform}${number}"                                          \
   -p "${port}:80"                                                             \
   -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/docker/tls:/etc/tls"                                        \
+  -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
+  -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
   -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
@@ -123,17 +130,18 @@ function createReva() {
 }
 
 function sciencemeshInsertIntoDB() {
-  local platform=${1}
-  local number=${2}
+  local platform="${1}"
+  local number="${2}"
+
+  echo "configuring ScienceMesh app for efss ${platform} ${number}"
 
   # run db injections.
   mysql_cmd="docker exec "maria${platform}${number}.docker" mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'iopUrl', 'https://reva${platform}${number}.docker/');"          >/dev/null 2>&1
-  $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"                         >/dev/null 2>&1 
+  $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'revaSharedSecret', 'shared-secret-1');"                         >/dev/null 2>&1
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'meshDirectoryUrl', 'https://meshdir.docker/meshdir');"          >/dev/null 2>&1
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"              >/dev/null 2>&1
 }
-
 
 # create temp directory if it doesn't exist.
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
@@ -159,12 +167,12 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # password:   password for sign in into efss.
 
 # ownClouds
-createEfss owncloud 1 marie radioactivity
-createEfss owncloud 2 mahdi baghbani
+createEfss owncloud   1   marie     radioactivity     sciencemesh
+createEfss owncloud   2   mahdi     baghbani          sciencemesh
 
 # Nextclouds
-createEfss nextcloud 1 einstein relativity
-createEfss nextcloud 2 michiel  dejong
+createEfss nextcloud  1   einstein  relativity        sciencemesh
+createEfss nextcloud  2   michiel   dejong            sciencemesh
 
 ############
 ### Reva ###
@@ -206,6 +214,7 @@ sciencemeshInsertIntoDB nextcloud 2
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                         \
   --name=meshdir.docker                                                       \
+  -e HOST="meshdir"                                                           \
   -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                   \
   pondersource/dev-stock-ocmstub                                              \
   >/dev/null 2>&1
