@@ -16,7 +16,7 @@ ocm-test-suite:
     - apk add bash
     - apk add git
     - ./docker/pull/ocm-test-suite.sh
-    - ./init/ocm-test-suite.sh
+    - ./init/ocm-test-suite.sh ci
     - ./dev/ocm-test-suite.sh ci $BROWSER
   artifacts:
     paths:
