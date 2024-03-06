@@ -124,7 +124,9 @@ function createReva() {
   chmod +x "${ENV_ROOT}/docker/scripts/reva-kill.sh"          >/dev/null 2>&1
   chmod +x "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh"    >/dev/null 2>&1
 
-  waitForCollabora
+  if [ "${SCRIPT_MODE}" = "dev" ]; then
+    waitForCollabora
+  fi
 
   docker run --detach --network=testnet                                       \
   --name="reva${platform}${number}.docker"                                    \
@@ -133,7 +135,7 @@ function createReva() {
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
   -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
-  -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
+  -v "${ENV_ROOT}/temp/revad:/configs/revad"                                  \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -159,15 +161,24 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -fr  "${ENV_ROOT}/docker/revad"                                  "${ENV_ROOT}/temp/"
+cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
-docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest  >/dev/null 2>&1
-docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest  >/dev/null 2>&1
-#docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+# NOTE: collabora doesn't work on github ci, disable ScienceMesh apps for now.
+if [ "${SCRIPT_MODE}" = "dev" ]; then
+  docker run --detach --name=collabora.docker --network=testnet -p 9980:9980 -t -e "extra_params=--o:ssl.enable=false" collabora/code:latest  >/dev/null 2>&1
+  docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs3org/wopiserver:latest  >/dev/null 2>&1
+  #docker run --detach --name=rclone.docker    --network=testnet  rclone/rclone rcd -vv --rc-user=rcloneuser --rc-pass=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek --rc-addr=0.0.0.0:5572 --server-side-across-configs=true --log-file=/dev/stdout
+fi
+
+# NOTE: collabora doesn't work on github ci, disable ScienceMesh apps for now.
+if [ "${SCRIPT_MODE}" = "ci" ]; then
+  rm -f "${ENV_ROOT}/temp/revad/sciencemesh-apps.toml"
+fi
 
 ############
 ### EFSS ###
@@ -222,11 +233,11 @@ createReva nextcloud 2 4504
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
-sciencemeshInsertIntoDB owncloud 1
-sciencemeshInsertIntoDB owncloud 2
+sciencemeshInsertIntoDB owncloud    1
+sciencemeshInsertIntoDB owncloud    2
 
-sciencemeshInsertIntoDB nextcloud 1
-sciencemeshInsertIntoDB nextcloud 2
+sciencemeshInsertIntoDB nextcloud   1
+sciencemeshInsertIntoDB nextcloud   2
 
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                                                       \
