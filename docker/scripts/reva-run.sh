@@ -3,6 +3,21 @@
 # @michielbdejong halt on error in docker init scripts.
 set -e
 
+# create reva directory if it doesn't exist.
+if [ ! -d /reva ]; then
+    mkdir -p /reva
+fi
+
+# if /reva has any files in it, do not copy image binaries into it.
+if [ -n "$(find /reva -prune -empty -type d 2>/dev/null)" ]; then
+    echo "/reva is an empty directory, populating it with reva binaries."
+    # populate /reva with Reva binaries.
+    cp --archive --recursive --no-clobber /reva-git/cmd /reva
+else
+    ls -l --all --size /reva
+    echo "/reva contains files, doing noting."
+fi
+
 # create new dir and copy relevant configs there.
 rm -rf                                                                                  /etc/revad
 mkdir -p                                                                                /etc/revad

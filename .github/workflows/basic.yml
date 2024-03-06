@@ -1,4 +1,4 @@
-name: Basic workflow for testing GitHub Actions and act.
+name: Basic workflow.
 
 on:
   workflow_dispatch

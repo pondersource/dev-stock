@@ -1,5 +1,4 @@
-name: ocm-test-suite
-run-name: Open Cloud Mesh Test Suite
+name: Open Cloud Mesh Test Suite
 
 # Controls when the action will run. 
 on:
@@ -33,19 +32,19 @@ jobs:
 
       - name: Pull images
         shell: bash
-        run: ./ci/ocm-test-suite-pull-images.sh
+        run: ./docker/pull/ocm-test-suite.sh
 
-      - name: Initalize OCM tests dependencies
+      - name: Initialize OCM tests dependencies
         shell: bash
-        run: ./ci/ocm-test-suite-init-deps.sh
+        run: ./init/ocm-test-suite.sh ci
 
       - name: Run tests
         shell: bash
-        run: ./ci/ocm-test-suite.sh ${{ matrix.browser }}
+        run: ./dev/ocm-test-suite.sh ci ${{ matrix.browser }}
 
       - name: Upload Cypress video artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.record }}
         with:
           name: cypress-videos
-          path: ./cypress/ocm-tests/cypress/videos
+          path: ./cypress/ocm-test-suite/cypress/videos

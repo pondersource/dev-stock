@@ -2,6 +2,7 @@
 .idea/
 .DS_Store
 
+bin/
 ocm
 reva/
 core
@@ -24,4 +25,4 @@ surf-trashbin-app
 oc-sciencemesh-release
 nc-sciencemesh-release
 surf-token-based-access
-cypress/ocm-tests/cypress/videos/*
+cypress/ocm-test-suite/cypress/videos/*

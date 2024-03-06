@@ -15,12 +15,12 @@ ocm-test-suite:
   script:
     - apk add bash
     - apk add git
-    - ./ci/ocm-test-suite-pull-images.sh
-    - ./ci/ocm-test-suite-init-deps.sh
-    - ./ci/ocm-test-suite.sh $BROWSER
+    - ./docker/pull/ocm-test-suite.sh
+    - ./init/ocm-test-suite.sh ci
+    - ./dev/ocm-test-suite.sh ci $BROWSER
   artifacts:
     paths:
-      - ./cypress/ocm-tests/cypress/videos
+      - ./cypress/ocm-test-suite/cypress/videos
     expire_in: 1 week
   rules:
   - if: '$CI_COMMIT_BRANCH == "main"'

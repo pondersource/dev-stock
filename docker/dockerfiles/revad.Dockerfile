@@ -1,4 +1,4 @@
-FROM golang:1.21.1-bullseye
+FROM golang:1.22.1-bookworm
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -30,7 +30,7 @@ WORKDIR /
 
 # fetch revad from source.
 ARG REPO_REVA=https://github.com/cs3org/reva
-ARG BRANCH_REVA=v1.26.0
+ARG BRANCH_REVA=v1.28.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
@@ -39,17 +39,17 @@ RUN git clone                       \
     --depth 1                       \
     --branch ${BRANCH_REVA}         \
     ${REPO_REVA}                    \
-    reva
+    reva-git
 
 # change directory to reva
-WORKDIR /reva
+WORKDIR /reva-git
 
 # build revad from source.
 RUN go mod vendor
 # only build revad, leave out reva and test and lint and docs.
 RUN make revad
 
-COPY ./revad /configs/revad
+COPY ./configs/revad /configs/revad
 WORKDIR /configs/revad
 
 # trust all the certificates:

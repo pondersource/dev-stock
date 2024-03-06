@@ -19,16 +19,16 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 function waitForPort () {
-  echo waitForPort "${1}" "${2}"
+  echo waitForPort "${1} ${2}"
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
+  x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
-    echo Waiting for "${1}" to open port "${2}", this usually takes about 10 seconds ... "${x}"
+    echo Waiting for "${1} to open port ${2}, this usually takes about 10 seconds ... ${x}"
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
+    x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
-  echo "${1}" port "${2}" is open
+  echo "${1} port ${2} is open"
 }
 
 function waitForCollabora() {
@@ -80,21 +80,21 @@ function createEfss() {
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
     "${image}"
 
-    # wait for hostname port to be open.
-    waitForPort "maria${platform}${number}.docker"  3306
-    waitForPort "${platform}${number}.docker"       443
+  # wait for hostname port to be open.
+  waitForPort "maria${platform}${number}.docker"  3306
+  waitForPort "${platform}${number}.docker"       443
 
-    # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-    docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
-    docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
+  # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
-    # run init script inside efss.
-    docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
+  # run init script inside efss.
+  docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
 
-    echo ""
+  echo ""
 }
 
 function createReva() {
@@ -118,7 +118,7 @@ function createReva() {
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
   -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
-  -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
+  -v "${ENV_ROOT}/temp/revad:/configs/revad"                                  \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -144,8 +144,9 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -fr  "${ENV_ROOT}/docker/configs/revad"                          "${ENV_ROOT}/temp/"
+cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
@@ -207,11 +208,11 @@ createReva nextcloud 2 4504
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
-sciencemeshInsertIntoDB owncloud  1
-sciencemeshInsertIntoDB owncloud  2
+sciencemeshInsertIntoDB owncloud    1
+sciencemeshInsertIntoDB owncloud    2
 
-sciencemeshInsertIntoDB nextcloud 1
-sciencemeshInsertIntoDB nextcloud 2
+sciencemeshInsertIntoDB nextcloud   1
+sciencemeshInsertIntoDB nextcloud   2
 
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                         \

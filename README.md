@@ -1,5 +1,5 @@
 # dev-stock
-[![ocm-test-suite](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml/badge.svg)](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml)
+[![Open Cloud Mesh Test Suite](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml/badge.svg)](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml)
 
 Docker images we use in development.
 
