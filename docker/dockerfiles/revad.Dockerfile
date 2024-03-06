@@ -49,7 +49,7 @@ RUN go mod vendor
 # only build revad, leave out reva and test and lint and docs.
 RUN make revad
 
-COPY ./revad /configs/revad
+COPY ./configs/revad /configs/revad
 WORKDIR /configs/revad
 
 # trust all the certificates:
