@@ -161,7 +161,7 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -fr  "${ENV_ROOT}/docker/conig/revad"                            "${ENV_ROOT}/temp/"
+cp -fr  "${ENV_ROOT}/docker/config/revad"                            "${ENV_ROOT}/temp/"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
@@ -177,7 +177,7 @@ fi
 
 # NOTE: collabora doesn't work on github ci, disable ScienceMesh apps for now.
 if [ "${SCRIPT_MODE}" = "ci" ]; then
-  rm -f "${ENV_ROOT}/temp/revad/sciencemesh-apps.toml"
+  rm -f "${ENV_ROOT}/temp/revad/sciencemesh-apps-collabora.toml"
 fi
 
 ############

@@ -144,7 +144,7 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -fr  "${ENV_ROOT}/docker/conig/revad"                            "${ENV_ROOT}/temp/"
+cp -fr  "${ENV_ROOT}/docker/config/revad"                            "${ENV_ROOT}/temp/"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
