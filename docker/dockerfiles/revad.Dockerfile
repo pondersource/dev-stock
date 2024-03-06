@@ -1,4 +1,4 @@
-FROM golang:1.21.1-bullseye
+FROM golang:1.22.1-bookworm
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
