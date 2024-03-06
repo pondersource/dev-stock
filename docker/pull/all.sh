@@ -14,6 +14,7 @@ docker pull cypress/included:13.3.0
 docker pull cs3org/wopiserver:latest
 docker pull quay.io/keycloak/keycloak:latest
 
+# dev-stock images.
 docker pull pondersource/dev-stock-ocmstub:latest
 docker pull pondersource/dev-stock-revad:latest
 docker pull pondersource/dev-stock-php-base:latest

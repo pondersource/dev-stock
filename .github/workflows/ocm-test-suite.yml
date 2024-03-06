@@ -33,11 +33,11 @@ jobs:
 
       - name: Pull images
         shell: bash
-        run: ./ci/ocm-test-suite-pull-images.sh
+        run: ./docker/pull/ocm-test-suite.sh
 
       - name: Initalize OCM tests dependencies
         shell: bash
-        run: ./ci/ocm-test-suite-init-deps.sh
+        run: ./init/ocm-test-suite.sh
 
       - name: Run tests
         shell: bash
