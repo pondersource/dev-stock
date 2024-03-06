@@ -36,12 +36,12 @@ function redirect_to_null_cmd() {
 function waitForPort () {
   redirect_to_null_cmd echo waitForPort "${1} ${2}"
   # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
-  x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" | cat)
+  x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" | cat)
   until [ "${x}" -ne 0 ]
   do
     redirect_to_null_cmd echo Waiting for "${1} to open port ${2}, this usually takes about 10 seconds ... ${x}"
     sleep 1
-    x=$(docker exec -it "${1}" ss -tulpn | grep -c "${2}" |  cat)
+    x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" |  cat)
   done
   redirect_to_null_cmd echo "${1} port ${2} is open"
 }
