@@ -95,6 +95,7 @@ fi
     redirect_to_null_cmd git clone                                                                      \
     --depth ${APP_CLONE_DEPTH}                                                                          \
     --branch ${BRANCH_NEXTCLOUD_APP}                                                                    \
+    --no-single-branch                                                                                  \
     ${REPO_NEXTCLOUD_APP}                                                                               \
     nextcloud-sciencemesh                                                                               \
     &&                                                                                                  \
