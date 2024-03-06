@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: ./docker/pull/ocm-test-suite.sh
 
-      - name: Initalize OCM tests dependencies
+      - name: Initialize OCM tests dependencies
         shell: bash
         run: ./init/ocm-test-suite.sh
 
