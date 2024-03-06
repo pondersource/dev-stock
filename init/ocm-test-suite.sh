@@ -112,6 +112,7 @@ fi
 [ ! -d "owncloud-sciencemesh" ] &&                                                                      \
     redirect_to_null_cmd git clone                                                                      \
     --depth ${APP_CLONE_DEPTH}                                                                          \
+    --no-single-branch                                                                                  \
     --branch ${BRANCH_OWNCLOUD_APP}                                                                     \
     ${REPO_OWNCLOUD_APP}                                                                                \
     owncloud-sciencemesh                                                                                \
