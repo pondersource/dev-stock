@@ -26,6 +26,11 @@ function redirect_to_null_cmd() {
     fi
 }
 
+if [ "${SCRIPT_MODE}" = "ci" ]; then
+    APP_CLONE_DEPTH=1
+else
+    APP_CLONE_DEPTH=1000000
+fi
 
 # repositories and branches.
 REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
@@ -86,38 +91,40 @@ else
 fi
 
 # Nextcloud Sciencemesh source code.
-[ ! -d "nextcloud-sciencemesh" ] &&                                                                 \
-    redirect_to_null_cmd git clone                                                                  \
-    --branch ${BRANCH_NEXTCLOUD_APP}                                                                \
-    ${REPO_NEXTCLOUD_APP}                                                                           \
-    nextcloud-sciencemesh                                                                           \
-    &&                                                                                              \
-    redirect_to_null_cmd docker run --rm                                                            \
-    -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
-    --workdir /var/www/html/apps/sciencemesh                                                        \
-    pondersource/dev-stock-nextcloud-sciencemesh                                                    \
+[ ! -d "nextcloud-sciencemesh" ] &&                                                                     \
+    redirect_to_null_cmd git clone                                                                      \
+    --depth ${APP_CLONE_DEPTH}                                                                          \
+    --branch ${BRANCH_NEXTCLOUD_APP}                                                                    \
+    ${REPO_NEXTCLOUD_APP}                                                                               \
+    nextcloud-sciencemesh                                                                               \
+    &&                                                                                                  \
+    redirect_to_null_cmd docker run --rm                                                                \
+    -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                    \
+    --workdir /var/www/html/apps/sciencemesh                                                            \
+    pondersource/dev-stock-nextcloud-sciencemesh                                                        \
     make composer
 
 # move app to its place inside efss and create symbolic links.
-[ ! -d "nextcloud/apps/sciencemesh" ] &&                                                            \
+[ ! -d "nextcloud/apps/sciencemesh" ] &&                                                                \
     mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 
 # ownCloud Sciencemesh source code.
-[ ! -d "owncloud-sciencemesh" ] &&                                                                  \
-    redirect_to_null_cmd git clone                                                                  \
-    --branch ${BRANCH_OWNCLOUD_APP}                                                                 \
-    ${REPO_OWNCLOUD_APP}                                                                            \
-    owncloud-sciencemesh                                                                            \
-    &&                                                                                              \
-    redirect_to_null_cmd docker run --rm                                                            \
-    -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
-    --workdir /var/www/html/apps/sciencemesh                                                        \
-    pondersource/dev-stock-owncloud-sciencemesh                                                     \
+[ ! -d "owncloud-sciencemesh" ] &&                                                                      \
+    redirect_to_null_cmd git clone                                                                      \
+    --depth ${APP_CLONE_DEPTH}                                                                          \
+    --branch ${BRANCH_OWNCLOUD_APP}                                                                     \
+    ${REPO_OWNCLOUD_APP}                                                                                \
+    owncloud-sciencemesh                                                                                \
+    &&                                                                                                  \
+    redirect_to_null_cmd docker run --rm                                                                \
+    -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                     \
+    --workdir /var/www/html/apps/sciencemesh                                                            \
+    pondersource/dev-stock-owncloud-sciencemesh                                                         \
     composer install
 
-[ ! -d "owncloud/apps/sciencemesh" ] &&                                                             \
+[ ! -d "owncloud/apps/sciencemesh" ] &&                                                                 \
     mv owncloud-sciencemesh owncloud/apps/sciencemesh
 
-docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
+docker network inspect testnet >/dev/null 2>&1 || redirect_to_null_cmd docker network create testnet
 
 [ ! -d "temp" ] && mkdir -p temp
