@@ -118,7 +118,7 @@ function createReva() {
   -v "${ENV_ROOT}/reva:/reva"                                                 \
   -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
   -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
-  -v "${ENV_ROOT}/docker/revad:/configs/revad"                                \
+  -v "${ENV_ROOT}/temp/revad:/configs/revad"                                  \
   -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
   -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
   -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
@@ -144,8 +144,9 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -fr  "${ENV_ROOT}/docker/conig/revad"                            "${ENV_ROOT}/temp/"
+cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
@@ -207,11 +208,11 @@ createReva nextcloud 2 4504
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
-sciencemeshInsertIntoDB owncloud  1
-sciencemeshInsertIntoDB owncloud  2
+sciencemeshInsertIntoDB owncloud    1
+sciencemeshInsertIntoDB owncloud    2
 
-sciencemeshInsertIntoDB nextcloud 1
-sciencemeshInsertIntoDB nextcloud 2
+sciencemeshInsertIntoDB nextcloud   1
+sciencemeshInsertIntoDB nextcloud   2
 
 # Mesh directory for ScienceMesh invite flow.
 docker run --detach --network=testnet                                         \
