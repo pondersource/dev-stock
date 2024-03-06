@@ -15,6 +15,18 @@ DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
 cd "${DIR}/.." || exit
 
+# script mode:   dev, ci. default is dev.
+SCRIPT_MODE=${1:-"dev"}
+
+function redirect_to_null_cmd() {
+    if [ "${SCRIPT_MODE}" = "ci" ]; then
+        "$@" >/dev/null 2>&1
+    else
+        "$@"
+    fi
+}
+
+
 # repositories and branches.
 REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=nextcloud
@@ -31,22 +43,56 @@ BRANCH_OWNCLOUD_APP=owncloud
 REPO_REVA=https://github.com/cs3org/reva
 BRANCH_REVA=v1.28.0
 
-# Nextcloud source code.
-[ ! -d "nextcloud" ] &&                                                                             \
-    git clone                                                                                       \
-    --depth 1                                                                                       \
-    --branch ${BRANCH_NEXTCLOUD}                                                                    \
-    ${REPO_NEXTCLOUD}                                                                               \
-    nextcloud
+if [ "${SCRIPT_MODE}" = "dev" ]; then
+    # Nextcloud source code.
+    [ ! -d "nextcloud" ] &&                                                                             \
+        git clone                                                                                       \
+        --depth 1                                                                                       \
+        --branch ${BRANCH_NEXTCLOUD}                                                                    \
+        ${REPO_NEXTCLOUD}                                                                               \
+        nextcloud
+    
+    # ownCloud source code.
+    [ ! -d "owncloud" ] &&                                                                              \
+        git clone                                                                                       \
+        --depth 1                                                                                       \
+        --branch ${BRANCH_OWNCLOUD}                                                                     \
+        ${REPO_OWNCLOUD}                                                                                \
+        owncloud
+    
+    # Reva source code.
+    [ ! -d "reva" ] &&                                                                                  \
+        git clone                                                                                       \
+        --depth 1                                                                                       \
+        --branch ${BRANCH_REVA}                                                                         \
+        ${REPO_REVA}                                                                                    \
+        reva                                                                                            \
+        &&                                                                                              \
+        docker run --rm                                                                                 \
+        -v "$(pwd)/reva:/reva-build"                                                                    \
+        --workdir /reva-build                                                                           \
+        golang:1.22.1-bookworm                                                                          \
+        bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
+else
+    [ ! -d "nextcloud/apps" ] &&                                                                        \
+        mkdir -p nextcloud/apps
+    
+    # ownCloud source code.
+    [ ! -d "owncloud/apps" ] &&                                                                         \
+        mkdir -p owncloud/apps
+    
+    [ ! -d "reva" ] &&                                                                                  \
+        mkdir  -p reva
+fi
 
 # Nextcloud Sciencemesh source code.
 [ ! -d "nextcloud-sciencemesh" ] &&                                                                 \
-    git clone                                                                                       \
+    redirect_to_null_cmd git clone                                                                  \
     --branch ${BRANCH_NEXTCLOUD_APP}                                                                \
     ${REPO_NEXTCLOUD_APP}                                                                           \
     nextcloud-sciencemesh                                                                           \
     &&                                                                                              \
-    docker run --rm                                                                                 \
+    redirect_to_null_cmd docker run --rm                                                            \
     -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-nextcloud-sciencemesh                                                    \
@@ -56,22 +102,14 @@ BRANCH_REVA=v1.28.0
 [ ! -d "nextcloud/apps/sciencemesh" ] &&                                                            \
     mv nextcloud-sciencemesh nextcloud/apps/sciencemesh
 
-# ownCloud source code.
-[ ! -d "owncloud" ] &&                                                                              \
-    git clone                                                                                       \
-    --depth 1                                                                                       \
-    --branch ${BRANCH_OWNCLOUD}                                                                     \
-    ${REPO_OWNCLOUD}                                                                                \
-    owncloud
-
 # ownCloud Sciencemesh source code.
 [ ! -d "owncloud-sciencemesh" ] &&                                                                  \
-    git clone                                                                                       \
+    redirect_to_null_cmd git clone                                                                  \
     --branch ${BRANCH_OWNCLOUD_APP}                                                                 \
     ${REPO_OWNCLOUD_APP}                                                                            \
     owncloud-sciencemesh                                                                            \
     &&                                                                                              \
-    docker run --rm                                                                                 \
+    redirect_to_null_cmd docker run --rm                                                            \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
     --workdir /var/www/html/apps/sciencemesh                                                        \
     pondersource/dev-stock-owncloud-sciencemesh                                                     \
@@ -79,20 +117,6 @@ BRANCH_REVA=v1.28.0
 
 [ ! -d "owncloud/apps/sciencemesh" ] &&                                                             \
     mv owncloud-sciencemesh owncloud/apps/sciencemesh
-
-# Reva source code.
-[ ! -d "reva" ] &&                                                                                  \
-    git clone                                                                                       \
-    --depth 1                                                                                       \
-    --branch ${BRANCH_REVA}                                                                         \
-    ${REPO_REVA}                                                                                    \
-    reva                                                                                            \
-    &&                                                                                              \
-    docker run --rm                                                                                 \
-    -v "$(pwd)/reva:/reva-build"                                                                    \
-    --workdir /reva-build                                                                           \
-    golang:1.22.1-bookworm                                                                          \
-    bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 

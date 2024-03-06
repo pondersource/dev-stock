@@ -39,10 +39,10 @@ RUN git clone                       \
     --depth 1                       \
     --branch ${BRANCH_REVA}         \
     ${REPO_REVA}                    \
-    reva
+    reva-git
 
 # change directory to reva
-WORKDIR /reva
+WORKDIR /reva-git
 
 # build revad from source.
 RUN go mod vendor
