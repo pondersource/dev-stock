@@ -29,7 +29,7 @@ REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=owncloud
 
 REPO_REVA=https://github.com/cs3org/reva
-BRANCH_REVA=v1.26.0
+BRANCH_REVA=v1.28.0
 
 # Nextcloud source code.
 [ ! -d "nextcloud" ] &&                                                                             \
