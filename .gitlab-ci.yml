@@ -20,7 +20,7 @@ ocm-test-suite:
     - ./dev/ocm-test-suite.sh ci $BROWSER
   artifacts:
     paths:
-      - ./cypress/ocm-tests/cypress/videos
+      - ./cypress/ocm-test-suite/cypress/videos
     expire_in: 1 week
   rules:
   - if: '$CI_COMMIT_BRANCH == "main"'

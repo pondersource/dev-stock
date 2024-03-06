@@ -47,4 +47,4 @@ jobs:
         if: ${{ matrix.record }}
         with:
           name: cypress-videos
-          path: ./cypress/ocm-tests/cypress/videos
+          path: ./cypress/ocm-test-suite/cypress/videos

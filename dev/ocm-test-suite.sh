@@ -291,7 +291,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
     -e DISPLAY=vnc-server:0.0                                                                               \
-    -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                                                 \
+    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                                            \
     -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
     -w /ocm                                                                                                 \
     --entrypoint cypress                                                                                    \
@@ -317,7 +317,7 @@ else
   # run Cypress test suite headlessly and with the defined browser.
   docker run --network=testnet                                                  \
     --name="cypress.docker"                                                     \
-    -v "${ENV_ROOT}/cypress/ocm-tests:/ocm"                                     \
+    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
     cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
 fi
