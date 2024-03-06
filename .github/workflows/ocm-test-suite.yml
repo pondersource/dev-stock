@@ -1,5 +1,4 @@
-name: ocm-test-suite
-run-name: Open Cloud Mesh Test Suite
+name: Open Cloud Mesh Test Suite
 
 # Controls when the action will run. 
 on:
