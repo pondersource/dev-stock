@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-#!/usr/bin/env bash
-
 # @michielbdejong halt on error in docker init scripts.
 set -e
 
