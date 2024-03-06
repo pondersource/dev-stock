@@ -40,3 +40,6 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud.Docke
 
 echo Building pondersource/dev-stock-owncloud-sciencemesh
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-sciencemesh.Dockerfile --tag pondersource/dev-stock-owncloud-sciencemesh .
+
+echo Building pondersource/dev-stock-owncloud-ocm-test-suite
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-ocm-test-suite.Dockerfile --tag pondersource/dev-stock-owncloud-ocm-test-suite .

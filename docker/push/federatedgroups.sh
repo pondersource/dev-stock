@@ -7,9 +7,6 @@ echo "Log in as pondersource"
 docker login
 
 docker push pondersource/dev-stock-php-base
-
 docker push pondersource/dev-stock-owncloud
-
 docker push pondersource/dev-stock-owncloud-opencloudmesh
-
 docker push pondersource/dev-stock-owncloud-federatedgroups

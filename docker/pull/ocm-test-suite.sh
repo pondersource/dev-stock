@@ -6,3 +6,4 @@ set -e
 docker pull pondersource/dev-stock-revad:latest
 docker pull pondersource/dev-stock-nextcloud-sciencemesh:latest
 docker pull pondersource/dev-stock-owncloud-sciencemesh:latest
+docker pull pondersource/dev-stock-owncloud-ocm-test-suite:latest
