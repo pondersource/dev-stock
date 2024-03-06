@@ -33,17 +33,3 @@ wopi_url = "{{ vars.wopi_endpoint }}"
 app_name = "Collabora"
 app_url = "http://collabora.docker:9980"
 app_int_url = "http://collabora.docker:9980"
-
-
-# [[grpc.services.appprovider]]
-# driver = "wopi"
-# custom_mime_types_json = "/etc/revad/custom-mime-types-demo.json"
-# mime_types = ["text/markdown", "application/compressed-markdown", "text/plain"]
-# app_provider_url = "{{ grpc.services.appprovider[1].address }}"
-#
-# [grpc.services.appprovider.drivers.wopi]
-# iop_secret = "{{ vars.wopi_shared_secret }}"
-# wopi_url = "{{ vars.wopi_endpoint }}"
-# app_name = "CodiMD"
-# app_url = "https://codimd.docker"
-# app_int_url = "https://codimd.docker"
