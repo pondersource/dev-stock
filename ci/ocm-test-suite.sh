@@ -53,6 +53,8 @@ function createEfss() {
   local user=${3}
   local password=${4}
 
+  echo "creating efss ${platform} ${number}"
+
   docker run --detach --network=testnet                                           \
     --name="maria${platform}${number}.docker"                                     \
     -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek             \
@@ -95,6 +97,8 @@ function createReva() {
   local platform=${1}
   local number=${2}
   local port=${3}
+
+  echo "creating reva for ${platform} ${number}"
 
   # make sure scripts are executable.
   chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"           >/dev/null 2>&1
