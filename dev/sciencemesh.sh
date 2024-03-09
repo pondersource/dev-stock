@@ -105,9 +105,9 @@ function createReva() {
   echo "creating reva for ${platform} ${number}"
 
   # make sure scripts are executable.
-  chmod +x "${ENV_ROOT}/docker/scripts/reva-run.sh"           >/dev/null 2>&1
-  chmod +x "${ENV_ROOT}/docker/scripts/reva-kill.sh"          >/dev/null 2>&1
-  chmod +x "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh"    >/dev/null 2>&1
+  chmod +x "${ENV_ROOT}/temp/reva/run.sh"                       >/dev/null 2>&1
+  chmod +x "${ENV_ROOT}/temp/reva/kill.sh"                      >/dev/null 2>&1
+  chmod +x "${ENV_ROOT}/temp/reva/entrypoint.sh"                >/dev/null 2>&1
 
   waitForCollabora
 
@@ -119,9 +119,9 @@ function createReva() {
   -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
   -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
   -v "${ENV_ROOT}/temp/revad:/configs/revad"                                  \
-  -v "${ENV_ROOT}/docker/scripts/reva-run.sh:/usr/bin/reva-run.sh"            \
-  -v "${ENV_ROOT}/docker/scripts/reva-kill.sh:/usr/bin/reva-kill.sh"          \
-  -v "${ENV_ROOT}/docker/scripts/reva-entrypoint.sh:/entrypoint.sh"           \
+  -v "${ENV_ROOT}/temp/reva/run.sh:/usr/bin/run.sh"                           \
+  -v "${ENV_ROOT}/temp/reva/kill.sh:/usr/bin/kill.sh"                         \
+  -v "${ENV_ROOT}/temp/reva/entrypoint.sh:/usr/bin/entrypoint.sh"             \
   pondersource/dev-stock-revad                                                \
   >/dev/null 2>&1
 }
@@ -144,6 +144,7 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
+cp -fr  "${ENV_ROOT}/docker/scripts/reva"                           "${ENV_ROOT}/temp/"
 cp -fr  "${ENV_ROOT}/docker/configs/revad"                          "${ENV_ROOT}/temp/"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"   "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"

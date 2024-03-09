@@ -12,9 +12,9 @@ fi
 if [ -n "$(find /reva -prune -empty -type d 2>/dev/null)" ]; then
     echo "/reva is an empty directory, populating it with reva binaries."
     # populate /reva with Reva binaries.
-    cp --archive --recursive --no-clobber /reva-git/cmd /reva
+    cp -ar /reva-git/cmd /reva
 else
-    ls -l --all --size /reva
+    ls -lsa /reva
     echo "/reva contains files, doing noting."
 fi
 
@@ -40,21 +40,21 @@ sed -i "s/debug/trace/"                                                         
 # update OS certificate store.
 mkdir -p /tls
 
-[ -d "/certificates" ] &&                                                             \
-  cp -f /certificates/*.crt                   /tls/                                   \
-  &&                                                                                  \
-  cp -f /certificates/*.key                   /tls/
+[ -d "/certificates" ] &&                                                               \
+  cp -f /certificates/*.crt                     /tls/                                   \
+  &&                                                                                    \
+  cp -f /certificates/*.key                     /tls/
 
-[ -d "/certificate-authority" ] &&                                                    \
-  cp -f /certificate-authority/*.crt      /tls/                                       \
-  &&                                                                                  \
-  cp -f /certificate-authority/*.key      /tls/
+[ -d "/certificate-authority" ] &&                                                      \
+  cp -f /certificate-authority/*.crt            /tls/                                   \
+  &&                                                                                    \
+  cp -f /certificate-authority/*.key            /tls/
 
-cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true
+cp -f /tls/*.crt                                /usr/local/share/ca-certificates/ || true
 update-ca-certificates
 
-ln --symbolic --force "/tls/${HOST}.crt" /tls/server.crt
-ln --symbolic --force "/tls/${HOST}.key" /tls/server.key
+ln -sf "/tls/${HOST}.crt"                       /tls/server.crt
+ln -sf "/tls/${HOST}.key"                       /tls/server.key
 
 # run revad.
 revad --dev-dir "/etc/revad" &
