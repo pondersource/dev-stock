@@ -91,8 +91,8 @@ BRANCH_REVA=v1.28.0
     docker run -it --rm                                                                             \
     -v "$(pwd)/reva:/reva-build"                                                                    \
     --workdir /reva-build                                                                           \
-    golang:1.22.1-bookworm                                                                          \
-    bash -c "git config --global --add safe.directory /reva-build && go mod vendor && make revad"
+    golang:1.22.1-alpine                                                                            \
+    sh -c "apk --no-cache add git make bash && git config --global --add safe.directory /reva-build && go mod download && make revad"
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
