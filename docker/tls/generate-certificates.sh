@@ -55,7 +55,7 @@ createCertificate stub2
 createCertificate revad1
 createCertificate revad2
 
-for efss in owncloud nextcloud cernbox ocis nc oc; do
+for efss in owncloud nextcloud cernbox ocis nc oc seafile; do
   createCertificate ${efss}1
   createCertificate ${efss}2
   createCertificate reva${efss}1
