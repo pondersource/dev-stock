@@ -30,4 +30,15 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
 
     // dashboard should be visible.
     cy.url().should('match', /apps\/dashboard(\/|$)/)
+
+    // open files app.
+    cy.get('header[id="header"]')
+        .find('div[class="header-left"]')
+        .find('nav[class="app-menu"]')
+        .find('ul[class="app-menu-main"]')
+        .find('li[data-app-id="files"]')
+        .click()
+    
+    // files app should be visible.
+    cy.url().should('match', /apps\/files(\/|$)/)
 })
