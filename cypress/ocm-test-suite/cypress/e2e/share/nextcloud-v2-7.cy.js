@@ -9,11 +9,13 @@ before(() => {
   })
 })
 
-describe('Native federated sharing functionality for Nextcloud', () => {
+describe('Native federated sharing functionality for Nextcloud V2.7', () => {
   it('Accept federated share from Nextcoud to Nextcloud', () => {
   
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+
+    // TODO: rename share from welcome.txt to something else before creating the share.
     createShareV2_7('welcome.txt', 'michiel', 'nextcloud2.docker')
 
     // accept share from Nextcloud 2.
@@ -24,6 +26,8 @@ describe('Native federated sharing functionality for Nextcloud', () => {
         .find('*[class^="oc-dialog-buttonrow"]')
         .find('button[class="primary"]')
         .click()
+      
+        // TODO: verify share received: 1. check for file name existance, 2. check if it can be downloaded, 3. compare checksum to original file to make sure it is same file
     })
   })
 })
