@@ -1,25 +1,33 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add('login', (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add('dismiss', { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+Cypress.Commands.add('loginOwncloud', (url, username, password) => {
+    cy.visit(url)
+
+    // login page is visible in browser.
+	cy.get('form[name="login"]').should('be.visible')
+
+    // login with username and password.
+    cy.get('form[name="login"]').within(() => {
+        cy.get('input[name="user"]').type(username)
+        cy.get('input[name="password"]').type(password)
+        cy.get('button[id="submit"]').click()
+    })
+
+    // files app should be visible.
+    cy.url().should('match', /apps\/files(\/|$)/)
+})
+
+Cypress.Commands.add('loginNextcloud', (url, username, password) => {
+    cy.visit(url)
+
+    // login page is visible in browser.
+	cy.get('form[name="login"]').should('be.visible')
+
+    // login with username and password.
+    cy.get('form[name="login"]').within(() => {
+        cy.get('input[name="user"]').type(username)
+        cy.get('input[name="password"]').type(password)
+        cy.contains('button[data-login-form-submit]', 'Log in').click()
+    })
+
+    // dashboard should be visible.
+    cy.url().should('match', /apps\/dashboard(\/|$)/)
+})
