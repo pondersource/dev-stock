@@ -1,29 +1,8 @@
-FROM golang:1.22.1-bookworm
+# stage 1: build stage
+FROM golang:1.22.1-alpine AS build
 
-# keys for oci taken from:
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="Pondersource Revad Image"
-LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
-LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
-
-# set timezone.
-ENV TZ=UTC
-RUN ln --symbolic --no-dereference --force /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt update --yes
-
-# install dependencies.
-RUN apt install --yes               \
-    git                             \
-    vim                             \
-    curl                            \
-    wget                            \
-    openssl                         \
-    build-essential                 \
-    ca-certificates
+# install build dependencies.
+RUN apk --no-cache add git make bash
 
 # go to root directory.
 WORKDIR /
@@ -41,21 +20,40 @@ RUN git clone                       \
     ${REPO_REVA}                    \
     reva-git
 
-# change directory to reva
+# change directory to reva git.
 WORKDIR /reva-git
 
-# build revad from source.
-RUN go mod vendor
+# copy and download dependencies.
+RUN go mod download
+
 # only build revad, leave out reva and test and lint and docs.
 RUN make revad
 
-COPY ./configs/revad /configs/revad
-WORKDIR /configs/revad
+# stage 2: app image.
+FROM alpine:3.19.1
+
+# keys for oci taken from:
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+LABEL org.opencontainers.image.licenses=MIT
+LABEL org.opencontainers.image.title="Pondersource Revad Image"
+LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
+LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
+
+# set the timezone and install CA certificates.
+RUN apk --no-cache add bash ca-certificates tzdata
+
+ENV TZ=Etc/UTC
+
+# copy the binary from the build stage.
+COPY --from=build /reva-git/cmd                                 /reva-git/cmd
+
+# copy the reva config files from host.
+COPY ./configs/revad                                            /configs/revad
 
 # trust all the certificates:
-COPY ./tls/certificates/*                                       /tls/
+COPY ./tls/certificates/reva*                                   /tls/
 COPY ./tls/certificate-authority/*                              /tls/
-RUN ln --symbolic --force /tls/*.crt                            /usr/local/share/ca-certificates
+RUN ln -sf /tls/*.crt                                           /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 RUN mkdir -p /var/tmp/reva/
@@ -63,16 +61,11 @@ RUN mkdir -p /var/tmp/reva/
 # update path to include revad bin directory.
 ENV PATH="${PATH}:/reva/cmd/revad"
 
-COPY ./scripts/reva-run.sh /usr/bin/reva-run.sh
-RUN chmod +x /usr/bin/reva-run.sh
+COPY ./scripts/reva/*                                           /usr/bin/
 
-COPY ./scripts/reva-kill.sh /usr/bin/reva-kill.sh
-RUN chmod +x /usr/bin/reva-kill.sh
+RUN chmod +x /usr/bin/run.sh && chmod +x /usr/bin/kill.sh && chmod +x /usr/bin/entrypoint.sh
 
-COPY ./scripts/reva-entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
-ENTRYPOINT ["/entrypoint.sh"]
-
-# Keep Docker Container Running for Debugging.
-CMD tail --follow /var/log/revad.log
+# keep Docker Container Running for Debugging.
+CMD tail -F /var/log/revad.log

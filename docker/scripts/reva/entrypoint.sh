@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts
+# @michielbdejong halt on error in docker init scripts.
 set -e
 
 # see https://github.com/golang/go/issues/22846#issuecomment-380809416
@@ -11,7 +11,7 @@ echo "127.0.0.1 ${HOST}.docker" >> /etc/hosts
 touch /var/log/revad.log
 
 # run revad.
-reva-run.sh
+run.sh
 
 # This will exec the CMD from your Dockerfile, i.e. "npm start"
 exec "$@"
