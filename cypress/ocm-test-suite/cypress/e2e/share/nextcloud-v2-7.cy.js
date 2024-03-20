@@ -27,7 +27,7 @@ describe('Native federated sharing functionality for Nextcloud V2.7', () => {
         .find('button[class="primary"]')
         .click()
       
-        // TODO: verify share received: 1. check for file name existance, 2. check if it can be downloaded, 3. compare checksum to original file to make sure it is same file
+        // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file
     })
   })
 })
