@@ -8,7 +8,7 @@ Docker images we use in development.
 
 upstream: [Nextcloud Server Official](https://github.com/nextcloud/server)
 
-branch: [v28.0.2](https://github.com/nextcloud/server/releases/tag/v28.0.2)
+branch: [v27.1.7](https://github.com/nextcloud/server/releases/tag/v27.1.7)
 
 ## ownCloud version
 

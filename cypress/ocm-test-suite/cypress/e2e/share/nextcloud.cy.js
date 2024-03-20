@@ -1,0 +1,29 @@
+import { createShareV2_7 } from '../utils/nextcloud-v2-7'
+
+before(() => {
+  // makes custom commands available to all subsequent cy.origin('url')
+  // calls in this spec. put it in your support file to make them available to
+  // all specs
+  cy.origin('https://nextcloud2.docker', () => {
+    Cypress.require('../../support/commands')
+  })
+})
+
+describe('Native federated sharing functionality for Nextcloud', () => {
+  it('Accept federated share from Nextcoud to Nextcloud', () => {
+  
+    // share from Nextcloud 1.
+    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+    createShareV2_7('welcome.txt', 'michiel', 'nextcloud2.docker')
+
+    // accept share from Nextcloud 2.
+    cy.origin('https://nextcloud2.docker', () => {
+      cy.loginNextcloud('/', 'michiel', 'dejong')
+
+      cy.get('div[class="oc-dialog"]', { timeout: 10000 })
+        .find('*[class^="oc-dialog-buttonrow"]')
+        .find('button[class="primary"]')
+        .click()
+    })
+  })
+})
