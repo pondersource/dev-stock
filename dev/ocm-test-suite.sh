@@ -162,6 +162,7 @@ rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -fr  "${ENV_ROOT}/docker/configs/revad"                          "${ENV_ROOT}/temp/"
+cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"               "${ENV_ROOT}/temp/index.js"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
@@ -239,11 +240,13 @@ sciencemeshInsertIntoDB owncloud    2
 sciencemeshInsertIntoDB nextcloud   1
 sciencemeshInsertIntoDB nextcloud   2
 
-# Mesh directory for ScienceMesh invite flow.
+######################
+### Mesh directory ###
+######################
 docker run --detach --network=testnet                                                                       \
   --name=meshdir.docker                                                                                     \
   -e HOST="meshdir"                                                                                         \
-  -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js"                                                 \
+  -v "${ENV_ROOT}/temp/index.js:/ocmstub/index.js"                                                          \
   pondersource/dev-stock-ocmstub                                                                            \
   >/dev/null 2>&1
 
