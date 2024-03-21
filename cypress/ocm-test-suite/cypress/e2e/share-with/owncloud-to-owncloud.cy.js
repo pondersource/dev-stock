@@ -11,7 +11,7 @@ before(() => {
 
 describe('Native federated sharing functionality for ownCloud', () => {
   it('Accept federated share from ownCloud to ownCloud', () => {
-    // share from owncloud 1.
+    // share from ownCloud 1.
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     renameFile('welcome.txt', 'oc1-to-oc2-share.txt')
