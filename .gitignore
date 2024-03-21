@@ -4,7 +4,7 @@
 
 bin/
 ocm
-.reva/
+./reva/
 core
 temp
 server
