@@ -161,11 +161,11 @@ function sciencemeshInsertIntoDB() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -fr  "${ENV_ROOT}/docker/scripts/reva"                           "${ENV_ROOT}/temp/"
-cp -fr  "${ENV_ROOT}/docker/configs/revad"                          "${ENV_ROOT}/temp/"
-cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"               "${ENV_ROOT}/temp/index.js"
-cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"        "${ENV_ROOT}/temp/owncloud.sh"
-cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_ROOT}/temp/"
+cp -fr  "${ENV_ROOT}/docker/configs/revad"                              "${ENV_ROOT}/temp/"
+cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"                   "${ENV_ROOT}/temp/index.js"
+cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
