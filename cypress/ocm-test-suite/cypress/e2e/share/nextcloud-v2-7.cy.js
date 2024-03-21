@@ -1,4 +1,4 @@
-import { acceptShareV2_7, createShareV2_7, getRowForFileV2_7, renameFileV2_7 } from '../utils/nextcloud-v2-7'
+import { createShareV2_7, renameFileV2_7 } from '../utils/nextcloud-v2-7'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
@@ -10,7 +10,7 @@ before(() => {
 })
 
 describe('Native federated sharing functionality for Nextcloud V2.7', () => {
-  it('Accept federated share from Nextcoud to Nextcloud', () => {
+  it('Accept federated share from Nextcloud to Nextcloud', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
