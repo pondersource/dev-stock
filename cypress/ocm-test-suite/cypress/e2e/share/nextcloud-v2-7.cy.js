@@ -1,4 +1,4 @@
-import { acceptShareV2_7, createShareV2_7, getRowForFileV2_7, renameFileV2_7 } from '../utils/nextcloud-v2-7'
+import { createShareV2_7, renameFileV2_7 } from '../utils/nextcloud-v2-7'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
