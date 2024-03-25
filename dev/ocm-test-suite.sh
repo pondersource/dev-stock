@@ -314,6 +314,12 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://nextcloud1.docker -> username: einstein   password: relativity"
   echo "https://nextcloud2.docker -> username: michiel    password: dejong"
 else
+
+  # only record when testing on electron.
+  if [ "${TEST_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
   ##################
   ### Cypress CI ###
   ##################
@@ -324,4 +330,10 @@ else
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
     cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
+  
+  # revert config file back to normal.
+  if [ "${TEST_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
 fi
