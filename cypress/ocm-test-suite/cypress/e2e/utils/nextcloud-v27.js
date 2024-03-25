@@ -1,4 +1,4 @@
-export function acceptShareV2_7() {
+export function acceptShareV27() {
 	cy.get('div[class="oc-dialog"]', { timeout: 10000 })
       .should('be.visible')
       .find('*[class^="oc-dialog-buttonrow"]')
@@ -6,7 +6,7 @@ export function acceptShareV2_7() {
       .click()
 }
 
-export function createShareV2_7(fileName, username, domain) {
+export function createShareV27(fileName, username, domain) {
 	openSharingPanel(fileName)
 
 	cy.get('#app-sidebar-vue').within(() => {
@@ -23,31 +23,31 @@ export function createShareV2_7(fileName, username, domain) {
 	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
 }
 
-export function renameFileV2_7(fileName, newFileName) {
-	triggerActionInFileMenuV2_7(fileName, 'Rename')
+export function renameFileV27(fileName, newFileName) {
+	triggerActionInFileMenuV27(fileName, 'Rename')
 
 	// intercept the move so we can wait for it.
 	cy.intercept('MOVE', /\/remote.php\/dav\/files\//).as('moveFile')
-    getRowForFileV2_7(fileName).find('form').find('input').clear()
-	getRowForFileV2_7(fileName).find('form').find('input').type(`${newFileName}{enter}`)
+    getRowForFileV27(fileName).find('form').find('input').clear()
+	getRowForFileV27(fileName).find('form').find('input').type(`${newFileName}{enter}`)
 	cy.wait('@moveFile')
 }
 
 export function openSharingPanel(fileName) {
-	triggerActionForFileV2_7(fileName, 'Share')
+	triggerActionForFileV27(fileName, 'Share')
 
 	cy.get('#app-sidebar-vue')
 		.get('[aria-controls="tab-sharing"]')
 		.click()
 }
 
-export function triggerActionInFileMenuV2_7 (fileName, actionId) {
-	triggerActionForFileV2_7(fileName,'menu')
-	getRowForFileV2_7(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+export function triggerActionInFileMenuV27 (fileName, actionId) {
+	triggerActionForFileV27(fileName,'menu')
+	getRowForFileV27(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
 }
 
-export const triggerActionForFileV2_7 = (filename, actionId) => getActionsForFileV2_7(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+export const triggerActionForFileV27 = (filename, actionId) => getActionsForFileV27(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
 
-export const getActionsForFileV2_7 = (filename) => getRowForFileV2_7(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]')
+export const getActionsForFileV27 = (filename) => getRowForFileV27(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]')
 
-export const getRowForFileV2_7 = (filename) => cy.get(`[data-file="${CSS.escape(filename)}"]`)
+export const getRowForFileV27 = (filename) => cy.get(`[data-file="${CSS.escape(filename)}"]`)
