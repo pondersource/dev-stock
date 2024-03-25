@@ -336,4 +336,7 @@ else
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
     sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
+
+  # auto clean after running tests in ci mode.
+  "${ENV_ROOT}/scripts/clean.sh"
 fi
