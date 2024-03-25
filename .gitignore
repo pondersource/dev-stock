@@ -26,3 +26,4 @@ oc-sciencemesh-release
 nc-sciencemesh-release
 surf-token-based-access
 cypress/ocm-test-suite/cypress/videos/*
+cypress/ocm-test-suite/cypress/screenshots/*
