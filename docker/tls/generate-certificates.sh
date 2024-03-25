@@ -50,16 +50,20 @@ createCertificate idp
 sudo chown 1000:root "${ENV_ROOT}"/certificates/idp.*
 
 createCertificate meshdir
-createCertificate stub1
-createCertificate stub2
 createCertificate revad1
 createCertificate revad2
 
 for efss in owncloud nextcloud cernbox ocis nc oc; do
   createCertificate ${efss}1
   createCertificate ${efss}2
+  createCertificate ${efss}3
+  createCertificate ${efss}4
   createCertificate reva${efss}1
   createCertificate reva${efss}2
+  createCertificate reva${efss}3
+  createCertificate reva${efss}4
   createCertificate wopi${efss}1
   createCertificate wopi${efss}2
+  createCertificate wopi${efss}3
+  createCertificate wopi${efss}4
 done
