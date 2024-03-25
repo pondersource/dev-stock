@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-owncloud
+FROM pondersource/dev-stock-owncloud:latest
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
