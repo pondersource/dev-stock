@@ -16,7 +16,7 @@ on:
 jobs:
   e2e:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         browser: [chrome, edge, firefox, electron]
         include:
