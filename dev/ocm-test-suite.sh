@@ -62,7 +62,8 @@ function createEfss() {
   local number="${2}"
   local user="${3}"
   local password="${4}"
-  local image="${5}"
+  local tag="${5-latest}"
+  local image="${6}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -93,7 +94,7 @@ function createEfss() {
     -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
-    "${image}"
+    "${image}:${tag}"
 
   # wait for hostname port to be open.
   waitForPort "maria${platform}${number}.docker"  3306
@@ -197,15 +198,19 @@ fi
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
+# tag:        tag for the image, use latest if not sure.
 # image:      which image variation to use for container.
 
 # ownClouds
-createEfss owncloud   1   marie     radioactivity     ocm-test-suite
-createEfss owncloud   2   mahdi     baghbani          ocm-test-suite
+createEfss owncloud   1   marie         radioactivity     latest              ocm-test-suite
+createEfss owncloud   2   mahdi         baghbani          latest              ocm-test-suite
 
 # Nextclouds
-createEfss nextcloud  1   einstein  relativity        sciencemesh
-createEfss nextcloud  2   michiel   dejong            sciencemesh
+createEfss nextcloud  1   einstein      relativity        latest              sciencemesh
+createEfss nextcloud  2   michiel       dejong            latest              sciencemesh
+
+createEfss nextcloud  3   yashar        pmh               v28.0.3 
+createEfss nextcloud  4   madeline      oleary            v28.0.3
 
 ############
 ### Reva ###
@@ -226,6 +231,9 @@ createReva owncloud  2 4502
 
 createReva nextcloud 1 4503
 createReva nextcloud 2 4504
+
+createReva nextcloud 3 4505
+createReva nextcloud 4 4506
 
 ###################
 ### ScienceMesh ###
@@ -316,6 +324,8 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://owncloud2.docker  -> username: mahdi      password: baghbani"
   echo "https://nextcloud1.docker -> username: einstein   password: relativity"
   echo "https://nextcloud2.docker -> username: michiel    password: dejong"
+  echo "https://nextcloud3.docker -> username: yahsar     password: pmh"
+  echo "https://nextcloud4.docker -> username: madeline   password: oleary"
 else
   # only record when testing on electron.
   if [ "${TEST_PLATFORM}" != "electron" ]; then
