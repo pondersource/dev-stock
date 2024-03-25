@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # @michielbdejong halt on error in docker init scripts.
-set -e
+set -ex
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
@@ -168,7 +168,7 @@ cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_R
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
 
 # auto clean before starting.
-"${ENV_ROOT}/scripts/clean.sh"
+"${ENV_ROOT}/scripts/clean.sh" "no"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
