@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # @michielbdejong halt on error in docker init scripts.
-set -ex
+set -e
 
 # find this scripts location.
 SOURCE=${BASH_SOURCE[0]}
