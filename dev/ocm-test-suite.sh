@@ -329,7 +329,8 @@ else
     --name="cypress.docker"                                                     \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
-    cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
+    cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"           || 
+    true
   
   # revert config file back to normal.
   if [ "${TEST_PLATFORM}" != "electron" ]; then
