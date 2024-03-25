@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-nextcloud:latest
+FROM pondersource/dev-stock-nextcloud:v27.1.7
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys

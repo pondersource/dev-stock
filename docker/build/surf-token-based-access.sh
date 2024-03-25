@@ -24,10 +24,10 @@ export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 
 echo Building pondersource/dev-stock-php-base
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base:latest .
 
 echo Building pondersource/dev-stock-owncloud
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud.Dockerfile --tag pondersource/dev-stock-owncloud .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud.Dockerfile --tag pondersource/dev-stock-owncloud:latest .
 
 echo Building pondersource/dev-stock-owncloud-token-based-access
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-token-based-access.Dockerfile --tag pondersource/dev-stock-owncloud-token-based-access .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-token-based-access.Dockerfile --tag pondersource/dev-stock-owncloud-token-based-access:latest .

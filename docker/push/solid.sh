@@ -5,4 +5,4 @@ set -e
 echo "Log in as pondersource"
 docker login
 
-docker push pondersource/dev-stock-nextcloud-solid
+docker push pondersource/dev-stock-nextcloud-solid:latest

@@ -24,7 +24,7 @@ export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 
 echo Building pondersource/dev-stock-nextcloud-sunet
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sunet.Dockerfile --tag pondersource/dev-stock-nextcloud-sunet:latest .
 
 cd simple-saml-php
 
