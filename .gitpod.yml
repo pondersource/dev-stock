@@ -29,15 +29,38 @@ vscode:
 # Define Ports and how they should be handled
 # Documentation: https://www.gitpod.io/docs/configure/workspaces/ports
 ports:
+  - port: 4501
+    onOpen: ignore
+    visibility: public
+  - port: 4502
+    onOpen: ignore
+    visibility: public
+  - port: 4503
+    onOpen: ignore
+    visibility: public
+  - port: 4504
+    onOpen: ignore
+    visibility: public
+  - port: 4505
+    onOpen: ignore
+    visibility: public
+  - port: 4506
+    onOpen: ignore
+    visibility: public
+  - port: 5700
+    onOpen: ignore
+    visibility: public
+    name: VNC
+    description: VNC server to view Cypress.
   - port: 5800
     onOpen: ignore
     visibility: public
-    name: firefox
-    description: firefox used by devstock to test Pondersource apps in browser
+    name: FireFox
+    description: Embedded browser to access docker containers.
   - port: 9003
     onOpen: ignore
     visibility: public
-    name: Nextcloud Xdebug
+    name: Xdebug
     description: Xdebug client port.
 
 tasks:
