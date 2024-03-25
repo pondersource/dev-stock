@@ -1,4 +1,4 @@
-import { createShareV2_7, renameFileV2_7 } from '../utils/nextcloud-v2-7'
+import { createShareV27, renameFileV27 } from '../utils/nextcloud-v27'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
@@ -14,8 +14,8 @@ describe('Native federated sharing functionality for Nextcloud v2.7', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    renameFileV2_7('welcome.txt', 'nc1-to-nc2-share.txt')
-    createShareV2_7('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
+    renameFileV27('welcome.txt', 'nc1-to-nc2-share.txt')
+    createShareV27('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
 
     // accept share from Nextcloud 2.
     cy.origin('https://nextcloud2.docker', () => {
