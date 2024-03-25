@@ -167,6 +167,9 @@ cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"                   "${ENV_R
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
 
+# auto clean before starting.
+"${ENV_ROOT}/scripts/clean.sh" "no"
+
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
@@ -314,6 +317,11 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://nextcloud1.docker -> username: einstein   password: relativity"
   echo "https://nextcloud2.docker -> username: michiel    password: dejong"
 else
+  # only record when testing on electron.
+  if [ "${TEST_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
   ##################
   ### Cypress CI ###
   ##################
@@ -323,5 +331,15 @@ else
     --name="cypress.docker"                                                     \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
-    cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"
+    cypress/included:13.3.0 cypress run --browser "${TEST_PLATFORM}"           || 
+    true
+  
+  # revert config file back to normal.
+  if [ "${TEST_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
+
+  # auto clean after running tests in ci mode. do not clear terminal.
+  "${ENV_ROOT}/scripts/clean.sh" "no"
 fi
