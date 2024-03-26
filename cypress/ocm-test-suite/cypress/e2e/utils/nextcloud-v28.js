@@ -19,9 +19,11 @@ export function createShareV28(fileName, username, domain) {
 	// ensure selecting remote [sharetype="6"] instead of email!
 	cy.get(`[user="${username}"]`).click()
 
+	// cy.get('[data-cy-files-sharing-share-editor-action="save"]').click({ scrollBehavior: 'nearest' })
+	cy.get('*[class^="sharingTabDetailsView"]').find('*[class^="sharingTabDetailsView__footer"]').find('*[class^="button-group"]').find('*[class^="button-vue button-vue--text-only button-vue--vue-primary"]').click()
+
 	// HACK: Save the share and then update it, as permissions changes are currently not saved for new share.
-	cy.get('[data-cy-files-sharing-share-editor-action="save"]').click({ scrollBehavior: 'nearest' })
-	updateShareV28(fileName, 0)
+	// updateShareV28(fileName, 0) // @MahdiBaghbani: not sure about this yet.
 }
 
 export function updateShareV28(fileName, index) {
@@ -55,7 +57,7 @@ export const renameFileV28 = (fileName, newFileName) => {
 	getRowForFileV28(fileName)
 	triggerActionForFileV28(fileName, 'rename')
 
-	// intercept the move so we can wait for it
+	// intercept the move so we can wait for it.
 	cy.intercept('MOVE', /\/remote.php\/dav\/files\//).as('moveFile')
 	getRowForFileV28(fileName).find('[data-cy-files-list-row-name] input').clear()
 	getRowForFileV28(fileName).find('[data-cy-files-list-row-name] input').type(`${newFileName}{enter}`)
