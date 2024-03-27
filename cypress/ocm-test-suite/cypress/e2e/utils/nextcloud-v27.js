@@ -7,7 +7,7 @@ export function acceptShareV27() {
 }
 
 export function createShareV27(fileName, username, domain) {
-	openSharingPanel(fileName)
+	openSharingPanelV27(fileName)
 
 	cy.get('#app-sidebar-vue').within(() => {
 		cy.get('#sharing-search-input').clear()
@@ -33,7 +33,7 @@ export function renameFileV27(fileName, newFileName) {
 	cy.wait('@moveFile')
 }
 
-export function openSharingPanel(fileName) {
+export function openSharingPanelV27(fileName) {
 	triggerActionForFileV27(fileName, 'Share')
 
 	cy.get('#app-sidebar-vue')
