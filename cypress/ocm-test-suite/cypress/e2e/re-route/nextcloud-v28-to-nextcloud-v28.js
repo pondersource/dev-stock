@@ -11,7 +11,7 @@ before(() => {
 
 describe('Native federated sharing functionality for Nextcloud v2.8', () => {
   it('Accept federated share from Nextcloud to Nextcloud', () => {
-    // share from Nextcloud 1.
+    // share from Nextcloud 3.
     cy.loginNextcloud('https://nextcloud3.docker', 'yashar', 'pmh')
 
     renameFileV28('welcome.txt', 'nc3-to-nc4-share.txt')
