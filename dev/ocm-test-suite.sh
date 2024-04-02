@@ -57,6 +57,66 @@ function waitForCollabora() {
   redirect_to_null_cmd echo "Collabora is ready"
 }
 
+function createSeafile() {
+  local platform="${1}"
+  local number="${2}"
+  local user="${3}"
+  local password="${4}"
+  local remote_ocm_server="${5}"
+
+  redirect_to_null_cmd echo "creating efss ${platform} ${number}"
+
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="memcache${platform}${number}.docker"                                                                            \
+    memcached:1.6.18                                                                                                        \
+    memcached -m 256
+  
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="maria${platform}${number}.docker"                                                                               \
+    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
+    mariadb                                                                                                                 \
+    --transaction-isolation=READ-COMMITTED                                                                                  \
+    --binlog-format=ROW                                                                                                     \
+    --innodb-file-per-table=1                                                                                               \
+    --skip-innodb-read-only-compressed
+
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="${platform}${number}.docker"                                                                                    \
+    -e TIME_ZONE="Etc/UTC"                                                                                                  \
+    -e DB_HOST="maria${platform}${number}.docker"                                                                           \
+    -e DB_ROOT_PASSWD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"                                                            \
+    -e SEAFILE_ADMIN_EMAIL="${user}@seafile.com"                                                                            \
+    -e SEAFILE_ADMIN_PASSWORD="${password}"                                                                                 \
+    -e SEAFILE_SERVER_LETSENCRYPT=false                                                                                     \
+    -e FORCE_HTTPS_IN_CONF=false                                                                                            \
+    -e SEAFILE_SERVER_HOSTNAME="${platform}${number}.docker"                                                                \
+    -e SEAFILE_MEMCACHE_HOST="memcache${platform}${number}.docker"                                                          \
+    -e SEAFILE_MEMCACHE_PORT=11211                                                                                          \
+    -v "${ENV_ROOT}/seafile-data/${platform}${number}:/shared"                                                              \
+    -v "${ENV_ROOT}/temp/sea-init.sh:/init.sh"                                                                              \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/shared/ssl/${platform}${number}.docker.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/shared/ssl/${platform}${number}.docker.key"           \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
+    seafileltd/seafile-mc:11.0.5
+
+  # wait for hostname port to be open.
+  waitForPort "maria${platform}${number}.docker"  3306
+
+  # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"                    >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"                    >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                              >/dev/null 2>&1
+
+  # seafile needs time to bootstrap itself.
+  sleep 5
+
+  # run init script inside seafile.
+  docker exec -e remote_ocm_server="${remote_ocm_server}" "${platform}${number}.docker" bash -c "/init.sh ${remote_ocm_server}"
+
+  redirect_to_null_cmd echo ""
+}
+
 function createEfss() {
   local platform="${1}"
   local number="${2}"
@@ -73,27 +133,27 @@ function createEfss() {
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
 
-  redirect_to_null_cmd docker run --detach --network=testnet                      \
-    --name="maria${platform}${number}.docker"                                     \
-    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek             \
-    mariadb                                                                       \
-    --transaction-isolation=READ-COMMITTED                                        \
-    --binlog-format=ROW                                                           \
-    --innodb-file-per-table=1                                                     \
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="maria${platform}${number}.docker"                                                                               \
+    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
+    mariadb                                                                                                                 \
+    --transaction-isolation=READ-COMMITTED                                                                                  \
+    --binlog-format=ROW                                                                                                     \
+    --innodb-file-per-table=1                                                                                               \
     --skip-innodb-read-only-compressed
 
-  redirect_to_null_cmd docker run --detach --network=testnet                      \
-    --name="${platform}${number}.docker"                                          \
-    --add-host "host.docker.internal:host-gateway"                                \
-    -e HOST="${platform}${number}"                                                \
-    -e DBHOST="maria${platform}${number}.docker"                                  \
-    -e USER="${user}"                                                             \
-    -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
-    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
-    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
-    -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
-    -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"  \
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="${platform}${number}.docker"                                                                                    \
+    --add-host "host.docker.internal:host-gateway"                                                                          \
+    -e HOST="${platform}${number}"                                                                                          \
+    -e DBHOST="maria${platform}${number}.docker"                                                                            \
+    -e USER="${user}"                                                                                                       \
+    -e PASS="${password}"                                                                                                   \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
+    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                                                               \
+    -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                                            \
+    -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"                                            \
     "${image}:${tag}"
 
   # wait for hostname port to be open.
@@ -129,18 +189,18 @@ function createReva() {
     waitForCollabora
   fi
 
-  docker run --detach --network=testnet                                       \
-  --name="reva${platform}${number}.docker"                                    \
-  -e HOST="reva${platform}${number}"                                          \
-  -p "${port}:80"                                                             \
-  -v "${ENV_ROOT}/reva:/reva"                                                 \
-  -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
-  -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"    \
-  -v "${ENV_ROOT}/temp/revad:/configs/revad"                                  \
-  -v "${ENV_ROOT}/temp/reva/run.sh:/usr/bin/run.sh"                           \
-  -v "${ENV_ROOT}/temp/reva/kill.sh:/usr/bin/kill.sh"                         \
-  -v "${ENV_ROOT}/temp/reva/entrypoint.sh:/usr/bin/entrypoint.sh"             \
-  pondersource/dev-stock-revad                                                \
+  docker run --detach --network=testnet                                                                       \
+  --name="reva${platform}${number}.docker"                                                                    \
+  -e HOST="reva${platform}${number}"                                                                          \
+  -p "${port}:80"                                                                                             \
+  -v "${ENV_ROOT}/reva:/reva"                                                                                 \
+  -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                      \
+  -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                    \
+  -v "${ENV_ROOT}/temp/revad:/configs/revad"                                                                  \
+  -v "${ENV_ROOT}/temp/reva/run.sh:/usr/bin/run.sh"                                                           \
+  -v "${ENV_ROOT}/temp/reva/kill.sh:/usr/bin/kill.sh"                                                         \
+  -v "${ENV_ROOT}/temp/reva/entrypoint.sh:/usr/bin/entrypoint.sh"                                             \
+  pondersource/dev-stock-revad                                                                                \
   >/dev/null 2>&1
 }
 
@@ -165,6 +225,7 @@ rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_ROOT}/temp/"
 cp -fr  "${ENV_ROOT}/docker/configs/revad"                              "${ENV_ROOT}/temp/"
 cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"                   "${ENV_ROOT}/temp/index.js"
+cp -f   "${ENV_ROOT}/docker/scripts/init/seafile.sh"                    "${ENV_ROOT}/temp/sea-init.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
 
@@ -202,15 +263,19 @@ fi
 # image:      which image variation to use for container.
 
 # ownClouds
-createEfss owncloud   1   marie         radioactivity     latest              ocm-test-suite
-createEfss owncloud   2   mahdi         baghbani          latest              ocm-test-suite
+createEfss    owncloud   1   marie         radioactivity     latest              ocm-test-suite
+createEfss    owncloud   2   mahdi         baghbani          latest              ocm-test-suite
 
 # Nextclouds
-createEfss nextcloud  1   einstein      relativity        latest              sciencemesh
-createEfss nextcloud  2   michiel       dejong            latest              sciencemesh
+createEfss    nextcloud  1   einstein      relativity        latest              sciencemesh
+createEfss    nextcloud  2   michiel       dejong            latest              sciencemesh
 
-createEfss nextcloud  3   yashar        pmh               v28.0.3 
-createEfss nextcloud  4   madeline      oleary            v28.0.3
+createEfss    nextcloud  3   yashar        pmh               v28.0.3 
+createEfss    nextcloud  4   madeline      oleary            v28.0.3
+
+# Seafiles
+createSeafile seafile    1  jonathan      xu                 seafile2
+createSeafile seafile    2  giuseppe      lopresti           seafile1
 
 ############
 ### Reva ###
@@ -320,12 +385,14 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://owncloud1.docker  -> username: marie      password: radioactivity"
-  echo "https://owncloud2.docker  -> username: mahdi      password: baghbani"
-  echo "https://nextcloud1.docker -> username: einstein   password: relativity"
-  echo "https://nextcloud2.docker -> username: michiel    password: dejong"
-  echo "https://nextcloud3.docker -> username: yahsar     password: pmh"
-  echo "https://nextcloud4.docker -> username: madeline   password: oleary"
+  echo "https://owncloud1.docker  -> username: marie                  password: radioactivity"
+  echo "https://owncloud2.docker  -> username: mahdi                  password: baghbani"
+  echo "https://nextcloud1.docker -> username: einstein               password: relativity"
+  echo "https://nextcloud2.docker -> username: michiel                password: dejong"
+  echo "https://nextcloud3.docker -> username: yahsar                 password: pmh"
+  echo "https://nextcloud4.docker -> username: madeline               password: oleary"
+  echo "https://seafile1.docker   -> username: jonathan@seafile.com   password: pmh"
+  echo "https://seafile2.docker   -> username: giuseppe@seafile.com   password: lopresti"
 else
   # only record when testing on electron.
   if [ "${TEST_PLATFORM}" != "electron" ]; then
