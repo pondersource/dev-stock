@@ -4,10 +4,12 @@
 set -e
 
 # 3rd party images.
-docker pull mariadb:latest 
+docker pull mariadb:latest
+docker pull memcached:1.6.18
 docker pull collabora/code:latest
 docker pull cypress/included:13.3.0
-docker pull cs3org/wopiserver:latest 
+docker pull cs3org/wopiserver:latest
+docker pull seafileltd/seafile-mc:11.0.5
 
 # dev-stock images.
 docker pull pondersource/dev-stock-revad:latest
