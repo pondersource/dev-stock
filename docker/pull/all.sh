@@ -6,12 +6,14 @@ set -e
 # 3rd party images.
 docker pull redis:latest
 docker pull mariadb:latest
+docker pull memcached:1.6.18
 docker pull theasp/novnc:latest
 docker pull rclone/rclone:latest
 docker pull collabora/code:latest
 docker pull jlesage/firefox:latest
 docker pull cypress/included:13.3.0
 docker pull cs3org/wopiserver:latest
+docker pull seafileltd/seafile-mc:11.0.5
 docker pull quay.io/keycloak/keycloak:latest
 
 # dev-stock images.
