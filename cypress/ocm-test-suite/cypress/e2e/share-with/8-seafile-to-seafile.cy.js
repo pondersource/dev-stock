@@ -3,12 +3,12 @@ describe('Native federated sharing functionality for Seafile', () => {
     // share from Seafile 1.
     cy.loginSeafile('http://seafile1.docker', 'jonathan@seafile.com', 'xu')
 
-    cy.get('*[role^="dialog"]')
-      .find('*[class^="modal-dialog"]')
-      .find('*[class^="modal-content"]')
-      .find('*[class^="modal-body"]')
-      .find('button')
-      .click()
+    // cy.get('*[role^="dialog"]')
+    //   .find('*[class^="modal-dialog"]')
+    //   .find('*[class^="modal-content"]')
+    //   .find('*[class^="modal-body"]')
+    //   .find('button')
+    //   .click()
 
     cy.get('*[id^="wrapper"]')
       .find('*[class^="main-panel"]')
@@ -68,18 +68,17 @@ describe('Native federated sharing functionality for Seafile', () => {
       .contains('Submit')
       .click()
 
-      cy.wait(1000)
   })
 
   it('Receive federated share from Seafile to Seafile', () => {
     cy.loginSeafile('http://seafile2.docker', 'giuseppe@cern.ch', 'lopresti')
 
-    cy.get('*[role^="dialog"]')
-      .find('*[class^="modal-dialog"]')
-      .find('*[class^="modal-content"]')
-      .find('*[class^="modal-body"]')
-      .find('button')
-      .click()
+    // cy.get('*[role^="dialog"]')
+    //   .find('*[class^="modal-dialog"]')
+    //   .find('*[class^="modal-content"]')
+    //   .find('*[class^="modal-body"]')
+    //   .find('button')
+    //   .click()
 
     cy.get('*[id^="wrapper"]')
       .find('*[class^="side-panel"]')
@@ -89,8 +88,6 @@ describe('Native federated sharing functionality for Seafile', () => {
       .find('ul>li')
       .eq(5)
       .click()
-
-    cy.wait(1000)
 
     // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
   })
