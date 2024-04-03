@@ -42,3 +42,17 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
     // files app should be visible.
     cy.url().should('match', /apps\/files(\/|$)/)
 })
+
+Cypress.Commands.add('loginSeafile', (url, username, password) => {
+    cy.visit(url)
+
+    // login page is visible in browser.
+	cy.get('*[id^="wrapper"]').find('*[id^="log-in-panel"]').find('*[id^="login-form"]').should('be.visible')
+
+    // login with username and password.
+    cy.get('*[id^="wrapper"]').find('*[id^="log-in-panel"]').find('*[id^="login-form"]').within(() => {
+        cy.get('input[name="login"]').type(username)
+        cy.get('input[name="password"]').type(password)
+        cy.get('*[type=submit]').click()
+    })
+})

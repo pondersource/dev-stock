@@ -60,7 +60,7 @@ function waitForCollabora() {
 function createSeafile() {
   local platform="${1}"
   local number="${2}"
-  local user="${3}"
+  local user_email="${3}"
   local password="${4}"
   local remote_ocm_server="${5}"
 
@@ -85,7 +85,7 @@ function createSeafile() {
     -e TIME_ZONE="Etc/UTC"                                                                                                  \
     -e DB_HOST="maria${platform}${number}.docker"                                                                           \
     -e DB_ROOT_PASSWD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"                                                            \
-    -e SEAFILE_ADMIN_EMAIL="${user}@seafile.com"                                                                            \
+    -e SEAFILE_ADMIN_EMAIL="${user_email}"                                                                                  \
     -e SEAFILE_ADMIN_PASSWORD="${password}"                                                                                 \
     -e SEAFILE_SERVER_LETSENCRYPT=false                                                                                     \
     -e FORCE_HTTPS_IN_CONF=false                                                                                            \
@@ -113,6 +113,11 @@ function createSeafile() {
 
   # run init script inside seafile.
   docker exec -e remote_ocm_server="${remote_ocm_server}" "${platform}${number}.docker" bash -c "/init.sh ${remote_ocm_server}"
+
+  # restart seafile to apply our changes.
+  sleep 2
+  docker restart "${platform}${number}.docker"
+  sleep 2
 
   redirect_to_null_cmd echo ""
 }
@@ -263,19 +268,19 @@ fi
 # image:      which image variation to use for container.
 
 # ownClouds
-createEfss    owncloud   1   marie         radioactivity     latest              ocm-test-suite
-createEfss    owncloud   2   mahdi         baghbani          latest              ocm-test-suite
+createEfss    owncloud   1   marie                    radioactivity     latest              ocm-test-suite
+createEfss    owncloud   2   mahdi                    baghbani          latest              ocm-test-suite
 
 # Nextclouds
-createEfss    nextcloud  1   einstein      relativity        latest              sciencemesh
-createEfss    nextcloud  2   michiel       dejong            latest              sciencemesh
+createEfss    nextcloud  1   einstein                 relativity        latest              sciencemesh
+createEfss    nextcloud  2   michiel                  dejong            latest              sciencemesh
 
-createEfss    nextcloud  3   yashar        pmh               v28.0.3 
-createEfss    nextcloud  4   madeline      oleary            v28.0.3
+createEfss    nextcloud  3   yashar                   pmh               v28.0.3 
+createEfss    nextcloud  4   madeline                 oleary            v28.0.3
 
 # Seafiles
-createSeafile seafile    1  jonathan      xu                 seafile2
-createSeafile seafile    2  giuseppe      lopresti           seafile1
+createSeafile seafile    1  jonathan@seafile.com      xu                 seafile2
+createSeafile seafile    2  giuseppe@cern.ch          lopresti           seafile1
 
 ############
 ### Reva ###
@@ -392,7 +397,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://nextcloud3.docker -> username: yahsar                 password: pmh"
   echo "https://nextcloud4.docker -> username: madeline               password: oleary"
   echo "https://seafile1.docker   -> username: jonathan@seafile.com   password: pmh"
-  echo "https://seafile2.docker   -> username: giuseppe@seafile.com   password: lopresti"
+  echo "https://seafile2.docker   -> username: giuseppe@cern.ch       password: lopresti"
 else
   # only record when testing on electron.
   if [ "${TEST_PLATFORM}" != "electron" ]; then
