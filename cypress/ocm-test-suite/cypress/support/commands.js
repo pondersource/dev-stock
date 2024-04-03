@@ -55,7 +55,4 @@ Cypress.Commands.add('loginSeafile', (url, username, password) => {
         cy.get('input[name="password"]').type(password)
         cy.get('*[type=submit]').click()
     })
-
-    // close banner by clicking anywhere in body.
-    cy.get('body').click(0, 0);
 })
