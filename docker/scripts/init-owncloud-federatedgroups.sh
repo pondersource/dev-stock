@@ -18,7 +18,9 @@ sed -i "8 i\    1 => 'oc1.docker',"                                             
 sed -i "9 i\    2 => 'oc2.docker',"                                                                 /var/www/html/config/config.php
 sed -i "10 i\    3 => 'owncloud1.docker',"                                                          /var/www/html/config/config.php
 sed -i "11 i\    4 => 'owncloud2.docker',"                                                          /var/www/html/config/config.php
-sed -i "12 i\    5 => (isset(\$_SERVER['HTTP_HOST']) ? \$_SERVER['HTTP_HOST'] : 'localhost'),"      /var/www/html/config/config.php
+sed -i "12 i\    5 => 'owncloud3.docker',"                                                          /var/www/html/config/config.php
+sed -i "13 i\    6 => 'owncloud4.docker',"                                                          /var/www/html/config/config.php
+sed -i "14 i\    7 => (isset(\$_SERVER['HTTP_HOST']) ? \$_SERVER['HTTP_HOST'] : 'localhost'),"      /var/www/html/config/config.php
 
 echo "Installing Custom Groups"
 php console.php app:enable customgroups

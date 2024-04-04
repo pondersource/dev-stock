@@ -127,8 +127,9 @@ function createEfss() {
   local number="${2}"
   local user="${3}"
   local password="${4}"
-  local tag="${5-latest}"
-  local image="${6}"
+  local init_script="${5}"
+  local tag="${6-latest}"
+  local image="${7}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -154,9 +155,10 @@ function createEfss() {
     -e DBHOST="maria${platform}${number}.docker"                                                                            \
     -e USER="${user}"                                                                                                       \
     -e PASS="${password}"                                                                                                   \
+    -v "${ENV_ROOT}/temp/federatedgroups:/curls"                                                                            \
     -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
     -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
-    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                                                               \
+    -v "${ENV_ROOT}/temp/${init_script}:/${platform}-init.sh"                                                               \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                                            \
     -v "${ENV_ROOT}/${platform}/apps/sciencemesh:/var/www/html/apps/sciencemesh"                                            \
     "${image}:${tag}"
@@ -173,7 +175,7 @@ function createEfss() {
   docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
   # run init script inside efss.
-  redirect_to_null_cmd docker exec -u www-data "${platform}${number}.docker" sh "/${platform}-init.sh"
+  redirect_to_null_cmd docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
 
   redirect_to_null_cmd echo ""
 }
@@ -223,16 +225,41 @@ function sciencemeshInsertIntoDB() {
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) values ('sciencemesh', 'inviteManagerApikey', 'invite-manager-endpoint');"              >/dev/null 2>&1
 }
 
+function federatedGroupsInsertIntoDB() {
+  local platform="${1}"
+  local number="${2}"
+
+  redirect_to_null_cmd echo "configuring scim control for <federated groups> for efss ${platform} ${number}"
+
+  # run db injections.
+  mysql_cmd="docker exec "maria${platform}${number}.docker" mariadb -u root -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek efss"
+  $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"                  >/dev/null 2>&1
+
+  redirect_to_null_cmd echo "creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on ${platform}${number}"
+  docker exec -it "${platform}${number}.docker" sh /curls/createGroup.sh "${platform}${number}.docker"                                                          >/dev/null 2>&1
+
+  docker exec -it "${platform}${number}.docker" sh /curls/includeMarie.sh "${platform}${number}.docker"                                                         >/dev/null 2>&1
+}
+
 # delete and create temp directory.
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_ROOT}/temp/"
 cp -fr  "${ENV_ROOT}/docker/configs/revad"                              "${ENV_ROOT}/temp/"
+cp -fr  "${ENV_ROOT}/docker/scripts/federatedgroups"                    "${ENV_ROOT}/temp/"
 cp -f   "${ENV_ROOT}/docker/scripts/ocmstub/index.js"                   "${ENV_ROOT}/temp/index.js"
 cp -f   "${ENV_ROOT}/docker/scripts/init/seafile.sh"                    "${ENV_ROOT}/temp/sea-init.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
 cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-federatedgroups.sh"   "${ENV_ROOT}/temp/owncloud-fg.sh"
+
+sed -i 's/owncloud1/owncloud3/g'                                        "${ENV_ROOT}/temp/federatedgroups/createGroup.sh"
+sed -i 's/owncloud1/owncloud3/g'                                        "${ENV_ROOT}/temp/federatedgroups/includeMarie.sh"
+sed -i 's/owncloud1/owncloud3/g'                                        "${ENV_ROOT}/temp/federatedgroups/excludeMarie.sh"
+sed -i 's/owncloud2/owncloud4/g'                                        "${ENV_ROOT}/temp/federatedgroups/createGroup.sh"
+sed -i 's/owncloud2/owncloud4/g'                                        "${ENV_ROOT}/temp/federatedgroups/includeMarie.sh"
+sed -i 's/owncloud2/owncloud4/g'                                        "${ENV_ROOT}/temp/federatedgroups/excludeMarie.sh"
 
 # auto clean before starting.
 "${ENV_ROOT}/scripts/clean.sh" "no"
@@ -268,15 +295,18 @@ fi
 # image:      which image variation to use for container.
 
 # ownClouds
-createEfss    owncloud   1   marie                    radioactivity     latest              ocm-test-suite
-createEfss    owncloud   2   mahdi                    baghbani          latest              ocm-test-suite
+createEfss    owncloud   1   marie                    radioactivity     owncloud.sh         latest        ocm-test-suite
+createEfss    owncloud   2   mahdi                    baghbani          owncloud.sh         latest        ocm-test-suite
+
+createEfss    owncloud   3   einstein                 relativity        owncloud-fg.sh      latest        federatedgroups
+createEfss    owncloud   4   marie                    radioactivity     owncloud-fg.sh      latest        federatedgroups
 
 # Nextclouds
-createEfss    nextcloud  1   einstein                 relativity        latest              sciencemesh
-createEfss    nextcloud  2   michiel                  dejong            latest              sciencemesh
+createEfss    nextcloud  1   einstein                 relativity        nextcloud.sh        latest        sciencemesh
+createEfss    nextcloud  2   michiel                  dejong            nextcloud.sh        latest        sciencemesh
 
-createEfss    nextcloud  3   yashar                   pmh               v28.0.3 
-createEfss    nextcloud  4   madeline                 oleary            v28.0.3
+createEfss    nextcloud  3   yashar                   pmh               nextcloud.sh        v28.0.3 
+createEfss    nextcloud  4   madeline                 oleary            nextcloud.sh        v28.0.3
 
 # Seafiles
 createSeafile seafile    1  jonathan@seafile.com      xu                 seafile2
@@ -321,6 +351,20 @@ sciencemeshInsertIntoDB owncloud    2
 
 sciencemeshInsertIntoDB nextcloud   1
 sciencemeshInsertIntoDB nextcloud   2
+
+########################
+### Federated Groups ###
+########################
+
+# syntax:
+# federatedGroupsInsertIntoDB platform number.
+#
+# 
+# platform:   owncloud, nextcloud.
+# number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
+
+federatedGroupsInsertIntoDB owncloud  3
+federatedGroupsInsertIntoDB owncloud  4
 
 ######################
 ### Mesh directory ###
@@ -392,11 +436,13 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
   echo "https://owncloud1.docker  -> username: marie                  password: radioactivity"
   echo "https://owncloud2.docker  -> username: mahdi                  password: baghbani"
+  echo "https://owncloud3.docker  -> username: einstein               password: relativity"
+  echo "https://owncloud4.docker  -> username: marie                  password: radioactivity"
   echo "https://nextcloud1.docker -> username: einstein               password: relativity"
   echo "https://nextcloud2.docker -> username: michiel                password: dejong"
   echo "https://nextcloud3.docker -> username: yahsar                 password: pmh"
   echo "https://nextcloud4.docker -> username: madeline               password: oleary"
-  echo "https://seafile1.docker   -> username: jonathan@seafile.com   password: pmh"
+  echo "https://seafile1.docker   -> username: jonathan@seafile.com   password: xu"
   echo "https://seafile2.docker   -> username: giuseppe@cern.ch       password: lopresti"
 else
   # only record when testing on electron.
