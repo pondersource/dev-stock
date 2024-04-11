@@ -24,6 +24,24 @@ export function createShare(fileName, username, domain) {
 	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
 }
 
+export function createShareGroup(fileName, group) {
+	openSharingPanel(fileName)
+
+	cy.get('#app-sidebar').within(() => {
+		cy.get('*[id^="shareWith-"]').clear()
+		cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
+		cy.get('*[id^="shareWith-"]').type(group)
+		cy.wait('@userSearch')
+	})
+
+	// ensure selecting remote, instead of email or group.
+	cy.get('*[class^=ui-autocomplete]')
+		.contains('span[class="autocomplete-item-typeInfo"]', 'Group')
+		.click()
+
+	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
+}
+
 export function renameFile(fileName, newFileName) {
 	triggerActionInFileMenu(fileName, 'Rename')
 
