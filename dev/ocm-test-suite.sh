@@ -112,11 +112,11 @@ function createSeafile() {
   sleep 5
 
   # run init script inside seafile.
-  docker exec -e remote_ocm_server="${remote_ocm_server}" "${platform}${number}.docker" bash -c "/init.sh ${remote_ocm_server}"
+  redirect_to_null_cmd docker exec -e remote_ocm_server="${remote_ocm_server}" "${platform}${number}.docker" bash -c "/init.sh ${remote_ocm_server}"
 
   # restart seafile to apply our changes.
   sleep 2
-  docker restart "${platform}${number}.docker"
+  redirect_to_null_cmd docker restart "${platform}${number}.docker"
   sleep 2
 
   redirect_to_null_cmd echo ""
@@ -236,9 +236,9 @@ function federatedGroupsInsertIntoDB() {
   $mysql_cmd -e "insert into oc_appconfig (appid, configkey, configvalue) VALUES ('federatedgroups', 'scim_token', 'something-super-secret');"                  >/dev/null 2>&1
 
   redirect_to_null_cmd echo "creating federated group 'TestGroup (uniharderwijk_surfdrive_test) (SRAM CO)' on ${platform}${number}"
-  docker exec -it "${platform}${number}.docker" sh /curls/createGroup.sh "${platform}${number}.docker"                                                          >/dev/null 2>&1
+  redirect_to_null_cmd docker exec "${platform}${number}.docker" sh /curls/createGroup.sh "${platform}${number}.docker"                                                          >/dev/null 2>&1
 
-  docker exec -it "${platform}${number}.docker" sh /curls/includeMarie.sh "${platform}${number}.docker"                                                         >/dev/null 2>&1
+  redirect_to_null_cmd docker exec "${platform}${number}.docker" sh /curls/includeMarie.sh "${platform}${number}.docker"                                                         >/dev/null 2>&1
 }
 
 # delete and create temp directory.
