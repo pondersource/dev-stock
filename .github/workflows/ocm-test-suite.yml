@@ -14,14 +14,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  e2e:
+  login:
     strategy:
       fail-fast: false
       matrix:
-        testcase:
-          - login-nextcloud
-          - login-owncloud
-          - login-seafil
+        efss_platform:
+          - nextcloud
+          - owncloud
+          - seafile
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
     runs-on: ubuntu-22.04
@@ -29,23 +29,23 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
+      - name: Checkout.
         uses: actions/checkout@v4
 
-      - name: Pull images
+      - name: Pull images.
         shell: bash
         run: ./docker/pull/ocm-test-suite.sh
 
-      - name: Initialize OCM tests dependencies
+      - name: Initialize OCM tests dependencies.
         shell: bash
         run: ./init/ocm-test-suite.sh ci
 
-      - name: Run tests
+      - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite-candid.sh ${{ matrix.testcase }} ci electron
+        run: ./dev/ocm-test-suite-candid.sh login ${{ matrix.efss_platform }} ci electron
 
-      - name: Upload Cypress video artifacts
+      - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.testcase }}
+          name: login ${{ matrix.efss_platform }} 
           path: ./cypress/ocm-test-suite/cypress/videos

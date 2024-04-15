@@ -19,30 +19,43 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 # test case:
-#   - login-nextcloud
-#   - login-owncloud
-#   - login-seafile
-TEST_CASE=${1:-"login-nextcloud"}
+#   - login
+TEST_CASE=${1:-"login"}
+
+# efss platform:
+#   - nextcloud
+#   - owncloud
+#   - seafile
+EFSS_PLATFORM=${2:-"nextcloud"}
 
 # script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${2:-"dev"}
+SCRIPT_MODE=${3:-"dev"}
 
-# test platform: chrome, edge, firefox, electron. default is electron.
+# browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-TEST_PLATFORM=${3:-"electron"}
+BROWSER_PLATFORM=${4:-"electron"}
 
-case $TEST_CASE in
+case "${TEST_CASE}" in
 
-  login-nextcloud)
-    "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${SCRIPT_MODE}" "${TEST_PLATFORM}"
-    ;;
+  "login")
+    case "${EFSS_PLATFORM}" in
 
-  login-owncloud)
-    "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${SCRIPT_MODE}" "${TEST_PLATFORM}"
-    ;;
+      "nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
 
-  login-seafile)
-    "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${SCRIPT_MODE}" "${TEST_PLATFORM}"
+      "owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "seafile")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      *)
+        echo -n "unknown login"
+        ;;
+    esac
     ;;
 
   *)
