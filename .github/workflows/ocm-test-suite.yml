@@ -18,12 +18,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chrome, edge, firefox, electron]
-        include:
-          - browser: electron
-            record: 1
+        testcase:
+          - login-nextcloud
+          - login-owncloud
+          - login-seafil
+
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
     runs-on: ubuntu-22.04
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -40,11 +42,10 @@ jobs:
 
       - name: Run tests
         shell: bash
-        run: ./dev/ocm-test-suite.sh ci ${{ matrix.browser }}
+        run: ./dev/ocm-test-suite-candid.sh ${{ matrix.testcase }} ci electron
 
       - name: Upload Cypress video artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.record }}
         with:
-          name: cypress-videos
+          name: ${{ matrix.testcase }}
           path: ./cypress/ocm-test-suite/cypress/videos
