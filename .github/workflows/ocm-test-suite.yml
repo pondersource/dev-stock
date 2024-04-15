@@ -48,7 +48,7 @@ jobs:
 
       - name: Pull images.
         shell: bash
-        run: ./docker/pull/ocm-test-suite/login/${{ matrix.efss.platform }}.sh
+        run: ./docker/pull/ocm-test-suite/login/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
 
       - name: Initialize OCM tests dependencies.
         shell: bash
