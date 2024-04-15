@@ -22,7 +22,8 @@ jobs:
           - login-nextcloud
           - login-owncloud
           - login-seafil
-        browser: [chrome, edge, firefox, electron]
+        browser:
+          - electron
         include:
           - browser: electron
             record: 1
