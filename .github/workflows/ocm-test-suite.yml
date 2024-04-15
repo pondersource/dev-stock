@@ -19,10 +19,22 @@ jobs:
       fail-fast: false
       matrix:
         efss: [ 
-          {platform: nextcloud, version: v27.1.7},
-          {platform: nextcloud, version: v28.0.3},
-          {platform: owncloud,  version: v10.14.0},
-          {platform: seafile,   version: 11.0.5}
+          {
+            platform: nextcloud,
+            version: v27.1.7
+          },
+          {
+            platform: nextcloud,
+            version: v28.0.3
+          },
+          {
+            platform: owncloud,
+            version: v10.14.0
+          },
+          {
+            platform: seafile,
+            version: 11.0.5
+          }
         ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
