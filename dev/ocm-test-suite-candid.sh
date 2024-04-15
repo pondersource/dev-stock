@@ -51,7 +51,7 @@ case "${TEST_CASE}" in
         ;;
 
       "seafile")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       *)

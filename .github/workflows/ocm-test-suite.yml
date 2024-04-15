@@ -33,6 +33,18 @@ jobs:
           },
           {
             platform: seafile,
+            version: 8.0.8
+          },
+          {
+            platform: seafile,
+            version: 9.0.10
+          },
+          {
+            platform: seafile,
+            version: 10.0.1
+          },
+          {
+            platform: seafile,
             version: 11.0.5
           }
         ]

@@ -18,6 +18,9 @@ cd "${DIR}/../../.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
+# nextcloud version:
+#   - v27.1.7
+#   - v28.0.3
 EFSS_PLATFORM_VERSION=${1:-"v27.1.7"}
 
 # script mode:   dev, ci. default is dev.

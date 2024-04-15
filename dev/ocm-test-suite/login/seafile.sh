@@ -18,12 +18,19 @@ cd "${DIR}/../../.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
+# seafile version:
+#   - 8.0.8
+#   - 9.0.10
+#   - 10.0.1
+#   - 11.0.5
+EFSS_PLATFORM_VERSION=${1:-"11.0.5"}
+
 # script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${1:-"dev"}
+SCRIPT_MODE=${2:-"dev"}
 
 # browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${2:-"electron"}
+BROWSER_PLATFORM=${3:-"electron"}
 
 function redirect_to_null_cmd() {
     if [ "${SCRIPT_MODE}" = "ci" ]; then
@@ -46,12 +53,13 @@ function waitForPort () {
   redirect_to_null_cmd echo "${1} port ${2} is open"
 }
 
-function createSeafile() {
+function createEfssSeafile() {
   local platform="${1}"
   local number="${2}"
   local user_email="${3}"
   local password="${4}"
   local remote_ocm_server="${5}"
+  local tag="${6-latest}"
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
 
@@ -87,7 +95,7 @@ function createSeafile() {
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/shared/ssl/${platform}${number}.docker.key"           \
     -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
     -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
-    seafileltd/seafile-mc:11.0.5
+    "seafileltd/seafile-mc:${tag}"
 
   # wait for hostname port to be open.
   waitForPort "maria${platform}${number}.docker"  3306
@@ -127,7 +135,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 ### Seafile ###
 ###############
 
-createSeafile   seafile   1   jonathan@seafile.com   xu   seafile2
+createEfssSeafile   seafile   1   jonathan@seafile.com   xu   seafile2   "${EFSS_PLATFORM_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
