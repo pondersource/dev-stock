@@ -47,5 +47,5 @@ jobs:
       - name: Upload Cypress video artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos
+          name: ${{ matrix.testcase }}
           path: ./cypress/ocm-test-suite/cypress/videos
