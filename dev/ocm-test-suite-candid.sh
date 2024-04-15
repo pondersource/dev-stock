@@ -28,12 +28,14 @@ TEST_CASE=${1:-"login"}
 #   - seafile
 EFSS_PLATFORM=${2:-"nextcloud"}
 
+EFSS_PLATFORM_VERSION=${3:-"unknown"}
+
 # script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${3:-"dev"}
+SCRIPT_MODE=${4:-"dev"}
 
 # browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${4:-"electron"}
+BROWSER_PLATFORM=${5:-"electron"}
 
 case "${TEST_CASE}" in
 
@@ -41,7 +43,7 @@ case "${TEST_CASE}" in
     case "${EFSS_PLATFORM}" in
 
       "nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${EFSS_PLATFORM_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       "owncloud")

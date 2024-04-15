@@ -18,10 +18,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        efss_platform:
-          - nextcloud
-          - owncloud
-          - seafile
+        efss: [ 
+          {platform: nextcloud, version: v27.1.7},
+          {platform: nextcloud, version: v28.0.3},
+          {platform: owncloud,  version: v10.14.0},
+          {platform: seafile,   version: 11.0.5}
+        ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
     runs-on: ubuntu-22.04
@@ -42,10 +44,10 @@ jobs:
 
       - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite-candid.sh login ${{ matrix.efss_platform }} ci electron
+        run: ./dev/ocm-test-suite-candid.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
         with:
-          name: login ${{ matrix.efss_platform }} 
+          name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
           path: ./cypress/ocm-test-suite/cypress/videos

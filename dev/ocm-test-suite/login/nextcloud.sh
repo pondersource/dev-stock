@@ -18,12 +18,14 @@ cd "${DIR}/../../.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
+EFSS_PLATFORM_VERSION=${1:-"v27.1.7"}
+
 # script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${1:-"dev"}
+SCRIPT_MODE=${2:-"dev"}
 
 # browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${2:-"electron"}
+BROWSER_PLATFORM=${3:-"electron"}
 
 function redirect_to_null_cmd() {
     if [ "${SCRIPT_MODE}" = "ci" ]; then
@@ -130,7 +132,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # tag:            tag for the image, use latest if not sure.
 # image:          which image variation to use for container.
 
-createEfss    nextcloud    1    einstein    relativity    nextcloud.sh    latest    sciencemesh
+createEfss    nextcloud    1    einstein    relativity    nextcloud.sh    "${EFSS_PLATFORM_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
