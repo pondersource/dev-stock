@@ -21,9 +21,9 @@ export ENV_ROOT=${ENV_ROOT}
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${1:-"dev"}
 
-# test platform: chrome, edge, firefox, electron. default is chrome.
+# browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-TEST_PLATFORM=${2:-"chrome"}
+BROWSER_PLATFORM=${2:-"electron"}
 
 function redirect_to_null_cmd() {
     if [ "${SCRIPT_MODE}" = "ci" ]; then
@@ -193,7 +193,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://nextcloud1.docker -> username: einstein               password: relativity"
 else
   # only record when testing on electron.
-  if [ "${TEST_PLATFORM}" != "electron" ]; then
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
     sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
@@ -207,11 +207,11 @@ else
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
     cypress/included:13.3.0 cypress run                                         \
-    --browser "${TEST_PLATFORM}"                                                \
+    --browser "${BROWSER_PLATFORM}"                                                \
     --spec "cypress/e2e/login/nextcloud.cy.js"
   
   # revert config file back to normal.
-  if [ "${TEST_PLATFORM}" != "electron" ]; then
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
     sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
