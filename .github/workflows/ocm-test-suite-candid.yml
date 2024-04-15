@@ -22,11 +22,6 @@ jobs:
           - login-nextcloud
           - login-owncloud
           - login-seafil
-        browser:
-          - electron
-        include:
-          - browser: electron
-            record: 1
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
     runs-on: ubuntu-22.04
@@ -36,26 +31,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout
         uses: actions/checkout@v4
-        if: ${{ matrix.record }}
 
       - name: Pull images
         shell: bash
-        if: ${{ matrix.record }}
         run: ./docker/pull/ocm-test-suite.sh
 
       - name: Initialize OCM tests dependencies
         shell: bash
-        if: ${{ matrix.record }}
         run: ./init/ocm-test-suite.sh ci
 
       - name: Run tests
         shell: bash
-        if: ${{ matrix.record }}
-        run: ./dev/ocm-test-suite-candid.sh ${{ matrix.testcase }} ci ${{ matrix.browser }}
+        run: ./dev/ocm-test-suite-candid.sh ${{ matrix.testcase }} ci electron
 
       - name: Upload Cypress video artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.record }}
         with:
           name: cypress-videos
           path: ./cypress/ocm-test-suite/cypress/videos
