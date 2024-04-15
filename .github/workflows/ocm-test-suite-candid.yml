@@ -1,0 +1,60 @@
+name: Open Cloud Mesh Test Suite
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the specified branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - ocm
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    strategy:
+      fail-fast: false
+      matrix:
+        testcase:
+          - login-nextcloud
+          - login-owncloud
+          - login-seafil
+        browser: [chrome, edge, firefox, electron]
+        include:
+          - browser: electron
+            record: 1
+
+    # The OS to run tests on, (I believe for OCM testing OS is really not that important)
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v4
+        if: ${{ matrix.record }}
+
+      - name: Pull images
+        shell: bash
+        if: ${{ matrix.record }}
+        run: ./docker/pull/ocm-test-suite.sh
+
+      - name: Initialize OCM tests dependencies
+        shell: bash
+        if: ${{ matrix.record }}
+        run: ./init/ocm-test-suite.sh ci
+
+      - name: Run tests
+        shell: bash
+        if: ${{ matrix.record }}
+        run: ./dev/ocm-test-suite-candid.sh ${{ matrix.testcase }} ci ${{ matrix.browser }}
+
+      - name: Upload Cypress video artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ matrix.record }}
+        with:
+          name: cypress-videos
+          path: ./cypress/ocm-test-suite/cypress/videos
