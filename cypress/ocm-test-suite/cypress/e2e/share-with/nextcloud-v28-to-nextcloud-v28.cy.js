@@ -18,7 +18,7 @@ describe('Native federated sharing functionality for Nextcloud v2.8', () => {
     createShareV28('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
 
     // accept share from Nextcloud 2.
-    cy.origin('https://nextcloud4.docker', () => {
+    cy.origin('https://nextcloud2.docker', () => {
       cy.loginNextcloud('/', 'michiel', 'dejong')
 
       cy.get('div[class="oc-dialog"]', { timeout: 10000 })
