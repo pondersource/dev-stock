@@ -207,7 +207,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "https://owncloud1.docker  -> username: marie                  password: radioactivity"
 else
   # only record when testing on electron.
-  if [ "${TEST_PLATFORM}" != "electron" ]; then
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
     sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
@@ -229,7 +229,7 @@ else
     --spec "cypress/e2e/share-with/nextcloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
   
   # revert config file back to normal.
-  if [ "${TEST_PLATFORM}" != "electron" ]; then
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
     sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
