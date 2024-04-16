@@ -1,25 +1,25 @@
-import { createShareV27, renameFileV27 } from '../utils/nextcloud-v27'
+import { createShareV28, renameFileV28 } from '../utils/nextcloud-v28'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
   // calls in this spec. put it in your support file to make them available to
   // all specs
-  cy.origin('https://nextcloud3.docker', () => {
+  cy.origin('https://nextcloud2.docker', () => {
     Cypress.require('../../support/commands')
   })
 })
 
-describe('Native federated sharing functionality for Nextcloud v2.7', () => {
-  it('Accept federated share from Nextcloud to Nextcloud', () => {
+describe('Native federated sharing functionality for Nextcloud v2.8', () => {
+  it('Accept federated share <file> from Nextcloud to Nextcloud', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    // renameFileV27('welcome.txt', 'nc1-to-nc2-share.txt')
-    createShareV27('nc1-to-nc2-share.txt', 'yashar', 'nextcloud3.docker')
+    renameFileV28('welcome.txt', 'nc1-to-nc2-share.txt')
+    createShareV28('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
 
-    // accept share from Nextcloud 3.
-    cy.origin('https://nextcloud3.docker', () => {
-      cy.loginNextcloud('/', 'yashar', 'pmh')
+    // accept share from Nextcloud 2.
+    cy.origin('https://nextcloud4.docker', () => {
+      cy.loginNextcloud('/', 'michiel', 'dejong')
 
       cy.get('div[class="oc-dialog"]', { timeout: 10000 })
       .should('be.visible')

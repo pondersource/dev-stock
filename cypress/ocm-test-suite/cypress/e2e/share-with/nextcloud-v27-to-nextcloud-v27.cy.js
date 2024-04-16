@@ -9,8 +9,8 @@ before(() => {
   })
 })
 
-describe('Native federated sharing functionality for Nextcloud v2.7', () => {
-  it('Accept federated share from Nextcloud to Nextcloud', () => {
+describe('Native federated sharing functionality for Nextcloud', () => {
+  it('Accept federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 

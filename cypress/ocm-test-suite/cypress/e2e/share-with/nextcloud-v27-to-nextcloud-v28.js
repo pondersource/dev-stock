@@ -1,4 +1,4 @@
-import { createShareV28, renameFileV28 } from '../utils/nextcloud-v28'
+import { createShareV27, renameFileV27 } from '../utils/nextcloud-v27'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
@@ -9,13 +9,13 @@ before(() => {
   })
 })
 
-describe('Native federated sharing functionality for Nextcloud v2.8', () => {
-  it('Accept federated share from Nextcloud 28 to Nextcloud 27', () => {
-    // share from Nextcloud 4.
-    cy.loginNextcloud('https://nextcloud4.docker', 'madeline', 'oleary')
+describe('Native federated sharing functionality for Nextcloud', () => {
+  it('Accept federated share <file> from Nextcloud v27 to Nextcloud v28', () => {
+    // share from Nextcloud 1.
+    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    renameFileV28('welcome.txt', 'nc4-to-nc2-share.txt')
-    createShareV28('nc4-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
+    renameFileV27('welcome.txt', 'nc1-to-nc2-share.txt')
+    createShareV27('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
 
     // accept share from Nextcloud 2.
     cy.origin('https://nextcloud2.docker', () => {
@@ -29,7 +29,7 @@ describe('Native federated sharing functionality for Nextcloud v2.8', () => {
 
       // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
       // 1. check for filename existence.
-      cy.get('[data-file="nc4-to-nc2-share.txt"]', { timeout: 10000 }).should('be.visible')
+      cy.get('[data-file="nc1-to-nc2-share.txt"]', { timeout: 10000 }).should('be.visible')
     })
   })
 })
