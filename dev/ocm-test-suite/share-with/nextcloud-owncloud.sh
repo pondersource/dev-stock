@@ -226,7 +226,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.3.0 cypress run                                         \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/login/nextcloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
+    --spec "cypress/e2e/share-with/nextcloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
   
   # revert config file back to normal.
   if [ "${TEST_PLATFORM}" != "electron" ]; then
