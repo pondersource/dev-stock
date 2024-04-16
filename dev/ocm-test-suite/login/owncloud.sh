@@ -18,12 +18,16 @@ cd "${DIR}/../../.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
+# owncloud version:
+#   - v10.14.0
+EFSS_PLATFORM_VERSION=${1:-"v10.14.0"}
+
 # script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${1:-"dev"}
+SCRIPT_MODE=${2:-"dev"}
 
 # browser platform: chrome, edge, firefox, electron. default is electron.
 # only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${2:-"electron"}
+BROWSER_PLATFORM=${3:-"electron"}
 
 function redirect_to_null_cmd() {
     if [ "${SCRIPT_MODE}" = "ci" ]; then
