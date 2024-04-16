@@ -4,7 +4,7 @@ before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
   // calls in this spec. put it in your support file to make them available to
   // all specs
-  cy.origin('https://nextcloud1.docker', () => {
+  cy.origin('https://nextcloud2.docker', () => {
     Cypress.require('../../support/commands')
   })
 })
