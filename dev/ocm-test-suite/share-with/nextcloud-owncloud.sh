@@ -13,7 +13,7 @@ while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a
 done
 DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-cd "${DIR}/.." || exit
+cd "${DIR}/../../.." || exit
 
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
