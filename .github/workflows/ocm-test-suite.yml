@@ -118,6 +118,31 @@ jobs:
             version: 11.0.5
           }
         ]
+        exclude:
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: nextcloud,
+            version: v27.1.7
+          }
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: nextcloud,
+            version: v28.0.3
+          }
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: owncloud,
+            version: v10.14.0
+          }
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important)
     runs-on: ubuntu-22.04
