@@ -20,15 +20,16 @@ export ENV_ROOT=${ENV_ROOT}
 
 # test case:
 #   - login
+#   - share-with
 TEST_CASE=${1:-"login"}
 
 # efss platform:
 #   - nextcloud
 #   - owncloud
 #   - seafile
-EFSS_PLATFORM=${2:-"nextcloud"}
+EFSS_PLATFORM_1=${2:-"nextcloud"}
 
-EFSS_PLATFORM_VERSION=${3:-"unknown"}
+EFSS_PLATFORM_1_VERSION=${3:-"unknown"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${4:-"dev"}
@@ -37,21 +38,29 @@ SCRIPT_MODE=${4:-"dev"}
 # only applies on SCRIPT_MODE=ci
 BROWSER_PLATFORM=${5:-"electron"}
 
+# efss platform:
+#   - nextcloud
+#   - owncloud
+#   - seafile
+EFSS_PLATFORM_2=${6:-"nextcloud"}
+
+EFSS_PLATFORM_2_VERSION=${7:-"unknown"}
+
 case "${TEST_CASE}" in
 
   "login")
-    case "${EFSS_PLATFORM}" in
+    case "${EFSS_PLATFORM_1}" in
 
       "nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${EFSS_PLATFORM_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       "owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       "seafile")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       *)
@@ -60,6 +69,52 @@ case "${TEST_CASE}" in
     esac
     ;;
 
+  "share-with")
+    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
+
+      "nextcloud-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "nextcloud-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "nextcloud-seafile")
+        echo -n "not supported"
+        ;;
+      
+      "owncloud-nextcloud")
+        echo -n "not supported"
+        #"${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}" "${EFSS_PLATFORM_2_VERSION}"
+        ;;
+
+      "owncloud-owncloud")
+        echo -n "not supported"
+        #"${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}" "${EFSS_PLATFORM_2_VERSION}"
+        ;;
+
+      "owncloud-seafile")
+        echo -n "not supported"
+        ;;
+      
+      "seafile-nextcloud")
+        echo -n "not supported"
+        ;;
+
+      "seafile-owncloud")
+        echo -n "not supported"
+        ;;
+
+      "seafile-seafile")
+        #"${ENV_ROOT}/dev/ocm-test-suite/share-with/seafile-seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      *)
+        echo -n "unknown share-with"
+        ;;
+    esac
+    ;;
   *)
     echo -n "unknown"
     ;;
