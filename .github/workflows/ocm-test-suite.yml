@@ -2,7 +2,7 @@ name: Open Cloud Mesh Test Suite
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the specified branch
+  # Triggers the workflow on push or pull request events but only for the specified branch.
   push:
     branches:
       - main
@@ -10,41 +10,166 @@ on:
     branches:
       - main
       - ocm
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
 jobs:
-  e2e:
+  login:
     strategy:
       fail-fast: false
       matrix:
-        browser: [chrome, edge, firefox, electron]
-        include:
-          - browser: electron
-            record: 1
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important)
+        efss: [ 
+          {
+            platform: nextcloud,
+            version: v27.1.7
+          },
+          {
+            platform: nextcloud,
+            version: v28.0.3
+          },
+          {
+            platform: owncloud,
+            version: v10.14.0
+          },
+          # TODO: @MahdiBaghbani fix it via naother pr in future. (is it necessary?)
+          # cypress login is not compatible with previous versions
+          # {
+          #   platform: seafile,
+          #   version: 8.0.8
+          # },
+          # {
+          #   platform: seafile,
+          #   version: 9.0.10
+          # },
+          # {
+          #   platform: seafile,
+          #   version: 10.0.1
+          # },
+          {
+            platform: seafile,
+            version: 11.0.5
+          }
+        ]
+
+    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
     runs-on: ubuntu-22.04
-    # Steps represent a sequence of tasks that will be executed as part of the job
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout.
         uses: actions/checkout@v4
 
-      - name: Pull images
+      - name: Pull images.
         shell: bash
-        run: ./docker/pull/ocm-test-suite.sh
+        run: ./docker/pull/ocm-test-suite/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
 
-      - name: Initialize OCM tests dependencies
+      - name: Initialize OCM tests dependencies.
         shell: bash
         run: ./init/ocm-test-suite.sh ci
 
-      - name: Run tests
+      - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite.sh ci ${{ matrix.browser }}
+        run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
 
-      - name: Upload Cypress video artifacts
+      - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
-        if: ${{ matrix.record }}
         with:
-          name: cypress-videos
+          name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
+          path: ./cypress/ocm-test-suite/cypress/videos
+
+  share-with:
+    strategy:
+      fail-fast: false
+      matrix:
+        sender: [ 
+          {
+            platform: nextcloud,
+            version: v27.1.7
+          },
+          {
+            platform: nextcloud,
+            version: v28.0.3
+          },
+          {
+            platform: owncloud,
+            version: v10.14.0
+          },
+          {
+            platform: seafile,
+            version: 11.0.5
+          }
+        ]
+        receiver: [ 
+          {
+            platform: nextcloud,
+            version: v27.1.7
+          },
+          {
+            platform: nextcloud,
+            version: v28.0.3
+          },
+          {
+            platform: owncloud,
+            version: v10.14.0
+          },
+          {
+            platform: seafile,
+            version: 11.0.5
+          }
+        ]
+        exclude:
+        # seafile doesn't support sending ocm shares to other platforms yet! exclude tests.
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: nextcloud,
+            version: v27.1.7
+          }
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: nextcloud,
+            version: v28.0.3
+          }
+        - sender: {
+            platform: seafile,
+            version: 11.0.5
+          }
+          receiver:  {
+            platform: owncloud,
+            version: v10.14.0
+          }
+
+    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout.
+        uses: actions/checkout@v4
+
+      - name: Pull images.
+        shell: bash
+        run: |
+          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+
+      - name: Initialize OCM tests dependencies.
+        shell: bash
+        run: ./init/ocm-test-suite.sh ci
+
+      - name: Run tests.
+        shell: bash
+        run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+
+      - name: Upload Cypress video artifacts.
+        uses: actions/upload-artifact@v4
+        with:
+          name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos

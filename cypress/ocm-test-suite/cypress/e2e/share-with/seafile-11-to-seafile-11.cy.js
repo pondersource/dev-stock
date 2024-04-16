@@ -1,14 +1,14 @@
 describe('Native federated sharing functionality for Seafile', () => {
-  it('Send federated share from Seafile to Seafile', () => {
+  it('Send federated share from Seafile 11 to Seafile 11', () => {
     // share from Seafile 1.
     cy.loginSeafile('http://seafile1.docker', 'jonathan@seafile.com', 'xu')
 
-    // cy.get('*[role^="dialog"]')
-    //   .find('*[class^="modal-dialog"]')
-    //   .find('*[class^="modal-content"]')
-    //   .find('*[class^="modal-body"]')
-    //   .find('button')
-    //   .click()
+    cy.get('*[role^="dialog"]')
+      .find('*[class^="modal-dialog"]')
+      .find('*[class^="modal-content"]')
+      .find('*[class^="modal-body"]')
+      .find('button')
+      .click()
 
     cy.get('*[id^="wrapper"]')
       .find('*[class^="main-panel"]')
@@ -73,12 +73,12 @@ describe('Native federated sharing functionality for Seafile', () => {
   it('Receive federated share from Seafile to Seafile', () => {
     cy.loginSeafile('http://seafile2.docker', 'giuseppe@cern.ch', 'lopresti')
 
-    // cy.get('*[role^="dialog"]')
-    //   .find('*[class^="modal-dialog"]')
-    //   .find('*[class^="modal-content"]')
-    //   .find('*[class^="modal-body"]')
-    //   .find('button')
-    //   .click()
+    cy.get('*[role^="dialog"]')
+      .find('*[class^="modal-dialog"]')
+      .find('*[class^="modal-content"]')
+      .find('*[class^="modal-body"]')
+      .find('button')
+      .click()
 
     cy.get('*[id^="wrapper"]')
       .find('*[class^="side-panel"]')
