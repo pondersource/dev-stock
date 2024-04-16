@@ -70,7 +70,7 @@ jobs:
 
       - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite-candid.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
+        run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
@@ -166,7 +166,7 @@ jobs:
 
       - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite-candid.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+        run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
