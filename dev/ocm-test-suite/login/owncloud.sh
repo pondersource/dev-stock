@@ -133,7 +133,6 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # tag:        tag for the image, use latest if not sure.
 # image:      which image variation to use for container.
 
-
 createEfss    owncloud    1    marie    radioactivity    owncloud.sh    latest    ocm-test-suite
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
