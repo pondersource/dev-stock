@@ -212,7 +212,7 @@ else
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
     cypress/included:13.3.0 cypress run                                         \
-    --browser "${BROWSER_PLATFORM}"                                                \
+    --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/login/seafile.cy.js"
   
   # revert config file back to normal.
