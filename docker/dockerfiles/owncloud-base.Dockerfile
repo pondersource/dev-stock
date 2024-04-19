@@ -1,25 +1,17 @@
-FROM php:8.2-fpm-alpine3.19
+FROM php:7.4-fpm-alpine3.16
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="PonderSource Base Nextcloud PHP 8.2 FPM Image"
+LABEL org.opencontainers.image.title="PonderSource Base ownCloud PHP 7.4 FPM Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
-# entrypoint.sh and cron.sh dependencies.
 RUN set -ex; apk add --no-cache                                                                 \
-    git                                                                                         \
     bash                                                                                        \
-    imagemagick                                                                                 \
-    rsync                                                                                       \
-    ;                                                                                           \
-                                                                                                \
-    rm /var/spool/cron/crontabs/root;                                                           \
-    echo "*/5 * * * * php -f /var/www/html/cron.php" > /var/spool/cron/crontabs/www-data
+    git
 
-# install the PHP extensions we need
-# see https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html
+# install the PHP extensions we need.
 RUN set -ex; apk add --no-cache --virtual .build-deps                                           \
         $PHPIZE_DEPS                                                                            \
         autoconf                                                                                \
@@ -85,8 +77,7 @@ RUN set -ex; apk add --no-cache --virtual .build-deps                           
     apk add --no-network --virtual .nextcloud-phpext-rundeps $runDeps;                          \
     apk del --no-network .build-deps
 
-# set recommended PHP.ini settings
-# see https://docs.nextcloud.com/server/latest/admin_manual/installation/server_tuning.html#enable-php-opcache
+# set recommended PHP.ini settings.
 ENV PHP_MEMORY_LIMIT 512M
 ENV PHP_UPLOAD_LIMIT 512M
 RUN {                                                                                           \
@@ -127,7 +118,7 @@ COPY ./tls/certificate-authority/*                              /tls/
 RUN ln -sf /tls/*.crt                                           /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
-COPY ./scripts/entrypoint/nextcloud.sh                          /entrypoint.sh
+COPY ./scripts/entrypoint/owncloud.sh                           /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
