@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-nextcloud-base
+FROM pondersource/dev-stock-nextcloud-base:latest
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -16,6 +16,8 @@ ARG BRANCH_NEXTCLOUD=v27.1.7
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="default"
+
+WORKDIR /var/www/source
 RUN git clone                       \
     --depth 1                       \
     --recursive                     \
@@ -24,6 +26,8 @@ RUN git clone                       \
     ${REPO_NEXTCLOUD}               \
     .
 
+RUN find . -type d | grep -i "\.git" | xargs rm -rf
+
 WORKDIR /var/www/html
 
-RUN find . -type d | grep -i "\.git" | xargs rm -rf
+RUN chown -R www-data:root /var/www && chmod -R g=u /var/www
