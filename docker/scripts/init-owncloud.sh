@@ -3,8 +3,8 @@
 # @michielbdejong halt on error in docker init scripts
 set -e
 
-php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
-                                    --database-name "efss" --database-user "root" --database-host "$DBHOST"     \
+php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"                            \
+                                    --database-name "efss" --database-user "root" --database-host "${DBHOST}"                   \
                                     --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
 php console.php app:disable firstrunwizard
 
