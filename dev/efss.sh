@@ -17,6 +17,8 @@ cd "${DIR}/.." || exit
 
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
+export NGINX_IMAGE="nginx:1.25.4-alpine3.18-slim"
+export MARIADB_IMAGE="mariadb:11.3.2"
 
 function waitForPort () {
   echo waitForPort "${1} ${2}"
@@ -37,6 +39,7 @@ function createEfss() {
   local user="${3}"
   local password="${4}"
   local image="${5}"
+  local tag="${6-latest}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -46,51 +49,75 @@ function createEfss() {
 
   echo "creating efss ${platform} ${number}"
 
-  docker run --detach --network=testnet                                           \
-    --name="maria${platform}${number}.docker"                                     \
-    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek             \
-    mariadb                                                                       \
-    --transaction-isolation=READ-COMMITTED                                        \
-    --binlog-format=ROW                                                           \
-    --innodb-file-per-table=1                                                     \
+  docker run --detach --network=testnet                                                                     \
+    --name="maria${platform}${number}.docker"                                                               \
+    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                       \
+    "${MARIADB_IMAGE}"                                                                                      \
+    --transaction-isolation=READ-COMMITTED                                                                  \
+    --binlog-format=ROW                                                                                     \
+    --innodb-file-per-table=1                                                                               \
     --skip-innodb-read-only-compressed
 
-  docker run --detach --network=testnet                                           \
-    --name="${platform}${number}.docker"                                          \
-    --add-host "host.docker.internal:host-gateway"                                \
-    -e HOST="${platform}${number}"                                                \
-    -e DBHOST="maria${platform}${number}.docker"                                  \
-    -e USER="${user}"                                                             \
-    -e PASS="${password}"                                                         \
-    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
-    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
-    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
-    -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
-    "${image}"
+  docker run --detach --network=testnet                                                                     \
+    --name="php${platform}${number}.docker"                                                                 \
+    --add-host "host.docker.internal:host-gateway"                                                          \
+    -e HOST="${platform}${number}"                                                                          \
+    -e DBHOST="maria${platform}${number}.docker"                                                            \
+    -e USER="${user}"                                                                                       \
+    -e PASS="${password}"                                                                                   \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                  \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                \
+    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                                               \
+    -v "${ENV_ROOT}/temp/entrypoint/${platform}.sh:/entrypoint.sh"                                          \
+    -v "${ENV_ROOT}/temp/mounted-${platform}${number}:/var/www/html:z"                                      \
+    "${image}:${tag}"
 
-  # wait for hostname port to be open.
+  # wait for database port to be open.
   waitForPort "maria${platform}${number}.docker"  3306
-  waitForPort "${platform}${number}.docker"       443
 
   # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
+  docker exec "php${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "php${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "php${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "php${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
+  docker exec "php${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
   # run init script inside efss.
-  docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
+  docker exec -u www-data "php${platform}${number}.docker" bash "/${platform}-init.sh"
+
+  docker run --detach --network=testnet                                                                     \
+    --name="${platform}${number}.docker"                                                                    \
+    -e HOST="${platform}${number}"                                                                          \
+    -e SERVER_NAME="php${platform}${number}.docker"                                                         \
+    -e PROXY_HOST="php${platform}${number}.docker"                                                          \
+    -e PROXY_PORT="9000"                                                                                    \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                  \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                \
+    -v "${ENV_ROOT}/temp/entrypoint/nginx.sh:/docker-entrypoint.sh"                                         \
+    -v "${ENV_ROOT}/temp/nginx/${platform}.conf:/etc/nginx/templates/server.conf.template:ro"               \
+    -v "${ENV_ROOT}/temp/mounted-${platform}${number}:/var/www/html:z,ro"                                   \
+    "${NGINX_IMAGE}"
+
+  # wait for nginx port to be open.
+  waitForPort "${platform}${number}.docker"  443
 
   echo ""
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm    -rf "${ENV_ROOT}/temp"
+mkdir -p  "${ENV_ROOT}/temp"
+mkdir -p  "${ENV_ROOT}/temp/nginx"
+mkdir -p  "${ENV_ROOT}/temp/entrypoint"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud.sh"   "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/entrypoint/nginx.sh"        "${ENV_ROOT}/temp/entrypoint/nginx.sh"
+cp -f "${ENV_ROOT}/docker/scripts/entrypoint/owncloud.sh"     "${ENV_ROOT}/temp/entrypoint/owncloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/entrypoint/nextcloud.sh"    "${ENV_ROOT}/temp/entrypoint/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-owncloud.sh"           "${ENV_ROOT}/temp/owncloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh"          "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/configs/nginx/owncloud.conf"        "${ENV_ROOT}/temp/nginx/owncloud.conf"
+cp -f "${ENV_ROOT}/docker/configs/nginx/nextcloud.conf"       "${ENV_ROOT}/temp/nginx/nextcloud.conf"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
