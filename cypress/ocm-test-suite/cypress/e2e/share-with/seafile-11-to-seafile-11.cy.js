@@ -1,5 +1,5 @@
 describe('Native federated sharing functionality for Seafile', () => {
-  it('Send federated share from Seafile 11 to Seafile 11', () => {
+  it('Send federated share <file> from Seafile 11 to Seafile 11', () => {
     // share from Seafile 1.
     cy.loginSeafile('http://seafile1.docker', 'jonathan@seafile.com', 'xu')
 
@@ -70,7 +70,7 @@ describe('Native federated sharing functionality for Seafile', () => {
 
   })
 
-  it('Receive federated share from Seafile to Seafile', () => {
+  it('Receive federated share <file> from Seafile to Seafile', () => {
     cy.loginSeafile('http://seafile2.docker', 'giuseppe@cern.ch', 'lopresti')
 
     cy.get('*[role^="dialog"]')
