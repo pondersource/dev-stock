@@ -11,7 +11,7 @@ describe('OCM federated sharing functionality for Nextcloud', () => {
 
   it('Receive federated share <file> from Nextcloud v27 to ownCloud v10', () => {
     // accept share from Nextcloud 2.
-    cy.loginNextcloud('https://owncloud1.docker', 'marie', 'radioactivity')
+    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     cy.get('div[class="oc-dialog"]', { timeout: 10000 })
       .should('be.visible')
