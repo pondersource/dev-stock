@@ -20,11 +20,11 @@ export ENV_ROOT=${ENV_ROOT}
 
 # owncloud version:
 #   - v10.14.0
-EFSS_PLATFORM_1_VERSION=${1:-"v27.1.7"}
+EFSS_PLATFORM_1_VERSION=${1:-"v27.1.10"}
 
 # nextcloud version:
-#   - v27.1.7
-#   - v28.0.3
+#   - v27.1.10
+#   - v28.0.6
 EFSS_PLATFORM_2_VERSION=${2:-"v10.14.0"}
 
 # script mode:   dev, ci. default is dev.

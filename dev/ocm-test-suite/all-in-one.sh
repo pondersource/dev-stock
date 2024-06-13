@@ -305,8 +305,8 @@ createEfss    owncloud   4   marie                    radioactivity     owncloud
 createEfss    nextcloud  1   einstein                 relativity        nextcloud.sh        latest        sciencemesh
 createEfss    nextcloud  2   michiel                  dejong            nextcloud.sh        latest        sciencemesh
 
-createEfss    nextcloud  3   yashar                   pmh               nextcloud.sh        v28.0.3 
-createEfss    nextcloud  4   madeline                 oleary            nextcloud.sh        v28.0.3
+createEfss    nextcloud  3   yashar                   pmh               nextcloud.sh        v28.0.6 
+createEfss    nextcloud  4   madeline                 oleary            nextcloud.sh        v28.0.6
 
 # Seafiles
 createSeafile seafile    1  jonathan@seafile.com      xu                 seafile2

@@ -27,10 +27,10 @@ echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base:latest .
 
 echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v28.0.3" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.3 --tag pondersource/dev-stock-nextcloud:latest .
+docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v28.0.6" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.6 --tag pondersource/dev-stock-nextcloud:latest .
 
 echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v27.1.7" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v27.1.7 .
+docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v27.1.10" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v27.1.10 .
 
 echo Building pondersource/dev-stock-nextcloud-solid
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-solid.Dockerfile --tag pondersource/dev-stock-nextcloud-solid:latest .
