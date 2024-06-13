@@ -6,17 +6,17 @@ Docker images we use in development.
 # EFSS versions
 ## Nextcloud version
 
-***tag: latest, v28.0.3***
+***tag: latest, v28.0.6***
 
 upstream: [Nextcloud Server Official](https://github.com/nextcloud/server)
 
-branch: [v28.0.3](https://github.com/nextcloud/server/releases/tag/v28.0.3)
+branch: [v28.0.6](https://github.com/nextcloud/server/releases/tag/v28.0.6)
 
-***tag: v27.1.7***
+***tag: v27.1.10***
 
 upstream: [Nextcloud Server Official](https://github.com/nextcloud/server)
 
-branch: [v27.1.7](https://github.com/nextcloud/server/releases/tag/v27.1.7)
+branch: [v27.1.10](https://github.com/nextcloud/server/releases/tag/v27.1.10)
 
 ## ownCloud version
 

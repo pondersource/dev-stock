@@ -21,11 +21,11 @@ jobs:
         efss: [ 
           {
             platform: nextcloud,
-            version: v27.1.7
+            version: v27.1.10
           },
           {
             platform: nextcloud,
-            version: v28.0.3
+            version: v28.0.6
           },
           {
             platform: owncloud,
@@ -85,11 +85,11 @@ jobs:
         sender: [ 
           {
             platform: nextcloud,
-            version: v27.1.7
+            version: v27.1.10
           },
           {
             platform: nextcloud,
-            version: v28.0.3
+            version: v28.0.6
           },
           {
             platform: owncloud,
@@ -103,11 +103,11 @@ jobs:
         receiver: [ 
           {
             platform: nextcloud,
-            version: v27.1.7
+            version: v27.1.10
           },
           {
             platform: nextcloud,
-            version: v28.0.3
+            version: v28.0.6
           },
           {
             platform: owncloud,
@@ -126,7 +126,7 @@ jobs:
           }
           receiver:  {
             platform: nextcloud,
-            version: v27.1.7
+            version: v27.1.10
           }
         - sender: {
             platform: seafile,
@@ -134,7 +134,7 @@ jobs:
           }
           receiver:  {
             platform: nextcloud,
-            version: v28.0.3
+            version: v28.0.6
           }
         - sender: {
             platform: seafile,
