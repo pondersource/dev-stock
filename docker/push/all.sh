@@ -10,7 +10,7 @@ docker push pondersource/dev-stock-ocmstub:latest
 docker push pondersource/dev-stock-revad:latest
 docker push pondersource/dev-stock-php-base:latest
 docker push pondersource/dev-stock-nextcloud:latest
-docker push pondersource/dev-stock-nextcloud:v28.0.6
+docker push pondersource/dev-stock-nextcloud:v28.0.7
 docker push pondersource/dev-stock-nextcloud:v27.1.10
 # docker push pondersource/dev-stock-nextcloud-sunet
 # docker push pondersource/dev-stock-simple-saml-php

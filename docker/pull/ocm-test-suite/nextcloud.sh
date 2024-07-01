@@ -5,7 +5,7 @@ set -e
 
 # nextcloud version:
 #   - v27.1.10
-#   - v28.0.6
+#   - v28.0.7
 EFSS_PLATFORM_VERSION=${1:-"v27.1.10"}
 
 # 3rd party images.
