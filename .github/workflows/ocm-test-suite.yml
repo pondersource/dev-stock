@@ -25,7 +25,7 @@ jobs:
           },
           {
             platform: nextcloud,
-            version: v28.0.6
+            version: v28.0.7
           },
           {
             platform: owncloud,
@@ -89,7 +89,7 @@ jobs:
           },
           {
             platform: nextcloud,
-            version: v28.0.6
+            version: v28.0.7
           },
           {
             platform: owncloud,
@@ -107,7 +107,7 @@ jobs:
           },
           {
             platform: nextcloud,
-            version: v28.0.6
+            version: v28.0.7
           },
           {
             platform: owncloud,
@@ -134,7 +134,7 @@ jobs:
           }
           receiver:  {
             platform: nextcloud,
-            version: v28.0.6
+            version: v28.0.7
           }
         - sender: {
             platform: seafile,
