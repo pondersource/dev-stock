@@ -15,7 +15,7 @@ DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
 cd "${DIR}/.." || exit
 
-# script mode:   dev, ci. default is dev.
+# script mode:  dev, ci. default is dev.
 SCRIPT_MODE=${1:-"dev"}
 
 function redirect_to_null_cmd() {
