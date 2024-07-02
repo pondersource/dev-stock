@@ -73,8 +73,10 @@ export function openSharingPanelV28(fileName) {
 }
 
 export const triggerActionForFileV28 = (filename, actionId) => {
-	getActionButtonForFileV28(filename).click()
-	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).should('exist').click()
+	getActionButtonForFileV28(filename).click({ force: true })
+	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).should('exist')
+	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).scrollIntoView()
+	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).click({ force: true })
 }
 
 export const getActionButtonForFileV28 = (filename) => getActionsForFileV28(filename).find('button[aria-label="Actions"]')

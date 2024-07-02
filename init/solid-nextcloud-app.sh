@@ -20,7 +20,7 @@ export ENV_ROOT=${ENV_ROOT}
 
 # repositories and branches.
 REPO_NEXTCLOUD=https://github.com/nextcloud/server
-BRANCH_NEXTCLOUD=v27.1.7
+BRANCH_NEXTCLOUD=v27.1.10
 
 REPO_SOLID=https://github.com/pdsinterop/solid-nextcloud
 BRANCH_SOLID=main
