@@ -1,4 +1,4 @@
-Cypress.Commands.add('loginOwncloud', (url, username, password) => {
+Cypress.Commands.add('loginOwncloudCore', (url, username, password) => {
     cy.visit(url)
 
     // login page is visible in browser.
@@ -10,12 +10,16 @@ Cypress.Commands.add('loginOwncloud', (url, username, password) => {
         cy.get('input[name="password"]').type(password)
         cy.get('button[id="submit"]').click()
     })
+})
+
+Cypress.Commands.add('loginOwncloud', (url, username, password) => {
+    cy.loginOwncloudCore(url, username, password)
 
     // files app should be visible.
     cy.url().should('match', /apps\/files(\/|$)/)
 })
 
-Cypress.Commands.add('loginNextcloud', (url, username, password) => {
+Cypress.Commands.add('loginNextcloudCore', (url, username, password) => {
     cy.visit(url)
 
     // login page is visible in browser.
@@ -27,6 +31,10 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
         cy.get('input[name="password"]').type(password)
         cy.contains('button[data-login-form-submit]', 'Log in').click()
     })
+})
+
+Cypress.Commands.add('loginNextcloud', (url, username, password) => {
+    cy.loginNextcloudCore(url, username, password)
 
     // dashboard should be visible.
     cy.url().should('match', /apps\/dashboard(\/|$)/)
