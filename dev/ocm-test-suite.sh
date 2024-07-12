@@ -21,6 +21,7 @@ export ENV_ROOT=${ENV_ROOT}
 # test case:
 #   - login
 #   - share-with
+#   - share-link
 TEST_CASE=${1:-"login"}
 
 # efss platform:
@@ -113,6 +114,32 @@ case "${TEST_CASE}" in
         ;;
     esac
     ;;
+
+  "share-link")
+    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
+
+      "nextcloud-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-link/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "nextcloud-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
+      "owncloud-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "owncloud-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      *)
+        echo -n "unknown share-link"
+        ;;
+    esac
+    ;;
+  
   *)
     echo -n "unknown"
     ;;
