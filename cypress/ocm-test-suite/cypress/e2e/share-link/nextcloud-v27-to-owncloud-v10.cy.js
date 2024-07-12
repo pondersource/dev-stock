@@ -1,12 +1,12 @@
 import { createShareLinkV27, renameFileV27 } from '../utils/nextcloud-v27'
 
 describe('Share link federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
+  it('Send federated share <file> from Nextcloud v27 to ownCloud v10', () => {
     // send share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    renameFileV27('welcome.txt', 'nc1-to-nc2-share-link.txt')
-    createShareLinkV27('nc1-to-nc2-share-link.txt').then(
+    renameFileV27('welcome.txt', 'nc1-to-oc1-share-link.txt')
+    createShareLinkV27('nc1-to-oc1-share-link.txt').then(
       (result) => {
         cy.visit(result)
 
@@ -14,16 +14,16 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
         cy.get('button[id="save-external-share"]').click()
         
         cy.get('form[class="save-form"]').within(() => {
-          cy.get('input[id="remote_address"]').type('michiel@nextcloud2.docker')
+          cy.get('input[id="remote_address"]').type('marie@owncloud1.docker')
           cy.get('input[id="save-button-confirm"]').click()
         })
       }
     )
   })
 
-  it('Receive federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
-    // accept share from Nextcloud 2.
-    cy.loginNextcloud('https://nextcloud2.docker', 'michiel', 'dejong')
+  it('Receive federated share <file> from Nextcloud v27 to ownCloud v10', () => {
+    // accept share from Nextcloud 1.
+    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     cy.get('div[class="oc-dialog"]', { timeout: 10000 })
       .should('be.visible')
@@ -32,6 +32,6 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
       .click()
 
     // 1. check for filename existence.
-    cy.get('[data-file="nc1-to-nc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
+    cy.get('[data-file="nc1-to-oc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })
