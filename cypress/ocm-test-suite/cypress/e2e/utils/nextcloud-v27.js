@@ -20,7 +20,25 @@ export function createShareV27(fileName, username, domain) {
 	cy.get(`[user="${username}"]`).click()
 	cy.get('div[class="button-group"]').contains('Save share').click()
 
-	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
+	// TODO: check if it has been shared before with same user or not! 
+	// or reset share on both ends on each run for better developer experience, 
+	// right now I have to manually clean and restart
+}
+
+export function createShareLinkV27(fileName) {
+	openSharingPanelV27(fileName)
+
+	return cy.window().then(win => {
+        cy.stub(win.navigator.clipboard, 'writeText').as('copy');
+
+        cy.get('#app-sidebar-vue').within(() => {
+			cy.get('*[class^="sharing-entry__actions"]').eq(0).click()
+		})
+
+        return cy.get('@copy').should('have.been.calledOnce').then((spy) => {
+            return (spy).lastCall.args[0];
+        });
+    })
 }
 
 export function renameFileV27(fileName, newFileName) {
