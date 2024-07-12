@@ -207,9 +207,13 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
-    sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*video: true,.*/video: false,/'                                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'                  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
+
+  # disable cypress editing javascript files. it would make adding share to your own efss fail.
+  sed -i 's/.*modifyObstructiveCode: true,.*/modifyObstructiveCode: false,/'          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+
   ##################
   ### Cypress CI ###
   ##################
@@ -229,9 +233,12 @@ else
   
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
-    sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*video: false,.*/  video: true,/'                                      "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'                "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
   fi
+
+  # revert back to normal.
+  sed -i 's/.*modifyObstructiveCode: false,.*/modifyObstructiveCode: true,/'          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
 
   # auto clean after running tests in ci mode. do not clear terminal.
   "${ENV_ROOT}/scripts/clean.sh" "no"
