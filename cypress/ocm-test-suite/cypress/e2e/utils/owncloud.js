@@ -21,7 +21,9 @@ export function createShare(fileName, username, domain) {
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Federated')
 		.click()
 
-	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
+	// TODO: check if it has been shared before with same user or not! 
+	// (or reset share on both ends on each run for better developer experience, 
+	// right now I have to manually clean and restart)
 }
 
 export function createShareGroup(fileName, group) {
@@ -39,7 +41,33 @@ export function createShareGroup(fileName, group) {
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Group')
 		.click()
 
-	// TODO: check if it has been shared before with same user or not! (or reset share on both ends on each run for better developer experience, right now I have to manually clean and restart)
+	// TODO: check if it has been shared before with same user or not! 
+	// (or reset share on both ends on each run for better developer experience, 
+	// right now I have to manually clean and restart)
+}
+
+export function createShareLink(fileName) {
+	openSharingPanel(fileName)
+
+	cy.get('#app-sidebar').get('li').contains('Public Links').click();
+	cy.get('#app-sidebar').get('button').contains('Create public link').click();
+
+	cy.get('div[class="oc-dialog"]', { timeout: 10000 })
+		.should('be.visible')
+		.find('*[class^="oc-dialog-buttonrow"]')
+		.find('button[class="primary"]')
+		.click()
+
+	return cy.get('*[data-original-title^="Copy to clipboard"]')
+		.parent()
+		.find('*[class^="minify"]')
+		.find('input')
+		.invoke('val')
+		.then(
+			sometext => {
+				return sometext
+			}
+		);
 }
 
 export function renameFile(fileName, newFileName) {
