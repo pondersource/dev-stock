@@ -184,6 +184,10 @@ jobs:
             version: v27.1.10
           },
           {
+            platform: nextcloud,
+            version: v28.0.7
+          },
+          {
             platform: owncloud,
             version: v10.14.0
           }
@@ -192,6 +196,10 @@ jobs:
           {
             platform: nextcloud,
             version: v27.1.10
+          },
+          {
+            platform: nextcloud,
+            version: v28.0.7
           },
           {
             platform: owncloud,
