@@ -26,6 +26,22 @@ export function createShareV28(fileName, username, domain) {
 	// updateShareV28(fileName, 0) // @MahdiBaghbani: not sure about this yet.
 }
 
+export function createShareLinkV28(fileName) {
+	openSharingPanelV28(fileName)
+
+	return cy.window().then(win => {
+        cy.stub(win.navigator.clipboard, 'writeText').as('copy');
+
+        cy.get('#app-sidebar-vue').within(() => {
+			cy.get('*[id^="tab-sharing"]').find('*[class^="sharing-entry__actions"]').click()
+		})
+
+        return cy.get('@copy').should('have.been.calledOnce').then((spy) => {
+            return (spy).lastCall.args[0];
+        });
+    })
+}
+
 export function updateShareV28(fileName, index) {
 	openSharingPanelV28(fileName)
 
@@ -75,11 +91,11 @@ export function openSharingPanelV28(fileName) {
 export const triggerActionForFileV28 = (filename, actionId) => {
 	getActionButtonForFileV28(filename).click({ force: true })
 	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).should('exist')
-	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).scrollIntoView()
+	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).scrollIntoView().should('be.visible')
 	cy.get(`[data-cy-files-list-row-action="${CSS.escape(actionId)}"] > button`).click({ force: true })
 }
 
-export const getActionButtonForFileV28 = (filename) => getActionsForFileV28(filename).find('button[aria-label="Actions"]')
+export const getActionButtonForFileV28 = (filename) => getActionsForFileV28(filename).find('button[aria-label="Actions"]').should('be.visible')
 
 export const getActionsForFileV28 = (filename) => getRowForFileV28(filename).find('[data-cy-files-list-row-actions]')
 
