@@ -19,6 +19,9 @@ describe('Native federated sharing functionality for Nextcloud v2.8', () => {
       .find('button[class="primary"]')
       .click()
 
+    // force reload the page for share to apear.
+    cy.reload(true)
+
     // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
     // 1. check for filename existence.
     cy.get('[data-file="welcome (2).txt"]', { timeout: 10000 }).should('be.visible')
