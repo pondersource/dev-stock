@@ -79,6 +79,8 @@ jobs:
           path: ./cypress/ocm-test-suite/cypress/videos
 
   share-with:
+    if: ${{ always() }}
+    needs: [login]
     strategy:
       fail-fast: false
       matrix:
@@ -175,6 +177,8 @@ jobs:
           path: ./cypress/ocm-test-suite/cypress/videos
   
   share-link:
+    if: ${{ always() }}
+    needs: [login, share-with]
     strategy:
       fail-fast: false
       matrix:
