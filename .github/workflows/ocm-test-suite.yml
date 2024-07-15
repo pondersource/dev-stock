@@ -75,6 +75,7 @@ jobs:
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
@@ -174,6 +175,7 @@ jobs:
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
@@ -239,6 +241,7 @@ jobs:
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: share-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
