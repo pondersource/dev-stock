@@ -39,7 +39,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     renameFile('welcome.txt', 'oc1-to-oc2-sciencemesh-share.txt')
-    createScienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'owncloud2.docker')
+    createScienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'revaowncloud2.docker')
   })
 
   it('Receive ScienceMesh share <file> from ownCloud v10 to ownCloud v10', () => {
