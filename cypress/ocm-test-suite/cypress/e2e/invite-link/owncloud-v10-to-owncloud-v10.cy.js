@@ -1,6 +1,6 @@
 import { createInviteLink, createSienceMeshShare, renameFile } from '../utils/owncloud'
 
-describe('invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
+describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
   it('Send invitation from ownCloud v10 to ownCloud v10', () => {
     // share from ownCloud 1.
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
