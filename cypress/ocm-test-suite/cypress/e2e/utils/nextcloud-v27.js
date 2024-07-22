@@ -19,10 +19,6 @@ export function createShareV27(fileName, username, domain) {
 	// ensure selecting remote [sharetype="6"] instead of email!
 	cy.get(`[user="${username}"]`).click()
 	cy.get('div[class="button-group"]').contains('Save share').click()
-
-	// TODO: check if it has been shared before with same user or not! 
-	// or reset share on both ends on each run for better developer experience, 
-	// right now I have to manually clean and restart
 }
 
 export function createShareLinkV27(fileName) {
@@ -40,6 +36,40 @@ export function createShareLinkV27(fileName) {
         });
     })
 }
+
+export function createInviteLinkV27(targetDomain) {
+
+	cy.get('button[id="token-generator"]').click()
+
+	return cy.get('input[class="generated-token-link"]')
+		.invoke('val')
+		.then(
+			sometext => {
+				// extract token from url.
+				const token = sometext.replace('https://meshdir.docker/meshdir?','');
+
+				// put target efss domain and token together.
+				const inviteLink = `${targetDomain}/index.php/apps/sciencemesh/accept?${token}`
+      
+				return inviteLink
+			}
+		);
+}
+
+export function createScienceMeshShareV27(fileName, username) {
+	openSharingPanelV27(fileName)
+
+	cy.get('#app-sidebar-vue').within(() => {
+		cy.get('#sharing-search-input').clear()
+		cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
+		cy.get('#sharing-search-input').type(username)
+		cy.wait('@userSearch')
+	})
+
+	cy.get(`[user="${username}"]`).click()
+	cy.get('div[class="button-group"]').contains('Save share').click()
+}
+
 
 export function renameFileV27(fileName, newFileName) {
 	triggerActionInFileMenuV27(fileName, 'Rename')
