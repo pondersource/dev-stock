@@ -117,11 +117,11 @@ function createReva() {
   redirect_to_null_cmd echo "creating reva for ${platform} ${number}"
 
   # make sure scripts are executable.
-  chmod +x "${ENV_ROOT}/temp/reva/run.sh"                       
-  chmod +x "${ENV_ROOT}/temp/reva/kill.sh"                      
-  chmod +x "${ENV_ROOT}/temp/reva/entrypoint.sh"                
+  chmod +x "${ENV_ROOT}/temp/reva/run.sh"                                     >/dev/null 2>&1
+  chmod +x "${ENV_ROOT}/temp/reva/kill.sh"                                    >/dev/null 2>&1
+  chmod +x "${ENV_ROOT}/temp/reva/entrypoint.sh"                              >/dev/null 2>&1
 
-  docker run --detach --network=testnet                  \
+  redirect_to_null_cmd docker run --detach --network=testnet                  \
   --name="reva${platform}${number}.docker"                                    \
   -e HOST="reva${platform}${number}"                                          \
   -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                      \
