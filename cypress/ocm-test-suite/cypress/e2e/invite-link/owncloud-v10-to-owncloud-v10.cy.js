@@ -2,7 +2,7 @@ import { createInviteLink, createSienceMeshShare, renameFile } from '../utils/ow
 
 describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
   it('Send invitation from ownCloud v10 to ownCloud v10', () => {
-    // share from ownCloud 1.
+
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
     cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/')
 
@@ -17,10 +17,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
 
   it('Accept invitation from ownCloud v10 to ownCloud v10', () => {
 
-    // load share url from file.
+    // load invite link from file.
     cy.readFile('invite-link-oc-oc.txt').then((url) => {
       
-      // accept share from ownCloud 2.
+      // accept invitation from ownCloud 2.
       cy.loginOwncloudCore(url, 'mahdi', 'baghbani')
 
       cy.get('input[id="accept-button"]', { timeout: 10000 })
