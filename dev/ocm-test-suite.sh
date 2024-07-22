@@ -139,6 +139,31 @@ case "${TEST_CASE}" in
         ;;
     esac
     ;;
+
+  "invite-link")
+    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
+
+      "nextcloud-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "nextcloud-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
+      "owncloud-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "owncloud-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      *)
+        echo -n "unknown invite-link"
+        ;;
+    esac
+    ;;
   
   *)
     echo -n "unknown"
