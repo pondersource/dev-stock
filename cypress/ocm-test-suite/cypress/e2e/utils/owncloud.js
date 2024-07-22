@@ -81,7 +81,7 @@ export function createInviteLink(targetDomain) {
 		);
 }
 
-export function createSienceMeshShare(fileName, username, domain) {
+export function createScienceMeshShare(fileName, username, domain) {
 	openSharingPanel(fileName)
 
 	cy.get('#app-sidebar').within(() => {

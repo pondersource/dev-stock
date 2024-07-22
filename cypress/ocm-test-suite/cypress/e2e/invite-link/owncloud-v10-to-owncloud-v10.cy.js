@@ -1,11 +1,10 @@
-import { createInviteLink, createSienceMeshShare, renameFile } from '../utils/owncloud'
+import { createInviteLink, createScienceMeshShare, renameFile } from '../utils/owncloud'
 
 describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
   it('Send invitation from ownCloud v10 to ownCloud v10', () => {
 
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
     cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/')
-
 
     createInviteLink('https://owncloud2.docker').then(
       (result) => {
@@ -40,11 +39,11 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     renameFile('welcome.txt', 'oc1-to-oc2-sciencemesh-share.txt')
-    createSienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'owncloud2.docker')
+    createScienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'owncloud2.docker')
   })
 
   it('Receive ScienceMesh share <file> from ownCloud v10 to ownCloud v10', () => {
-    // accept share from Nextcloud 2.
+    // accept share from ownCloud 2.
     cy.loginOwncloud('https://owncloud2.docker', 'mahdi', 'baghbani')
 
     cy.get('div[class="oc-dialog"]', { timeout: 10000 })
