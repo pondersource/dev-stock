@@ -1,0 +1,24 @@
+[
+    {
+        "name": "oCIS |-NUMBER-|",
+        "full_name": "Ponder Source oCIS |-NUMBER-|",
+        "organization": "oCIS_|-NUMBER-|",
+        "domain": "ocis|-NUMBER-|.docker",
+        "homepage": "https://ocis|-NUMBER-|.docker",
+        "services": [
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "OCM",
+                        "description": "ocis|-NUMBER-|.docker Open Cloud Mesh API"
+                    },
+                    "name": "ocis|-NUMBER-|.docker - OCM API",
+                    "path": "https://ocis|-NUMBER-|.docker/ocm/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "ocis|-NUMBER-|.docker:443"
+            }
+        ]
+    }
+]
