@@ -94,6 +94,7 @@ export function createScienceMeshShare(fileName, username, domain) {
 	// ensure selecting ScienceMesh.
 	cy.get('*[class^=ui-autocomplete]')
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Federated')
+		.should('be.visible', { timeout: 10000 })
 		.click()
 }
 
