@@ -20,10 +20,6 @@ export function createShare(fileName, username, domain) {
 	cy.get('*[class^=ui-autocomplete]')
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Federated')
 		.click()
-
-	// TODO: check if it has been shared before with same user or not! 
-	// (or reset share on both ends on each run for better developer experience, 
-	// right now I have to manually clean and restart)
 }
 
 export function createShareGroup(fileName, group) {
@@ -40,10 +36,6 @@ export function createShareGroup(fileName, group) {
 	cy.get('*[class^=ui-autocomplete]')
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Group')
 		.click()
-
-	// TODO: check if it has been shared before with same user or not! 
-	// (or reset share on both ends on each run for better developer experience, 
-	// right now I have to manually clean and restart)
 }
 
 export function createShareLink(fileName) {
@@ -68,6 +60,42 @@ export function createShareLink(fileName) {
 				return sometext
 			}
 		);
+}
+
+export function createInviteLink(targetDomain) {
+
+	cy.get('button[id="token-generator"]').click()
+
+	return cy.get('input[class="generated-token-link"]')
+		.invoke('val')
+		.then(
+			sometext => {
+				// extract token from url.
+				const token = sometext.replace('https://meshdir.docker/meshdir?','');
+
+				// put target efss domain and token together.
+				const inviteLink = `${targetDomain}/index.php/apps/sciencemesh/accept?${token}`
+      
+				return inviteLink
+			}
+		);
+}
+
+export function createScienceMeshShare(fileName, username, domain) {
+	openSharingPanel(fileName)
+
+	cy.get('#app-sidebar').within(() => {
+		cy.get('*[id^="shareWith-"]').clear()
+		cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
+		cy.get('*[id^="shareWith-"]').type(username + '@' + domain)
+		cy.wait('@userSearch')
+	})
+
+	// ensure selecting ScienceMesh.
+	cy.get('*[class^=ui-autocomplete]')
+		.contains('span[class="autocomplete-item-typeInfo"]', 'Federated')
+		.should('be.visible', { timeout: 10000 })
+		.click()
 }
 
 export function renameFile(fileName, newFileName) {

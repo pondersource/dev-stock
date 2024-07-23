@@ -17,4 +17,7 @@ sed -i "11 i\ 4 => 'nextcloud2.docker',"                    /var/www/html/config
 sed -i "12 i\ 5 => 'nextcloud3.docker',"                    /var/www/html/config/config.php
 sed -i "13 i\ 6 => 'nextcloud4.docker',"                    /var/www/html/config/config.php
 
+# hack sciencemesh version :=)
+sed -i -e 's/min-version="28"/min-version="27"/g'           /var/www/html/apps/sciencemesh/appinfo/info.xml
+
 php console.php app:enable sciencemesh
