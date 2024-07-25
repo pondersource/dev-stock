@@ -66,7 +66,7 @@ Cypress.Commands.add('loginOCISCore', (url, username, password) => {
 })
 
 Cypress.Commands.add('loginOCIS', (url, username, password) => {
-    cy.loginOCISCoree(url, username, password)
+    cy.loginOCISCore(url, username, password)
 
     // files app should be visible.
     cy.url().should('match', /files\/spaces\/personal(\/|$)/)
