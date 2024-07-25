@@ -60,6 +60,10 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
+      "ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
       "seafile")
         "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;

@@ -32,6 +32,10 @@ jobs:
             platform: owncloud,
             version: v10.14.0
           },
+          {
+            platform: ocis,
+            version: 5.0.6
+          },
           # TODO: @MahdiBaghbani fix it via naother pr in future. (is it necessary?)
           # cypress login is not compatible with previous versions
           # {
