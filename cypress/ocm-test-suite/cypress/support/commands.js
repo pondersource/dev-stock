@@ -58,7 +58,7 @@ Cypress.Commands.add('loginOCISCore', (url, username, password) => {
 	cy.get('form[class="oc-login-form"]').should('be.visible')
 
     // login with username and password.
-    cy.get('form[name="oc-login-form"]').within(() => {
+    cy.get('form[class="oc-login-form"]').within(() => {
         cy.get('input[id="oc-login-username"]').type(username)
         cy.get('input[id="oc-login-password"]').type(password)
         cy.get('button[type="submit"]').click()
