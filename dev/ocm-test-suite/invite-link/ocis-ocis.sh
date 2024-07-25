@@ -54,26 +54,18 @@ function waitForPort () {
   redirect_to_null_cmd echo "${1} port ${2} is open"
 }
 
+function changeInFile() {
+  local file_path="${1}"
+  local original="${2}"
+  local replacement="${3}"
+
+  sed -i "s/${original}/${replacement}/g" "${file_path}"
+}
+
 function createEfssOcis() {
   local number="${1}"
 
   redirect_to_null_cmd echo "creating efss ocis ${number}"
-
-  # redirect_to_null_cmd docker run --detach --network=testnet                                                                \
-  #   --name="ldapocis${number}.docker"                                                                                       \
-  #   -e BITNAMI_DEBUG=true                                                                                                   \
-  #   -e  LDAP_TLS_VERIFY_CLIENT=never                                                                                        \
-  #   -e  LDAP_ENABLE_TLS="yes"                                                                                               \
-  #   -e  LDAP_TLS_CA_FILE="/certificate-authority/dev-stock.crt"                                                             \
-  #   -e  LDAP_TLS_CERT_FILE="/certificates/ldapocis${number}.crt"                                                            \
-  #   -e  LDAP_TLS_KEY_FILE="/certificates/ldapocis${number}.key"                                                             \
-  #   -e  LDAP_ROOT="dc=owncloud,dc=com"                                                                                      \
-  #   -e  LDAP_ADMIN_PASSWORD="admin"                                                                                         \
-  #   -v "${ENV_ROOT}/temp/ldap/ldifs:/ldifs"                                                                                 \
-  #   -v "${ENV_ROOT}/temp/ldap/schemas:/schemas"                                                                             \
-  #   -v "${ENV_ROOT}/temp/certificates:/certificates"                                                                        \
-  #   -v "${ENV_ROOT}/temp/certificate-authority:/certificate-authority"                                                      \
-  #   bitnami/openldap:2.6
 
   redirect_to_null_cmd docker run --detach --network=testnet                                                                \
     --name="ocis${number}.docker"                                                                                           \
@@ -88,41 +80,32 @@ function createEfssOcis() {
     -e PROXY_ENABLE_BASIC_AUTH=true                                                                                         \
     -e IDM_ADMIN_PASSWORD=admin                                                                                             \
     -e IDM_CREATE_DEMO_USERS=true                                                                                           \
+    -e FRONTEND_OCS_INCLUDE_OCM_SHAREES=true                                                                                \
+		-e FRONTEND_OCS_LIST_OCM_SHARES=true                                                                                    \
+		-e FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING=true                                                                      \
+		-e FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING=true                                                                      \
+		-e OCIS_ADD_RUN_SERVICES=ocm                                                                                            \
+		-e OCM_OCM_PROVIDER_AUTHORIZER_PROVIDERS_FILE=/dev-stock/ocmproviders.json                                              \
+		-e GRAPH_INCLUDE_OCM_SHAREES=true                                                                                       \
+		-e OCM_OCM_INVITE_MANAGER_INSECURE=true                                                                                 \
+		-e OCM_OCM_SHARE_PROVIDER_INSECURE=true                                                                                 \
+		-e OCM_OCM_STORAGE_PROVIDER_INSECURE=true                                                                               \
+    -e WEB_UI_CONFIG_FILE=/dev-stock/web-ui-config.json                                                                     \
+    -v "${ENV_ROOT}/temp/ocis:/dev-stock"                                                                                   \
     -v "${ENV_ROOT}/temp/certificates:/certificates"                                                                        \
     -v "${ENV_ROOT}/temp/certificate-authority:/certificate-authority"                                                      \
     --entrypoint /bin/sh                                                                                                    \
     "owncloud/ocis:5.0.6"                                                                                                   \
     -c "ocis init || true; ocis server"
-
-
-    # -e OCIS_LDAP_URI="ldaps://ldapocis${number}.docker:1636"                                                                \
-    # -e OCIS_LDAP_INSECURE="true"                                                                                            \
-    # -e OCIS_LDAP_BIND_DN="cn=admin,dc=owncloud,dc=com"                                                                      \
-    # -e OCIS_LDAP_BIND_PASSWORD="admin"                                                                                      \
-    # -e OCIS_LDAP_GROUP_BASE_DN="ou=groups,dc=owncloud,dc=com"                                                               \
-    # -e OCIS_LDAP_GROUP_FILTER="(objectclass=owncloud)"                                                                      \
-    # -e OCIS_LDAP_GROUP_OBJECTCLASS="groupOfNames"                                                                           \
-    # -e OCIS_LDAP_USER_BASE_DN="ou=users,dc=owncloud,dc=com"                                                                 \
-    # -e OCIS_LDAP_USER_FILTER="(objectclass=owncloud)"                                                                       \
-    # -e OCIS_LDAP_USER_OBJECTCLASS="inetOrgPerson"                                                                           \
-    # -e LDAP_LOGIN_ATTRIBUTES="uid"                                                                                          \
-    # -e OCIS_ADMIN_USER_ID="ddc2004c-0977-11eb-9d3f-a793888cd0f8"                                                            \
-    # -e IDP_LDAP_LOGIN_ATTRIBUTE="uid"                                                                                       \
-    # -e IDP_LDAP_UUID_ATTRIBUTE="ownclouduuid"                                                                               \
-    # -e IDP_LDAP_UUID_ATTRIBUTE_TYPE=binary                                                                                  \
-    # -e GRAPH_LDAP_SERVER_WRITE_ENABLED="true"                                                                               \
-    # -e GRAPH_LDAP_REFINT_ENABLED="true"                                                                                     \
-    # -e OCIS_EXCLUDE_RUN_SERVICES=idm                                                                                        \
 }
 
 # delete and create temp directory.
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp/certificates"
 
 # copy init files.
-cp -fr "${ENV_ROOT}/docker/configs/ldap"                  "${ENV_ROOT}/temp/ldap"
+cp -fr "${ENV_ROOT}/docker/configs/ocis"                  "${ENV_ROOT}/temp/ocis"
 cp -f "${ENV_ROOT}/docker/tls/certificates/ocis"*         "${ENV_ROOT}/temp/certificates"
-cp -f "${ENV_ROOT}/docker/tls/certificates/ldap"*         "${ENV_ROOT}/temp/certificates"
-cp -fr "${ENV_ROOT}/docker/tls/certificate-authority"     "${ENV_ROOT}/temp"
+cp -fr "${ENV_ROOT}/docker/tls/certificate-authority"     "${ENV_ROOT}/temp/certificate-authority"
 
 # fix permissions.
 chmod -R 777  "${ENV_ROOT}/temp/certificates"
@@ -133,6 +116,10 @@ chmod -R 777  "${ENV_ROOT}/temp/certificate-authority"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
+
+# insert real domain names into ocmproviders.json
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--|" "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--|" "ocis2.docker"
 
 ############
 ### oCIS ###
@@ -148,18 +135,95 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 createEfssOcis    1
 createEfssOcis    2
 
-###############
-### Firefox ###
-###############
+if [ "${SCRIPT_MODE}" = "dev" ]; then
+  ###############
+  ### Firefox ###
+  ###############
 
-docker run --detach --network=testnet                                                                     \
-  --name=firefox                                                                                          \
-  -p 5800:5800                                                                                            \
-  --shm-size 2g                                                                                           \
-  -e USER_ID="${UID}"                                                                                     \
-  -e GROUP_ID="${UID}"                                                                                    \
-  -e DARK_MODE=1                                                                                          \
-  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
-  -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
-  jlesage/firefox:latest                                                                                  \
-  >/dev/null 2>&1
+  docker run --detach --network=testnet                                                                     \
+    --name=firefox                                                                                          \
+    -p 5800:5800                                                                                            \
+    --shm-size 2g                                                                                           \
+    -e USER_ID="${UID}"                                                                                     \
+    -e GROUP_ID="${UID}"                                                                                    \
+    -e DARK_MODE=1                                                                                          \
+    -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
+    -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
+    jlesage/firefox:latest                                                                                  \
+    >/dev/null 2>&1
+
+  ##################
+  ### VNC Server ###
+  ##################
+
+  # remove previous x11 unix socket file, avoid any problems while mounting new one.
+  sudo rm -rf "${ENV_ROOT}/temp/.X11-unix"
+
+  # try to change DISPLAY_WIDTH, DISPLAY_HEIGHT to make it fit in your screen,
+  # NOTE: please do not commit any change related to resolution.
+  docker run --detach --network=testnet                                                                     \
+    --name=vnc-server                                                                                       \
+    -p 5700:8080                                                                                            \
+    -e RUN_XTERM=no                                                                                         \
+    -e DISPLAY_WIDTH=1920                                                                                   \
+    -e DISPLAY_HEIGHT=1080                                                                                  \
+    -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
+    theasp/novnc:latest
+
+  ###############
+  ### Cypress ###
+  ###############
+
+  # create cypress and attach its display to the VNC server container. 
+  # this way you can view inside cypress container through vnc server.
+  docker run --detach --network=testnet                                                                     \
+    --name="cypress.docker"                                                                                 \
+    -e DISPLAY=vnc-server:0.0                                                                               \
+    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                                            \
+    -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
+    -w /ocm                                                                                                 \
+    --entrypoint cypress                                                                                    \
+    cypress/included:13.13.1                                                                                \
+    open --project .
+
+  # print instructions.
+  clear
+  echo "Now browse to :"
+  echo "Cypress inside VNC Server -> http://localhost:5700"
+  echo "Embedded Firefox          -> http://localhost:5800"
+  echo ""
+  echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
+  echo "https://ocis1.docker -> username: einstein               password: relativity"
+  echo "https://ocis2.docker -> username: marie                  password: radioactivity"
+else
+  # only record when testing on electron.
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: true,.*/video: false,/'                          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'    "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
+  ##################
+  ### Cypress CI ###
+  ##################
+
+  # extract version up until first first ., example: v27.1.17 becomes v27
+  P1_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_1_VERSION}" )"
+  P2_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_2_VERSION}" )"
+
+  # run Cypress test suite headlessly and with the defined browser.
+  docker run --network=testnet                                                  \
+    --name="cypress.docker"                                                     \
+    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
+    -w /ocm                                                                     \
+    cypress/included:13.13.1 cypress run                                        \
+    --browser "${BROWSER_PLATFORM}"                                             \
+    --spec "cypress/e2e/invite-link/ocis-${P1_VER}-to-ocis-${P2_VER}.cy.js"
+  
+  # revert config file back to normal.
+  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
+    sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+  fi
+
+  # auto clean after running tests in ci mode. do not clear terminal.
+  "${ENV_ROOT}/scripts/clean.sh" "no"
+fi
