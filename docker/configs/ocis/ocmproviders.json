@@ -1,24 +1,74 @@
 [
     {
-        "name": "oCIS |-NUMBER-|",
-        "full_name": "Ponder Source oCIS |-NUMBER-|",
-        "organization": "oCIS_|-NUMBER-|",
-        "domain": "ocis|-NUMBER-|.docker",
-        "homepage": "https://ocis|-NUMBER-|.docker",
+        "name": "Instance 1",
+        "full_name": "Instance 1 provider",
+        "organization": "Instance 1",
+        "domain": "|--instance1--|",
+        "homepage": "https://|--instance1--|",
+		"description": "Instance 1 cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "ocis|-NUMBER-|.docker Open Cloud Mesh API"
+                        "description": "|--instance1--| Open Cloud Mesh API"
                     },
-                    "name": "ocis|-NUMBER-|.docker - OCM API",
-                    "path": "https://ocis|-NUMBER-|.docker/ocm/",
+                    "name": "|--instance1--| - OCM API",
+                    "path": "https://|--instance1--|/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "ocis|-NUMBER-|.docker:443"
-            }
+                "host": "http://|--instance1--|"
+            },
+			{
+				"endpoint": {
+					"type": {
+						"name": "Webdav",
+						"description": "|--instance1--| Webdav API"
+					},
+					"name": "|--instance1--| - Webdav API",
+					"path": "https://|--instance1--|/dav/",
+					"is_monitored": true
+				},
+				"api_version": "0.0.1",
+				"host": "https://|--instance1--|/"
+			}
+        ]
+    },
+	{
+        "name": "Instance 2",
+        "full_name": "Instance 2 provider",
+        "organization": "Instance 2",
+        "domain": "|--instance2--|",
+        "homepage": "https://|--instance2--|",
+		"description": "Instance 2 cloud storage",
+        "services": [
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "OCM",
+                        "description": "|--instance2--| Open Cloud Mesh API"
+                    },
+                    "name": "|--instance2--| - OCM API",
+                    "path": "https://|--instance2--|/ocm/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "http://|--instance2--|"
+            },
+			{
+				"endpoint": {
+					"type": {
+						"name": "Webdav",
+						"description": "|--instance2--| Webdav API"
+					},
+					"name": "|--instance2--| - Webdav API",
+					"path": "https://|--instance2--|/dav/",
+					"is_monitored": true
+				},
+				"api_version": "0.0.1",
+				"host": "https://|--instance2--|/"
+			}
         ]
     }
 ]
