@@ -60,6 +60,23 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
         .scrollIntoView()
         .should('be.visible')
         .click()
+      
+      // check if federation connection is added.
+      cy.get('div[id="sciencemesh-connections"]')
+        .get('table')
+        .find('tbody>tr')
+        .eq(0)
+        .find('td')
+        .eq(0)
+        .should("have.text", "Albert Einstein")
+
+      cy.get('div[id="sciencemesh-connections"]')
+        .get('table')
+        .find('tbody>tr')
+        .eq(0)
+        .find('td')
+        .eq(2)
+        .should("have.text", "ocis1.docker")
     })
   })
 
