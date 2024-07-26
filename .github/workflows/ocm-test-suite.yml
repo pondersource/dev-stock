@@ -265,7 +265,11 @@ jobs:
           {
             platform: owncloud,
             version: v10.14.0
-          }
+          },
+          {
+            platform: ocis,
+            version: 5.0.6
+          },
         ]
         receiver: [ 
           {
@@ -275,8 +279,46 @@ jobs:
           {
             platform: owncloud,
             version: v10.14.0
-          }
+          },
+          {
+            platform: ocis,
+            version: 5.0.6
+          },
         ]
+        exclude:
+        # not implemented yet!
+        - sender: {
+            platform: ocis,
+            version: 5.0.6
+          }
+          receiver:  {
+            platform: nextcloud,
+            version: v27.1.10
+          }
+        - sender: {
+            platform: ocis,
+            version: 5.0.6
+          }
+          receiver:  {
+            platform: owncloud,
+            version: v10.14.0
+          }
+        - sender: {
+            platform: nextcloud,
+            version: v27.1.10
+          }
+          receiver:  {
+            platform: ocis,
+            version: 5.0.6
+          }
+        - sender: {
+            platform: owncloud,
+            version: v10.14.0
+          }
+          receiver:  {
+            platform: ocis,
+            version: 5.0.6
+          }
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
     runs-on: ubuntu-22.04
