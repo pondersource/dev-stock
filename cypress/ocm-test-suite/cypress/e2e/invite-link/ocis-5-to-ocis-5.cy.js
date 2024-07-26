@@ -1,4 +1,4 @@
-import { openScienceMeshAppV5, createInviteLinkV5 } from '../utils/ocis-5'
+import { openFilesAppV5, openScienceMeshAppV5, createInviteLinkV5, createShareV5 } from '../utils/ocis-5'
 
 describe('Invite link federated sharing via ScienceMesh functionality for oCIS', () => {
   it('Send invitation from oCIS v5 to oCIS v5', () => {
@@ -80,24 +80,66 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     })
   })
 
-  // it('Send ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
-  //   // share from oCIS 1.
-  //   cy.loginOcis('https://ocis1.docker', 'marie', 'radioactivity')
+  it('Send ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
+    // share from oCIS 1.
+    cy.loginOcis('https://ocis1.docker', 'einstein', 'relativity')
 
-  //   renameFile('welcome.txt', 'oc1-to-oc2-sciencemesh-share.txt')
-  //   createScienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'revaocis2.docker')
-  // })
+    cy.get('button[id="new-file-menu-btn"]')
+      .scrollIntoView()
+      .should('be.visible')
+      .click()
+    
+    cy.get('div[id="new-file-menu-drop"]')
+      .scrollIntoView()
+      .should('be.visible')
+      .find('ul[id="create-list"]')
+      .find('span')
+      .contains('txt')
+      .parent()
+      .click()
 
-  // it('Receive ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
-  //   // accept share from oCIS 2.
-  //   cy.loginOcis('https://ocis2.docker', 'mahdi', 'baghbani')
+    cy.get('div[class="oc-modal-background"]')
+      .scrollIntoView()
+      .should('be.visible')
+      .within(() => {
+        cy.get('input[id="oc-textinput-10"]').clear()
+        cy.get('input[id="oc-textinput-10"]').type('invite-link-ocis-ocis.txt')
 
-  //   cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-  //     .should('be.visible')
-  //     .find('*[class^="oc-dialog-buttonrow"]')
-  //     .find('button[class="primary"]')
-  //     .click()
+        cy.get('button')
+          .contains('Create')
+          .scrollIntoView()
+          .should('be.visible')
+          .click()
+      })
+    
+    cy.get('textarea[id="text-editor-input"]')
+      .scrollIntoView()
+      .should('be.visible')
+      .type('Hello World!')
 
-  //   cy.get('[data-file="oc1-to-oc2-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
-  // })
+    cy.get('button[id="app-save-action"]')
+      .scrollIntoView()
+      .should('be.visible')
+      .click()
+
+    openFilesAppV5()
+
+    createShareV5('invite-link-ocis-ocis.txt', 'marie')
+
+  })
+
+  it('Receive ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
+    // accept share from oCIS 2.
+    cy.loginOcis('https://ocis2.docker', 'marie', 'radioactivity')
+
+    cy.get('div[id="web-nav-sidebar"]')
+      .should('be.visible')
+      .find('span')
+      .contains('Shares')
+      .click()
+
+    cy.get('span[data-test-resource-name="invite-link-ocis-ocis.txt"]')
+      .scrollIntoView()
+      .should('be.visible')
+  })
 })
