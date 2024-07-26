@@ -16,7 +16,7 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
     cy.loginNextcloudCore(url, username, password)
 
     // dashboard should be visible.
-    cy.url().should('match', /apps\/dashboard(\/|$)/)
+    cy.url({ timeout: 10000 }).should('match', /apps\/dashboard(\/|$)/)
 
     // open files app.
     cy.get('header[id="header"]')
@@ -27,7 +27,7 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
         .click()
     
     // files app should be visible.
-    cy.url().should('match', /apps\/files(\/|$)/)
+    cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/)
 })
 
 Cypress.Commands.add('loginSeafile', (url, username, password) => {
@@ -62,7 +62,7 @@ Cypress.Commands.add('loginOwncloud', (url, username, password) => {
     cy.loginOwncloudCore(url, username, password)
 
     // files app should be visible.
-    cy.url().should('match', /apps\/files(\/|$)/)
+    cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/)
 })
 
 Cypress.Commands.add('loginOcisCore', (url, username, password) => {
@@ -83,5 +83,5 @@ Cypress.Commands.add('loginOcis', (url, username, password) => {
     cy.loginOcisCore(url, username, password)
 
     // files app should be visible.
-    cy.url().should('match', /files\/spaces\/personal(\/|$)/)
+    cy.url({ timeout: 10000 }).should('match', /files\/spaces\/personal(\/|$)/)
 })
