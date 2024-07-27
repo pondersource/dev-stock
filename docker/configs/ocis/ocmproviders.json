@@ -14,7 +14,7 @@
                         "description": "|--instance1--ocm--| Open Cloud Mesh API"
                     },
                     "name": "|--instance1--ocm--| - OCM API",
-                    "path": "https://|--instance1--ocm--path--|/ocm/",
+                    "path": "https://|--instance1--ocm--path--|",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
@@ -27,7 +27,7 @@
                         "description": "|--instance1--webdav--| Webdav API"
                     },
                     "name": "|--instance1--webdav--| - Webdav API",
-                    "path": "https://|--instance1--webdav--path--|/dav/",
+                    "path": "https://|--instance1--webdav--path--|",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
@@ -50,7 +50,7 @@
                         "description": "|--instance2--ocm--| Open Cloud Mesh API"
                     },
                     "name": "|--instance2--ocm--| - OCM API",
-                    "path": "https://|--instance2--ocm--path--|/ocm/",
+                    "path": "https://|--instance2--ocm--path--|",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
@@ -63,7 +63,7 @@
                         "description": "|--instance2--webdav--| Webdav API"
                     },
                     "name": "|--instance2--webdav--| - Webdav API",
-                    "path": "https://|--instance2--webdav--path--|/dav/",
+                    "path": "https://|--instance2--webdav--path--|",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
