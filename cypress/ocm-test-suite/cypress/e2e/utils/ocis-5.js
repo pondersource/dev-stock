@@ -41,6 +41,14 @@ export function createInviteTokenV5() {
         )
 }
 
+export function createLagacyInviteLinkV5(domain, providerDomain) {
+    return createInviteTokenV5().then(
+        (token) => {
+          return `https://${domain}/index.php/apps/sciencemesh/accept?token=${token}&providerDomain=${providerDomain}`
+        }
+      )
+}
+
 export function acceptInviteLinkV5(token) {
     openScienceMeshAppV5()
 
