@@ -378,7 +378,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/invite-link/ocis-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
+    --spec "cypress/e2e/invite-link/owncloud-${P1_VER}-to-ocis-${P2_VER}.cy.js"
   
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
