@@ -118,8 +118,23 @@ chmod -R 777  "${ENV_ROOT}/temp/certificate-authority"
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
 # insert real domain names into ocmproviders.json
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--|" "ocis1.docker"
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--|" "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--domain--|"        "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--homepage--|"      "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--|"           "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--path--|"     "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--host--|"     "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--|"        "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--path--|"  "ocis1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--host--|"  "ocis1.docker"
+
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--domain--|"        "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--homepage--|"      "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--host--|"     "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--|"        "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--path--|"  "ocis2.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--host--|"  "ocis2.docker"
 
 ############
 ### oCIS ###

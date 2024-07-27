@@ -3,72 +3,72 @@
         "name": "Instance 1",
         "full_name": "Instance 1 provider",
         "organization": "Instance 1",
-        "domain": "|--instance1--|",
-        "homepage": "https://|--instance1--|",
-		"description": "Instance 1 cloud storage",
+        "domain": "|--instance1--domain--|",
+        "homepage": "https://|--instance1--homepage--|",
+        "description": "Instance 1 cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "|--instance1--| Open Cloud Mesh API"
+                        "description": "|--instance1--ocm--| Open Cloud Mesh API"
                     },
-                    "name": "|--instance1--| - OCM API",
-                    "path": "https://|--instance1--|/ocm/",
+                    "name": "|--instance1--ocm--| - OCM API",
+                    "path": "https://|--instance1--ocm--path--|/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "http://|--instance1--|"
+                "host": "http://|--instance1--ocm--host--|"
             },
-			{
-				"endpoint": {
-					"type": {
-						"name": "Webdav",
-						"description": "|--instance1--| Webdav API"
-					},
-					"name": "|--instance1--| - Webdav API",
-					"path": "https://|--instance1--|/dav/",
-					"is_monitored": true
-				},
-				"api_version": "0.0.1",
-				"host": "https://|--instance1--|/"
-			}
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "Webdav",
+                        "description": "|--instance1--webdav--| Webdav API"
+                    },
+                    "name": "|--instance1--webdav--| - Webdav API",
+                    "path": "https://|--instance1--webdav--path|/dav/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://|--instance1--webdav--host--|/"
+            }
         ]
     },
-	{
+    {
         "name": "Instance 2",
         "full_name": "Instance 2 provider",
         "organization": "Instance 2",
-        "domain": "|--instance2--|",
-        "homepage": "https://|--instance2--|",
-		"description": "Instance 2 cloud storage",
+        "domain": "|--instance2--domain--|",
+        "homepage": "https://|--instance2--homepage--|",
+        "description": "Instance 2 cloud storage",
         "services": [
             {
                 "endpoint": {
                     "type": {
                         "name": "OCM",
-                        "description": "|--instance2--| Open Cloud Mesh API"
+                        "description": "|--instance2--ocm--| Open Cloud Mesh API"
                     },
-                    "name": "|--instance2--| - OCM API",
-                    "path": "https://|--instance2--|/ocm/",
+                    "name": "|--instance2--ocm--| - OCM API",
+                    "path": "https://|--instance2--ocm--path--|/ocm/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
-                "host": "http://|--instance2--|"
+                "host": "http://|--instance2--ocm--host--|"
             },
-			{
-				"endpoint": {
-					"type": {
-						"name": "Webdav",
-						"description": "|--instance2--| Webdav API"
-					},
-					"name": "|--instance2--| - Webdav API",
-					"path": "https://|--instance2--|/dav/",
-					"is_monitored": true
-				},
-				"api_version": "0.0.1",
-				"host": "https://|--instance2--|/"
-			}
+            {
+                "endpoint": {
+                    "type": {
+                        "name": "Webdav",
+                        "description": "|--instance2--webdav--| Webdav API"
+                    },
+                    "name": "|--instance2--webdav--| - Webdav API",
+                    "path": "https://|--instance2--webdav--path|/dav/",
+                    "is_monitored": true
+                },
+                "api_version": "0.0.1",
+                "host": "https://|--instance2--webdav--host--|/"
+            }
         ]
     }
 ]
