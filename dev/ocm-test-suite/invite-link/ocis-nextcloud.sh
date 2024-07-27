@@ -203,7 +203,7 @@ cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_R
 cp -fr "${ENV_ROOT}/docker/configs/revad"                               "${ENV_ROOT}/temp/reva/configs"
 cp -f "${ENV_ROOT}/docker/tls/certificates/ocis"*                       "${ENV_ROOT}/temp/certificates"
 cp -fr "${ENV_ROOT}/docker/tls/certificate-authority"                   "${ENV_ROOT}/temp/certificate-authority"
-cp -f  "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f  "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"       "${ENV_ROOT}/temp/nextcloud.sh"
 
 # fix permissions.
 chmod -R 777  "${ENV_ROOT}/temp/certificates"
