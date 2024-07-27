@@ -170,6 +170,10 @@ case "${TEST_CASE}" in
       "ocis-owncloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
+      
+      "ocis-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
 
       *)
         echo -n "unknown invite-link"
