@@ -62,7 +62,7 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://nc1.docker/remote.php/webdav/"
+          "path": "https://nextcloud1.docker/remote.php/webdav/"
         },
         "host": "nextcloud1.docker"
       }
@@ -85,7 +85,7 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://nc2.docker/remote.php/webdav/"
+          "path": "https://nextcloud2.docker/remote.php/webdav/"
         },
         "host": "nextcloud2.docker"
       }
