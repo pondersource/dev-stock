@@ -288,14 +288,6 @@ jobs:
         exclude:
         # not implemented yet!
         - sender: {
-            platform: ocis,
-            version: 5.0.6
-          }
-          receiver:  {
-            platform: nextcloud,
-            version: v27.1.10
-          }
-        - sender: {
             platform: nextcloud,
             version: v27.1.10
           }
