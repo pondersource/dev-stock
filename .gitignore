@@ -35,4 +35,5 @@ cypress/ocm-test-suite/invite-link-nc-nc.txt
 cypress/ocm-test-suite/invite-link-nc-oc.txt
 cypress/ocm-test-suite/invite-link-oc-nc.txt
 cypress/ocm-test-suite/invite-link-oc-oc.txt
+cypress/ocm-test-suite/invite-link-ocis-oc.txt
 cypress/ocm-test-suite/invite-link-ocis-ocis.txt
