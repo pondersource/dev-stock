@@ -155,6 +155,10 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
       
+      "nextcloud-ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
