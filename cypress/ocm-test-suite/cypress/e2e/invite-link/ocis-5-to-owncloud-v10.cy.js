@@ -32,7 +32,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
       cy.get('input[id="accept-button"]', { timeout: 10000 })
         .click()
 
-      // validate 'marie' is shown as a contact. 
+      // validate 'Albert Einstein' is shown as a contact. 
       cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/contacts')
 
       cy.get('table[id="contact-table"]')
