@@ -62,7 +62,6 @@ function changeInFile() {
   sed -i "s#${original}#${replacement}#g" "${file_path}"
 }
 
-
 function createEfss() {
   local platform="${1}"
   local number="${2}"
