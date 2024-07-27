@@ -27,7 +27,7 @@
                         "description": "|--instance1--webdav--| Webdav API"
                     },
                     "name": "|--instance1--webdav--| - Webdav API",
-                    "path": "https://|--instance1--webdav--path|/dav/",
+                    "path": "https://|--instance1--webdav--path--|/dav/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
@@ -63,7 +63,7 @@
                         "description": "|--instance2--webdav--| Webdav API"
                     },
                     "name": "|--instance2--webdav--| - Webdav API",
-                    "path": "https://|--instance2--webdav--path|/dav/",
+                    "path": "https://|--instance2--webdav--path--|/dav/",
                     "is_monitored": true
                 },
                 "api_version": "0.0.1",
