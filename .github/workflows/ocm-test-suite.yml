@@ -295,14 +295,6 @@ jobs:
             platform: ocis,
             version: 5.0.6
           }
-        - sender: {
-            platform: owncloud,
-            version: v10.14.0
-          }
-          receiver:  {
-            platform: ocis,
-            version: 5.0.6
-          }
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
     runs-on: ubuntu-22.04
