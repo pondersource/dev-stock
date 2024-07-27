@@ -163,6 +163,10 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
+      "owncloud-ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
       "ocis-ocis")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
