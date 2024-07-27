@@ -1,7 +1,7 @@
 import {
   openFilesAppV5,
   openScienceMeshAppV5,
-  createLagacyInviteLinkV5,
+  createLegacyInviteLinkV5,
   createTextFileV5,
   createShareV5,
 } from '../utils/ocis-5'
@@ -13,7 +13,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
     openScienceMeshAppV5()
 
-    createLagacyInviteLinkV5('owncloud1.docker', 'ocis1.docker').then(
+    createLegacyInviteLinkV5('owncloud1.docker', 'ocis1.docker').then(
       (result) => {
         // save invite link to file.
         cy.writeFile('invite-link-ocis-oc.txt', result)
