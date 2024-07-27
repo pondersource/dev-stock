@@ -8,7 +8,7 @@ export function openScienceMeshAppV5() {
     getApplicationV5('ocm')
 }
 
-export function createInviteLinkV5() {
+export function createInviteTokenV5() {
     cy.get('div[id="sciencemesh-invite"]')
         .get('span')
         .contains('Generate invitation')

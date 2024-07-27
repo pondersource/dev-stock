@@ -1,7 +1,7 @@
 import {
   openFilesAppV5,
   openScienceMeshAppV5,
-  createInviteLinkV5,
+  createInviteTokenV5,
   acceptInviteLinkV5,
   verifyFederatedContactV5,
   createTextFileV5,
@@ -17,7 +17,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
     openScienceMeshAppV5()
 
-    createInviteLinkV5().then(
+    createInviteTokenV5().then(
       (result) => {
         // save invite link to file.
         cy.writeFile('invite-link-ocis-ocis.txt', result)
