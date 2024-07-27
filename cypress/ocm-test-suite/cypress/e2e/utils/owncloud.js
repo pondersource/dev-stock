@@ -62,6 +62,22 @@ export function createShareLink(fileName) {
 		);
 }
 
+export function createInviteToken(senderDomain) {
+
+	cy.get('button[id="token-generator"]').click()
+
+	return cy.get('input[class="generated-token-link"]')
+		.invoke('val')
+		.then(
+			sometext => {
+				// extract token from url.
+				const token = sometext.replace('https://meshdir.docker/meshdir?token=', '');
+      
+				return token.replace(`&providerDomain=${senderDomain}`, '')
+			}
+		);
+}
+
 export function createInviteLink(targetDomain) {
 
 	cy.get('button[id="token-generator"]').click()
@@ -71,7 +87,7 @@ export function createInviteLink(targetDomain) {
 		.then(
 			sometext => {
 				// extract token from url.
-				const token = sometext.replace('https://meshdir.docker/meshdir?','');
+				const token = sometext.replace('https://meshdir.docker/meshdir?', '');
 
 				// put target efss domain and token together.
 				const inviteLink = `${targetDomain}/index.php/apps/sciencemesh/accept?${token}`
