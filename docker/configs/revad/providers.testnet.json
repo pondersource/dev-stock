@@ -1,34 +1,258 @@
 [
-  {	"domain": "revad1.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revad1.docker/ocm/" }, "host": "revad1.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://revad1.docker/remote.php/webdav/" }, "host": "revad1.docker" }
-  ] },
-  { "domain": "revad2.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revad2.docker/ocm/" }, "host": "revad2.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://revad2.docker/remote.php/webdav/" }, "host": "revad2.docker" }
-  ] },
-  {	"domain": "revanextcloud1.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revanextcloud1.docker/ocm/" }, "host": "revanextcloud1.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://nc1.docker/remote.php/webdav/" }, "host": "nextcloud1.docker" }
-  ] },
-  { "domain": "revanextcloud2.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revanextcloud2.docker/ocm/" }, "host": "revanextcloud2.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://nc2.docker/remote.php/webdav/" }, "host": "nextcloud2.docker" }
-  ] },
-  {	"domain": "revaowncloud1.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revaowncloud1.docker/ocm/" }, "host": "revaowncloud1.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://owncloud1.docker/remote.php/webdav/" }, "host": "owncloud1.docker" }
-  ] },
-  { "domain": "revaowncloud2.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revaowncloud2.docker/ocm/" }, "host": "revaowncloud2.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://owncloud2.docker/remote.php/dav/" }, "host": "owncloud2.docker" }
-  ] },
-  {	"domain": "revacernbox1.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revacernbox1.docker/ocm/" }, "host": "revacernbox1.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://cernbox1.docker/remote.php/dav/" }, "host": "cernbox1.docker" }
-  ] },
-  { "domain": "revacernbox2.docker", "services": [
-    { "endpoint": { "type": { "name": "OCM" }, "path": "https://revacernbox2.docker/ocm/" }, "host": "revacernbox2.docker" },
-    { "endpoint": { "type": { "name": "Webdav" }, "path": "https://cernbox2.docker/remote.php/dav/" }, "host": "cernbox2.docker" }
-  ] }
+  {
+    "domain": "revad1.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revad1.docker/ocm/"
+        },
+        "host": "revad1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://revad1.docker/remote.php/webdav/"
+        },
+        "host": "revad1.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revad2.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revad2.docker/ocm/"
+        },
+        "host": "revad2.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://revad2.docker/remote.php/webdav/"
+        },
+        "host": "revad2.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revanextcloud1.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revanextcloud1.docker/ocm/"
+        },
+        "host": "revanextcloud1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://nextcloud1.docker/remote.php/webdav/"
+        },
+        "host": "nextcloud1.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revanextcloud2.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revanextcloud2.docker/ocm/"
+        },
+        "host": "revanextcloud2.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://nextcloud2.docker/remote.php/webdav/"
+        },
+        "host": "nextcloud2.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revaowncloud1.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revaowncloud1.docker/ocm/"
+        },
+        "host": "revaowncloud1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://owncloud1.docker/remote.php/webdav/"
+        },
+        "host": "owncloud1.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revaowncloud2.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revaowncloud2.docker/ocm/"
+        },
+        "host": "revaowncloud2.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://owncloud2.docker/remote.php/dav/"
+        },
+        "host": "owncloud2.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revacernbox1.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revacernbox1.docker/ocm/"
+        },
+        "host": "revacernbox1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://cernbox1.docker/remote.php/dav/"
+        },
+        "host": "cernbox1.docker"
+      }
+    ]
+  },
+  {
+    "domain": "revacernbox2.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://revacernbox2.docker/ocm/"
+        },
+        "host": "revacernbox2.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://cernbox2.docker/remote.php/dav/"
+        },
+        "host": "cernbox2.docker"
+      }
+    ]
+  },
+  {
+    "name": "Instance 1",
+    "full_name": "Instance 1 provider",
+    "organization": "Instance 1",
+    "domain": "ocis1.docker",
+    "homepage": "https://ocis1.docker",
+    "description": "Instance 1 cloud storage",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "ocis1.docker Open Cloud Mesh API"
+          },
+          "name": "ocis1.docker - OCM API",
+          "path": "https://ocis1.docker/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "http://ocis1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav",
+            "description": "ocis1.docker Webdav API"
+          },
+          "name": "ocis1.docker - Webdav API",
+          "path": "https://ocis1.docker/dav/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "https://ocis1.docker/"
+      }
+    ]
+  },
+  {
+    "name": "Instance 2",
+    "full_name": "Instance 2 provider",
+    "organization": "Instance 2",
+    "domain": "ocis2.docker",
+    "homepage": "https://ocis2.docker",
+    "description": "Instance 2 cloud storage",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM",
+            "description": "ocis2.docker Open Cloud Mesh API"
+          },
+          "name": "ocis2.docker - OCM API",
+          "path": "https://ocis2.docker/ocm/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "http://ocis2.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav",
+            "description": "ocis2.docker Webdav API"
+          },
+          "name": "ocis2.docker - Webdav API",
+          "path": "https://ocis2.docker/dav/",
+          "is_monitored": true
+        },
+        "api_version": "0.0.1",
+        "host": "https://ocis2.docker/"
+      }
+    ]
+  }
 ]

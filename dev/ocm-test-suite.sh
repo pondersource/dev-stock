@@ -60,6 +60,10 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
+      "ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
       "seafile")
         "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -151,12 +155,32 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
       
+      "nextcloud-ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       "owncloud-owncloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "owncloud-ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      "ocis-ocis")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
+      "ocis-owncloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
+      "ocis-nextcloud")
+        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       *)
