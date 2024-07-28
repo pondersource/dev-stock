@@ -285,16 +285,6 @@ jobs:
             version: 5.0.6
           },
         ]
-        exclude:
-        # not implemented yet!
-        - sender: {
-            platform: nextcloud,
-            version: v27.1.10
-          }
-          receiver:  {
-            platform: ocis,
-            version: 5.0.6
-          }
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
     runs-on: ubuntu-22.04
