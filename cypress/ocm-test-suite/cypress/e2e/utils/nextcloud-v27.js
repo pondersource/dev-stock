@@ -84,26 +84,6 @@ export function verifyFederatedContactV27(domain, displayName, contactDomain) {
 		)
 }
 
-export function createScienceMeshShareV27(fileName, username) {
-	openSharingPanelV27(fileName)
-
-	cy.get('#app-sidebar-vue').within(() => {
-		cy.get('#sharing-search-input').clear()
-		cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
-		cy.get('#sharing-search-input').type(username)
-		cy.wait('@userSearch')
-	})
-
-	cy.get(`[user="${username}"]`)
-		.should('be.visible')
-		.click()
-
-	cy.get('div[class="button-group"]')
-		.contains('Save share')
-		.should('be.visible')
-		.click()
-}
-
 export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain) {
 	verifyFederatedContactV27(domain, displayName, contactDomain)
 
@@ -121,7 +101,7 @@ export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, c
 		)
 }
 
-export function createScienceMeshShareAdvancedV27(domain, displayName, contactDomain, filename) {
+export function createScienceMeshShareV27(domain, displayName, contactDomain, filename) {
 	getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain).then(
 		(shareWith) => {
 			cy.visit(`https://${domain}/index.php/apps/files`)

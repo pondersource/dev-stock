@@ -1,4 +1,9 @@
-import { createInviteLinkV27, createScienceMeshShareV27, renameFileV27 } from '../utils/nextcloud-v27'
+import {
+  createInviteLinkV27, 
+  verifyFederatedContactV27,
+  createScienceMeshShareV27,
+  renameFileV27
+} from '../utils/nextcloud-v27'
 
 describe('Invite link federated sharing via ScienceMesh functionality for Nextcloud', () => {
   it('Send invitation from Nextcloud v27 to Nextcloud v27', () => {
@@ -24,13 +29,9 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
 
       cy.get('input[id="accept-button"]', { timeout: 10000 })
         .click()
-      
-      // validate 'einstein' is shown as a contact. 
-      cy.visit('https://nextcloud2.docker/index.php/apps/sciencemesh/contacts')
 
-      cy.get('table[id="contact-table"]')
-        .find('p[class="displayname"]')
-        .should("have.text", "einstein");
+      // validate 'eisntein' is shown as a contact.
+      verifyFederatedContactV27('nextcloud2.docker', 'einstein', 'revanextcloud1.docker')
     })
   })
 
@@ -38,8 +39,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    renameFileV27('welcome.txt', 'nc1-to-nc2-sciencemesh-share.txt')
-    createScienceMeshShareV27('nc1-to-nc2-sciencemesh-share.txt', 'michiel')
+    renameFileV27('welcome.txt', 'invite-link-nc-nc.txt')
+    createScienceMeshShareV27('nextcloud1.docker', 'michiel', 'revanextcloud2.docker', 'invite-link-nc-nc.txt')
   })
 
   it('Receive ScienceMesh share <file> from Nextcloud v27 to Nextcloud v27', () => {
@@ -52,6 +53,6 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       .find('button[class="primary"]')
       .click()
 
-    cy.get('[data-file="nc1-to-nc2-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
+    cy.get('[data-file="invite-link-nc-nc.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

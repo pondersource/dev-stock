@@ -1,7 +1,6 @@
 import {
-  createInviteLinkV27,
   verifyFederatedContactV27,
-  createScienceMeshShareAdvancedV27,
+  createScienceMeshShareV27,
   renameFileV27
 } from '../utils/nextcloud-v27'
 
@@ -48,7 +47,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
 
     renameFileV27('welcome.txt', 'invite-link-nc-ocis.txt')
-    createScienceMeshShareAdvancedV27('nextcloud1.docker', 'Albert Einstein', 'ocis1.docker', 'invite-link-nc-ocis.txt')
+    createScienceMeshShareV27('nextcloud1.docker', 'Albert Einstein', 'ocis1.docker', 'invite-link-nc-ocis.txt')
   })
 
   it('Receive ScienceMesh share <file> from Nextcloud v27 to oCIS v5', () => {
