@@ -221,6 +221,9 @@ else
   P1_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_1_VERSION}" )"
   P2_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_2_VERSION}" )"
 
+  # for some reason this test fails on ci! so lets sleep a bit.
+  sleep 60
+
   # run Cypress test suite headlessly and with the defined browser.
   docker run --network=testnet                                                  \
     --name="cypress.docker"                                                     \

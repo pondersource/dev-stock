@@ -200,7 +200,7 @@ jobs:
     needs: [login]
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 9
       matrix:
         sender: [ 
           {
