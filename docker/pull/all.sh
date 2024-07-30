@@ -11,7 +11,7 @@ docker pull theasp/novnc:latest
 docker pull rclone/rclone:latest
 docker pull collabora/code:latest
 docker pull jlesage/firefox:latest
-docker pull cypress/included:13.3.0
+docker pull cypress/included:13.13.1
 docker pull cs3org/wopiserver:latest
 docker pull seafileltd/seafile-mc:11.0.5
 docker pull quay.io/keycloak/keycloak:latest

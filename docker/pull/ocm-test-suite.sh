@@ -7,7 +7,7 @@ set -e
 docker pull mariadb:latest
 docker pull memcached:1.6.18
 docker pull collabora/code:latest
-docker pull cypress/included:13.3.0
+docker pull cypress/included:13.13.1
 docker pull cs3org/wopiserver:latest
 docker pull seafileltd/seafile-mc:11.0.5
 

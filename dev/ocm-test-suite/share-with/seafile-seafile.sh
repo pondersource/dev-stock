@@ -206,7 +206,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
     -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
     -w /ocm                                                                                                 \
     --entrypoint cypress                                                                                    \
-    cypress/included:13.3.0                                                                                 \
+    cypress/included:13.13.1                                                                                \
     open --project .
 
   # print instructions.
@@ -237,7 +237,7 @@ else
     --name="cypress.docker"                                                     \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
-    cypress/included:13.3.0 cypress run                                         \
+    cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/share-with/seafile-${P1_VER}-to-seafile-${P2_VER}.cy.js"
   

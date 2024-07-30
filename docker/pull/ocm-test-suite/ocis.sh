@@ -8,8 +8,7 @@ set -e
 EFSS_PLATFORM_VERSION=${1:-"5.0.6"}
 
 # 3rd party images.
-docker pull bitnami/openldap:2.6
-docker pull cypress/included:13.3.0
+docker pull cypress/included:13.13.1
 
 # images.
 docker pull "owncloud/ocis:${EFSS_PLATFORM_VERSION}"
