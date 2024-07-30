@@ -1,4 +1,9 @@
-import { createInviteLinkV27, createScienceMeshShareV27, renameFileV27 } from '../utils/nextcloud-v27'
+import {
+  createInviteLinkV27, 
+  verifyFederatedContactV27,
+  createScienceMeshShareV27,
+  renameFileV27
+} from '../utils/nextcloud-v27'
 
 describe('Invite link federated sharing via ScienceMesh functionality for Nextcloud to ownCloud', () => {
   it('Send invitation from Nextcloud v27 to ownCloud v10', () => {
@@ -38,8 +43,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
-    renameFileV27('welcome.txt', 'nc1-to-oc1-sciencemesh-share.txt')
-    createScienceMeshShareV27('nc1-to-oc1-sciencemesh-share.txt', 'marie')
+    renameFileV27('welcome.txt', 'invite-link-nc-oc.txt')
+    createScienceMeshShareV27('nextcloud1.docker', 'marie', 'revaowncloud1.docker', 'invite-link-nc-oc.txt')
   })
 
   it('Receive ScienceMesh share <file> from Nextcloud v27 to ownCloud v10', () => {
@@ -52,6 +57,6 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       .find('button[class="primary"]')
       .click()
 
-    cy.get('[data-file="nc1-to-oc1-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
+    cy.get('[data-file="invite-link-nc-oc.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

@@ -17,7 +17,7 @@ jobs:
   login:
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 5
       matrix:
         efss: [ 
           {
@@ -36,20 +36,6 @@ jobs:
             platform: ocis,
             version: 5.0.6
           },
-          # TODO: @MahdiBaghbani fix it via naother pr in future. (is it necessary?)
-          # cypress login is not compatible with previous versions
-          # {
-          #   platform: seafile,
-          #   version: 8.0.8
-          # },
-          # {
-          #   platform: seafile,
-          #   version: 9.0.10
-          # },
-          # {
-          #   platform: seafile,
-          #   version: 10.0.1
-          # },
           {
             platform: seafile,
             version: 11.0.5
@@ -128,6 +114,31 @@ jobs:
           }
         ]
         exclude:
+          # seafile doesn't support receiving ocm shares to other platforms yet! exclude tests.
+        - sender: {
+            platform: nextcloud,
+            version: v27.1.10
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
+        - sender: {
+            platform: nextcloud,
+            version: v28.0.7
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
+        - sender: {
+            platform: owncloud,
+            version: v10.14.0
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
         # seafile doesn't support sending ocm shares to other platforms yet! exclude tests.
         - sender: {
             platform: seafile,
@@ -189,7 +200,7 @@ jobs:
     needs: [login]
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 9
       matrix:
         sender: [ 
           {
