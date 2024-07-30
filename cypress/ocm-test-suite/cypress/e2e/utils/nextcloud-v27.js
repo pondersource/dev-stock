@@ -17,8 +17,8 @@ export function createShareV27(fileName, username, domain) {
 	})
 
 	// ensure selecting remote [sharetype="6"] instead of email!
-	cy.get(`[user="${username}"]`).click()
-	cy.get('div[class="button-group"]').contains('Save share').click()
+	cy.get(`[user="${username}"]`).should('be.visible').click()
+	cy.get('div[class="button-group"]').contains('Save share').should('be.visible').click()
 }
 
 export function createShareLinkV27(fileName) {
@@ -28,7 +28,10 @@ export function createShareLinkV27(fileName) {
 		cy.stub(win.navigator.clipboard, 'writeText').as('copy');
 
 		cy.get('#app-sidebar-vue').within(() => {
-			cy.get('*[class^="sharing-entry__actions"]').eq(0).click()
+			cy.get('*[class^="sharing-entry__actions"]')
+				.eq(0)
+				.should('be.visible')
+				.click()
 		})
 
 		return cy.get('@copy').should('have.been.calledOnce').then((spy) => {
@@ -91,8 +94,14 @@ export function createScienceMeshShareV27(fileName, username) {
 		cy.wait('@userSearch')
 	})
 
-	cy.get(`[user="${username}"]`).click()
-	cy.get('div[class="button-group"]').contains('Save share').click()
+	cy.get(`[user="${username}"]`)
+		.should('be.visible')
+		.click()
+
+	cy.get('div[class="button-group"]')
+		.contains('Save share')
+		.should('be.visible')
+		.click()
 }
 
 export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain) {
@@ -126,8 +135,15 @@ export function createScienceMeshShareAdvancedV27(domain, displayName, contactDo
 				cy.wait('@userSearch')
 			})
 
-			cy.get(`[sharewith="${shareWith}"]`).eq(0).click()
-			cy.get('div[class="button-group"]').contains('Save share').click()
+			cy.get(`[sharewith="${shareWith}"]`)
+				.eq(0)
+				.should('be.visible')
+				.click()
+
+			cy.get('div[class="button-group"]')
+				.contains('Save share')
+				.should('be.visible')
+				.click()
 		}
 	)
 }
@@ -147,15 +163,16 @@ export function openSharingPanelV27(fileName) {
 
 	cy.get('#app-sidebar-vue')
 		.get('[aria-controls="tab-sharing"]')
+		.should('be.visible')
 		.click()
 }
 
 export function triggerActionInFileMenuV27(fileName, actionId) {
 	triggerActionForFileV27(fileName, 'menu')
-	getRowForFileV27(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+	getRowForFileV27(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
 }
 
-export const triggerActionForFileV27 = (filename, actionId) => getActionsForFileV27(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+export const triggerActionForFileV27 = (filename, actionId) => getActionsForFileV27(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
 
 export const getActionsForFileV27 = (filename) => getRowForFileV27(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]')
 
