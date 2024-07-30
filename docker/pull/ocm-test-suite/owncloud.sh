@@ -5,7 +5,7 @@ set -e
 
 # 3rd party images.
 docker pull mariadb:latest
-docker pull cypress/included:13.3.0
+docker pull cypress/included:13.13.1
 
 # dev-stock images.
 docker pull pondersource/dev-stock-owncloud-ocm-test-suite:latest

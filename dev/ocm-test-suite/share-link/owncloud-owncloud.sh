@@ -184,12 +184,13 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # this way you can view inside cypress container through vnc server.
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
+    --ipc=host                                                                                              \
     -e DISPLAY=vnc-server:0.0                                                                               \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                                            \
     -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
     -w /ocm                                                                                                 \
     --entrypoint cypress                                                                                    \
-    cypress/included:13.3.0                                                                                 \
+    cypress/included:13.13.1                                                                                \
     open --project .
 
   # print instructions.
@@ -211,16 +212,17 @@ else
   ### Cypress CI ###
   ##################
 
-  # extract version up until first first ., example: v27.1.17 becomes v27
+  # extract version up until first dot . , example: v27.1.17 becomes v27
   P1_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_1_VERSION}" )"
   P2_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_2_VERSION}" )"
 
   # run Cypress test suite headlessly and with the defined browser.
   docker run --network=testnet                                                  \
     --name="cypress.docker"                                                     \
+    --ipc=host                                                                  \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
-    cypress/included:13.3.0 cypress run                                         \
+    cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/share-link/owncloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
   
