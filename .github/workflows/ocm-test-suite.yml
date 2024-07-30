@@ -114,6 +114,31 @@ jobs:
           }
         ]
         exclude:
+          # seafile doesn't support receiving ocm shares to other platforms yet! exclude tests.
+        - sender: {
+            platform: nextcloud,
+            version: v27.1.10
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
+        - sender: {
+            platform: nextcloud,
+            version: v28.0.7
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
+        - sender: {
+            platform: owncloud,
+            version: v10.14.0
+          }
+          receiver:  {
+            platform: seafile,
+            version: 11.0.5
+          }
         # seafile doesn't support sending ocm shares to other platforms yet! exclude tests.
         - sender: {
             platform: seafile,
