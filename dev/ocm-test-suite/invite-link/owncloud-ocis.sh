@@ -340,7 +340,6 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # this way you can view inside cypress container through vnc server.
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
-
     -e DISPLAY=vnc-server:0.0                                                                               \
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                                            \
     -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
@@ -375,7 +374,6 @@ else
   # run Cypress test suite headlessly and with the defined browser.
   docker run --network=testnet                                                  \
     --name="cypress.docker"                                                     \
-    
     -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
