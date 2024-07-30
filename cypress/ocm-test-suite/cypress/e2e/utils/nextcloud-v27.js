@@ -28,8 +28,7 @@ export function createShareLinkV27(fileName) {
 		cy.stub(win.navigator.clipboard, 'writeText').as('copy');
 
 		cy.get('#app-sidebar-vue').within(() => {
-			cy.get('*[class^="sharing-entry__actions"]')
-				.eq(0)
+			cy.get('button[title="Create a new share link"]')
 				.should('be.visible')
 				.click()
 		})
