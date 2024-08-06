@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-php-base:latest
+FROM pondersource/php-base:8.3
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -7,7 +7,13 @@ LABEL org.opencontainers.image.title="PonderSource Nextcloud Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
-RUN rm --recursive --force /var/www/html
+# remove html directory and recreate it with correct permissions
+RUN rm -rf /var/www/html && mkdir /var/www/html
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 775 /var/www/html
+
+WORKDIR /var/www/html
+
 USER www-data
 
 ARG REPO_NEXTCLOUD=https://github.com/nextcloud/server
@@ -22,13 +28,9 @@ RUN git clone                       \
     --shallow-submodules            \
     --branch ${BRANCH_NEXTCLOUD}    \
     ${REPO_NEXTCLOUD}               \
-    html
+    .
 
 USER root
-WORKDIR /var/www/html
-
-# switch php version for Nextloud.
-RUN switch-php.sh 8.2
 
 ENV PHP_MEMORY_LIMIT="512M"
 
@@ -42,4 +44,4 @@ COPY ./scripts/init/nextcloud.sh /init.sh
 RUN mkdir -p data; touch data/nextcloud.log
 
 USER root
-CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow data/nextcloud.log
+CMD /usr/sbin/httpd -DFOREGROUND & tail -f /var/log/apache2/access.log & tail -f /var/log/apache2/error.log & tail -f data/nextcloud.log

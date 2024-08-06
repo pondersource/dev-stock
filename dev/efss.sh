@@ -49,7 +49,7 @@ function createEfss() {
   docker run --detach --network=testnet                                           \
     --name="maria${platform}${number}.docker"                                     \
     -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek             \
-    mariadb                                                                       \
+    mariadb:11.4.2                                                                \
     --transaction-isolation=READ-COMMITTED                                        \
     --binlog-format=ROW                                                           \
     --innodb-file-per-table=1                                                     \
@@ -89,8 +89,8 @@ function createEfss() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-owncloud.sh"   "${ENV_ROOT}/temp/owncloud.sh"
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init/owncloud.sh"   "${ENV_ROOT}/temp/owncloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init/nextcloud.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1

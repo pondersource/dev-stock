@@ -38,7 +38,7 @@ function waitForPort () {
 EFSS1=nc
 
 # copy init files.
-cp -f ./docker/scripts/init-nextcloud-sunet.sh ./temp/init-nextcloud-sunet.sh
+cp -f ./docker/scripts/init/nextcloud-sunet.sh ./temp/init-nextcloud-sunet.sh
 
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
 docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --shm-size 2g jlesage/firefox:v1.18.0
@@ -46,7 +46,7 @@ docker run --detach --name=firefox-legacy   --network=testnet -p 5900:5800  --sh
 docker run --detach --network=testnet                                                                                             \
   --name=maria1.docker                                                                                                            \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                               \
-  mariadb                                                                                                                         \
+  mariadb:11.4.2                                                                                                                 \
   --transaction-isolation=READ-COMMITTED                                                                                          \
   --binlog-format=ROW                                                                                                             \
   --innodb-file-per-table=1                                                                                                       \

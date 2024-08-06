@@ -49,7 +49,7 @@ function waitForCollabora {
 [ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f ./docker/scripts/init-owncloud-sm-sram-ocm.sh  ./temp/owncloud.sh
+cp -f ./docker/scripts/init/owncloud-sm-sram-ocm.sh  ./temp/owncloud.sh
 
 docker run --detach --name=meshdir.docker   --network=testnet -v "${ENV_ROOT}/docker/scripts/stub.js:/ocm-stub/stub.js" pondersource/dev-stock-ocmstub
 docker run --detach --name=firefox          --network=testnet -p 5800:5800  --shm-size 2g jlesage/firefox:latest
@@ -63,7 +63,7 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 docker run --detach --network=testnet                                                   \
   --name=maria1.docker                                                                  \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                     \
-  mariadb                                                                               \
+  mariadb:11.4.2                                                                        \
   --transaction-isolation=READ-COMMITTED                                                \
   --binlog-format=ROW                                                                   \
   --innodb-file-per-table=1                                                             \
@@ -90,7 +90,7 @@ docker run --detach --network=testnet                                           
 docker run --detach --network=testnet                                                   \
   --name=maria2.docker                                                                  \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                     \
-  mariadb                                                                               \
+  mariadb:11.4.2                                                                        \
   --transaction-isolation=READ-COMMITTED                                                \
   --binlog-format=ROW                                                                   \
   --innodb-file-per-table=1                                                             \

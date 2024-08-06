@@ -75,7 +75,7 @@ function createEfss() {
   redirect_to_null_cmd docker run --detach --network=testnet                                                                \
     --name="maria${platform}${number}.docker"                                                                               \
     -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
-    mariadb                                                                                                                 \
+    mariadb:11.4.2                                                                                                          \
     --transaction-isolation=READ-COMMITTED                                                                                  \
     --binlog-format=ROW                                                                                                     \
     --innodb-file-per-table=1                                                                                               \
@@ -155,8 +155,8 @@ rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp/configs"
 cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_ROOT}/temp/"
 cp -fr "${ENV_ROOT}/docker/configs/revad"                               "${ENV_ROOT}/temp/reva/configs"
 cp -f  "${ENV_ROOT}/docker/scripts/ocmstub/index.js"                    "${ENV_ROOT}/temp/index.js"
-cp -f  "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"        "${ENV_ROOT}/temp/owncloud.sh"
-cp -f  "${ENV_ROOT}/docker/scripts/init-nextcloud-sciencemesh.sh"       "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f  "${ENV_ROOT}/docker/scripts/init/owncloud-sciencemesh.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f  "${ENV_ROOT}/docker/scripts/init/nextcloud-sciencemesh.sh"       "${ENV_ROOT}/temp/nextcloud.sh"
 
 # remove unnecessary configs.
 rm "${ENV_ROOT}/temp/reva/configs/sciencemesh-apps-codimd.toml"

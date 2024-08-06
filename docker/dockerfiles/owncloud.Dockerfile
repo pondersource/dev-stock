@@ -43,7 +43,7 @@ RUN npm install --global yarn
 USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud.sh /oc-init.sh
+COPY ./scripts/init/owncloud.sh /init.sh
 RUN mkdir -p data; touch data/owncloud.log
 
 RUN composer install --no-dev

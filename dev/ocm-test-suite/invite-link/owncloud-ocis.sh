@@ -83,7 +83,7 @@ function createEfss() {
   redirect_to_null_cmd docker run --detach --network=testnet                                                                \
     --name="maria${platform}${number}.docker"                                                                               \
     -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
-    mariadb                                                                                                                 \
+    mariadb:11.4.2                                                                                                          \
     --transaction-isolation=READ-COMMITTED                                                                                  \
     --binlog-format=ROW                                                                                                     \
     --innodb-file-per-table=1                                                                                               \
@@ -202,7 +202,7 @@ cp -fr  "${ENV_ROOT}/docker/scripts/reva"                               "${ENV_R
 cp -fr "${ENV_ROOT}/docker/configs/revad"                               "${ENV_ROOT}/temp/reva/configs"
 cp -f "${ENV_ROOT}/docker/tls/certificates/ocis"*                       "${ENV_ROOT}/temp/certificates"
 cp -fr "${ENV_ROOT}/docker/tls/certificate-authority"                   "${ENV_ROOT}/temp/certificate-authority"
-cp -f  "${ENV_ROOT}/docker/scripts/init-owncloud-sciencemesh.sh"        "${ENV_ROOT}/temp/owncloud.sh"
+cp -f  "${ENV_ROOT}/docker/scripts/init/owncloud-sciencemesh.sh"        "${ENV_ROOT}/temp/owncloud.sh"
 
 # fix permissions.
 chmod -R 777  "${ENV_ROOT}/temp/certificates"

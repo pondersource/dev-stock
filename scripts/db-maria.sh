@@ -15,7 +15,7 @@ number=${2}
 
 docker exec -it                                     \
     "maria${platform}${number}.docker"              \
-    mariadb                                         \
+    mariadb:11.4.2                                  \
     -u root                                         \
     -peilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek      \
     efss

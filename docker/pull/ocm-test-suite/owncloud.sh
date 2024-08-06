@@ -4,7 +4,7 @@
 set -e
 
 # 3rd party images.
-docker pull mariadb:latest
+docker pull mariadb:11.4.2
 docker pull cypress/included:13.13.1
 
 # dev-stock images.

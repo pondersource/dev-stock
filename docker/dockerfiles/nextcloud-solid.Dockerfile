@@ -34,6 +34,6 @@ RUN composer install --working-dir=/var/www/html/apps/solid --no-dev --prefer-di
     
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-nextcloud-solid.sh /init.sh
+COPY ./scripts/init/nextcloud-solid.sh /init.sh
 
 USER root

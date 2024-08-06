@@ -14,7 +14,7 @@ BRANCH_OWNCLOUD_APP=release
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-opencloudmesh.sh" "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
+cp -f "${REPO_ROOT}/docker/scripts/init/owncloud-opencloudmesh.sh" "${REPO_ROOT}/temp/oc-opencloudmesh.sh"
 
 # ownCloud opencloudmesh source code.
 [ ! -d "oc-ocm-release" ] &&                                                                                      \
@@ -31,7 +31,7 @@ mkdir -p "${REPO_ROOT}/oc-ocm-release/opencloudmesh/release"
 docker run --detach --network=testnet                                                                             \
   --name=maria1.docker                                                                                            \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                               \
-  mariadb                                                                                                         \
+  mariadb:11.4.2                                                                                                  \
   --transaction-isolation=READ-COMMITTED                                                                          \
   --binlog-format=ROW                                                                                             \
   --innodb-file-per-table=1                                                                                       \

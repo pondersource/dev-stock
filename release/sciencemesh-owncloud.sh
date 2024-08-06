@@ -13,7 +13,7 @@ BRANCH_OWNCLOUD_APP=owncloud
 [ ! -d "temp" ] && mkdir -p temp
 
 # copy init file.
-cp -f ./docker/scripts/init-owncloud-sciencemesh.sh ./temp/oc.sh
+cp -f ./docker/scripts/init/owncloud-sciencemesh.sh ./temp/oc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc1-sciencemesh
@@ -37,7 +37,7 @@ docker tag pondersource/dev-stock-owncloud-sciencemesh pondersource/dev-stock-oc
 docker run --detach --network=testnet                                                                             \
   --name=maria1.docker                                                                                            \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                               \
-  mariadb                                                                                                         \
+  mariadb:11.4.2                                                                                                  \
   --transaction-isolation=READ-COMMITTED                                                                          \
   --binlog-format=ROW                                                                                             \
   --innodb-file-per-table=1                                                                                       \

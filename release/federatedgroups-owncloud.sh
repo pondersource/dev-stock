@@ -14,7 +14,7 @@ BRANCH_OWNCLOUD_APP=release
 [ ! -d "${REPO_ROOT}/temp" ] && mkdir -p "${REPO_ROOT}/temp"
 
 # copy init files.
-cp -f "${REPO_ROOT}/docker/scripts/init-owncloud-rd-sram.sh"  "${REPO_ROOT}/temp/oc-rd-sram.sh"
+cp -f "${REPO_ROOT}/docker/scripts/init/owncloud-rd-sram.sh"  "${REPO_ROOT}/temp/oc-rd-sram.sh"
 
 # ownCloud federatedgroups source code.
 [ ! -d "rd-sram-release" ] &&                                                                                     \
@@ -30,7 +30,7 @@ mkdir -p "${REPO_ROOT}/rd-sram-release/federatedgroups/release"
 docker run --detach --network=testnet                                                                             \
   --name=maria1.docker                                                                                            \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                               \
-  mariadb                                                                                                         \
+  mariadb:11.4.2                                                                                                  \
   --transaction-isolation=READ-COMMITTED                                                                          \
   --binlog-format=ROW                                                                                             \
   --innodb-file-per-table=1                                                                                       \
