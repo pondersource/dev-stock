@@ -55,10 +55,6 @@ jobs:
         shell: bash
         run: ./docker/pull/ocm-test-suite/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
 
-      - name: Initialize OCM tests dependencies.
-        shell: bash
-        run: ./init/ocm-test-suite.sh ci
-
       - name: Run tests.
         shell: bash
         run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
@@ -180,10 +176,6 @@ jobs:
           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Initialize OCM tests dependencies.
-        shell: bash
-        run: ./init/ocm-test-suite.sh ci
-
       - name: Run tests.
         shell: bash
         run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
@@ -246,10 +238,6 @@ jobs:
           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Initialize OCM tests dependencies.
-        shell: bash
-        run: ./init/ocm-test-suite.sh ci
-
       - name: Run tests.
         shell: bash
         run: ./dev/ocm-test-suite.sh share-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
@@ -311,10 +299,6 @@ jobs:
         run: |
           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
-
-      - name: Initialize OCM tests dependencies.
-        shell: bash
-        run: ./init/ocm-test-suite.sh ci
 
       - name: Run tests.
         shell: bash
