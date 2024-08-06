@@ -51,7 +51,7 @@ RUN cd apps && ln --symbolic --force oc-opencloudmesh/opencloudmesh
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud-sm-ocm.sh /init.sh
+COPY ./scripts/init/owncloud-sm-ocm.sh /init.sh
 
 USER root
 CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow data/owncloud.log

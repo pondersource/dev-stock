@@ -115,8 +115,8 @@ function createEfss() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f   "${ENV_ROOT}/docker/scripts/init-owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
-cp -f   "${ENV_ROOT}/docker/scripts/init-nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init/owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
+cp -f   "${ENV_ROOT}/docker/scripts/init/nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
 
 # auto clean before starting.
 "${ENV_ROOT}/scripts/clean.sh" "no"

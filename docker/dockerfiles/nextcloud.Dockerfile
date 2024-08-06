@@ -38,7 +38,7 @@ RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=compose
 USER www-data
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-nextcloud.sh /init.sh
+COPY ./scripts/init/nextcloud.sh /init.sh
 RUN mkdir -p data; touch data/nextcloud.log
 
 USER root

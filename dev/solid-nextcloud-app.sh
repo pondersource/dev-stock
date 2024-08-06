@@ -90,7 +90,7 @@ function createEfss() {
 rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
 
 # copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init-nextcloud-solid.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
+cp -f "${ENV_ROOT}/docker/scripts/init/nextcloud-solid.sh"  "${ENV_ROOT}/temp/nextcloud.sh"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1

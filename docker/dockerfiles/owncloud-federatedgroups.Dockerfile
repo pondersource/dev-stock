@@ -27,6 +27,6 @@ COPY ./scripts/federatedgroups /curls
 
 # this file can be overrided in docker run or docker compose.yaml. 
 # example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init-owncloud-federatedgroups.sh /init.sh
+COPY ./scripts/init/owncloud-federatedgroups.sh /init.sh
 
 USER root

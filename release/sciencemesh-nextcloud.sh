@@ -13,7 +13,7 @@ BRANCH_OWNCLOUD_APP=nextcloud
 [ ! -d "temp" ] && mkdir -p temp
 
 # copy init file.
-cp -f ./docker/scripts/init-nextcloud-sciencemesh.sh ./temp/nc.sh
+cp -f ./docker/scripts/init/nextcloud-sciencemesh.sh ./temp/nc.sh
 
 # add additional tagging for docker images.
 docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
