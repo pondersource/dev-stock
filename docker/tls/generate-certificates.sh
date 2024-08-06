@@ -53,7 +53,7 @@ createCertificate meshdir
 createCertificate revad1
 createCertificate revad2
 
-for efss in seafile owncloud nextcloud cernbox ocis nc oc; do
+for efss in owncloud nextcloud cernbox; do
   createCertificate ${efss}1
   createCertificate ${efss}2
   createCertificate ${efss}3
@@ -68,9 +68,9 @@ for efss in seafile owncloud nextcloud cernbox ocis nc oc; do
   createCertificate wopi${efss}4
 done
 
-for efss in ocis; do
-  createCertificate ldap${efss}1
-  createCertificate ldap${efss}2
-  createCertificate ldap${efss}3
-  createCertificate ldap${efss}4
+for efss in seafile ocis; do
+  createCertificate ${efss}1
+  createCertificate ${efss}2
+  createCertificate ${efss}3
+  createCertificate ${efss}4
 done
