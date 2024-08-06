@@ -7,7 +7,7 @@ mkdir -p /tls
 
 [ -d "/certificates" ] &&                                                           \
   cp -f /certificates/*.crt                   /tls/                                 \
-  &&                                                                            \
+  &&                                                                                \
   cp -f /certificates/*.key                   /tls/
 
 ln --symbolic --force "/tls/${HOST}.crt"    /tls/server.crt
