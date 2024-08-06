@@ -34,6 +34,9 @@ existing=$(docker ps -qa)
 # shellcheck disable=SC2086
 [ -z "$existing" ] || docker rm $existing                   >/dev/null 2>&1
 
+echo "y" | docker volume prune
+echo "y" | docker system prune
+
 docker network remove testnet >/dev/null 2>&1 || true       >/dev/null 2>&1
 docker network create testnet                               >/dev/null 2>&1
 
