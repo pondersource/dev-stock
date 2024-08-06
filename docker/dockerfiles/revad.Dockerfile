@@ -40,7 +40,11 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 # set the timezone and install CA certificates.
-RUN apk --no-cache add bash ca-certificates tzdata
+RUN apk --no-cache add                                          \
+    bash                                                        \
+    curl                                                        \
+    tzdata                                                      \
+    ca-certificates 
 
 ENV TZ=Etc/UTC
 
