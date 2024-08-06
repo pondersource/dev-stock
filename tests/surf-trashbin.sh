@@ -45,7 +45,7 @@ echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
   --name=maria1.docker                                                                              \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                 \
-  mariadb                                                                                           \
+  mariadb:11.4.2                                                                                    \
   --transaction-isolation=READ-COMMITTED                                                            \
   --binlog-format=ROW                                                                               \
   --innodb-file-per-table=1                                                                         \

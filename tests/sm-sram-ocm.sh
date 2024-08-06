@@ -63,7 +63,7 @@ docker run --detach --name=wopi.docker      --network=testnet -p 8880:8880 -t cs
 docker run --detach --network=testnet                                                   \
   --name=maria1.docker                                                                  \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                     \
-  mariadb                                                                               \
+  mariadb:11.4.2                                                                        \
   --transaction-isolation=READ-COMMITTED                                                \
   --binlog-format=ROW                                                                   \
   --innodb-file-per-table=1                                                             \
@@ -90,7 +90,7 @@ docker run --detach --network=testnet                                           
 docker run --detach --network=testnet                                                   \
   --name=maria2.docker                                                                  \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                     \
-  mariadb                                                                               \
+  mariadb:11.4.2                                                                        \
   --transaction-isolation=READ-COMMITTED                                                \
   --binlog-format=ROW                                                                   \
   --innodb-file-per-table=1                                                             \

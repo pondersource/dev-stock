@@ -70,7 +70,7 @@ echo "starting maria1.docker"
 docker run --detach --network=testnet                                                               \
   --name=maria1.docker                                                                              \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                 \
-  mariadb                                                                                           \
+  mariadb:11.4.2                                                                                    \
   --transaction-isolation=READ-COMMITTED                                                            \
   --binlog-format=ROW                                                                               \
   --innodb-file-per-table=1                                                                         \
@@ -86,9 +86,9 @@ docker run --detach --network=testnet                                           
   -e USER="einstein"                                                                                \
   -e PASS="relativity"                                                                              \
   -e REDIS_HOST="redis1.docker"                                                                     \
-  -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                          \
-  -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                   \
-  -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
+  -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                           \
+  -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                    \
+  -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                 \
   pondersource/dev-stock-owncloud-token-based-access
 
 echo "starting redis2.docker service"
@@ -100,7 +100,7 @@ echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
   --name=maria2.docker                                                                              \
   -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                 \
-  mariadb                                                                                           \
+  mariadb:11.4.2                                                                                    \
   --transaction-isolation=READ-COMMITTED                                                            \
   --binlog-format=ROW                                                                               \
   --innodb-file-per-table=1                                                                         \
@@ -116,9 +116,9 @@ docker run --detach --network=testnet                                           
   -e USER="marie"                                                                                   \
   -e PASS="radioactivity"                                                                           \
   -e REDIS_HOST="redis2.docker"                                                                     \
-  -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                          \
-  -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                   \
-  -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                \
+  -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                           \
+  -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                    \
+  -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                 \
   pondersource/dev-stock-owncloud-token-based-access
 
 waitForPort maria1.docker 3306
