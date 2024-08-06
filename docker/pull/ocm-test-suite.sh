@@ -4,7 +4,7 @@
 set -e
 
 # 3rd party images.
-docker pull mariadb:latest
+docker pull mariadb:11.4.2
 docker pull memcached:1.6.18
 docker pull collabora/code:latest
 docker pull cypress/included:13.13.1

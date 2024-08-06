@@ -5,7 +5,7 @@ set -e
 
 # 3rd party images.
 docker pull redis:latest
-docker pull mariadb:latest
+docker pull mariadb:11.4.2
 docker pull memcached:1.6.18
 docker pull theasp/novnc:latest
 docker pull rclone/rclone:latest
