@@ -1,12 +1,12 @@
 import {
-  verifyFederatedContactV27,
+  createInviteTokenV27,
   createScienceMeshShareV27,
   renameFileV27
 } from '../utils/nextcloud-v27'
 
 import {
-  openScienceMeshAppV5,
-  createLegacyInviteLinkV5,
+  acceptInviteLinkV5,
+  verifyFederatedContactV5,
   acceptShareV5,
   verifyShareV5
 } from '../utils/ocis-5'
@@ -14,11 +14,10 @@ import {
 describe('Invite link federated sharing via ScienceMesh functionality for oCIS', () => {
   it('Send invitation from Nextcloud v27 to oCIS v5', () => {
 
-    cy.loginOcis('https://ocis1.docker', 'einstein', 'relativity')
+    cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
+    cy.visit('https://nextcloud1.docker/index.php/apps/sciencemesh/contacts')
 
-    openScienceMeshAppV5()
-
-    createLegacyInviteLinkV5('nextcloud1.docker', 'ocis1.docker').then(
+    createInviteTokenV27('revanextcloud1.docker').then(
       (result) => {
         // save invite link to file.
         cy.writeFile('invite-link-nc-ocis.txt', result)
@@ -28,17 +27,14 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
   it('Accept invitation from Nextcloud v27 to oCIS v5', () => {
 
-    // load invite link from file.
-    cy.readFile('invite-link-nc-ocis.txt').then((url) => {
+    // load invite token from file.
+    cy.readFile('invite-link-nc-ocis.txt').then((token) => {
 
-      // accept invitation from Nextcloud 1.
-      cy.loginNextcloudCore(url, 'marie', 'radioactivity')
+      cy.loginOcis('https://ocis1.docker', 'einstein', 'relativity')
 
-      cy.get('input[id="accept-button"]', { timeout: 10000 })
-        .click()
+      acceptInviteLinkV5(token)
 
-      // validate 'Albert Einstein' is shown as a contact.
-      verifyFederatedContactV27('nextcloud1.docker', 'Albert Einstein', 'ocis1.docker')
+      verifyFederatedContactV5('marie', 'revanextcloud1.docker')
     })
   })
 
@@ -47,7 +43,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
 
     renameFileV27('welcome.txt', 'invite-link-nc-ocis.txt')
-    createScienceMeshShareV27('nextcloud1.docker', 'Albert Einstein', 'ocis1.docker', 'invite-link-nc-ocis.txt')
+    createScienceMeshShareV27('nextcloud1.docker', 'Albert Einstein', 'https://ocis1.docker', 'invite-link-nc-ocis.txt')
   })
 
   it('Receive ScienceMesh share <file> from Nextcloud v27 to oCIS v5', () => {

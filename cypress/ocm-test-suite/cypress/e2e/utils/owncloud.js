@@ -64,7 +64,7 @@ export function createShareLink(fileName) {
 
 export function createInviteToken(senderDomain) {
 
-	cy.get('button[id="token-generator"]').click()
+	cy.get('button[id="token-generator"]').should('be.visible').click()
 
 	return cy.get('input[class="generated-token-link"]')
 		.invoke('val')
@@ -80,7 +80,7 @@ export function createInviteToken(senderDomain) {
 
 export function createInviteLink(targetDomain) {
 
-	cy.get('button[id="token-generator"]').click()
+	cy.get('button[id="token-generator"]').should('be.visible').click()
 
 	return cy.get('input[class="generated-token-link"]')
 		.invoke('val')

@@ -58,9 +58,9 @@ export function acceptInviteLinkV5(token) {
     })
 
     getScienceMeshAcceptInvitePartV5('label', 'institution').within(() => {
-        cy.get('div[class="vs__actions"').click()
+        cy.get('div[class="vs__actions"').should('be.visible').click()
 
-        cy.get('ul[role="listbox"]').find('li').first().click()
+        cy.get('ul[role="listbox"]').find('li').first().should('be.visible').click()
     })
 
     getScienceMeshAcceptInvitePartV5('span', 'accept').click()
