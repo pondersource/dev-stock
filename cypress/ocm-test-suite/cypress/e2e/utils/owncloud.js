@@ -19,6 +19,7 @@ export function createShare(fileName, username, domain) {
 	// ensure selecting remote, instead of email or group.
 	cy.get('*[class^=ui-autocomplete]')
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Federated')
+		.should('be.visible')
 		.click()
 }
 
@@ -35,6 +36,7 @@ export function createShareGroup(fileName, group) {
 	// ensure selecting remote, instead of email or group.
 	cy.get('*[class^=ui-autocomplete]')
 		.contains('span[class="autocomplete-item-typeInfo"]', 'Group')
+		.should('be.visible')
 		.click()
 }
 
@@ -48,6 +50,7 @@ export function createShareLink(fileName) {
 		.should('be.visible')
 		.find('*[class^="oc-dialog-buttonrow"]')
 		.find('button[class="primary"]')
+		.should('be.visible')
 		.click()
 
 	return cy.get('*[data-original-title^="Copy to clipboard"]')
@@ -129,16 +132,17 @@ export function openSharingPanel(fileName) {
 
 	cy.get('#app-sidebar')
 		.get('[data-tabid="shareTabView"]')
+		.should('be.visible')
 		.click()
 }
 
 export function triggerActionInFileMenu (fileName, actionId) {
 	triggerActionForFile(fileName,'menu')
-	getRowForFile(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+	getRowForFile(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
 }
 
-export const triggerActionForFile = (filename, actionId) => getActionsForFile(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('exist').click()
+export const triggerActionForFile = (filename, actionId) => getActionsForFile(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').as('action-btn').click()
 
-export const getActionsForFile = (filename) => getRowForFile(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]')
+export const getActionsForFile = (filename) => getRowForFile(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]').should('be.visible')
 
 export const getRowForFile = (filename) => cy.get(`[data-file="${CSS.escape(filename)}"]`)
