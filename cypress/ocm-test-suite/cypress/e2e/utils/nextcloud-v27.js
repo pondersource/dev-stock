@@ -117,7 +117,7 @@ export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, c
 				var domain = usernameWithDomain.substr(lastIndex)
 
 				// remove https:// or http:// from domain (reva likes to show username@https://domain sometimes)
-				// I'm too afraid to explain the regex here let's just say its from here:
+				// I'm too afraid to explain the regex here let's just say its from here: https://stackoverflow.com/a/8206299/8549230
 				domain = domain.replace(/^\/\/|^.*?:(\/\/)?/, '');
 
 				return username + '@' + domain
