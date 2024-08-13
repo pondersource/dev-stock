@@ -40,7 +40,6 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
 
     selectAppFromLeftSide('sharingin')
 
-    // 1. check for filename existence.
     cy.get('[data-file="nc1-to-oc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

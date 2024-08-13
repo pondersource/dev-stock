@@ -88,7 +88,5 @@ describe('Native federated sharing functionality for Seafile', () => {
       .find('ul>li')
       .eq(5)
       .click()
-
-    // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
   })
 })

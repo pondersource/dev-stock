@@ -42,7 +42,6 @@ describe('Share link federated sharing functionality for ownCloud', () => {
       
       selectAppFromLeftSide('sharingin')
 
-      // 1. check for filename existence.
       cy.get('[data-file="oc1-to-oc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
     })
   })

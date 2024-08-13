@@ -34,7 +34,6 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
     // force reload the page for share to apear.
     cy.reload(true)
 
-    // 1. check for filename existence.
     cy.get('[data-cy-files-list-row-name="nc1-to-nc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

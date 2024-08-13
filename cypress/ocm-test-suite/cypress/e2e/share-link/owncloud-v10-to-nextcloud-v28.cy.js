@@ -41,7 +41,6 @@ describe('Share link federated sharing functionality for ownCloud', () => {
       // force reload the page for share to apear.
       cy.reload(true)
 
-      // 1. check for filename existence.
       cy.get('[data-cy-files-list-row-name="oc1-to-nc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')
     
     })
