@@ -230,8 +230,8 @@ changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--ho
 
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--domain--|"        "revanextcloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--homepage--|"      "revanextcloud1.docker"
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "revanextcloud1.docker/ocm/"
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "revanextcloud1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "revanextcloud1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "revanextcloud1.docker/ocm/"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--host--|"     "revanextcloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--|"        "nextcloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--path--|"  "nextcloud1.docker/remote.php/webdav/"

@@ -39,9 +39,25 @@ export function createShareLinkV27(fileName) {
 	})
 }
 
+export function createInviteTokenV27(senderDomain) {
+
+	cy.get('button[id="token-generator"]').should('be.visible').click()
+
+	return cy.get('input[class="generated-token-link"]')
+		.invoke('val')
+		.then(
+			sometext => {
+				// extract token from url.
+				const token = sometext.replace('https://meshdir.docker/meshdir?token=', '');
+      
+				return token.replace(`&providerDomain=${senderDomain}`, '')
+			}
+		);
+}
+
 export function createInviteLinkV27(targetDomain) {
 
-	cy.get('button[id="token-generator"]').click()
+	cy.get('button[id="token-generator"]').should('be.visible').click()
 
 	return cy.get('input[class="generated-token-link"]')
 		.invoke('val')
@@ -95,7 +111,16 @@ export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, c
 		.invoke('text')
 		.then(
 			usernameWithDomain => {
-				return usernameWithDomain
+				// get the index of the last @
+				var lastIndex = usernameWithDomain.lastIndexOf('@');
+				var username = usernameWithDomain.substr(0, lastIndex)
+				var domain = usernameWithDomain.substr(lastIndex + 1)
+
+				// remove https:// or http:// from domain (reva likes to show username@https://domain sometimes)
+				// I'm too afraid to explain the regex here let's just say its from here: https://stackoverflow.com/a/8206299/8549230
+				domain = domain.replace(/^\/\/|^.*?:(\/\/)?/, '');
+
+				return username + '@' + domain
 			}
 		)
 }

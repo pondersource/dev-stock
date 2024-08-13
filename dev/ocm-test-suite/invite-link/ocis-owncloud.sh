@@ -229,8 +229,8 @@ changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--ho
 
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--domain--|"        "revaowncloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--homepage--|"      "revaowncloud1.docker"
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "revaowncloud1.docker/ocm/"
-changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "revaowncloud1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "revaowncloud1.docker"
+changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "revaowncloud1.docker/ocm/"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--host--|"     "revaowncloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--|"        "owncloud1.docker"
 changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--path--|"  "owncloud1.docker/remote.php/webdav/"
