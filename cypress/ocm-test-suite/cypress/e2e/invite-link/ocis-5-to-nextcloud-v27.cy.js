@@ -56,7 +56,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
     createShareV5('invite-link-ocis-nc.txt', 'marie')
 
-    cy.wait(2000)
+    cy.wait(5000)
   })
 
   it('Receive ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
