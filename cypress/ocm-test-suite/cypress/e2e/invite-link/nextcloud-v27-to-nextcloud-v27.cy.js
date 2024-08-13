@@ -2,7 +2,9 @@ import {
   createInviteLinkV27, 
   verifyFederatedContactV27,
   createScienceMeshShareV27,
-  renameFileV27
+  renameFileV27,
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
 } from '../utils/nextcloud-v27'
 
 describe('Invite link federated sharing via ScienceMesh functionality for Nextcloud', () => {
@@ -52,6 +54,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+
+    navigationSwitchLeftSideV27('Open navigation')
+    selectAppFromLeftSideV27('shareoverview')
+    navigationSwitchLeftSideV27('Close navigation')
 
     cy.get('[data-file="invite-link-nc-nc.txt"]', { timeout: 10000 }).should('be.visible')
   })

@@ -1,4 +1,9 @@
-import { createShareLinkV27, renameFileV27 } from '../utils/nextcloud-v27'
+import { 
+  createShareLinkV27, 
+  renameFileV27,
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
+} from '../utils/nextcloud-v27'
 
 describe('Share link federated sharing functionality for Nextcloud', () => {
   it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
@@ -31,7 +36,10 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
       .find('button[class="primary"]')
       .click()
 
-    // 1. check for filename existence.
+    navigationSwitchLeftSideV27('Open navigation')
+    selectAppFromLeftSideV27('shareoverview')
+    navigationSwitchLeftSideV27('Close navigation')
+
     cy.get('[data-file="nc1-to-nc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

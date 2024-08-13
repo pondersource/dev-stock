@@ -171,6 +171,30 @@ export function openSharingPanelV27(fileName) {
 		.click()
 }
 
+// actionId possible values are:
+// 1. Open navigation
+// 2. Close navigation
+export function navigationSwitchLeftSideV27(actionId) {
+	cy.get('div[id="app-navigation-vue"]')
+		.find(`button[aria-label="${CSS.escape(actionId)}"]`)
+        .should('be.visible')
+		.click()
+}
+
+// appId possible values are:
+// 1. files
+// 2. recent
+// 3. favorites
+// 4. shareoverview
+// 5. systemtagsfilter
+// 6. trashbin
+export function selectAppFromLeftSideV27(appId) {
+	cy.get('div[id="app-navigation-vue"]')
+		.find(`li[data-cy-files-navigation-item="${CSS.escape(appId)}"]`)
+        .should('be.visible')
+		.click()
+}
+
 export function triggerActionInFileMenuV27(fileName, actionId) {
 	triggerActionForFileV27(fileName, 'menu')
 	getRowForFileV27(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
