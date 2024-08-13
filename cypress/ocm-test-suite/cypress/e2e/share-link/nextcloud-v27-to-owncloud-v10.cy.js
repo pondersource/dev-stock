@@ -1,4 +1,11 @@
-import { createShareLinkV27, renameFileV27 } from '../utils/nextcloud-v27'
+import { 
+  createShareLinkV27, 
+  renameFileV27 
+} from '../utils/nextcloud-v27'
+
+import {
+  selectAppFromLeftSide
+} from '../utils/owncloud'
 
 describe('Share link federated sharing functionality for Nextcloud', () => {
   it('Send federated share <file> from Nextcloud v27 to ownCloud v10', () => {
@@ -30,6 +37,8 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+    
+    selectAppFromLeftSide('sharingin')
 
     // 1. check for filename existence.
     cy.get('[data-file="nc1-to-oc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')

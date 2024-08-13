@@ -131,13 +131,28 @@ export function openSharingPanel(fileName) {
 	triggerActionForFile(fileName, 'Share')
 
 	cy.get('#app-sidebar')
-		.get('[data-tabid="shareTabView"]')
+		.find('[data-tabid="shareTabView"]')
 		.should('be.visible')
 		.click()
 }
 
+// appId possible values are:
+// 1. files
+// 2. favorites
+// 3. sharingin
+// 4. sharingout
+// 5. sharinglinks
+// 6. systemtagsfilter
+// 7. trashbin
+export function selectAppFromLeftSide(appId) {
+	cy.get('div[id="app-navigation"]')
+		.find(`li[data-id="${CSS.escape(appId)}"]`)
+        .should('be.visible')
+		.click()
+}
+
 export function triggerActionInFileMenu (fileName, actionId) {
-	triggerActionForFile(fileName,'menu')
+	triggerActionForFile(fileName, 'menu')
 	getRowForFile(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
 }
 

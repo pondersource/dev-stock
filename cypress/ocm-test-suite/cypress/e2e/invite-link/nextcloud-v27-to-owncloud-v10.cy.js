@@ -1,9 +1,12 @@
 import {
   createInviteLinkV27, 
-  verifyFederatedContactV27,
   createScienceMeshShareV27,
   renameFileV27
 } from '../utils/nextcloud-v27'
+
+import {
+  selectAppFromLeftSide
+} from '../utils/owncloud'
 
 describe('Invite link federated sharing via ScienceMesh functionality for Nextcloud to ownCloud', () => {
   it('Send invitation from Nextcloud v27 to ownCloud v10', () => {
@@ -56,6 +59,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+
+    selectAppFromLeftSide('sharingin')
 
     cy.get('[data-file="invite-link-nc-oc.txt"]', { timeout: 10000 }).should('be.visible')
   })
