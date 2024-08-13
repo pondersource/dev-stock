@@ -23,6 +23,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
         cy.writeFile('invite-link-ocis-ocis.txt', result)
       }
     )
+    cy.wait(5000)
   })
 
   it('Accept invitation from oCIS v5 to oCIS v5', () => {
@@ -36,6 +37,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
       verifyFederatedContactV5('Albert Einstein', 'ocis1.docker')
     })
+    cy.wait(5000)
   })
 
   it('Send ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
@@ -47,6 +49,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     openFilesAppV5()
 
     createShareV5('invite-link-ocis-ocis.txt', 'marie')
+    cy.wait(5000)
   })
 
   it('Receive ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
@@ -62,5 +65,6 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
       'Albert Einstein',
       'Marie Skłodowska Curie'
     )
+    cy.wait(5000)
   })
 })

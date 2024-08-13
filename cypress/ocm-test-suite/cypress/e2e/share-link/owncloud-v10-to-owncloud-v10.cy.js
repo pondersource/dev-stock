@@ -1,4 +1,8 @@
-import { createShareLink, renameFile } from '../utils/owncloud'
+import { 
+  createShareLink, 
+  renameFile,
+  selectAppFromLeftSide
+} from '../utils/owncloud'
 
 describe('Share link federated sharing functionality for ownCloud', () => {
   it('Send federated share <file> from ownCloud v10 to ownCloud v10', () => {
@@ -35,8 +39,9 @@ describe('Share link federated sharing functionality for ownCloud', () => {
         .find('*[class^="oc-dialog-buttonrow"]')
         .find('button[class="primary"]')
         .click()
+      
+      selectAppFromLeftSide('sharingin')
 
-      // 1. check for filename existence.
       cy.get('[data-file="oc1-to-oc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
     })
   })

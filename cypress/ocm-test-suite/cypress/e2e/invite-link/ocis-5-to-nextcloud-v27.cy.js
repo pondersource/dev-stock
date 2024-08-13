@@ -6,6 +6,11 @@ import {
   createShareV5,
 } from '../utils/ocis-5'
 
+import {
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
+} from '../utils/nextcloud-v27'
+
 describe('Invite link federated sharing via ScienceMesh functionality for oCIS', () => {
   it('Send invitation from oCIS v5 to Nextcloud v27', () => {
 
@@ -50,6 +55,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     openFilesAppV5()
 
     createShareV5('invite-link-ocis-nc.txt', 'marie')
+
+    cy.wait(5000)
   })
 
   it('Receive ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
@@ -61,6 +68,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+
+    navigationSwitchLeftSideV27('Open navigation')
+    selectAppFromLeftSideV27('shareoverview')
+    navigationSwitchLeftSideV27('Close navigation')
 
     cy.get('[data-file="invite-link-ocis-nc.txt"]', { timeout: 10000 }).should('be.visible')
   })

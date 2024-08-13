@@ -1,4 +1,12 @@
-import { createShare, renameFile } from '../utils/owncloud'
+import { 
+  createShare, 
+  renameFile 
+} from '../utils/owncloud'
+
+import {
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
+} from '../utils/nextcloud-v27'
 
 describe('OCM federated sharing functionality for ownCloud', () => {
   it('Send federated share <file> from ownCloud v10 to Nextcloudn v27', () => {
@@ -19,8 +27,10 @@ describe('OCM federated sharing functionality for ownCloud', () => {
       .find('button[class="primary"]')
       .click()
 
-    // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
-    // 1. check for filename existence.
+    navigationSwitchLeftSideV27('Open navigation')
+    selectAppFromLeftSideV27('shareoverview')
+    navigationSwitchLeftSideV27('Close navigation')
+
     cy.get('[data-file="oc1-to-nc1-share.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

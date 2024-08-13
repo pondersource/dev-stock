@@ -1,4 +1,9 @@
-import { createInviteLink, createScienceMeshShare, renameFile } from '../utils/owncloud'
+import { 
+  createInviteLink, 
+  createScienceMeshShare, 
+  renameFile,
+  selectAppFromLeftSide,
+} from '../utils/owncloud'
 
 describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
   it('Send invitation from ownCloud v10 to ownCloud v10', () => {
@@ -51,6 +56,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+    
+    selectAppFromLeftSide('sharingin')
 
     cy.get('[data-file="oc1-to-oc2-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
   })

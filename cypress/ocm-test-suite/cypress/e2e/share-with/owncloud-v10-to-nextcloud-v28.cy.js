@@ -22,8 +22,6 @@ describe('OCM federated sharing functionality for ownCloud', () => {
     // force reload the page for share to apear.
     cy.reload(true)
 
-    // TODO: verify share received: 1. check for file name existence, 2. check if it can be downloaded, 3. compare checksum to the original file to make sure it is the same file.
-    // 1. check for filename existence.
     cy.get('[data-cy-files-list-row-name="oc1-to-nc1-share.txt"]', { timeout: 10000 }).should('be.visible')
   })
 })

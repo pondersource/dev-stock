@@ -6,6 +6,10 @@ import {
   createShareV5,
 } from '../utils/ocis-5'
 
+import {
+  selectAppFromLeftSide
+} from '../utils/owncloud'
+
 describe('Invite link federated sharing via ScienceMesh functionality for oCIS', () => {
   it('Send invitation from oCIS v5 to ownCloud v10', () => {
 
@@ -61,6 +65,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
+
+    selectAppFromLeftSide('sharingin')
 
     cy.get('[data-file="invite-link-ocis-oc.txt"]', { timeout: 10000 })
       .should('be.visible')
