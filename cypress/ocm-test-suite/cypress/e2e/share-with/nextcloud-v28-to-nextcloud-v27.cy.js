@@ -1,4 +1,12 @@
-import { createShareV28, renameFileV28 } from '../utils/nextcloud-v28'
+import { 
+  createShareV28, 
+  renameFileV28 
+} from '../utils/nextcloud-v28'
+
+import {
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
+} from '../utils/nextcloud-v27'
 
 describe('Native federated sharing functionality for Nextcloud', () => {
   it('Send federated share <file> from Nextcloud v28 to Nextcloud v27', () => {

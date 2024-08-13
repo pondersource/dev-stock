@@ -1,4 +1,12 @@
-import { createShare, renameFile } from '../utils/owncloud'
+import { 
+  createShare, 
+  renameFile 
+} from '../utils/owncloud'
+
+import {
+  navigationSwitchLeftSideV27,
+  selectAppFromLeftSideV27,
+} from '../utils/nextcloud-v27'
 
 describe('OCM federated sharing functionality for ownCloud', () => {
   it('Send federated share <file> from ownCloud v10 to Nextcloudn v27', () => {
