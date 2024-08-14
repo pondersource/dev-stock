@@ -23,19 +23,11 @@ rm -rf                                                                          
 mkdir -p                                                                                /etc/revad
 cp /configs/revad/*                                                                     /etc/revad/
 
-if [ "${HOST::-1}" == "revacernbox" ]; then
-  cp /configs/cernbox/*                                                                 /etc/revad/
-  rm /etc/revad/sciencemesh*.toml
-fi
-
 # substitute placeholders and "external" values with valid ones for the testnet.
 sed -i "s/your.revad.org/${HOST}.docker/"                                               /etc/revad/*.toml
 sed -i "s/localhost/${HOST}.docker/"                                                    /etc/revad/*.toml
 sed -i "s/your.efss.org/${HOST//reva/}.docker/"                                         /etc/revad/*.toml
 sed -i "s/your.nginx.org/${HOST//reva/}.docker/"                                        /etc/revad/*.toml
-# sed: -e expression #1, char 22: unknown option to `s'
-# sed -i "s/your.wopi.org/${HOST/reva/wopi/}.docker/"                                     /etc/revad/*.toml
-sed -i "s/debug/trace/"                                                                 /etc/revad/*.toml
 
 # update OS certificate store.
 mkdir -p /tls

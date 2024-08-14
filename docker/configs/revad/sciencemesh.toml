@@ -31,7 +31,7 @@ certfile = "/tls/server.crt"
 keyfile = "/tls/server.key"
 
 [log]
-level = "debug"
+level = "trace"
 
 [shared]
 gatewaysvc = "{{ vars.internal_gateway }}:19000"
