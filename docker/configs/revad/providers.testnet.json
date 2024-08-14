@@ -184,12 +184,12 @@
     ]
   },
   {
-    "name": "Instance 1",
-    "full_name": "Instance 1 provider",
-    "organization": "Instance 1",
+    "name": "oCIS 1",
+    "full_name": "oCIS 1 provider",
+    "organization": "oCIS 1",
     "domain": "ocis1.docker",
     "homepage": "https://ocis1.docker",
-    "description": "Instance 1 cloud storage",
+    "description": "oCIS 1 cloud storage",
     "services": [
       {
         "endpoint": {
@@ -220,12 +220,12 @@
     ]
   },
   {
-    "name": "Instance 2",
-    "full_name": "Instance 2 provider",
-    "organization": "Instance 2",
+    "name": "oCIS 2",
+    "full_name": "oCIS 2 provider",
+    "organization": "oCIS 2",
     "domain": "ocis2.docker",
     "homepage": "https://ocis2.docker",
-    "description": "Instance 2 cloud storage",
+    "description": "oCIS 2 cloud storage",
     "services": [
       {
         "endpoint": {
