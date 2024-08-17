@@ -32,6 +32,11 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/revad.Dockerfi
 echo Building pondersource/dev-stock-php-base
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/php-base.Dockerfile --tag pondersource/dev-stock-php-base:latest .
 
+
+# echo Building pondersource/dev-stock-nextcloud
+# docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v29.0.4" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v29.0.4 .
+
+
 echo Building pondersource/dev-stock-nextcloud
 docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v28.0.7" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.7 --tag pondersource/dev-stock-nextcloud:latest .
 
@@ -74,7 +79,3 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-feder
 
 echo Building pondersource/dev-stock-owncloud-ocm-test-suite
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-ocm-test-suite.Dockerfile --tag pondersource/dev-stock-owncloud-ocm-test-suite:latest .
-
-
-echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v29.0.4" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v29.0.4 .
