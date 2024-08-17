@@ -20,8 +20,7 @@ fi
 
 # create new dir and copy relevant configs there.
 rm -rf                                                                                  /etc/revad
-mkdir -p                                                                                /etc/revad
-cp /configs/revad/*                                                                     /etc/revad/
+cp -r /configs/revad                                                                    /etc/revad
 
 # substitute placeholders and "external" values with valid ones for the testnet.
 sed -i "s/your.revad.org/${HOST}.docker/"                                               /etc/revad/*.toml
