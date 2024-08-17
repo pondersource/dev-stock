@@ -6,17 +6,15 @@
 internal_gateway = "your.revad.org"
 provider_domain = "your.revad.org"
 external_reva_endpoint = "https://your.nginx.org"   # append here any route if applicable
-wopi_endpoint = "http://your.wopi.org:8880"
 ocmshares_json_file = "/var/tmp/reva/shares_cernbox.json"
 machine_api_key = "machine-api-key"
-wopi_shared_secret = "shared-secret-2"
 
 [http]
-certfile = "/etc/tls/your.revad.ssl.crt"
-keyfile = "/etc/tls/your.revad.ssl.key"
+certfile = "/tls/server.crt"
+keyfile = "/tls/server.key"
 
 [log]
-level = "debug"
+level = "trace"
 
 [shared]
 gatewaysvc = "{{ vars.internal_gateway }}:19000"
@@ -57,35 +55,6 @@ mime_types = [
     {"mime_type" = "application/vnd.jupyter", "extension" = "ipynb", "name" = "Jupyter Notebook", "description" = "Jupyter Notebook"}
 ]
 
-[[grpc.services.appprovider]]
-driver = "wopi"
-custom_mime_types_json = "/etc/revad/custom-mime-types-demo.json"
-mime_types = ["application/vnd.oasis.opendocument.text", "application/vnd.oasis.opendocument.spreadsheet", "application/vnd.oasis.opendocument.presentation", "text/rtf"]
-app_provider_url = "{{ grpc.services.appprovider[0].address }}"
-language = "en-GB"
-
-[grpc.services.appprovider.drivers.wopi]
-iop_secret = "{{ vars.wopi_shared_secret }}"
-wopi_url = "{{ vars.wopi_endpoint }}"
-app_name = "Collabora"
-app_url = "http://collabora.docker:9980"
-app_int_url = "http://collabora.docker:9980"
-
-
-# [[grpc.services.appprovider]]
-# driver = "wopi"
-# custom_mime_types_json = "/etc/revad/custom-mime-types-demo.json"
-# mime_types = ["text/markdown", "application/compressed-markdown", "text/plain"]
-# app_provider_url = "{{ grpc.services.appprovider[1].address }}"
-#
-# [grpc.services.appprovider.drivers.wopi]
-# iop_secret = "{{ vars.wopi_shared_secret }}"
-# wopi_url = "{{ vars.wopi_endpoint }}"
-# app_name = "CodiMD"
-# app_url = "https://codimd.docker"
-# app_int_url = "https://codimd.docker"
-
-
 ### AUTH ###
 
 [grpc.services.authregistry]
@@ -104,7 +73,7 @@ auth_manager = "oidc"
 users = "/etc/revad/users.demo.json"
 
 [grpc.services.authprovider.auth_managers.oidc]
-issuer = "https://idp.docker:8443/realms/cernbox"
+issuer = "https://idp.docker/realms/cernbox"
 uid_claim = "cern_uid"
 gid_claim = "cern_gid"
 gatewaysvc = "{{ vars.internal_gateway }}:19000"
