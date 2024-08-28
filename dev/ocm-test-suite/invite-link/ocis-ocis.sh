@@ -100,7 +100,7 @@ function createEfssOcis() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp/certificates"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp/certificates"
 
 # copy init files.
 cp -fr "${ENV_ROOT}/docker/configs/ocis"                  "${ENV_ROOT}/temp/ocis"

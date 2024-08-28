@@ -107,7 +107,7 @@ function federatedGroupsInsertIntoDB() {
 
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -Rf "${ENV_ROOT}/docker/scripts/federatedgroups"                 "${ENV_ROOT}/temp/federatedgroups"

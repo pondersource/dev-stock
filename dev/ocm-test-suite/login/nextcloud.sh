@@ -108,7 +108,7 @@ function createEfss() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -f "${ENV_ROOT}/docker/scripts/init/nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"

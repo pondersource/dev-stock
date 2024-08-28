@@ -111,7 +111,7 @@ function createEfss() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -f "${ENV_ROOT}/docker/scripts/init/owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"

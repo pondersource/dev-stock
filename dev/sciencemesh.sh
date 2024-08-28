@@ -141,7 +141,7 @@ function sciencemeshInsertIntoDB() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -fr  "${ENV_ROOT}/docker/scripts/reva"                           "${ENV_ROOT}/temp/"

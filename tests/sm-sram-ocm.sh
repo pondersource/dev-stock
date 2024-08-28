@@ -46,7 +46,7 @@ function waitForCollabora {
 }
 
 # create temp directory if it doesn't exist.
-[ ! -d "${ENV_ROOT}/temp" ] && mkdir --parents "${ENV_ROOT}/temp"
+[ ! -d "${ENV_ROOT}/temp" ] && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -f ./docker/scripts/init/owncloud-sm-sram-ocm.sh  ./temp/owncloud.sh
