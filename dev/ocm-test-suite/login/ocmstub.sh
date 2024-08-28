@@ -66,13 +66,19 @@ function createEfss() {
   fi
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
-
-  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
-    --name="${platform}${number}.docker"                                                                                    \
-    --add-host "host.docker.internal:host-gateway"                                                                          \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/shared/ssl/${platform}${number}.docker.crt"           \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/shared/ssl/${platform}${number}.docker.key"           \
-    -e HOST="${platform}${number}"                                                                                          \
+  echo docker run --detach --network=testnet                                                  \
+    --name="${platform}${number}.docker"                                                                      \
+    --add-host "host.docker.internal:host-gateway"                                                            \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
+    "${image}:${tag}"
+  redirect_to_null_cmd docker run --detach --network=testnet                                                  \
+    --name="${platform}${number}.docker"                                                                      \
+    --add-host "host.docker.internal:host-gateway"                                                            \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
     "${image}:${tag}"
 
   # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
