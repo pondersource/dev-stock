@@ -193,7 +193,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://owncloud1.docker -> username: einstein               password: relativity"
+  echo "https://owncloud1.docker -> username: marie               password: radioactivity"
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
