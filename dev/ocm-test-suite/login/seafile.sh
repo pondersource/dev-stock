@@ -195,7 +195,8 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://nextcloud1.docker -> username: einstein               password: relativity"
+  echo "http://seafile1.docker -> username: einstein               password: relativity"
+  echo "FIXME: you will see Page unavailable on http://seafile1.docker/accounts/login/?next="
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
