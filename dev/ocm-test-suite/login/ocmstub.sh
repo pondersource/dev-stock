@@ -70,11 +70,10 @@ function createEfss() {
   redirect_to_null_cmd docker run --detach --network=testnet                                                                \
     --name="${platform}${number}.docker"                                                                                    \
     --add-host "host.docker.internal:host-gateway"                                                                          \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/shared/ssl/${platform}${number}.docker.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/shared/ssl/${platform}${number}.docker.key"           \
     -e HOST="${platform}${number}"                                                                                          \
     "${image}:${tag}"
-
-  # wait for hostname port to be open.
-  waitForPort "${platform}${number}.docker"       443
 
   # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
   docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
@@ -83,6 +82,10 @@ function createEfss() {
   docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
   docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
+  docker restart "${platform}${number}.docker"
+
+  # wait for hostname port to be open.
+  waitForPort "${platform}${number}.docker"       443
   redirect_to_null_cmd echo ""
 }
 
