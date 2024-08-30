@@ -48,7 +48,7 @@ describe('Native federated sharing functionality for Seafile', () => {
       .click()
 
     cy.get('*[role^="dialog"]')
-      .contains(/^seafile\w+/)
+      .contains(/^ocmstub\w+/)
       .click()
 
     cy.get('*[id^="share-to-other-server-panel"]')
