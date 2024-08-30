@@ -33,7 +33,7 @@ sed -i "51 i\      'password' => '',"                                   /var/www
 sed -i "52 i\      'dbindex' => 0,"                                     /var/www/html/config/config.php
 sed -i "53 i\  ],"                                                      /var/www/html/config/config.php
 
-# some how above command doesn't have the corrct backslash escaping and we have to do it again! 
+# some how above command doesn't have the corrct backslash escaping and we have to do it again!
 sed -i 's/OCMemcacheRedis/\\OC\\Memcache\\Redis/g' /var/www/html/config/config.php
 
 echo "Installing Token Based Access"

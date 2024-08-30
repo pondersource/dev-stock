@@ -1,6 +1,6 @@
-import { 
-  createShareV28, 
-  renameFileV28 
+import {
+  createShareV28,
+  renameFileV28
 } from '../utils/nextcloud-v28'
 
 import {

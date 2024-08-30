@@ -196,7 +196,7 @@ createEfss    nextcloud   1    einstein    relativity      nextcloud.sh   latest
 # syntax:
 # createReva platform number port.
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # port:       maps a port on local host to port 80 of reva, for `curl` purposes! should be unique.
@@ -213,7 +213,7 @@ createReva nextcloud  1
 # syntax:
 # sciencemeshInsertIntoDB platform number.
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 
@@ -269,7 +269,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   ### Cypress ###
   ###############
 
-  # create cypress and attach its display to the VNC server container. 
+  # create cypress and attach its display to the VNC server container.
   # this way you can view inside cypress container through vnc server.
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
@@ -312,7 +312,7 @@ else
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/invite-link/owncloud-${P1_VER}-to-nextcloud-${P2_VER}.cy.js"
-  
+
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"

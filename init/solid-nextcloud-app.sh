@@ -39,7 +39,7 @@ BRANCH_SOLID=main
     --branch ${BRANCH_SOLID}                                                                        \
     ${REPO_SOLID}                                                                                   \
     solid-nextcloud                                                                                 \
-    
+
 [ ! -d "nextcloud/apps/solid" ] &&                                                                  \
     mv solid-nextcloud nextcloud/apps/solid-nextcloud                                               \
     &&                                                                                              \

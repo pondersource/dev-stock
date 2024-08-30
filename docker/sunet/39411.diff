@@ -9,10 +9,10 @@ index 7e115cf9b422..3e71d0787b31 100644
 +	public const SESSION_UID_CONFIGURING = 'two_factor_auth_configuring';
  	public const REMEMBER_LOGIN = 'two_factor_remember_login';
  	public const BACKUP_CODES_PROVIDER_ID = 'backup_codes';
- 
+
 @@ -359,7 +360,7 @@ public function needsSecondFactor(IUser $user = null): bool {
  				$tokensNeeding2FA = $this->config->getUserKeys($user->getUID(), 'login_token_2fa');
- 
+
  				if (!\in_array((string) $tokenId, $tokensNeeding2FA, true)) {
 -					$this->session->set(self::SESSION_UID_DONE, $user->getUID());
 +					$this->session->set(self::SESSION_UID_CONFIGURING, $user->getUID());

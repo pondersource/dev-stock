@@ -1,6 +1,6 @@
-import { 
-  createShare, 
-  renameFile 
+import {
+  createShare,
+  renameFile
 } from '../utils/owncloud'
 
 import {

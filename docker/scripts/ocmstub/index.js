@@ -48,7 +48,7 @@ const server = https.createServer(HTTPS_OPTIONS, async (req, res) => {
                         items.push(`  <li>${key}: Please run <pre>ocm-invite-forward -idp ${providerDomain} -token ${token}</pre> in Reva's CLI tool.</li>`);
                     }
                 })
-                
+
                 sendHTML(res, `Welcome to the meshdir stub. Please click a server to continue to:\n<ul>${items.join("\n")}</ul>\n<script>\n${scriptLines.join("\n")}\n</script>\n`);
             } else {
 

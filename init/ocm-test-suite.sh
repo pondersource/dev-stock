@@ -56,7 +56,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
         --branch ${BRANCH_NEXTCLOUD}                                                                    \
         ${REPO_NEXTCLOUD}                                                                               \
         nextcloud
-    
+
     # ownCloud source code.
     [ ! -d "owncloud" ] &&                                                                              \
         git clone                                                                                       \
@@ -64,7 +64,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
         --branch ${BRANCH_OWNCLOUD}                                                                     \
         ${REPO_OWNCLOUD}                                                                                \
         owncloud
-    
+
     # Reva source code.
     [ ! -d "reva" ] &&                                                                                  \
         git clone                                                                                       \
@@ -81,11 +81,11 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
 else
     [ ! -d "nextcloud/apps" ] &&                                                                        \
         mkdir -p nextcloud/apps
-    
+
     # ownCloud source code.
     [ ! -d "owncloud/apps" ] &&                                                                         \
         mkdir -p owncloud/apps
-    
+
     [ ! -d "reva" ] &&                                                                                  \
         mkdir  -p reva
 fi

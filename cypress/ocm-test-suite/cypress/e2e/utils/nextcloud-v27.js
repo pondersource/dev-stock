@@ -49,7 +49,7 @@ export function createInviteTokenV27(senderDomain) {
 			sometext => {
 				// extract token from url.
 				const token = sometext.replace('https://meshdir.docker/meshdir?token=', '');
-      
+
 				return token.replace(`&providerDomain=${senderDomain}`, '')
 			}
 		);

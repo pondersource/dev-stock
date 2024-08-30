@@ -141,7 +141,7 @@ createEfss owncloud   2   marie     radioactivity     federatedgroups
 # syntax:
 # federatedGroupsInsertIntoDB platform number.
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 

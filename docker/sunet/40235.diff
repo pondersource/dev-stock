@@ -125,7 +125,7 @@
 @@ -486,6 +487,13 @@ class Manager implements IManager {
  		return $result;
  	}
- 
+
 +	/**
 +	 * @param string $entity
 +	 * @param array $events

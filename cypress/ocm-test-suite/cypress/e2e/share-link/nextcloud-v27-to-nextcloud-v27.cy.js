@@ -1,5 +1,5 @@
-import { 
-  createShareLinkV27, 
+import {
+  createShareLinkV27,
   renameFileV27,
   navigationSwitchLeftSideV27,
   selectAppFromLeftSideV27,
@@ -17,7 +17,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
 
         cy.get('button[id="header-actions-toggle"]').click()
         cy.get('button[id="save-external-share"]').click()
-        
+
         cy.get('form[class="save-form"]').within(() => {
           cy.get('input[id="remote_address"]').type('michiel@nextcloud2.docker')
           cy.get('input[id="save-button-confirm"]').click()

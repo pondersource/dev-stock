@@ -62,7 +62,7 @@ $config = [
     ],
 
 
-    
+
     'example-sql' => [
         'sqlauth:SQL',
         'dsn' => 'mysql:host=sunet-ssp-mdb;port=3306;dbname=saml',
@@ -70,7 +70,7 @@ $config = [
         'password' => 'sspus3r',
         'query' => 'SELECT username, display_name, mfa_verified  FROM users WHERE username = :username AND AES_DECRYPT(password,"SECRET") = :password',
     ],
-    
+
 
     /*
     'example-static' => [

@@ -92,7 +92,7 @@ case "${TEST_CASE}" in
       "nextcloud-seafile")
         echo -n "not supported"
         ;;
-      
+
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -104,7 +104,7 @@ case "${TEST_CASE}" in
       "owncloud-seafile")
         echo -n "not supported"
         ;;
-      
+
       "seafile-nextcloud")
         echo -n "not supported"
         ;;
@@ -133,7 +133,7 @@ case "${TEST_CASE}" in
       "nextcloud-owncloud")
         "${ENV_ROOT}/dev/ocm-test-suite/share-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
-      
+
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/share-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -158,11 +158,11 @@ case "${TEST_CASE}" in
       "nextcloud-owncloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
-      
+
       "nextcloud-ocis")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
-      
+
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -178,11 +178,11 @@ case "${TEST_CASE}" in
       "ocis-ocis")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
-      
+
       "ocis-owncloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
-      
+
       "ocis-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -192,7 +192,7 @@ case "${TEST_CASE}" in
         ;;
     esac
     ;;
-  
+
   *)
     echo -n "unknown"
     ;;

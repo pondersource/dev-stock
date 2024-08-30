@@ -25,7 +25,7 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
         .find('ul[class="app-menu-main"]')
         .find('li[data-app-id="files"]')
         .click()
-    
+
     // files app should be visible.
     cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/)
 })

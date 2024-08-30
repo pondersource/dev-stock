@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e 
+set -e
 
 curl --request POST \
   --url https://$1/index.php/apps/federatedgroups/scim/Groups \
@@ -31,7 +31,7 @@ curl --request POST \
    "urn:mace:surf.nl:sram:scim:extension:Group":{
       "description":"Provisioned by service Research Drive test - ",
       "labels":[
-         
+
       ],
       "urn":"uniharderwijk:surfdrive_test:srd_test-testgroup"
    },

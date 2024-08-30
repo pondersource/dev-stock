@@ -3,4 +3,3 @@ describe('Login Seafile', () => {
           cy.loginSeafile('http://seafile1.docker', 'jonathan@seafile.com', 'xu')
     })
   })
-  
