@@ -84,13 +84,6 @@ function createEfss() {
   # wait for hostname port to be open.
   waitForPort "${platform}${number}.docker"       443
 
-  # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
-
   redirect_to_null_cmd echo ""
 }
 

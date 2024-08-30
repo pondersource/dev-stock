@@ -13,11 +13,6 @@ RUN apt install -yq iproute2
 RUN git clone https://github.com/michielbdejong/ocm-stub /ocmstub
 WORKDIR /ocmstub
 
-# trust all the certificates:
-COPY ./tls/certificates/*                                       /tls/
-RUN cp /tls/*.crt /usr/local/share/ca-certificates/
-RUN update-ca-certificates
-
 RUN npm install
 
 # run the app
