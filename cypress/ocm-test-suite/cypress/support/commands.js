@@ -90,11 +90,11 @@ Cypress.Commands.add('loginOcmStub', (url) => {
     cy.visit(url)
 
     // login buton is visible in browser.
-	cy.get('button[value="Log in"]', { timeout: 10000 }).should('be.visible')
+	cy.get('input[value="Log in"]', { timeout: 10000 }).should('be.visible')
 
     // login with button.
-    cy.get('button[value="Log in"]').click()
+    cy.get('input[value="Log in"]').click()
 
     // files app should be visible.
-    cy.url({ timeout: 10000 }).should('match', /^\/?session=active/)
+    cy.url({ timeout: 10000 }).should('match', /\/?session=active/)
 })
