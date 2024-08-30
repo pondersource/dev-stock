@@ -13,15 +13,16 @@ describe('Native federated sharing functionality for Nextcloud v28', () => {
     // accept share from OcmStub 2.
     cy.loginOcmStub('https://ocmstub2.docker/?')
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
-
-    // force reload the page for share to apear.
-    cy.reload(true)
-
-    cy.get('[data-cy-files-list-row-name="nc1-to-os2-share.txt"]', { timeout: 10000 }).should('be.visible')
+    cy.contains('"shareWith": "michiel@https://ocmstub2.docker"').should('be.visible')
+    cy.contains('"shareType": "user"').should('be.visible')
+    cy.contains('"name": "nc1-to-os2-share.txt"').should('be.visible')
+    cy.contains('"resourceType": "file"').should('be.visible')
+    cy.contains('"owner": "einstein@https://nextcloud1.docker/"').should('be.visible')
+    cy.contains('"sharedBy": "einstein@https://nextcloud1.docker/"').should('be.visible')
+    cy.contains('"ownerDisplayName": "einstein"').should('be.visible')
+    cy.contains('"description": ""').should('be.visible')
+    cy.contains('"shareWith": "michiel@https://ocmstub2.docker"').should('be.visible')
+    cy.contains('"protocol": { "name": "webdav", "options": { "sharedSecret": "').should('be.visible')
+    cy.contains('"permissions": "{http://open-cloud-mesh.org/ns}share-permissions"').should('be.visible')
   })
 })
