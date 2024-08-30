@@ -25,12 +25,9 @@ export ENV_ROOT=${ENV_ROOT}
 #   - 11.0.5
 EFSS_PLATFORM_1_VERSION=${1:-"11.0.5"}
 
-# seafile version:
-#   - 8.0.8
-#   - 9.0.10
-#   - 10.0.1
-#   - 11.0.5
-EFSS_PLATFORM_2_VERSION=${2:-"11.0.5"}
+# ocmstub version:
+#   - 1.0
+EFSS_PLATFORM_2_VERSION=${2:-"1.0"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}
@@ -137,6 +134,43 @@ function createEfssSeafile() {
   redirect_to_null_cmd echo ""
 }
 
+function createOcmStub() {
+  local platform="${1}"
+  local number="${2}"
+  local user="${3}"
+  local password="${4}"
+  local init_script="${5}"
+  local tag="${6-latest}"
+  local image="${7}"
+
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
+
+  redirect_to_null_cmd echo "creating efss ${platform} ${number}"
+  echo docker run --detach --network=testnet                                                  \
+    --name="${platform}${number}.docker"                                                                      \
+    --add-host "host.docker.internal:host-gateway"                                                            \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
+    "${image}:${tag}"
+  redirect_to_null_cmd docker run --detach --network=testnet                                                  \
+    --name="${platform}${number}.docker"                                                                      \
+    --add-host "host.docker.internal:host-gateway"                                                            \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
+    "${image}:${tag}"
+
+  # wait for hostname port to be open.
+  waitForPort "${platform}${number}.docker"       443
+
+  redirect_to_null_cmd echo ""
+}
+
 # delete and create temp directory.
 rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
@@ -156,7 +190,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 
 # Seafiles.
 createEfssSeafile seafile    1  jonathan@seafile.com      xu                 seafile2    "${EFSS_PLATFORM_1_VERSION}"
-createEfssSeafile seafile    2  giuseppe@cern.ch          lopresti           seafile1    "${EFSS_PLATFORM_2_VERSION}"
+createOcmStub    ocmstub    2    michiel     dejong        ocmstub.sh    "${EFSS_PLATFORM_2_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
