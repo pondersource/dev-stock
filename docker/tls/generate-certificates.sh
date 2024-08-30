@@ -43,32 +43,32 @@ function createCertificate {
     -extfile          "${ENV_ROOT}/certificates/${1}.cnf"
 }
 
-# rm -rf "${ENV_ROOT}/certificates"
-# mkdir -p "${ENV_ROOT}/certificates"
+rm -rf "${ENV_ROOT}/certificates"
+mkdir -p "${ENV_ROOT}/certificates"
 
-# createCertificate idp
-# sudo chown 1000:root "${ENV_ROOT}"/certificates/idp.*
+createCertificate idp
+sudo chown 1000:root "${ENV_ROOT}"/certificates/idp.*
 
-# createCertificate meshdir
-# createCertificate revad1
-# createCertificate revad2
+createCertificate meshdir
+createCertificate revad1
+createCertificate revad2
 
-# for efss in owncloud nextcloud cernbox; do
-#   createCertificate ${efss}1
-#   createCertificate ${efss}2
-#   createCertificate ${efss}3
-#   createCertificate ${efss}4
-#   createCertificate reva${efss}1
-#   createCertificate reva${efss}2
-#   createCertificate reva${efss}3
-#   createCertificate reva${efss}4
-#   createCertificate wopi${efss}1
-#   createCertificate wopi${efss}2
-#   createCertificate wopi${efss}3
-#   createCertificate wopi${efss}4
-# done
+for efss in owncloud nextcloud cernbox; do
+  createCertificate ${efss}1
+  createCertificate ${efss}2
+  createCertificate ${efss}3
+  createCertificate ${efss}4
+  createCertificate reva${efss}1
+  createCertificate reva${efss}2
+  createCertificate reva${efss}3
+  createCertificate reva${efss}4
+  createCertificate wopi${efss}1
+  createCertificate wopi${efss}2
+  createCertificate wopi${efss}3
+  createCertificate wopi${efss}4
+done
 
-for efss in ocmstub; do
+for efss in seafile ocis ocmstub; do
   createCertificate ${efss}1
   createCertificate ${efss}2
   createCertificate ${efss}3
