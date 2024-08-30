@@ -1,6 +1,4 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1-alpine
+FROM node
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -18,6 +16,5 @@ COPY ./tls/certificates/meshdir.crt                                       /tls/m
 COPY ./tls/certificates/meshdir.key                                       /tls/meshdir.key
 
 # run the app
-USER bun
 EXPOSE 443/tcp
-ENTRYPOINT [ "bun", "run", "index.js" ]
+CMD NODE_TLS_REJECT_UNAUTHORIZED=0 node stub.js
