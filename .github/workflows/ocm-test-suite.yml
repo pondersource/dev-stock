@@ -39,6 +39,10 @@ jobs:
           {
             platform: seafile,
             version: 11.0.5
+          },
+          {
+            platform: ocmstub,
+            version: 1.0
           }
         ]
 
@@ -202,10 +206,10 @@ jobs:
           {
             platform: nextcloud,
             version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
           }
         ]
         receiver: [ 
