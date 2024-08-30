@@ -251,7 +251,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
   echo "https://seafile1.docker -> username: jonathan@seafile.com   password: xu"
-  echo "https://seafile2.docker -> username: giuseppe@cern.ch   password: lopresti"
+  echo "https://ocmstub2.docker/? -> just click 'Log in'"
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
