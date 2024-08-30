@@ -169,7 +169,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://ocmstub1.docker -> username: einstein               password: relativity"
+  echo "https://ocmstub1.docker/? -> click 'Log in'"
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then

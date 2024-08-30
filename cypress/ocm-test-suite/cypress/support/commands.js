@@ -85,3 +85,16 @@ Cypress.Commands.add('loginOcis', (url, username, password) => {
     // files app should be visible.
     cy.url({ timeout: 10000 }).should('match', /files\/spaces\/personal(\/|$)/)
 })
+
+Cypress.Commands.add('loginOcmStub', (url) => {
+    cy.visit(url)
+
+    // login buton is visible in browser.
+	cy.get('input[value="Log in"]', { timeout: 10000 }).should('be.visible')
+
+    // login with button.
+    cy.get('input[value="Log in"]').click()
+
+    // files app should be visible.
+    cy.url({ timeout: 10000 }).should('match', /\/?session=active/)
+})
