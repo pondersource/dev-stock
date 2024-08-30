@@ -7,13 +7,18 @@ LABEL org.opencontainers.image.title="PonderSource OCM Stub Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
+RUN apt update
+RUN apt install -yq iproute2
+
+RUN git clone https://github.com/michielbdejong/ocm-stub /ocmstub
 WORKDIR /ocmstub
 
-COPY ./scripts/ocmstub/index.js                                           index.js
-
 # trust all the certificates:
-COPY ./tls/certificates/meshdir.crt                                       /tls/meshdir.crt
-COPY ./tls/certificates/meshdir.key                                       /tls/meshdir.key
+COPY ./tls/certificates/*                                       /tls/
+RUN cp /tls/*.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+RUN npm install
 
 # run the app
 EXPOSE 443/tcp
