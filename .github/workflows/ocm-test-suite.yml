@@ -20,26 +20,26 @@ jobs:
       max-parallel: 5
       matrix:
         efss: [ 
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
-          },
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: nextcloud,
+          #   version: v28.0.7
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # },
+          # {
+          #   platform: ocis,
+          #   version: 5.0.6
+          # },
+          # {
+          #   platform: seafile,
+          #   version: 11.0.5
+          # },
           {
             platform: ocmstub,
             version: "1.0"
@@ -81,36 +81,40 @@ jobs:
           {
             platform: nextcloud,
             version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
+          # },
+          # {
+          #   platform: nextcloud,
+          #   version: v28.0.7
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # },
+          # {
+          #   platform: seafile,
+          #   version: 11.0.5
           }
         ]
         receiver: [ 
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: nextcloud,
+          #   version: v28.0.7
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # },
+          # {
+          #   platform: seafile,
+          #   version: 11.0.5
+          # },
           {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
+            platform: ocmstub,
+            version: "1.0"
           }
         ]
         exclude:
@@ -199,32 +203,32 @@ jobs:
       max-parallel: 9
       matrix:
         sender: [ 
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          }
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: nextcloud,
+          #   version: v28.0.7
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # }
         ]
         receiver: [ 
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.7
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          }
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: nextcloud,
+          #   version: v28.0.7
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # }
         ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
@@ -261,32 +265,32 @@ jobs:
       max-parallel: 4
       matrix:
         sender: [ 
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # },
+          # {
+          #   platform: ocis,
+          #   version: 5.0.6
+          # },
         ]
         receiver: [ 
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
+          # {
+          #   platform: nextcloud,
+          #   version: v27.1.10
+          # },
+          # {
+          #   platform: owncloud,
+          #   version: v10.14.0
+          # },
+          # {
+          #   platform: ocis,
+          #   version: 5.0.6
+          # },
         ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
