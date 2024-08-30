@@ -78,7 +78,7 @@ RUN apt-get install --yes   \
 
 # PHP switcher script.
 COPY ./scripts/switch-php.sh /usr/bin/switch-php.sh
-RUN chmod +x /usr/bin/switch-php.sh 
+RUN chmod +x /usr/bin/switch-php.sh
 
 # copy xdebug configuration and create its link in each PHP version conf directory.
 COPY ./configs/20-xdebug.ini /configs-pondersource/20-xdebug.ini
@@ -86,7 +86,7 @@ RUN ln --symbolic --force /configs-pondersource/20-xdebug.ini /etc/php/7.4/cli/c
 RUN ln --symbolic --force /configs-pondersource/20-xdebug.ini /etc/php/8.2/cli/conf.d/20-xdebug.ini
 
 # apache config.
-COPY ./configs/site.conf /configs-pondersource/site.conf 
+COPY ./configs/site.conf /configs-pondersource/site.conf
 RUN ln --symbolic --force /configs-pondersource/site.conf /etc/apache2/sites-enabled/000-default.conf
 
 # trust all the certificates:

@@ -1,6 +1,6 @@
 name: Open Cloud Mesh Test Suite
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the specified branch.
   push:
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        efss: [ 
+        efss: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -77,7 +77,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        sender: [ 
+        sender: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -95,7 +95,7 @@ jobs:
             version: 11.0.5
           }
         ]
-        receiver: [ 
+        receiver: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -194,7 +194,7 @@ jobs:
         with:
           name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
-  
+
   share-link:
     if: ${{ always() }}
     needs: [login]
@@ -202,7 +202,7 @@ jobs:
       fail-fast: false
       max-parallel: 9
       matrix:
-        sender: [ 
+        sender: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -216,7 +216,7 @@ jobs:
             version: v10.14.0
           },
         ]
-        receiver: [ 
+        receiver: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -256,7 +256,7 @@ jobs:
         with:
           name: share-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
-  
+
   invite-link:
     if: ${{ always() }}
     needs: [login]
@@ -264,7 +264,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        sender: [ 
+        sender: [
           {
             platform: nextcloud,
             version: v27.1.10
@@ -278,7 +278,7 @@ jobs:
             version: 5.0.6
           },
         ]
-        receiver: [ 
+        receiver: [
           {
             platform: nextcloud,
             version: v27.1.10

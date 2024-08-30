@@ -27,7 +27,7 @@ RUN git clone                           \
 RUN cd apps/customgroups &&             \
     composer install --no-dev &&        \
     yarn install &&                     \
-    yarn build  
+    yarn build
 
 RUN git clone                           \
     --depth 1                           \
@@ -37,7 +37,7 @@ RUN git clone                           \
 
 RUN cd apps && ln --symbolic --force oc-opencloudmesh/opencloudmesh
 
-# this file can be overrided in docker run or docker compose.yaml. 
+# this file can be overrided in docker run or docker compose.yaml.
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init/owncloud-opencloudmesh.sh /init.sh
 

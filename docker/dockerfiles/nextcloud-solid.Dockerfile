@@ -31,8 +31,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 ARG CACHEBUST="default"
 RUN cd apps/solid-nextcloud && git pull
 RUN composer install --working-dir=/var/www/html/apps/solid --no-dev --prefer-dist
-    
-# this file can be overrided in docker run or docker compose.yaml. 
+
+# this file can be overrided in docker run or docker compose.yaml.
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init/nextcloud-solid.sh /init.sh
 

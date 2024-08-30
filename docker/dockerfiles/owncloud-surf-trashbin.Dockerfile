@@ -23,7 +23,7 @@ RUN git clone                           \
 
 RUN cd apps && ln --symbolic --force surf-trashbin-app/surf_trashbin
 
-# this file can be overrided in docker run or docker compose.yaml. 
+# this file can be overrided in docker run or docker compose.yaml.
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init/owncloud-surf-trashbin.sh /init.sh
 

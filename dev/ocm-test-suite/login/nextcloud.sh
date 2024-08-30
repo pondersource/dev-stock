@@ -176,7 +176,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   ### Cypress ###
   ###############
 
-  # create cypress and attach its display to the VNC server container. 
+  # create cypress and attach its display to the VNC server container.
   # this way you can view inside cypress container through vnc server.
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
@@ -214,7 +214,7 @@ else
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/login/nextcloud.cy.js"
-  
+
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cyp ress/ocm-test-suite/cypress.config.js"

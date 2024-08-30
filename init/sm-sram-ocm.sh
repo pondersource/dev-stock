@@ -20,7 +20,7 @@ REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.13.0
 
 # for now it should be owncloud-dev
-# TODO: @MahdiBaghbani change to owncloud once the new version is released. 
+# TODO: @MahdiBaghbani change to owncloud once the new version is released.
 REPO_OWNCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_OWNCLOUD_APP=owncloud-dev
 

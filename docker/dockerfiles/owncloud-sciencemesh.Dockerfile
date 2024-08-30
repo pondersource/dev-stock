@@ -24,7 +24,7 @@ RUN git clone                           \
 RUN cd apps/sciencemesh && git pull
 RUN cd apps/sciencemesh && make
 
-# this file can be overrided in docker run or docker compose.yaml. 
+# this file can be overrided in docker run or docker compose.yaml.
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init/owncloud-sciencemesh.sh /init.sh
 

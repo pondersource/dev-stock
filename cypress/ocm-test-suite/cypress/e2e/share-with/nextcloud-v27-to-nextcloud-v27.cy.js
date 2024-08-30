@@ -1,5 +1,5 @@
 import {
-  createShareV27, 
+  createShareV27,
   renameFileV27,
   navigationSwitchLeftSideV27,
   selectAppFromLeftSideV27,

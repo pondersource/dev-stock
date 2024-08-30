@@ -44,7 +44,7 @@ RUN apk --no-cache add                                          \
     bash                                                        \
     curl                                                        \
     tzdata                                                      \
-    ca-certificates 
+    ca-certificates
 
 ENV TZ=Etc/UTC
 

@@ -1,5 +1,5 @@
-import { 
-  createShare, 
+import {
+  createShare,
   renameFile,
   selectAppFromLeftSide
 } from '../utils/owncloud'

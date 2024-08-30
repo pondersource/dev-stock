@@ -50,4 +50,4 @@ See https://github.com/pondersource/surf-trashbin-app
 See [docs](./docs/xdebug.md)
 
 # SOLID RemoteStorage
-for development see [docs](./docs/solid-remotestorage.md) 
+for development see [docs](./docs/solid-remotestorage.md)

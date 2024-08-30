@@ -38,7 +38,7 @@ describe('Native federated sharing functionality for Seafile', () => {
       .find('ul>li')
       .eq(4)
       .click()
-    
+
     cy.get('*[id^="share-to-other-server-panel"]')
       .find('table>tbody')
       .eq(0)
@@ -50,7 +50,7 @@ describe('Native federated sharing functionality for Seafile', () => {
     cy.get('*[role^="dialog"]')
       .contains(/^seafile\w+/)
       .click()
-    
+
     cy.get('*[id^="share-to-other-server-panel"]')
       .find('table>tbody')
       .eq(0)
@@ -59,7 +59,7 @@ describe('Native federated sharing functionality for Seafile', () => {
       .within(() => {
           cy.get('input[class="form-control"]').type('giuseppe@cern.ch')
       })
-    
+
     cy.get('*[id^="share-to-other-server-panel"]')
       .find('table>tbody')
       .eq(0)

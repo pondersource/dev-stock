@@ -20,13 +20,13 @@ describe('Share link federated sharing functionality for ownCloud', () => {
 
     // load share url from file.
     cy.readFile('share-link-url.txt').then((result) => {
-      
+
       // extract token from url.
       const token = result.replace('https://owncloud1.docker/index.php/s/','');
 
       // put token into the link.
       const url = `https://nextcloud1.docker/index.php/login?redirect_url=%252Findex.php%252Fapps%252Ffiles#remote=https%3A%2F%2Fowncloud1.docker&token=${token}&owner=marie&ownerDisplayName=marie&name=oc1-to-oc2-share-link.txt&protected=0`
-      
+
       // accept share from Nextcloud 1.
       cy.loginNextcloudCore('https://nextcloud1.docker', 'einstein', 'relativity')
 
@@ -42,7 +42,7 @@ describe('Share link federated sharing functionality for ownCloud', () => {
       cy.reload(true)
 
       cy.get('[data-cy-files-list-row-name="oc1-to-nc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')
-    
+
     })
   })
 })

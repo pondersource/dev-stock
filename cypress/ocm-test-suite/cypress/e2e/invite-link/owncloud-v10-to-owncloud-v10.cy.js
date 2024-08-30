@@ -1,6 +1,6 @@
-import { 
-  createInviteLink, 
-  createScienceMeshShare, 
+import {
+  createInviteLink,
+  createScienceMeshShare,
   renameFile,
   selectAppFromLeftSide,
 } from '../utils/owncloud'
@@ -23,14 +23,14 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
 
     // load invite link from file.
     cy.readFile('invite-link-oc-oc.txt').then((url) => {
-      
+
       // accept invitation from ownCloud 2.
       cy.loginOwncloudCore(url, 'mahdi', 'baghbani')
 
       cy.get('input[id="accept-button"]', { timeout: 10000 })
         .click()
-      
-      // validate 'marie' is shown as a contact. 
+
+      // validate 'marie' is shown as a contact.
       cy.visit('https://owncloud2.docker/index.php/apps/sciencemesh/contacts')
 
       cy.get('table[id="contact-table"]')
@@ -56,7 +56,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
       .find('*[class^="oc-dialog-buttonrow"]')
       .find('button[class="primary"]')
       .click()
-    
+
     selectAppFromLeftSide('sharingin')
 
     cy.get('[data-file="oc1-to-oc2-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
