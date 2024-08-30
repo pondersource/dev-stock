@@ -189,7 +189,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 ###############
 
 # Seafiles.
-createEfssSeafile seafile    1  jonathan@seafile.com      xu                 seafile2    "${EFSS_PLATFORM_1_VERSION}"
+createEfssSeafile seafile    1  jonathan@seafile.com      xu                 ocmstub2    "${EFSS_PLATFORM_1_VERSION}"
 createOcmStub    ocmstub    2    michiel     dejong        ocmstub.sh    "${EFSS_PLATFORM_2_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
