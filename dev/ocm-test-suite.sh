@@ -68,6 +68,10 @@ case "${TEST_CASE}" in
         "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
+      "ocmstub")
+        "${ENV_ROOT}/dev/ocm-test-suite/login/ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
       *)
         echo -n "unknown login"
         ;;

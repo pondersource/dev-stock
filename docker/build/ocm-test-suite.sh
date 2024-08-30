@@ -46,3 +46,6 @@ docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-scien
 
 echo Building pondersource/dev-stock-owncloud-ocm-test-suite
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/owncloud-ocm-test-suite.Dockerfile --tag pondersource/dev-stock-owncloud-ocm-test-suite:latest .
+
+echo Building pondersource/dev-stock-ocmstub
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/ocmstub.Dockerfile --tag pondersource/dev-stock-ocmstub:1.0 .

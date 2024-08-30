@@ -68,7 +68,7 @@ for efss in owncloud nextcloud cernbox; do
   createCertificate wopi${efss}4
 done
 
-for efss in seafile ocis; do
+for efss in seafile ocis ocmstub; do
   createCertificate ${efss}1
   createCertificate ${efss}2
   createCertificate ${efss}3
