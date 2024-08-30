@@ -43,7 +43,7 @@ jobs:
           {
             platform: ocmstub,
             version: "1.0"
-          }
+          },
         ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
@@ -81,7 +81,7 @@ jobs:
           {
             platform: nextcloud,
             version: v27.1.10
-          # },
+          },
           # {
           #   platform: nextcloud,
           #   version: v28.0.7
@@ -93,7 +93,7 @@ jobs:
           # {
           #   platform: seafile,
           #   version: 11.0.5
-          }
+          # },
         ]
         receiver: [ 
           # {
@@ -115,7 +115,7 @@ jobs:
           {
             platform: ocmstub,
             version: "1.0"
-          }
+          },
         ]
         exclude:
           # seafile doesn't support receiving ocm shares to other platforms yet! exclude tests.
@@ -214,7 +214,7 @@ jobs:
           # {
           #   platform: owncloud,
           #   version: v10.14.0
-          # }
+          # },
         ]
         receiver: [ 
           # {
@@ -228,7 +228,7 @@ jobs:
           # {
           #   platform: owncloud,
           #   version: v10.14.0
-          # }
+          # },
         ]
 
     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
