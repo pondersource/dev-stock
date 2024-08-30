@@ -81,6 +81,9 @@ function createEfss() {
     -e HOST="${platform}${number}"                                                                            \
     "${image}:${tag}"
 
+  # wait for hostname port to be open.
+  waitForPort "${platform}${number}.docker"       443
+
   # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
   docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
   docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
@@ -88,10 +91,6 @@ function createEfss() {
   docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
   docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
 
-  docker restart "${platform}${number}.docker"
-
-  # wait for hostname port to be open.
-  waitForPort "${platform}${number}.docker"       443
   redirect_to_null_cmd echo ""
 }
 
@@ -173,7 +172,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # print instructions.
   clear
   echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html"
+  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"

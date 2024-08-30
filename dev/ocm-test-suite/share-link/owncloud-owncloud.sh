@@ -195,7 +195,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # print instructions.
   clear
   echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html"
+  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
