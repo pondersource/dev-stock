@@ -10,6 +10,10 @@ LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 RUN apt update
 RUN apt install -yq iproute2
 
+# CACHEBUST forces docker to clone fresh source codes from git.
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
+# $RANDOM returns random number each time.
+ARG CACHEBUST="default"
 RUN git clone https://github.com/michielbdejong/ocm-stub /ocmstub
 WORKDIR /ocmstub
 

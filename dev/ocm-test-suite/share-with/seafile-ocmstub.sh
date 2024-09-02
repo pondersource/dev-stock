@@ -246,7 +246,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # print instructions.
   clear
   echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
+  echo "Cypress inside VNC Server -> http://localhost:5700/vnc.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
@@ -273,7 +273,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/share-with/seafile-${P1_VER}-to-seafile-${P2_VER}.cy.js"
+    --spec "cypress/e2e/share-with/seafile-${P1_VER}-to-ocmstub-${P2_VER}.cy.js"
 
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then

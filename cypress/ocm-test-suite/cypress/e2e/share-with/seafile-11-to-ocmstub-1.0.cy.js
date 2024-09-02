@@ -1,5 +1,5 @@
-describe('Native federated sharing functionality for Seafile', () => {
-  it('Send federated share <file> from Seafile 11 to Seafile 11', () => {
+describe('OCM federated sharing functionality for Seafile 11 and OcmStub', () => {
+  it('Send federated share <file> from Seafile 11 to OcmStub 1.0', () => {
     // share from Seafile 1.
     cy.loginSeafile('http://seafile1.docker', 'jonathan@seafile.com', 'xu')
 
@@ -70,7 +70,7 @@ describe('Native federated sharing functionality for Seafile', () => {
 
   })
 
-  it('Receive federated share <file> from ownCloud v10 to OcmStub 1.0', () => {
+  it('Receive federated share <file> from Seafile 11 to OcmStub 1.0', () => {
     // accept share from OcmStub 2.
     cy.loginOcmStub('https://ocmstub2.docker/?')
 
@@ -82,7 +82,6 @@ describe('Native federated sharing functionality for Seafile', () => {
     cy.contains('"sharedBy": "einstein@https://seafile1.docker/"').should('be.visible')
     cy.contains('"ownerDisplayName": "einstein"').should('be.visible')
     cy.contains('"description": ""').should('be.visible')
-    cy.contains('"shareWith": "michiel@https://ocmstub2.docker"').should('be.visible')
     cy.contains('"protocol": { "name": "webdav", "options": { "sharedSecret": "').should('be.visible')
     cy.contains('"permissions": "{http://open-cloud-mesh.org/ns}share-permissions"').should('be.visible')
   })

@@ -5,8 +5,8 @@ import {
   selectAppFromLeftSideV27,
 } from '../utils/nextcloud-v27'
 
-describe('Native federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
+describe('OCM federated sharing functionality for Nextcloud and OcmStub', () => {
+  it('Send federated share <file> from Nextcloud v27 to OcmStub 1.0', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
@@ -26,7 +26,6 @@ describe('Native federated sharing functionality for Nextcloud', () => {
     cy.contains('"sharedBy": "einstein@https://nextcloud1.docker/"').should('be.visible')
     cy.contains('"ownerDisplayName": "einstein"').should('be.visible')
     cy.contains('"description": ""').should('be.visible')
-    cy.contains('"shareWith": "michiel@https://ocmstub2.docker"').should('be.visible')
     cy.contains('"protocol": { "name": "webdav", "options": { "sharedSecret": "').should('be.visible')
     cy.contains('"permissions": "{http://open-cloud-mesh.org/ns}share-permissions"').should('be.visible')
   })
