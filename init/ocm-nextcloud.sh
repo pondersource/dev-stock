@@ -15,6 +15,9 @@ DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
 cd "${DIR}/.." || exit
 
+ENV_ROOT=$(pwd)
+export ENV_ROOT=${ENV_ROOT}
+
 # repositories and branches.
 REPO_NEXTCLOUD=https://github.com/SUNET/nextcloud-server
 BRANCH_NEXTCLOUD=master
@@ -24,8 +27,17 @@ BRANCH_NEXTCLOUD=master
     git clone                                                                                       \
     --depth 1                                                                                       \
     --branch ${BRANCH_NEXTCLOUD}                                                                    \
+    --recursive                                                                                     \
+    --shallow-submodules                                                                            \
     ${REPO_NEXTCLOUD}                                                                               \
-    ocm-nextcloud
+    ocm-nextcloud                                                                                   \
+    &&                                                                                              \
+    mkdir -p "${ENV_ROOT}/ocm-nextcloud/data"                                                       \
+    &&                                                                                              \
+    touch "${ENV_ROOT}/ocm-nextcloud/data/nextcloud.log"                                            \
+    &&                                                                                              \
+    sudo chown -R www-data:www-data "${ENV_ROOT}/ocm-nextcloud"
+
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 
 [ ! -d "temp" ] && mkdir -p temp
