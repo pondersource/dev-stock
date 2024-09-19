@@ -23,20 +23,35 @@ REPO_NEXTCLOUD=https://github.com/SUNET/nextcloud-server
 BRANCH_NEXTCLOUD=master
 
 # Nextcloud source code.
-[ ! -d "ocm-nextcloud" ] &&                                                                         \
+[ ! -d "ocm-nextcloud1" ] &&                                                                        \
     git clone                                                                                       \
     --depth 1                                                                                       \
     --branch ${BRANCH_NEXTCLOUD}                                                                    \
     --recursive                                                                                     \
     --shallow-submodules                                                                            \
     ${REPO_NEXTCLOUD}                                                                               \
-    ocm-nextcloud                                                                                   \
+    ocm-nextcloud1                                                                                  \
     &&                                                                                              \
-    mkdir -p "${ENV_ROOT}/ocm-nextcloud/data"                                                       \
+    mkdir -p "${ENV_ROOT}/ocm-nextcloud1/data"                                                      \
     &&                                                                                              \
-    touch "${ENV_ROOT}/ocm-nextcloud/data/nextcloud.log"                                            \
+    touch "${ENV_ROOT}/ocm-nextcloud1/data/nextcloud.log"                                           \
     &&                                                                                              \
-    sudo chown -R www-data:www-data "${ENV_ROOT}/ocm-nextcloud"
+    sudo chown -R www-data:www-data "${ENV_ROOT}/ocm-nextcloud1"
+
+[ ! -d "ocm-nextcloud2" ] &&                                                                        \
+    git clone                                                                                       \
+    --depth 1                                                                                       \
+    --branch ${BRANCH_NEXTCLOUD}                                                                    \
+    --recursive                                                                                     \
+    --shallow-submodules                                                                            \
+    ${REPO_NEXTCLOUD}                                                                               \
+    ocm-nextcloud2                                                                                  \
+    &&                                                                                              \
+    mkdir -p "${ENV_ROOT}/ocm-nextcloud2/data"                                                      \
+    &&                                                                                              \
+    touch "${ENV_ROOT}/ocm-nextcloud2/data/nextcloud.log"                                           \
+    &&                                                                                              \
+    sudo chown -R www-data:www-data "${ENV_ROOT}/ocm-nextcloud2"
 
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet
 

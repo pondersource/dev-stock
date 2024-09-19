@@ -109,8 +109,8 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
 # Nextclouds.
-createEfss nextcloud    1   einstein  relativity  ocm-nextcloud
-createEfss nextcloud    2   michiel   dejong      ocm-nextcloud
+createEfss nextcloud    1   einstein  relativity  ocm-nextcloud1
+createEfss nextcloud    2   michiel   dejong      ocm-nextcloud2
 
 ###############
 ### Firefox ###
