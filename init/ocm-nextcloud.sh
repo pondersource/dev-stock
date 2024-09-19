@@ -22,6 +22,7 @@ BRANCH_NEXTCLOUD=master
 # Nextcloud source code.
 [ ! -d "ocm-nextcloud" ] &&                                                                         \
     git clone                                                                                       \
+    --depth 1                                                                                       \
     --branch ${BRANCH_NEXTCLOUD}                                                                    \
     ${REPO_NEXTCLOUD}                                                                               \
     ocm-nextcloud
