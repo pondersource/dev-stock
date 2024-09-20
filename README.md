@@ -24,6 +24,22 @@ upstream: [ownCloud Core Official](https://github.com/owncloud/core)
 
 branch: [v10.14.0](https://github.com/owncloud/core/releases/tag/v10.14.0)
 
+# OCM Test Suite
+Run specific tests with this command syntax.
+1. test scenario: login. share-with, invite-link, share-link
+2. platform 1: ocis, nextcloud, owncloud, seafile
+3. run mode: dev, ci
+4. cypress runner: electron, chrome, firefox, edge
+
+```bash
+./dev/ocm-test-suite.sh [test scenario] [platform 1] [platform 1 version] [run mode] [cypress runner] [platform 2] [platform 2 version]
+```
+
+example:
+```bash
+./dev/ocm-test-suite.sh share-with nextcloud v27.1.10 ci electron nextcloud v27.1.10
+```
+
 # Debugging
 ## RD-SRAM
 
