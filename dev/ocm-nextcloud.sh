@@ -37,7 +37,9 @@ function createEfss() {
   local user="${3}"
   local password="${4}"
   local source_code="${5}"
-  local image="${6}"
+  local init_script="${6}"
+  local tag="${7-latest}"
+  local image="${8}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -65,10 +67,11 @@ function createEfss() {
     -e PASS="${password}"                                                         \
     -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                        \
     -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"      \
-    -v "${ENV_ROOT}/temp/${platform}.sh:/${platform}-init.sh"                     \
+    -v "${ENV_ROOT}/temp/${init_script}:/${platform}-init.sh"                     \
     -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                  \
-    -v "${ENV_ROOT}/${source_code}:/var/www/html"                                 \
-    "${image}"
+    -v "${ENV_ROOT}/${source_code}/lib:/var/www/html/lib"                         \
+    -v "${ENV_ROOT}/${source_code}/apps:/var/www/html/apps"                       \
+    "${image}:${tag}"
 
   # wait for hostname port to be open.
   waitForPort "maria${platform}${number}.docker"  3306
@@ -109,8 +112,8 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # username:   username for sign in into efss.
 # password:   password for sign in into efss.
 # Nextclouds.
-createEfss nextcloud    1   einstein  relativity  ocm-nextcloud1
-createEfss nextcloud    2   michiel   dejong      ocm-nextcloud2
+createEfss    nextcloud    1    einstein    relativity    ocm-nextcloud1    nextcloud.sh    v30.0.0
+createEfss    nextcloud    2    michiel     dejong        ocm-nextcloud2    nextcloud.sh    v30.0.0
 
 ###############
 ### Firefox ###
