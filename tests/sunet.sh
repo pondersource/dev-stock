@@ -102,7 +102,7 @@ $mysql1_cmd -e "INSERT INTO oc_appconfig (appid, configkey, configvalue) VALUES 
 (\"user_saml\", \"type\", \"saml\")"
 
 $mysql1_cmd -e "INSERT INTO oc_user_saml_configurations (id, name, configuration) VALUES \
-(1, \"samlidp\", \"{\ 
+(1, \"samlidp\", \"{\
 \\\"general-uid_mapping\\\":\\\"username\\\",\
 \\\"general-idp0_display_name\\\":\\\"samlidp\\\",\
 \\\"idp-entityId\\\":\\\"http:\/\/sunet-ssp\/simplesaml\/saml2\/idp\/metadata.php\\\",\

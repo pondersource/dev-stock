@@ -1,7 +1,7 @@
-import { 
-  createInviteLink, 
-  createScienceMeshShare, 
-  renameFile 
+import {
+  createInviteLink,
+  createScienceMeshShare,
+  renameFile
 } from '../utils/owncloud'
 
 import {
@@ -27,14 +27,14 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
 
     // load invite link from file.
     cy.readFile('invite-link-oc-nc.txt').then((url) => {
-      
+
       // accept invitation from Nextcloud 1.
       cy.loginNextcloudCore(url, 'einstein', 'relativity')
 
       cy.get('input[id="accept-button"]', { timeout: 10000 })
         .click()
-      
-      // validate 'einstein' is shown as a contact. 
+
+      // validate 'einstein' is shown as a contact.
       cy.visit('https://nextcloud1.docker/index.php/apps/sciencemesh/contacts')
 
       cy.get('table[id="contact-table"]')

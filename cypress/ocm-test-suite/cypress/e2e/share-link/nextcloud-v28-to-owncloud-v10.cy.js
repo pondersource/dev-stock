@@ -1,6 +1,6 @@
-import { 
-  createShareLinkV28, 
-  renameFileV28 
+import {
+  createShareLinkV28,
+  renameFileV28
 } from '../utils/nextcloud-v28'
 
 import {
@@ -19,7 +19,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
 
         cy.get('button[id="header-actions-toggle"]').click()
         cy.get('button[id="save-external-share"]').click()
-        
+
         cy.get('form[class="save-form"]').within(() => {
           cy.get('input[id="remote_address"]').type('marie@owncloud1.docker')
           cy.get('input[id="save-button-confirm"]').click()

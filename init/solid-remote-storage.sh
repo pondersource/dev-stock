@@ -66,7 +66,7 @@ mkdir remotestorage-dev
 ln -sf "${PWD}/remotestorage/release/remotestorage.js" remotestorage-dev/remotestorage.js
 ln -sf "${PWD}/remotestorage-widget/build/widget.js" remotestorage-dev/widget.js
 
-cd remotestorage-dev 
+cd remotestorage-dev
 cat > index.html <<EOF
 <html>
     <head>

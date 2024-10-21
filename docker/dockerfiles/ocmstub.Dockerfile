@@ -1,6 +1,4 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1-alpine
+FROM node
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -9,15 +7,18 @@ LABEL org.opencontainers.image.title="PonderSource OCM Stub Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
+RUN apt update
+RUN apt install -yq iproute2
+
+# CACHEBUST forces docker to clone fresh source codes from git.
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
+# $RANDOM returns random number each time.
+ARG CACHEBUST="default"
+RUN git clone https://github.com/michielbdejong/ocm-stub /ocmstub
 WORKDIR /ocmstub
 
-COPY ./scripts/ocmstub/index.js                                           index.js
-
-# trust all the certificates:
-COPY ./tls/certificates/meshdir.crt                                       /tls/meshdir.crt
-COPY ./tls/certificates/meshdir.key                                       /tls/meshdir.key
+RUN npm install
 
 # run the app
-USER bun
 EXPOSE 443/tcp
-ENTRYPOINT [ "bun", "run", "index.js" ]
+CMD NODE_TLS_REJECT_UNAUTHORIZED=0 node stub.js

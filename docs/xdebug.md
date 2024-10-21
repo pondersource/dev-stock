@@ -74,7 +74,7 @@ in case you don't want to use COPY in Dockerfile to include this configuration i
 
 - Xdebug 3 defaults to port 9003, while the old Xdebug 2 defaults to port 9000.  Watch out for this in examples on the internet.
 - Once I got the pathMappings variable correctly setup in VSCode, I was able to step through my PHP application running in Docker!  Unfortunately, my Composer dependencies only exist inside the container, not on the host.  Thus, VSCode encountered errors e.g. `"could not find file /var/www/html/vendor/blah"` referring to a PHP dependency managed by Composer when stepping into vendor libraries.  In my situation, I don't want Composer dependencies to exist outside of Docker, so I'm not able to debug/step through the dependent libraries.  If you want this ability, make sure that you have a copy of the dependencies on your host (or do the composer install step on your host) before debugging.
-- Turn off `Breakpoints: Everything` in the VSCode debugger.  This was causing VSCode to want to step inside vendor libraries. 
+- Turn off `Breakpoints: Everything` in the VSCode debugger.  This was causing VSCode to want to step inside vendor libraries.
 
 ## How to Debug your Xdebug setup :) ##
 

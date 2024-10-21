@@ -75,7 +75,7 @@ export function createInviteToken(senderDomain) {
 			sometext => {
 				// extract token from url.
 				const token = sometext.replace('https://meshdir.docker/meshdir?token=', '');
-      
+
 				return token.replace(`&providerDomain=${senderDomain}`, '')
 			}
 		);
@@ -94,7 +94,7 @@ export function createInviteLink(targetDomain) {
 
 				// put target efss domain and token together.
 				const inviteLink = `${targetDomain}/index.php/apps/sciencemesh/accept?${token}`
-      
+
 				return inviteLink
 			}
 		);

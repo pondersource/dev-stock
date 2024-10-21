@@ -141,7 +141,7 @@ function sciencemeshInsertIntoDB() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -fr  "${ENV_ROOT}/docker/scripts/reva"                           "${ENV_ROOT}/temp/"
@@ -186,7 +186,7 @@ createEfss nextcloud  2   michiel   dejong            sciencemesh
 # syntax:
 # createReva platform number port.
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 # port:       maps a port on local host to port 80 of reva, for `curl` purposes! should be unique.
@@ -206,7 +206,7 @@ createReva nextcloud 2 4504
 # syntax:
 # sciencemeshInsertIntoDB platform number.
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
 

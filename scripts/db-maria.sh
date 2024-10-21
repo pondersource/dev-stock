@@ -6,7 +6,7 @@ set -e
 # syntax:
 # db-maria.sh platform number
 #
-# 
+#
 # platform:   owncloud, nextcloud.
 # number:     should be unique for each platform, you cannot have two nextclouds with same number.
 

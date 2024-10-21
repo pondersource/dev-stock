@@ -1,5 +1,5 @@
 import {
-  createInviteLinkV27, 
+  createInviteLinkV27,
   verifyFederatedContactV27,
   createScienceMeshShareV27,
   renameFileV27,
@@ -25,7 +25,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
 
     // load invite link from file.
     cy.readFile('invite-link-nc-nc.txt').then((url) => {
-      
+
       // accept invitation from Nextcloud 2.
       cy.loginNextcloudCore(url, 'michiel', 'dejong')
 

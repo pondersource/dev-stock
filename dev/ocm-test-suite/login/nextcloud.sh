@@ -108,7 +108,7 @@ function createEfss() {
 }
 
 # delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir --parents "${ENV_ROOT}/temp"
+rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
 # copy init files.
 cp -f "${ENV_ROOT}/docker/scripts/init/nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
@@ -176,7 +176,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   ### Cypress ###
   ###############
 
-  # create cypress and attach its display to the VNC server container. 
+  # create cypress and attach its display to the VNC server container.
   # this way you can view inside cypress container through vnc server.
   docker run --detach --network=testnet                                                                     \
     --name="cypress.docker"                                                                                 \
@@ -191,7 +191,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # print instructions.
   clear
   echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700"
+  echo "Cypress inside VNC Server -> http://localhost:5700/vnc.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
@@ -214,7 +214,7 @@ else
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
     --spec "cypress/e2e/login/nextcloud.cy.js"
-  
+
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
     sed -i 's/.*video: false,.*/  video: true,/'                        "${ENV_ROOT}/cyp ress/ocm-test-suite/cypress.config.js"

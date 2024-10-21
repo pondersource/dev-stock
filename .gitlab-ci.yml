@@ -5,12 +5,12 @@ stages:
   parallel:
     matrix:
       - BROWSER: [chrome, edge, firefox, electron]
-  
+
 ocm-test-suite:
   extends: .parallel-hidden-job
   stage: test
   image: docker
-  services: 
+  services:
     - docker:dind
   script:
     - apk add bash

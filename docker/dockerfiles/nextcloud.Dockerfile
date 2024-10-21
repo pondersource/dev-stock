@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_NEXTCLOUD=https://github.com/nextcloud/server
-ARG BRANCH_NEXTCLOUD=v28.0.7
+ARG BRANCH_NEXTCLOUD=v30.0.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
@@ -36,7 +36,7 @@ RUN curl --silent --show-error https://getcomposer.org/installer -o /root/compos
 RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 USER www-data
-# this file can be overrided in docker run or docker compose.yaml. 
+# this file can be overrided in docker run or docker compose.yaml.
 # example: docker run --volume new-init.sh:/init.sh:ro
 COPY ./scripts/init/nextcloud.sh /init.sh
 RUN mkdir -p data; touch data/nextcloud.log
