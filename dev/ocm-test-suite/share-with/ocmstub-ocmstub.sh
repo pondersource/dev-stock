@@ -54,11 +54,8 @@ function waitForPort () {
 function createOcmStub() {
   local platform="${1}"
   local number="${2}"
-  local user="${3}"
-  local password="${4}"
-  local init_script="${5}"
-  local tag="${6-latest}"
-  local image="${7}"
+  local tag="${3-latest}"
+  local image="${4}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -67,13 +64,7 @@ function createOcmStub() {
   fi
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
-  echo docker run --detach --network=testnet                                                  \
-    --name="${platform}${number}.docker"                                                                      \
-    --add-host "host.docker.internal:host-gateway"                                                            \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
-    -e HOST="${platform}${number}"                                                                            \
-    "${image}:${tag}"
+
   redirect_to_null_cmd docker run --detach --network=testnet                                                  \
     --name="${platform}${number}.docker"                                                                      \
     --add-host "host.docker.internal:host-gateway"                                                            \
@@ -97,9 +88,22 @@ rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
-# EFSSs.
-createOcmStub    ocmstub    1    einstein    relativity    ocmstub.sh    "${EFSS_PLATFORM_1_VERSION}"
-createOcmStub    ocmstub    2    michiel     dejong        ocmstub.sh    "${EFSS_PLATFORM_2_VERSION}"
+#################
+### ocmstub ###
+#################
+
+# syntax:
+# createEfss platform number username password image.
+#
+#
+# platform:       ocmstub.
+# number:         should be unique for each platform, for example: you cannot have two ocmstubs with same number.
+# tag:            tag for the image, use latest if not sure.
+# image:          which image variation to use for container.
+
+# ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
+createOcmStub    ocmstub    1
+createOcmStub    ocmstub    2
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
@@ -159,7 +163,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://ocmstub1.docker -> username: einstein               password: relativity"
+  echo "https://ocmstub1.docker/? -> just click 'Log in'"
   echo "https://ocmstub2.docker/? -> just click 'Log in'"
 else
   # only record when testing on electron.

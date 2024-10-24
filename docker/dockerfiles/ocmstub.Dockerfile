@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 RUN apt update
-RUN apt install -yq iproute2
+RUN apt install -yq iproute2 git
 
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .

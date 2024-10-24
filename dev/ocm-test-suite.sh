@@ -120,6 +120,10 @@ case "${TEST_CASE}" in
       "seafile-seafile")
         "${ENV_ROOT}/dev/ocm-test-suite/share-with/seafile-seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
+      
+      "ocmstub-ocmstub")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with/ocmstub-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
 
       *)
         echo -n "unknown share-with"
