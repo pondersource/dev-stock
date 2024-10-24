@@ -15,7 +15,7 @@ wopi_endpoint = "http://your.wopi.org:8880"
 wopi_shared_secret = "shared-secret-2"
 
 [log]
-level = "debug"
+level = "trace"
 
 [shared]
 gatewaysvc = "{{ vars.provider_domain }}:19000"

@@ -23,6 +23,7 @@ docker pull pondersource/dev-stock-php-base:latest
 docker pull pondersource/dev-stock-nextcloud:latest
 docker pull pondersource/dev-stock-nextcloud:v28.0.7
 docker pull pondersource/dev-stock-nextcloud:v27.1.10
+docker pull pondersource/dev-stock-nextcloud:v30.0.0
 # docker pull pondersource/dev-stock-nextcloud-sunet:latest
 # docker pull pondersource/dev-stock-simple-saml-php:latest
 docker pull pondersource/dev-stock-nextcloud-solid:latest

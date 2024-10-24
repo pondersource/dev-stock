@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_NEXTCLOUD=https://github.com/nextcloud/server
-ARG BRANCH_NEXTCLOUD=v28.0.7
+ARG BRANCH_NEXTCLOUD=v30.0.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
