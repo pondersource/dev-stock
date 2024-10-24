@@ -1,8 +1,16 @@
 # stage 1: build stage
-FROM golang:1.22.1-alpine AS build
+FROM golang:1.22.1-bookworm@sha256:d996c645c9934e770e64f05fc2bc103755197b43fd999b3aa5419142e1ee6d78 AS build
 
-# install build dependencies.
-RUN apk --no-cache add git make bash
+ENV CGO_ENABLED=1
+
+RUN apt-get update
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes         \
+    git                                                                                         \
+    bash                                                                                        \
+    make                                                                                        \
+    build-essential                                                                             \
+    libsqlite3-dev
 
 # go to root directory.
 WORKDIR /
@@ -30,7 +38,7 @@ RUN go mod download
 RUN make revad
 
 # stage 2: app image.
-FROM alpine:3.19.1
+FROM debian:bookworm@sha256:aadf411dc9ed5199bc7dab48b3e6ce18f8bbee4f170127f5ff1b75cd8035eb36
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -40,10 +48,12 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 # set the timezone and install CA certificates.
-RUN apk --no-cache add                                          \
-    bash                                                        \
-    curl                                                        \
-    tzdata                                                      \
+RUN apt-get update
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes         \
+    bash                                                                                        \
+    curl                                                                                        \
+    tzdata                                                                                      \
     ca-certificates
 
 ENV TZ=Etc/UTC
