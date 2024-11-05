@@ -98,7 +98,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # image:          which image variation to use for container.
 
 # ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
-createEfss    ocmstub    1    ocmstub1.sh
+createEfss    ocmstub    1
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
