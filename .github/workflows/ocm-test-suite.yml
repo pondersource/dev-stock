@@ -321,7 +321,7 @@ jobs:
   
   share-with-signed-http:
     if: ${{ always() }}
-    needs: [share-with]
+    needs: [login]
     strategy:
       fail-fast: false
       max-parallel: 4
