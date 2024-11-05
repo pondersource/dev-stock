@@ -67,9 +67,9 @@ function createEfss() {
   redirect_to_null_cmd docker run --detach --network=testnet                                                  \
     --name="${platform}${number}.docker"                                                                      \
     --add-host "host.docker.internal:host-gateway"                                                            \
+    -e HOST="${platform}${number}"                                                                            \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
-    -e HOST="${platform}${number}"                                                                            \
     "${image}:${tag}"
 
   # wait for hostname port to be open.
@@ -98,7 +98,7 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # image:          which image variation to use for container.
 
 # ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
-createEfss    ocmstub    1
+createEfss    ocmstub    1    ocmstub1.sh
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
