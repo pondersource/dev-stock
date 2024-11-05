@@ -273,7 +273,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/share-with/seafile-${P1_VER}-to-seafile-${P2_VER}.cy.js"
+    --spec "cypress/e2e/share-with-signed-http/seafile-${P1_VER}-to-seafile-${P2_VER}.cy.js"
 
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then

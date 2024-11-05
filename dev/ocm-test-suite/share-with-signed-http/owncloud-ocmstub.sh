@@ -18,10 +18,13 @@ cd "${DIR}/../../.." || exit
 ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
-# ocmstub version:
-#   - 1.0
-EFSS_PLATFORM_1_VERSION=${1:-"1.0"}
-EFSS_PLATFORM_2_VERSION=${2:-"1.0"}
+# owncloud version:
+#   - v10.14.0
+EFSS_PLATFORM_1_VERSION=${1:-"v10.14.0"}
+
+# owncloud version:
+#   - v10.14.0
+EFSS_PLATFORM_2_VERSION=${2:-"v10.14.0"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}
@@ -51,11 +54,14 @@ function waitForPort () {
   redirect_to_null_cmd echo "${1} port ${2} is open"
 }
 
-function createOcmStub() {
+function createOwnCloud() {
   local platform="${1}"
   local number="${2}"
-  local tag="${3-latest}"
-  local image="${4}"
+  local user="${3}"
+  local password="${4}"
+  local init_script="${5}"
+  local tag="${6-latest}"
+  local image="${7}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -65,12 +71,74 @@ function createOcmStub() {
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
 
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="maria${platform}${number}.docker"                                                                               \
+    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
+    mariadb:11.4.2                                                                                                          \
+    --transaction-isolation=READ-COMMITTED                                                                                  \
+    --binlog-format=ROW                                                                                                     \
+    --innodb-file-per-table=1                                                                                               \
+    --skip-innodb-read-only-compressed
+
+  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
+    --name="${platform}${number}.docker"                                                                                    \
+    --add-host "host.docker.internal:host-gateway"                                                                          \
+    -e HOST="${platform}${number}"                                                                                          \
+    -e DBHOST="maria${platform}${number}.docker"                                                                            \
+    -e USER="${user}"                                                                                                       \
+    -e PASS="${password}"                                                                                                   \
+    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
+    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
+    -v "${ENV_ROOT}/temp/${init_script}:/${platform}-init.sh"                                                               \
+    -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                                            \
+    "${image}:${tag}"
+
+  # wait for hostname port to be open.
+  waitForPort "maria${platform}${number}.docker"  3306
+  waitForPort "${platform}${number}.docker"       443
+
+  # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
+  docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
+
+  # run init script inside efss.
+  redirect_to_null_cmd docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
+
+  redirect_to_null_cmd echo ""
+}
+
+function createOcmStub() {
+  local platform="${1}"
+  local number="${2}"
+  local user="${3}"
+  local password="${4}"
+  local init_script="${5}"
+  local tag="${6-latest}"
+  local image="${7}"
+
+  if [[ -z "${image}" ]]; then
+    local image="pondersource/dev-stock-${platform}"
+  else
+    local image="pondersource/dev-stock-${platform}-${image}"
+  fi
+
+  redirect_to_null_cmd echo "creating efss ${platform} ${number}"
+  echo docker run --detach --network=testnet                                                  \
+    --name="${platform}${number}.docker"                                                                      \
+    --add-host "host.docker.internal:host-gateway"                                                            \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
+    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
+    "${image}:${tag}"
   redirect_to_null_cmd docker run --detach --network=testnet                                                  \
     --name="${platform}${number}.docker"                                                                      \
     --add-host "host.docker.internal:host-gateway"                                                            \
-    -e HOST="${platform}${number}"                                                                            \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
+    -e HOST="${platform}${number}"                                                                            \
     "${image}:${tag}"
 
   # wait for hostname port to be open.
@@ -82,28 +150,33 @@ function createOcmStub() {
 # delete and create temp directory.
 rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
 
+# copy init files.
+cp -f "${ENV_ROOT}/docker/scripts/init/owncloud-sm-ocm.sh"            "${ENV_ROOT}/temp/owncloud.sh"
+
 # auto clean before starting.
 "${ENV_ROOT}/scripts/clean.sh" "no"
 
 # make sure network exists.
 docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
 
-#################
-### ocmstub ###
-#################
+################
+### ownCloud ###
+################
 
 # syntax:
-# createEfss platform number username password image.
+# createOwnCloud platform number username password image.
 #
 #
-# platform:       ocmstub.
-# number:         should be unique for each platform, for example: you cannot have two ocmstubs with same number.
-# tag:            tag for the image, use latest if not sure.
-# image:          which image variation to use for container.
+# platform:   owncloud, nextcloud.
+# number:     should be unique for each platform, for example: you cannot have two Nextclouds with same number.
+# username:   username for sign in into efss.
+# password:   password for sign in into efss.
+# tag:        tag for the image, use latest if not sure.
+# image:      which image variation to use for container.
 
-# ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
-createOcmStub    ocmstub    1
-createOcmStub    ocmstub    2
+# ownClouds.
+createOwnCloud    owncloud    1    marie    radioactivity    owncloud.sh    latest    ocm-test-suite
+createOcmStub    ocmstub    2    michiel     dejong        ocmstub.sh    "${EFSS_PLATFORM_2_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
@@ -159,12 +232,12 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   # print instructions.
   clear
   echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700/vnc.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
+  echo "Cypress inside VNC Server -> http://localhost:5700/vnc_auto.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
   echo "Embedded Firefox          -> http://localhost:5800"
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://ocmstub1.docker/? -> just click 'Log in'"
-  echo "https://ocmstub2.docker/? -> just click 'Log in'"
+  echo "https://nextcloud1.docker -> username: einstein               password: relativity"
+  echo "https://nextcloud2.docker -> username: michiel                password: dejong"
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
@@ -186,7 +259,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/share-with/ocmstub-${P1_VER}-to-ocmstub-${P2_VER}.cy.js"
+    --spec "cypress/e2e/share-with-signed-http/owncloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
 
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then

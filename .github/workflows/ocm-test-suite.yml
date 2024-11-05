@@ -318,3 +318,49 @@ jobs:
         with:
           name: invite-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
+  
+  signed-http-share-with:
+    if: ${{ always() }}
+    needs: [share-with]
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        sender: [
+          {
+            platform: ocmstub,
+            version: "1.0"
+          },
+        ]
+        receiver: [
+          {
+            platform: ocmstub,
+            version: "1.0"
+          },
+        ]
+
+    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job.
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+      - name: Checkout.
+        uses: actions/checkout@v4
+
+      - name: Pull images.
+        shell: bash
+        run: |
+          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+
+      - name: Run tests.
+        shell: bash
+        run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+
+      - name: Upload Cypress video artifacts.
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+          path: ./cypress/ocm-test-suite/cypress/videos

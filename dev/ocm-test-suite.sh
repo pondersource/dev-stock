@@ -93,10 +93,6 @@ case "${TEST_CASE}" in
         echo -n "not supported"
         ;;
 
-      "nextcloud-ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
       "owncloud-nextcloud")
         "${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
@@ -120,9 +116,22 @@ case "${TEST_CASE}" in
       "seafile-seafile")
         "${ENV_ROOT}/dev/ocm-test-suite/share-with/seafile-seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
+
+      *)
+        echo -n "unknown share-with"
+        ;;
+    esac
+    ;;
+
+  "share-with-signed-http")
+    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
+
+      "nextcloud-ocmstub")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with-signed-http/nextcloud-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
       
       "ocmstub-ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/ocmstub-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with-signed-http/ocmstub-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
         ;;
 
       *)
