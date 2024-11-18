@@ -4,8 +4,8 @@ import {
   selectAppFromLeftSide
 } from '../utils/owncloud'
 
-describe('OCM federated sharing functionality for ownCloud and OcmStub', () => {
-  it('Send federated share <file> from ownCloud v10 to OcmStub 1.0', () => {
+describe('Native federated sharing functionality for ownCloud', () => {
+  it('Send federated share <file> from ownCloud v10 to ownCloud v10', () => {
     // share from ownCloud 1.
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
@@ -25,6 +25,7 @@ describe('OCM federated sharing functionality for ownCloud and OcmStub', () => {
     cy.contains('"sharedBy": "einstein@https://owncloud1.docker/"').should('be.visible')
     cy.contains('"ownerDisplayName": "einstein"').should('be.visible')
     cy.contains('"description": ""').should('be.visible')
+    cy.contains('"shareWith": "michiel@https://ocmstub2.docker"').should('be.visible')
     cy.contains('"protocol": { "name": "webdav", "options": { "sharedSecret": "').should('be.visible')
     cy.contains('"permissions": "{http://open-cloud-mesh.org/ns}share-permissions"').should('be.visible')
   })

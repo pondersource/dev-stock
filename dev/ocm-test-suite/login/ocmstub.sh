@@ -53,11 +53,8 @@ function waitForPort () {
 function createEfss() {
   local platform="${1}"
   local number="${2}"
-  local user="${3}"
-  local password="${4}"
-  local init_script="${5}"
-  local tag="${6-latest}"
-  local image="${7}"
+  local tag="${3-latest}"
+  local image="${4}"
 
   if [[ -z "${image}" ]]; then
     local image="pondersource/dev-stock-${platform}"
@@ -66,19 +63,13 @@ function createEfss() {
   fi
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
-  echo docker run --detach --network=testnet                                                  \
-    --name="${platform}${number}.docker"                                                                      \
-    --add-host "host.docker.internal:host-gateway"                                                            \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
-    -e HOST="${platform}${number}"                                                                            \
-    "${image}:${tag}"
+
   redirect_to_null_cmd docker run --detach --network=testnet                                                  \
     --name="${platform}${number}.docker"                                                                      \
     --add-host "host.docker.internal:host-gateway"                                                            \
+    -e HOST="${platform}${number}"                                                                            \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
     -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
-    -e HOST="${platform}${number}"                                                                            \
     "${image}:${tag}"
 
   # wait for hostname port to be open.
@@ -103,13 +94,11 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 #
 # platform:       ocmstub.
 # number:         should be unique for each platform, for example: you cannot have two ocmstubs with same number.
-# username:       username for sign in into efss.
-# password:       password for sign in into efss.
-# init script:    script for initializing efss.
 # tag:            tag for the image, use latest if not sure.
 # image:          which image variation to use for container.
 
-createEfss    ocmstub    1    einstein    relativity    ocmstub.sh    "${EFSS_PLATFORM_VERSION}"
+# ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
+createEfss    ocmstub    1
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############

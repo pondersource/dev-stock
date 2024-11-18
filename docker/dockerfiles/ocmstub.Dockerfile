@@ -8,13 +8,22 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 RUN apt update
-RUN apt install -yq iproute2
+RUN apt install -yq iproute2 git
 
+ARG REPO_OCMSTUB=https://github.com/pondersource/ocm-stub
+ARG BRANCH_OCMSTUB=mahdi/fix-grants
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="default"
-RUN git clone https://github.com/michielbdejong/ocm-stub /ocmstub
+RUN git clone                       \
+    --depth 1                       \
+    --recursive                     \
+    --shallow-submodules            \
+    --branch ${BRANCH_OCMSTUB}      \
+    ${REPO_OCMSTUB}                 \
+    /ocmstub
+
 WORKDIR /ocmstub
 
 RUN npm install

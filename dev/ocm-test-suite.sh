@@ -123,6 +123,23 @@ case "${TEST_CASE}" in
     esac
     ;;
 
+  "share-with-signed-http")
+    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
+
+      "nextcloud-ocmstub")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with-signed-http/nextcloud-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+      
+      "ocmstub-ocmstub")
+        "${ENV_ROOT}/dev/ocm-test-suite/share-with-signed-http/ocmstub-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+        ;;
+
+      *)
+        echo -n "unknown share-with"
+        ;;
+    esac
+    ;;
+
   "share-link")
     case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
 
