@@ -1,7 +1,13 @@
-# dev-stock
-[![Open Cloud Mesh Test Suite](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml/badge.svg)](https://github.com/pondersource/dev-stock/actions/workflows/ocm-test-suite.yml)
+# Development Stockpile (dev-stock)
 
 Docker images we use in development.
+
+# Open Cloud Mesh Test Suite
+
+### Login Tests
+| Test Name | Nextcloud v27.1.10 | Nextcloud v28.0.12 | oCIS v5.0.6 | OcmStub v1.0.0 | ownCloud v10.14.0 | Seafile v11.0.5 |
+|-----------|--------------------|--------------------|-------------|----------------|-------------------|-----------------|
+| Login     | ![OCM Test Login Nextcloud v27.1.10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v27.yml?branch=matrix-ci-tests&style=flat-square&label=) | ![OCM Test Login Nextcloud v28.0.12](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v28.yml?branch=matrix-ci-tests&style=flat-square&label=) | ![OCM Test Login oCIS v5.0.6](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocis-v5.yml?branch=matrix-ci-tests&style=flat-square&label=) | ![OCM Test Login OcmStub v1.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocmstub-v1.yml?branch=matrix-ci-tests&style=flat-square&label=) | ![OCM Test Login ownCloud v10.14.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-owncloud-v10.yml?branch=matrix-ci-tests&style=flat-square&label=) | ![OCM Test Login Seafile v11.0.5](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-seafile-v11.yml?branch=matrix-ci-tests&style=flat-square&label=)
 
 # EFSS versions
 ## Nextcloud version
