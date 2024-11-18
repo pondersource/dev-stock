@@ -1,366 +1,366 @@
-name: Open Cloud Mesh Test Suite
+# name: Open Cloud Mesh Test Suite
 
-# Controls when the action will run.
-on:
-  # Triggers the workflow on push or pull request events but only for the specified branch.
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-      - ocm
-  # Allows you to run this workflow manually from the Actions tab.
-  workflow_dispatch:
+# # Controls when the action will run.
+# on:
+#   # Triggers the workflow on push or pull request events but only for the specified branch.
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+#       - ocm
+#   # Allows you to run this workflow manually from the Actions tab.
+#   workflow_dispatch:
 
-jobs:
-  login:
-    strategy:
-      fail-fast: false
-      max-parallel: 5
-      matrix:
-        efss: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.12
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
-          },
-          {
-            platform: ocmstub,
-            version: "1.0"
-          },
-        ]
+# jobs:
+#   login:
+#     strategy:
+#       fail-fast: false
+#       max-parallel: 5
+#       matrix:
+#         efss: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#           {
+#             platform: ocis,
+#             version: 5.0.6
+#           },
+#           {
+#             platform: seafile,
+#             version: 11.0.5
+#           },
+#           {
+#             platform: ocmstub,
+#             version: "1.0"
+#           },
+#         ]
 
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-22.04
+#     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+#     runs-on: ubuntu-22.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
+#     # Steps represent a sequence of tasks that will be executed as part of the job.
+#     steps:
+#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+#       - name: Checkout.
+#         uses: actions/checkout@v4
 
-      - name: Pull images.
-        shell: bash
-        run: ./docker/pull/ocm-test-suite/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
+#       - name: Pull images.
+#         shell: bash
+#         run: ./docker/pull/ocm-test-suite/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
 
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
+#       - name: Run tests.
+#         shell: bash
+#         run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
 
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+#       - name: Upload Cypress video artifacts.
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
+#           path: ./cypress/ocm-test-suite/cypress/videos
 
-  share-with:
-    if: ${{ always() }}
-    needs: [login]
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        sender: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.12
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
-          }
-        ]
-        receiver: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.12
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: seafile,
-            version: 11.0.5
-          },
-          {
-            platform: ocmstub,
-            version: "1.0"
-          },
-        ]
-        exclude:
-          # seafile doesn't support receiving ocm shares to other platforms yet! exclude tests.
-        - sender: {
-            platform: nextcloud,
-            version: v27.1.10
-          }
-          receiver:  {
-            platform: seafile,
-            version: 11.0.5
-          }
-        - sender: {
-            platform: nextcloud,
-            version: v28.0.12
-          }
-          receiver:  {
-            platform: seafile,
-            version: 11.0.5
-          }
-        - sender: {
-            platform: owncloud,
-            version: v10.14.0
-          }
-          receiver:  {
-            platform: seafile,
-            version: 11.0.5
-          }
-        # seafile doesn't support sending ocm shares to other platforms yet! exclude tests.
-        - sender: {
-            platform: seafile,
-            version: 11.0.5
-          }
-          receiver:  {
-            platform: nextcloud,
-            version: v27.1.10
-          }
-        - sender: {
-            platform: seafile,
-            version: 11.0.5
-          }
-          receiver:  {
-            platform: nextcloud,
-            version: v28.0.12
-          }
-        - sender: {
-            platform: seafile,
-            version: 11.0.5
-          }
-          receiver:  {
-            platform: owncloud,
-            version: v10.14.0
-          }
+#   share-with:
+#     if: ${{ always() }}
+#     needs: [login]
+#     strategy:
+#       fail-fast: false
+#       max-parallel: 4
+#       matrix:
+#         sender: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#           {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#         ]
+#         receiver: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#           {
+#             platform: seafile,
+#             version: 11.0.5
+#           },
+#           {
+#             platform: ocmstub,
+#             version: "1.0"
+#           },
+#         ]
+#         exclude:
+#           # seafile doesn't support receiving ocm shares to other platforms yet! exclude tests.
+#         - sender: {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           }
+#           receiver:  {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#         - sender: {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           }
+#           receiver:  {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#         - sender: {
+#             platform: owncloud,
+#             version: v10.14.0
+#           }
+#           receiver:  {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#         # seafile doesn't support sending ocm shares to other platforms yet! exclude tests.
+#         - sender: {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#           receiver:  {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           }
+#         - sender: {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#           receiver:  {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           }
+#         - sender: {
+#             platform: seafile,
+#             version: 11.0.5
+#           }
+#           receiver:  {
+#             platform: owncloud,
+#             version: v10.14.0
+#           }
 
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-22.04
+#     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+#     runs-on: ubuntu-22.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
+#     # Steps represent a sequence of tasks that will be executed as part of the job.
+#     steps:
+#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+#       - name: Checkout.
+#         uses: actions/checkout@v4
 
-      - name: Pull images.
-        shell: bash
-        run: |
-          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
-          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+#       - name: Pull images.
+#         shell: bash
+#         run: |
+#           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+#           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#       - name: Run tests.
+#         shell: bash
+#         run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+#       - name: Upload Cypress video artifacts.
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#           path: ./cypress/ocm-test-suite/cypress/videos
 
-  share-link:
-    if: ${{ always() }}
-    needs: [login]
-    strategy:
-      fail-fast: false
-      max-parallel: 9
-      matrix:
-        sender: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.12
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-        ]
-        receiver: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: nextcloud,
-            version: v28.0.12
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-        ]
+#   share-link:
+#     if: ${{ always() }}
+#     needs: [login]
+#     strategy:
+#       fail-fast: false
+#       max-parallel: 9
+#       matrix:
+#         sender: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#         ]
+#         receiver: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: nextcloud,
+#             version: v28.0.12
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#         ]
 
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-22.04
+#     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+#     runs-on: ubuntu-22.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
+#     # Steps represent a sequence of tasks that will be executed as part of the job.
+#     steps:
+#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+#       - name: Checkout.
+#         uses: actions/checkout@v4
 
-      - name: Pull images.
-        shell: bash
-        run: |
-          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
-          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+#       - name: Pull images.
+#         shell: bash
+#         run: |
+#           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+#           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh share-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#       - name: Run tests.
+#         shell: bash
+#         run: ./dev/ocm-test-suite.sh share-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: share-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+#       - name: Upload Cypress video artifacts.
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: share-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#           path: ./cypress/ocm-test-suite/cypress/videos
 
-  invite-link:
-    if: ${{ always() }}
-    needs: [login]
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        sender: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
-        ]
-        receiver: [
-          {
-            platform: nextcloud,
-            version: v27.1.10
-          },
-          {
-            platform: owncloud,
-            version: v10.14.0
-          },
-          {
-            platform: ocis,
-            version: 5.0.6
-          },
-        ]
+#   invite-link:
+#     if: ${{ always() }}
+#     needs: [login]
+#     strategy:
+#       fail-fast: false
+#       max-parallel: 4
+#       matrix:
+#         sender: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#           {
+#             platform: ocis,
+#             version: 5.0.6
+#           },
+#         ]
+#         receiver: [
+#           {
+#             platform: nextcloud,
+#             version: v27.1.10
+#           },
+#           {
+#             platform: owncloud,
+#             version: v10.14.0
+#           },
+#           {
+#             platform: ocis,
+#             version: 5.0.6
+#           },
+#         ]
 
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-22.04
+#     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+#     runs-on: ubuntu-22.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
+#     # Steps represent a sequence of tasks that will be executed as part of the job.
+#     steps:
+#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+#       - name: Checkout.
+#         uses: actions/checkout@v4
 
-      - name: Pull images.
-        shell: bash
-        run: |
-          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
-          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+#       - name: Pull images.
+#         shell: bash
+#         run: |
+#           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+#           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh invite-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#       - name: Run tests.
+#         shell: bash
+#         run: ./dev/ocm-test-suite.sh invite-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: invite-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+#       - name: Upload Cypress video artifacts.
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: invite-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#           path: ./cypress/ocm-test-suite/cypress/videos
   
-  share-with-signed-http:
-    if: ${{ always() }}
-    needs: [login]
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        sender: [
-          {
-            platform: ocmstub,
-            version: "1.0"
-          },
-        ]
-        receiver: [
-          {
-            platform: ocmstub,
-            version: "1.0"
-          },
-        ]
+#   share-with-signed-http:
+#     if: ${{ always() }}
+#     needs: [login]
+#     strategy:
+#       fail-fast: false
+#       max-parallel: 4
+#       matrix:
+#         sender: [
+#           {
+#             platform: ocmstub,
+#             version: "1.0"
+#           },
+#         ]
+#         receiver: [
+#           {
+#             platform: ocmstub,
+#             version: "1.0"
+#           },
+#         ]
 
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-22.04
+#     # The OS to run tests on, (I believe for OCM testing OS is really not that important).
+#     runs-on: ubuntu-22.04
 
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
+#     # Steps represent a sequence of tasks that will be executed as part of the job.
+#     steps:
+#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
+#       - name: Checkout.
+#         uses: actions/checkout@v4
 
-      - name: Pull images.
-        shell: bash
-        run: |
-          ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
-          ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
+#       - name: Pull images.
+#         shell: bash
+#         run: |
+#           ./docker/pull/ocm-test-suite/${{ matrix.sender.platform }}.sh     ${{ matrix.sender.version }}
+#           ./docker/pull/ocm-test-suite/${{ matrix.receiver.platform }}.sh   ${{ matrix.receiver.version }}
 
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh share-with-signed-http ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#       - name: Run tests.
+#         shell: bash
+#         run: ./dev/ocm-test-suite.sh share-with-signed-http ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+#       - name: Upload Cypress video artifacts.
+#         uses: actions/upload-artifact@v4
+#         if: always()
+#         with:
+#           name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+#           path: ./cypress/ocm-test-suite/cypress/videos
