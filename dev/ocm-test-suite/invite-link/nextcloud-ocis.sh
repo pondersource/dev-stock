@@ -20,7 +20,7 @@ export ENV_ROOT=${ENV_ROOT}
 
 # nextcloud version:
 #   - v27.1.10
-#   - v28.0.7
+#   - v28.0.12
 EFSS_PLATFORM_1_VERSION=${1:-"v27.1.10"}
 
 # oCIS version:
