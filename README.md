@@ -129,6 +129,18 @@ The test suite currently supports:
 To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://github.com/cs3org/OCM-API)
 
 
+# OCM Compatibility Results 🚦
+
+## Legend 📖
+
+- **![Possible](https://img.shields.io/badge/Possible-blue?style=flat-square)** Indicates that the test scenario is supported for the specified combination of sender and receiver platforms but the test scripts are not available yet.
+- **![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square)** Indicates that the test scenario is not supported for the specified combination of sender and receiver platforms.
+- **CI Badge**: Displays the status of the test in the CI pipeline. Click the badge to view the detailed workflow or logs on GitHub Actions.
+  - **Green (✅)**: Test passed successfully.
+  - **Red (❌)**: Test failed.
+  - **Yellow (🕒)**: Test is in progress or has been queued.
+
+
 ## Login Tests
 | Test Name | Nextcloud v27.1.10 | Nextcloud v28.0.12 | oCIS v5.0.6 | OcmStub v1.0.0 | ownCloud v10.14.0 | Seafile v11.0.5 |
 |-----------|--------------------|--------------------|-------------|----------------|-------------------|-----------------|
@@ -251,15 +263,15 @@ Ensure the versions provided are supported by the test suite. Refer to the Suppo
 
 
 ### Cypress Runner:
-Using electron is recommended for headless CI testing.
-Other browsers (chrome, firefox, edge) can be used for debugging or local testing.
+Using `electron` is recommended for headless CI testing.
+Other browsers (`chrome`, `firefox`, `edge`) can be used for debugging or local testing.
 
 ### Run Mode:
 Use dev for iterative local testing with enhanced logging.
 Use ci for automated pipelines with concise output.
 
 ### Cross-Platform Tests:
-For scenarios requiring two platforms (e.g., share-with, invite-link), specify both Platform 1 and Platform 2 along with their versions.
+For scenarios requiring two platforms (e.g., `share-with`, `invite-link`), specify both Platform 1 and Platform 2 along with their versions.
 
 # Debugging
 ## RD-SRAM
