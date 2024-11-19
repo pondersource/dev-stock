@@ -1,6 +1,45 @@
 # Development Stockpile 🛠️📦  
 A collection of Docker images and scripts designed to set up a complete development environment for building and testing applications. 🚀
 
+---
+
+## Table of Contents 📑
+
+1. [Our Dockerized EFSS Images 📂](#our-dockerized-efss-images-)
+   - [Nextcloud Versions](#nextcloud-versions)
+   - [ownCloud Versions](#owncloud-versions)
+   - [Docker Pull Commands](#docker-pull-commands)
+2. [Our Dockerized Reva Images 🚀](#our-dockerized-reva-images-)
+   - [Reva Versions](#reva-versions)
+   - [Docker Pull Commands](#docker-pull-commands-1)
+3. [Open Cloud Mesh Test Suite 🌐🧪](#open-cloud-mesh-test-suite-)
+   - [What is the Open Cloud Mesh Test Suite? 🤔](#what-is-the-open-cloud-mesh-test-suite-)
+   - [Why Open Cloud Mesh? 🤝](#why-open-cloud-mesh-)
+   - [Features of the OCM Test Suite 🚀](#features-of-the-ocm-test-suite-)
+   - [Key Test Categories 📝](#key-test-categories-)
+   - [Supported Platforms 📋](#supported-platforms-)
+   - [How It Works 🔧](#how-it-works-)
+   - [Benefits of the Open Cloud Mesh Test Suite 🌟](#benefits-of-the-open-cloud-mesh-test-suite-)
+   - [Learn More 🔗](#learn-more-)
+4. [OCM Compatibility Results 🚦](#ocm-compatibility-results-)
+   - [Legend 📖](#legend-)
+   - [Login Tests 🔐](#login-tests-)
+   - [Share Link Tests 🔗](#share-link-tests-)
+   - [Share With Tests 🤝](#share-with-tests-)
+   - [Invite Link Tests 📨](#invite-link-tests-)
+5. [Developer's Guide for the Open Cloud Mesh Test Suite 🛠️](#developers-guide-for-the-open-cloud-mesh-test-suite-)
+   - [Command Syntax 🖥️](#command-syntax-️)
+   - [Example Usage 📘](#example-usage-)
+   - [Notes 📝](#notes-)
+6. [Debugging](#debugging)
+   - [RD-SRAM](#rd-sram)
+   - [ScienceMesh](#sciencemesh)
+   - [Trashbin](#trashbin)
+7. [Using XDebug](#using-xdebug)
+8. [SOLID RemoteStorage](#solid-remotestorage)
+
+---
+
 ## Our Dockerized EFSS Images 📂
 **EFSS (Enterprise File Sync and Share)** solutions are software platforms designed to enable organizations to securely share and synchronize files, both internally and externally.
 These systems are built to ensure data integrity, compliance, and accessibility, making them essential for modern collaboration. 
@@ -164,14 +203,18 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 - **Receiver (C)**: Means the platform specified on the Column (C) is receiving the action.
 
 
-## Login Tests
+## Login Tests 🔐
+Verifies authentication mechanisms for supported EFSS platforms, ensuring users can securely log in.
+
 | Test Name | Nextcloud v27.1.10 | Nextcloud v28.0.12 | oCIS v5.0.6 | OcmStub v1.0.0 | ownCloud v10.14.0 | Seafile v11.0.5 |
 |-----------|--------------------|--------------------|-------------|----------------|-------------------|-----------------|
 | **Login** | [![NC v27.1.10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v27.yml) | [![NC v28.0.12](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v28.yml) | [![oCIS v5.0.6](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocis-v5.yml) | [![OcmStub v1.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocmstub-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocmstub-v1.yml) | [![ownCloud v10.14.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-owncloud-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-owncloud-v10.yml) | [![Seafile v11.0.5](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-seafile-v11.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-seafile-v11.yml) |
 
 ---
 
-## Share Link Tests
+## Share Link Tests 🔗
+Tests the ability to create and manage public links for file sharing, and their integration into EFSS platforms.
+
 | Sender (R) / Receiver (C) | Nextcloud v27.1.10 | Nextcloud v28.0.12 | ownCloud v10.14.0 |
 |---------------------------|--------------------|--------------------|-------------------|
 | **Nextcloud v27.1.10**    | [![NC v27 ↔ NC v27](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-nc-v27.yml) | [![NC v27 ↔ NC v28](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-nc-v28.yml) | [![NC v27 ↔ OC v10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-oc-v10.yml) |
@@ -180,7 +223,9 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 
 ---
 
-## Share With Tests
+## Share With Tests 🤝
+Validates direct file sharing between users on different EFSS platforms, ensuring seamless collaboration.
+
 | Sender (R) / Receiver (C) | Nextcloud v27.1.10 | Nextcloud v28.0.12 | OcmStub v1.0.0 | ownCloud v10.14.0 | Seafile v11.0.5 |
 |---------------------------|--------------------|--------------------|----------------|-------------------|-----------------|
 | **Nextcloud v27.1.10**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-nc-v27.yml) | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-nc-v28.yml) | ![Possible](https://img.shields.io/badge/Possible-blue?style=flat-square) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-oc-v10.yml) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
@@ -191,7 +236,9 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 
 ---
 
-## Invite Link Tests
+## Invite Link Tests 📨
+Checks workflows for sending and accepting invitations to collaborate between external users or organizations.
+
 | Sender (R) / Receiver (C) | Nextcloud v27.1.10 with ScienceMesh | oCIS v5.0.6 | ownCloud v10.14.0 with ScienceMesh |
 |---------------------------|-------------------------------------|-------------|-----------------------------------|
 | **Nextcloud v27.1.10  with ScienceMesh**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-nc-v27.yml) | [![NC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-ocis-v5.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-oc-v10.yml) |
