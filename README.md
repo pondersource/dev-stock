@@ -1,7 +1,7 @@
 # Development Stockpile 🛠️📦  
 A collection of Docker images and scripts designed to set up a complete development environment for building and testing applications. 🚀
 
-## EFSS Versions 📂
+## Our Dockerized EFSS Versions 📂
 **EFSS (Enterprise File Sync and Share)** solutions are software platforms designed to enable organizations to securely share and synchronize files, both internally and externally.
 These systems are built to ensure data integrity, compliance, and accessibility, making them essential for modern collaboration. 
 Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provide robust, open-source solutions for enterprise file management.
@@ -23,6 +23,21 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 |----------------------------------|---------------|----------------------------------------------------------------------------|------------------------------------------------------------------------------|
 | pondersource/dev-stock-owncloud  | v10.14.0      | [v10.14.0](https://github.com/owncloud/core/releases/tag/v10.14.0)         | [Official ownCloud Core](https://github.com/owncloud/core)                   |
 
+
+#### Docker Pull Commands
+To pull the Docker images for EFSS, use the following commands:
+
+```bash
+# Pull the latest version of Nextcloud
+docker pull pondersource/dev-stock-nextcloud:latest
+
+# Pull a specific version of Nextcloud
+docker pull pondersource/dev-stock-nextcloud:v30.0.0
+docker pull pondersource/dev-stock-nextcloud:v29.0.8
+
+# Pull a specific version of ownCloud
+docker pull pondersource/dev-stock-owncloud:v10.14.0
+```
 
 # Open Cloud Mesh Test Suite 🌐🧪
 
@@ -148,21 +163,103 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 | **oCIS v5.0.6**           | [![oCIS ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-nc-v27.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-nc-v27.yml) | [![oCIS ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-ocis-v5.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-ocis-v5.yml) | [![oCIS ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-oc-v10.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-oc-v10.yml) |
 | **ownCloud v10.14.0**     | [![OC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-nc-v27.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-nc-v27.yml) | [![OC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-ocis-v5.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-ocis-v5.yml) | [![OC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-oc-v10.yml?branch=matrix-ci-tests&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-oc-v10.yml) |
 
-# OCM Test Suite
-Run specific tests with this command syntax.
-1. test scenario: login. share-with, invite-link, share-link
-2. platform 1: ocis, nextcloud, owncloud, seafile
-3. run mode: dev, ci
-4. cypress runner: electron, chrome, firefox, edge
+# Developer's Guide for the Open Cloud Mesh Test Suite 🛠️
+
+The **Open Cloud Mesh Test Suite** is designed to help developers run and validate specific test scenarios across multiple EFSS platforms. This guide provides instructions on how to execute specific tests using the command-line interface.
+
+---
+
+## Command Syntax 🖥️
+
+To run specific tests, use the following command syntax:
 
 ```bash
 ./dev/ocm-test-suite.sh [test scenario] [platform 1] [platform 1 version] [run mode] [cypress runner] [platform 2] [platform 2 version]
 ```
 
-example:
+### Arguments Breakdown:
+1. **Test Scenario:**
+    - The type of test you want to run. Supported scenarios:
+        1. `login`
+        2. `share-with`
+        3. `invite-link`
+        4. `share-link`
+
+
+2. **Platform 1:**
+    - The first EFSS platform being tested. Supported platforms:
+        1. `nextcloud`
+        2. `owncloud`
+        3. `seafile`
+        4. `ocis`
+
+3. **Platform 1 Version:**
+    - The specific version of Platform 1. For example: `v27.1.10`.
+
+4. **Run Mode:**
+    - Defines the environment for the test execution:
+        1. `dev`: Local development mode.
+        2. `ci`: Continuous Integration mode.
+
+5. **Cypress Runner:**
+    - The browser to be used by the Cypress test runner:
+        1. `electron` (default for headless mode)
+        2. `chrome`
+        3. `firefox`
+        4. `edge`
+
+6. **Platform 2 (Optional):**
+    - The second EFSS platform involved in cross-platform scenarios. Supported platforms:
+        1. `nextcloud`
+        2. `owncloud`
+        3. `seafile`
+        4. `ocis`
+
+7. **Platform 2 Version (Optional):**
+    - The specific version of Platform 2. For example: `v28.0.12`.
+
+
+## Example Usage 📘
+
+
+### Running a share-with Test:
+
+Run a "share-with" test between two Nextcloud instances using version `v27.1.10`, in CI mode, with the Electron browser:
+
 ```bash
 ./dev/ocm-test-suite.sh share-with nextcloud v27.1.10 ci electron nextcloud v27.1.10
 ```
+
+### Running a login Test:
+Run a "login" test on a Seafile instance using version `v11.0.5`, in development mode, with the Chrome browser:
+
+```bash
+./dev/ocm-test-suite.sh login seafile v11.0.5 dev chrome
+```
+
+### Running a share-link Test:
+Run a "share-link" test between ownCloud and Nextcloud instances, using versions `v10.14.0` and `v29.0.8`, respectively, in CI mode with Firefox:
+
+```bash
+./dev/ocm-test-suite.sh share-link owncloud v10.14.0 ci firefox nextcloud v29.0.8
+```
+
+## Notes 📝
+
+### Platform Versions:
+Ensure the versions provided are supported by the test suite. Refer to the Supported Platforms Section for the latest compatibility list.
+
+
+### Cypress Runner:
+Using electron is recommended for headless CI testing.
+Other browsers (chrome, firefox, edge) can be used for debugging or local testing.
+
+### Run Mode:
+Use dev for iterative local testing with enhanced logging.
+Use ci for automated pipelines with concise output.
+
+### Cross-Platform Tests:
+For scenarios requiring two platforms (e.g., share-with, invite-link), specify both Platform 1 and Platform 2 along with their versions.
 
 # Debugging
 ## RD-SRAM
