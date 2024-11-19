@@ -22,9 +22,9 @@ export ENV_ROOT=${ENV_ROOT}
 #   - v10.14.0
 EFSS_PLATFORM_1_VERSION=${1:-"v10.14.0"}
 
-# owncloud version:
-#   - v10.14.0
-EFSS_PLATFORM_2_VERSION=${2:-"v10.14.0"}
+# ocmstub version:
+#   - v1.0
+EFSS_PLATFORM_2_VERSION=${2:-"1.0"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}
@@ -126,13 +126,7 @@ function createOcmStub() {
   fi
 
   redirect_to_null_cmd echo "creating efss ${platform} ${number}"
-  echo docker run --detach --network=testnet                                                  \
-    --name="${platform}${number}.docker"                                                                      \
-    --add-host "host.docker.internal:host-gateway"                                                            \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.crt:/tls/${platform}${number}.crt"           \
-    -v "${ENV_ROOT}/docker/tls/certificates/${platform}${number}.key:/tls/${platform}${number}.key"           \
-    -e HOST="${platform}${number}"                                                                            \
-    "${image}:${tag}"
+
   redirect_to_null_cmd docker run --detach --network=testnet                                                  \
     --name="${platform}${number}.docker"                                                                      \
     --add-host "host.docker.internal:host-gateway"                                                            \
@@ -176,7 +170,9 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 
 # ownClouds.
 createOwnCloud    owncloud    1    marie    radioactivity    owncloud.sh    latest    ocm-test-suite
-createOcmStub    ocmstub    2    michiel     dejong        ocmstub.sh    "${EFSS_PLATFORM_2_VERSION}"
+
+# ocmstub only has the latest tag so we don't need this "${EFSS_PLATFORM_VERSION}"
+createOcmStub    ocmstub    1
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
   ###############
@@ -237,7 +233,7 @@ if [ "${SCRIPT_MODE}" = "dev" ]; then
   echo ""
   echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
   echo "https://nextcloud1.docker -> username: einstein               password: relativity"
-  echo "https://nextcloud2.docker -> username: michiel                password: dejong"
+  echo "https://ocmstub1.docker/? -> just click 'Log in'"
 else
   # only record when testing on electron.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then
@@ -259,7 +255,7 @@ else
     -w /ocm                                                                     \
     cypress/included:13.13.1 cypress run                                        \
     --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/share-with-signed-http/owncloud-${P1_VER}-to-owncloud-${P2_VER}.cy.js"
+    --spec "cypress/e2e/share-with/owncloud-${P1_VER}-to-ocmstub-${P2_VER}.cy.js"
 
   # revert config file back to normal.
   if [ "${BROWSER_PLATFORM}" != "electron" ]; then

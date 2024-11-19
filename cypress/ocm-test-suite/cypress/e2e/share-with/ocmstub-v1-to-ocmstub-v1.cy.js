@@ -4,7 +4,7 @@ describe('Native federated sharing functionality for OcmStub', () => {
     cy.contains('yes shareWith').should('be.visible')
   })
 
-  it('Receive federated share <file> from OcmStub 1.0 to OcmStub 1.0', () => {
+  it('Receive federated share <file> from OcmStub v1.0.0 to OcmStub v1.0.0', () => {
     // accept share from OcmStub 2.
     cy.loginOcmStub('https://ocmstub2.docker/?')
 

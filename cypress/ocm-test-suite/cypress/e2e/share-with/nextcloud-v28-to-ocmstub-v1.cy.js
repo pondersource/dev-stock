@@ -4,7 +4,7 @@ import {
 } from '../utils/nextcloud-v28'
 
 describe('Native federated sharing functionality for Nextcloud v28', () => {
-  it('Send federated share <file> from Nextcloud to Nextcloud', () => {
+  it('Send federated share <file> from Nextcloud v28 to OcmStub v1.0.0', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 

@@ -4,7 +4,7 @@ import {
 } from '../utils/nextcloud-v27'
 
 describe('Native federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
+  it('Send federated share <file> from Nextcloud v27 to OcmStub v1.0.0', () => {
     // share from Nextcloud 1.
     cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
 
@@ -12,7 +12,7 @@ describe('Native federated sharing functionality for Nextcloud', () => {
     createShareV27('nc1-to-os1-share.txt', 'michiel', 'ocmstub1.docker')
   })
 
-  it('Receive federated share <file> from Nextcloud v27 to OcmStub 1.0', () => {
+  it('Receive federated share <file> from Nextcloud v27 to OcmStub v1.0.0', () => {
     // accept share from OcmStub 1.
     cy.loginOcmStub('https://ocmstub1.docker/?')
 
