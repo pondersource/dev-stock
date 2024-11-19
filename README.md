@@ -1,7 +1,7 @@
 # Development Stockpile 🛠️📦  
 A collection of Docker images and scripts designed to set up a complete development environment for building and testing applications. 🚀
 
-## Our Dockerized EFSS Versions 📂
+## Our Dockerized EFSS Images 📂
 **EFSS (Enterprise File Sync and Share)** solutions are software platforms designed to enable organizations to securely share and synchronize files, both internally and externally.
 These systems are built to ensure data integrity, compliance, and accessibility, making them essential for modern collaboration. 
 Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provide robust, open-source solutions for enterprise file management.
@@ -10,10 +10,10 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 
 | **Repository**                   | **Tag**         | **Branch**                                                                | **Upstream**                                                                 |
 |----------------------------------|-----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| pondersource/dev-stock-nextcloud | latest, v30.0.0 | [v30.0.0](https://github.com/nextcloud/server/releases/tag/v30.0.0)       | [Official Nextcloud Server](https://github.com/nextcloud/server)              |
-| pondersource/dev-stock-nextcloud | v29.0.8         | [v29.0.8](https://github.com/nextcloud/server/releases/tag/v29.0.8)       | [Official Nextcloud Server](https://github.com/nextcloud/server)              |
-| pondersource/dev-stock-nextcloud | v28.0.12        | [v28.0.12](https://github.com/nextcloud/server/releases/tag/v28.0.12)     | [Official Nextcloud Server](https://github.com/nextcloud/server)              |
-| pondersource/dev-stock-nextcloud | v27.1.10        | [v27.1.10](https://github.com/nextcloud/server/releases/tag/v27.1.10)     | [Official Nextcloud Server](https://github.com/nextcloud/server)              |
+| pondersource/dev-stock-nextcloud | latest, v30.0.0 | [v30.0.0](https://github.com/nextcloud/server/releases/tag/v30.0.0)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/dev-stock-nextcloud | v29.0.8         | [v29.0.8](https://github.com/nextcloud/server/releases/tag/v29.0.8)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/dev-stock-nextcloud | v28.0.12        | [v28.0.12](https://github.com/nextcloud/server/releases/tag/v28.0.12)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/dev-stock-nextcloud | v27.1.10        | [v27.1.10](https://github.com/nextcloud/server/releases/tag/v27.1.10)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
 
 ---
 
@@ -37,6 +37,27 @@ docker pull pondersource/dev-stock-nextcloud:v29.0.8
 
 # Pull a specific version of ownCloud
 docker pull pondersource/dev-stock-owncloud:v10.14.0
+```
+
+## Our Dockerized Reva Images 🚀
+[**Reva**](https://github.com/cs3org/reva) is a key component in the **CS3API** ecosystem, designed to provide a robust backend for cloud storage and file-sharing services. It acts as a middleware for connecting EFSS platforms, enabling smooth communication and interoperability.
+
+---
+
+### Reva Versions
+
+| **Repository**               | **Tag**       | **Branch**                                                                | **Upstream**                                                                |
+|------------------------------|---------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| pondersource/dev-stock-reva  | v1.28.0       | [v1.28.0](https://github.com/cs3org/reva/releases/tag/v1.28.0)            | [Official Reva Repository](https://github.com/cs3org/reva)                  |
+
+---
+
+#### Docker Pull Commands
+To pull the Docker image for Reva, use the following command:
+
+```bash
+# Pull the specific version of Reva
+docker pull pondersource/dev-stock-reva:v1.28.0
 ```
 
 # Open Cloud Mesh Test Suite 🌐🧪
@@ -139,6 +160,8 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
   - **Green (✅)**: Test passed successfully.
   - **Red (❌)**: Test failed.
   - **Yellow (🕒)**: Test is in progress or has been queued.
+- **Sender (R)**: Means the platform specified on the Row (R) is sending the action.
+- **Receiver (C)**: Means the platform specified on the Column (C) is receiving the action.
 
 
 ## Login Tests
@@ -171,9 +194,9 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 ## Invite Link Tests
 | Sender (R) / Receiver (C) | Nextcloud v27.1.10 with ScienceMesh | oCIS v5.0.6 | ownCloud v10.14.0 with ScienceMesh |
 |---------------------------|-------------------------------------|-------------|-----------------------------------|
-| **Nextcloud v27.1.10**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-nc-v27.yml) | [![NC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-ocis-v5.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-oc-v10.yml) |
+| **Nextcloud v27.1.10  with ScienceMesh**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-nc-v27.yml) | [![NC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-ocis-v5.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-nc-v27-oc-v10.yml) |
 | **oCIS v5.0.6**           | [![oCIS ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-nc-v27.yml) | [![oCIS ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-ocis-v5.yml) | [![oCIS ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-ocis-v5-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-ocis-v5-oc-v10.yml) |
-| **ownCloud v10.14.0**     | [![OC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-nc-v27.yml) | [![OC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-ocis-v5.yml) | [![OC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-oc-v10.yml) |
+| **ownCloud v10.14.0  with ScienceMesh**     | [![OC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-nc-v27.yml) | [![OC ↔ oCIS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-ocis-v5.yml) | [![OC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/invite-link-oc-v10-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/invite-link-oc-v10-oc-v10.yml) |
 
 # Developer's Guide for the Open Cloud Mesh Test Suite 🛠️
 
@@ -283,12 +306,6 @@ See https://github.com/SURFnet/rd-sram-integration#testing-environment for up-to
 This was moved to https://github.com/cs3org/reva/tree/sciencemesh-testing/examples/sciencemesh .
 
 The scripts for ScienceMesh still exist here but are not guaranteed to work as expected.
-
-### Reva version
-
-upstream: [Reva](https://github.com/cs3org/reva)
-
-branch: [v1.28.0](https://github.com/owncloud/core/releases/tag/v1.28.0)
 
 ## Trashbin
 
