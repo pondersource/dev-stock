@@ -24,7 +24,7 @@ export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 
 echo Building pondersource/dev-stock-ocmstub
-docker build --build-arg CACHEBUST="default" --file ./dockerfiles/ocmstub.Dockerfile --tag pondersource/dev-stock-ocmstub:latest .
+docker build --build-arg CACHEBUST="default" --file ./dockerfiles/ocmstub.Dockerfile --tag pondersource/dev-stock-ocmstub:v1.0.0 --tag pondersource/dev-stock-ocmstub:latest .
 
 echo Building pondersource/dev-stock-revad
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/revad.Dockerfile --tag pondersource/dev-stock-revad:latest .
