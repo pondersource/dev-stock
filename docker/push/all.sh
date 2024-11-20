@@ -7,6 +7,7 @@ echo "Log in as pondersource"
 docker login
 
 docker push pondersource/dev-stock-ocmstub:latest
+docker push pondersource/dev-stock-ocmstub:v1.0.0
 docker push pondersource/dev-stock-revad:latest
 docker push pondersource/dev-stock-php-base:latest
 docker push pondersource/dev-stock-nextcloud:latest
