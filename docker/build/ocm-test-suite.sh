@@ -39,7 +39,7 @@ echo Building pondersource/dev-stock-nextcloud
 docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v28.0.12" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.12 .
 
 echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v27.1.10" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v27.1.10 .
+docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v27.1.11" --file ./dockerfiles/nextcloud.Dockerfile --tag pondersource/dev-stock-nextcloud:v27.1.11 .
 
 echo Building pondersource/dev-stock-nextcloud-sciencemesh
 docker build --build-arg CACHEBUST="default" --file ./dockerfiles/nextcloud-sciencemesh.Dockerfile --tag pondersource/dev-stock-nextcloud-sciencemesh:latest .
