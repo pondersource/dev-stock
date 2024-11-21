@@ -350,7 +350,7 @@ See https://github.com/SURFnet/rd-sram-integration#testing-environment for up-to
 
 ## ScienceMesh
 
-This was moved to https://github.com/cs3org/reva/tree/sciencemesh-testing/examples/sciencemesh .
+This was moved to https://github.com/sciencemesh/dev-stock .
 
 The scripts for ScienceMesh still exist here but are not guaranteed to work as expected.
 
