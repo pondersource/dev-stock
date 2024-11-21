@@ -2,13 +2,21 @@ name: OCM Test Share With OcmStub v1.0.0 to OcmStub v1.0.0
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the specified branch.
+  # Triggers the workflow on push or pull request events but only for the specified branch and files.
   push:
     branches:
       - main
+    paths:
+      - "cypress/ocm-tesdt-suite/**"
+      - "dev/ocm-test-suite.sh"
+      - "dev/ocm-test-suite/**"
   pull_request:
     branches:
       - main
+    paths:
+      - "cypress/ocm-tesdt-suite/**"
+      - "dev/ocm-test-suite.sh"
+      - "dev/ocm-test-suite/**"
   # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
