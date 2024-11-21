@@ -11,7 +11,7 @@ RUN rm --recursive --force /var/www/html
 USER www-data
 
 ARG REPO_OWNCLOUD=https://github.com/owncloud/core
-ARG BRANCH_OWNCLOUD=v10.14.0
+ARG BRANCH_OWNCLOUD=v10.15.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.

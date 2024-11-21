@@ -19,12 +19,12 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 # owncloud version:
-#   - v10.14.0
-EFSS_PLATFORM_1_VERSION=${1:-"v10.14.0"}
+#   - v10.15.0
+EFSS_PLATFORM_1_VERSION=${1:-"v10.15.0"}
 
 # owncloud version:
-#   - v10.14.0
-EFSS_PLATFORM_2_VERSION=${2:-"v10.14.0"}
+#   - v10.15.0
+EFSS_PLATFORM_2_VERSION=${2:-"v10.15.0"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}

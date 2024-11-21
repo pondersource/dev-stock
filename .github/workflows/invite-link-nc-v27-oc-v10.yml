@@ -1,4 +1,4 @@
-name: OCM Test Invite Link NC v27.1.11 to OC v10.14.0
+name: OCM Test Invite Link NC v27.1.11 to OC v10.15.0
 
 # Controls when the action will run.
 on:
@@ -35,7 +35,7 @@ jobs:
         receiver: [
           {
             platform: owncloud,
-            version: v10.14.0
+            version: v10.15.0
           },
         ]
 

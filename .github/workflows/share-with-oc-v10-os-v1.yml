@@ -1,4 +1,4 @@
-name: OCM Test Share With OC v10.14.0 to OcmStub v1.0.0
+name: OCM Test Share With OC v10.15.0 to OcmStub v1.0.0
 
 # Controls when the action will run.
 on:
@@ -29,7 +29,7 @@ jobs:
         sender: [
           {
             platform: owncloud,
-            version: v10.14.0
+            version: v10.15.0
           },
         ]
         receiver: [
