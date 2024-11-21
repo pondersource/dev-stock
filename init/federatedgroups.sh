@@ -17,7 +17,7 @@ cd "${DIR}/.." || exit
 
 # repositories and branches.
 REPO_OWNCLOUD=https://github.com/owncloud/core
-BRANCH_OWNCLOUD=v10.14.0
+BRANCH_OWNCLOUD=v10.15.0
 
 VERSION_CUSTOM_GROUPS=0.9.0
 LINK_CUSTOM_GROUPS=https://github.com/owncloud/customgroups/releases/download/v${VERSION_CUSTOM_GROUPS}/customgroups-${VERSION_CUSTOM_GROUPS}.tar.gz
