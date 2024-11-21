@@ -37,7 +37,7 @@ REPO_NEXTCLOUD_APP=https://github.com/sciencemesh/nc-sciencemesh
 BRANCH_NEXTCLOUD_APP=nextcloud
 
 REPO_NEXTCLOUD=https://github.com/nextcloud/server
-BRANCH_NEXTCLOUD=v27.1.10
+BRANCH_NEXTCLOUD=v27.1.11
 
 REPO_OWNCLOUD=https://github.com/owncloud/core
 BRANCH_OWNCLOUD=v10.14.0

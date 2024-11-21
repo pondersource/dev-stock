@@ -23,7 +23,7 @@ export ENV_ROOT=${ENV_ROOT}
 EFSS_PLATFORM_1_VERSION=${1:-"v10.14.0"}
 
 # nextcloud version:
-#   - v27.1.10
+#   - v27.1.11
 #   - v28.0.12
 EFSS_PLATFORM_2_VERSION=${2:-"v28.0.12"}
 

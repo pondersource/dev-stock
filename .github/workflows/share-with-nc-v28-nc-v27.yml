@@ -1,4 +1,4 @@
-name: OCM Test Share With NC v28.0.12 to NC v27.1.10
+name: OCM Test Share With NC v28.0.12 to NC v27.1.11
 
 # Controls when the action will run.
 on:
@@ -35,7 +35,7 @@ jobs:
         receiver: [
           {
             platform: nextcloud,
-            version: v27.1.10
+            version: v27.1.11
           },
         ]
 

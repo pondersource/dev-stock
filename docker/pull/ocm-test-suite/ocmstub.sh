@@ -4,7 +4,7 @@
 set -e
 
 # nextcloud version:
-#   - v27.1.10
+#   - v27.1.11
 #   - v28.0.12
 EFSS_PLATFORM_VERSION=${1:-"1.0"}
 
