@@ -19,12 +19,12 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 # oCIS version:
-#   - 5.0.6
-EFSS_PLATFORM_1_VERSION=${1:-"5.0.6"}
+#   - 5.0.9
+EFSS_PLATFORM_1_VERSION=${1:-"5.0.9"}
 
 # oCIS version:
-#   - 5.0.6
-EFSS_PLATFORM_2_VERSION=${2:-"5.0.6"}
+#   - 5.0.9
+EFSS_PLATFORM_2_VERSION=${2:-"5.0.9"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}
@@ -95,7 +95,7 @@ function createEfssOcis() {
     -v "${ENV_ROOT}/temp/certificates:/certificates"                                                                        \
     -v "${ENV_ROOT}/temp/certificate-authority:/certificate-authority"                                                      \
     --entrypoint /bin/sh                                                                                                    \
-    "owncloud/ocis:5.0.6"                                                                                                   \
+    "owncloud/ocis:5.0.9@sha256:96671605863b38b0b8021400fdb2d843586dfa31451a8c7766f15eabe85d8267"                           \
     -c "ocis init || true; ocis server"
 }
 

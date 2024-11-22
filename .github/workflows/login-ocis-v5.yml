@@ -1,4 +1,4 @@
-name: OCM Test Login oCIS v5.0.6
+name: OCM Test Login oCIS v5.0.9
 
 # Controls when the action will run.
 on:
@@ -29,7 +29,7 @@ jobs:
         efss: [
           {
             platform: ocis,
-            version: 5.0.6
+            version: 5.0.9
           },
         ]
 

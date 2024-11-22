@@ -19,12 +19,12 @@ ENV_ROOT=$(pwd)
 export ENV_ROOT=${ENV_ROOT}
 
 # oCIS version:
-#   - 5.0.6
-EFSS_PLATFORM_1_VERSION=${1:-"5.0.6"}
+#   - 5.0.9
+EFSS_PLATFORM_1_VERSION=${1:-"5.0.9"}
 
 # oCIS version:
-#   - 5.0.6
-EFSS_PLATFORM_2_VERSION=${2:-"5.0.6"}
+#   - 5.0.9
+EFSS_PLATFORM_2_VERSION=${2:-"5.0.9"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}
