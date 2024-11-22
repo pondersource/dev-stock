@@ -1,4 +1,4 @@
-name: OCM Test Invite Link oCIS v5.0.6 to NC v27.1.11
+name: OCM Test Invite Link oCIS v5.0.9 to NC v27.1.11
 
 # Controls when the action will run.
 on:
@@ -29,7 +29,7 @@ jobs:
         sender: [
           {
             platform: ocis,
-            version: 5.0.6
+            version: 5.0.9
           },
         ]
         receiver: [

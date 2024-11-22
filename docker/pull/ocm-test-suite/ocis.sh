@@ -4,8 +4,8 @@
 set -e
 
 # oCIS version:
-#   - 5.0.6
-EFSS_PLATFORM_VERSION=${1:-"5.0.6"}
+#   - 5.0.9
+EFSS_PLATFORM_VERSION=${1:-"5.0.9"}
 
 # 3rd party images.
 docker pull cypress/included:13.13.1
