@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# TODO: this is outdated, fix it soon.
 # @michielbdejong halt on error in docker init scripts
 set -e
 
