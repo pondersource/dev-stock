@@ -12,8 +12,9 @@
 # before running the script.
 # -----------------------------------------------------------------------------------
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# Exit immediately if a command exits with a non-zero status,
+# a variable is used but not defined, or a command in a pipeline fails
+set -euo pipefail
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
@@ -50,12 +51,7 @@ modify_cypress_config() {
 # Purpose: Stops and removes all Docker containers.
 # -----------------------------------------------------------------------------------
 stop_and_remove_docker_containers() {
-    local all_containers
-    all_containers=$(docker ps -aq)
-    if [[ -n "$all_containers" ]]; then
-        # Forcefully stop and remove all containers
-        docker rm -f $all_containers >/dev/null 2>&1 || true
-    fi
+    docker ps -q | xargs -r docker stop && docker ps -q -a | xargs -r docker rm 
 }
 
 # -----------------------------------------------------------------------------------
