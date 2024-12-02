@@ -19,17 +19,20 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
 # Purpose: Resolves the absolute path of the script's directory, handling symlinks.
+# Returns:
+#   The absolute path to the script's directory.
 # -----------------------------------------------------------------------------------
 resolve_script_dir() {
     local source="${BASH_SOURCE[0]}"
     local dir
-    while [ -L "$source" ]; do
-        dir="$(cd -P "$(dirname "$source")" >/dev/null 2>&1 && pwd)"
-        source="$(readlink "$source")"
-        [[ "$source" != /* ]] && source="$dir/$source"  # Resolve relative symlink
+    while [ -L "${source}" ]; do
+        dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+        source="$(readlink "${source}")"
+        # Resolve relative symlink
+        [[ "${source}" != /* ]] && source="${dir}/${source}"
     done
-    dir="$(cd -P "$(dirname "$source")" >/dev/null 2>&1 && pwd)"
-    printf "%s" "$dir"
+    dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+    printf "%s" "${dir}"
 }
 
 # -----------------------------------------------------------------------------------
@@ -37,11 +40,11 @@ resolve_script_dir() {
 # Purpose: Modifies the Cypress configuration file to set 'modifyObstructiveCode' to true.
 # -----------------------------------------------------------------------------------
 modify_cypress_config() {
-    local config_file="$ENV_ROOT/cypress/ocm-test-suite/cypress.config.js"
-    if [[ -f "$config_file" ]]; then
-        sed -i 's/.*modifyObstructiveCode: false,.*/  modifyObstructiveCode: true,/' "$config_file"
+    local config_file="${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    if [[ -f "${config_file}" ]]; then
+        sed -i 's/.*modifyObstructiveCode: false,.*/  modifyObstructiveCode: true,/' "${config_file}"
     else
-        printf "Warning: Configuration file not found: %s\n" "$config_file" >&2
+        printf "Warning: Configuration file not found: %s\n" "${config_file}" >&2
         exit 1
     fi
 }
@@ -51,7 +54,7 @@ modify_cypress_config() {
 # Purpose: Stops and removes all Docker containers.
 # -----------------------------------------------------------------------------------
 stop_and_remove_docker_containers() {
-    docker ps -q | xargs -r docker stop && docker ps -q -a | xargs -r docker rm 
+    docker ps -q | xargs -r docker stop && docker ps -q -a | xargs -r docker rm
 }
 
 # -----------------------------------------------------------------------------------
@@ -72,22 +75,22 @@ docker_cleanup() {
 #   $1 - Name of the Docker network to recreate
 # -----------------------------------------------------------------------------------
 recreate_docker_network() {
-    local network_name="$1"
-    if [[ -z "$network_name" ]]; then
+    local network_name="${1}"
+    if [[ -z "${network_name}" ]]; then
         printf "Error: Network name is required.\n" >&2
         exit 1
     fi
 
     # Remove the Docker network if it exists
-    if docker network inspect "$network_name" >/dev/null 2>&1; then
-        docker network rm "$network_name" >/dev/null 2>&1 || {
-            printf "Warning: Failed to remove Docker network: %s\n" "$network_name" >&2
+    if docker network inspect "${network_name}" >/dev/null 2>&1; then
+        docker network rm "${network_name}" >/dev/null 2>&1 || {
+            printf "Warning: Failed to remove Docker network: %s\n" "${network_name}" >&2
         }
     fi
 
     # Create the Docker network
-    docker network create "$network_name" >/dev/null 2>&1 || {
-        printf "Error: Failed to create Docker network: %s\n" "$network_name" >&2
+    docker network create "${network_name}" >/dev/null 2>&1 || {
+        printf "Error: Failed to create Docker network: %s\n" "${network_name}" >&2
         exit 1
     }
 }
@@ -100,7 +103,7 @@ main() {
     # Resolve the script's directory and move to the parent directory
     local script_dir
     script_dir="$(resolve_script_dir)"
-    cd "$script_dir/.." || {
+    cd "${script_dir}/.." || {
         printf "Error: Failed to change directory to script's parent.\n" >&2
         exit 1
     }
@@ -108,7 +111,7 @@ main() {
     # Export the environment root directory
     local env_root
     env_root="$(pwd)"
-    export ENV_ROOT="$env_root"
+    export ENV_ROOT="${env_root}"
 
     # Modify the Cypress configuration
     modify_cypress_config
@@ -117,7 +120,7 @@ main() {
     local clear_terminal="${1:-yes}"
 
     # Stop and remove all Docker containers
-    stop_and_remove_docker_containers
+    stop_and_remove_docker_containers >/dev/null 2>&1
 
     # Clean up unused Docker volumes and system resources
     docker_cleanup
@@ -126,7 +129,7 @@ main() {
     recreate_docker_network "testnet"
 
     # Clear the terminal if requested
-    if [[ "$clear_terminal" == "yes" ]]; then
+    if [[ "${clear_terminal}" == "yes" ]]; then
         clear
     fi
 }
