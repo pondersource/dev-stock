@@ -1,64 +1,128 @@
+/**
+ * @fileoverview
+ * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in ownCloud v10.
+ * This suite covers sending and accepting invitation links, sharing files via ScienceMesh,
+ * and verifying that the shares are received correctly.
+ * 
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
+
 import {
+  acceptShare,
   createInviteLink,
+  verifyFederatedContact,
+  acceptScienceMeshInvitation,
   createScienceMeshShare,
   renameFile,
+  ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud'
+} from '../utils/owncloud';
 
 describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
-  it('Send invitation from ownCloud v10 to ownCloud v10', () => {
 
-    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
-    cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/')
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('OWNCLOUD1_URL') || 'https://owncloud1.docker';
+  const recipientUrl = Cypress.env('OWNCLOUD2_URL') || 'https://owncloud2.docker';
+  const senderUsername = Cypress.env('OWNCLOUD1_USERNAME') || 'marie';
+  const senderPassword = Cypress.env('OWNCLOUD1_PASSWORD') || 'radioactivity';
+  const recipientUsername = Cypress.env('OWNCLOUD2_USERNAME') || 'mahdi';
+  const recipientPassword = Cypress.env('OWNCLOUD2_PASSWORD') || 'baghbani';
+  const inviteLinkFileName = 'invite-link-oc-oc.txt';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'invite-link-oc-oc.txt';
 
-    createInviteLink('https://owncloud2.docker').then(
-      (result) => {
-        // save invite link to file.
-        cy.writeFile('invite-link-oc-oc.txt', result)
-      }
-    )
-  })
+  /**
+   * Test case: Sending an invitation link from sender to recipient.
+   */
+  it('Send invitation from from ownCloud v10 to ownCloud v10', () => {
+    // Step 1: Log in to the sender's ownCloud instance
+    cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
-  it('Accept invitation from ownCloud v10 to ownCloud v10', () => {
+    // Step 2: Navigate to the ScienceMesh app
+    cy.visit(`${senderUrl}/index.php/apps/sciencemesh/`);
 
-    // load invite link from file.
-    cy.readFile('invite-link-oc-oc.txt').then((url) => {
+    // Step 3: Generate an invite link and save it to a file
+    createInviteLink(recipientUrl).then((inviteLink) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteLink);
+    });
+  });
 
-      // accept invitation from ownCloud 2.
-      cy.loginOwncloudCore(url, 'mahdi', 'baghbani')
+  /**
+   * Test case: Accepting the invitation link on the recipient's side.
+   */
+  it('Accept invitation from from ownCloud v10 to ownCloud v10', () => {
+    const expectedContactDisplayName = senderUsername;
+    // Extract domain without protocol or trailing slash
+    // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
+    const expectedContactDomain = `reva${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`;
 
-      cy.get('input[id="accept-button"]', { timeout: 10000 })
-        .click()
+    // Step 1: Read the invite link from the file
+    cy.readFile(inviteLinkFileName).then((inviteLink) => {
+      // Step 2: Ensure the invite link is valid
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
 
-      // validate 'marie' is shown as a contact.
-      cy.visit('https://owncloud2.docker/index.php/apps/sciencemesh/contacts')
+      // Step 3: Login to the recipient's ownCloud instance using the invite link
+      cy.loginOwncloudCore(inviteLink, recipientUsername, recipientPassword);
 
-      cy.get('table[id="contact-table"]')
-        .find('p[class="displayname"]')
-        .should("have.text", "marie");
-    })
-  })
+      // Step 4: Accept the invitation
+      acceptScienceMeshInvitation();
 
-  it('Send ScienceMesh share <file> from ownCloud v10 to ownCloud v10', () => {
-    // share from ownCloud 1.
-    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
+      // Step 5: Verify that the sender is now a contact in the recipient's contacts list
+      verifyFederatedContact(
+        recipientUrl.replace(/^https?:\/\/|\/$/g, ''),
+        expectedContactDisplayName,
+        expectedContactDomain
+      );
+    });
+  });
 
-    renameFile('welcome.txt', 'oc1-to-oc2-sciencemesh-share.txt')
-    createScienceMeshShare('oc1-to-oc2-sciencemesh-share.txt', 'mahdi', 'revaowncloud2.docker')
-  })
+  /**
+   * Test case: Sharing a file via ScienceMesh from sender to recipient.
+   */
+  it('Send ScienceMesh share of a file from ownCloud v10 to ownCloud v10', () => {
+    // Step 1: Log in to the sender's ownCloud instance
+    cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
-  it('Receive ScienceMesh share <file> from ownCloud v10 to ownCloud v10', () => {
-    // accept share from ownCloud 2.
-    cy.loginOwncloud('https://owncloud2.docker', 'mahdi', 'baghbani')
+    // Step 2: Ensure the original file exists
+    ensureFileExists(originalFileName);
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+    // Step 3: Rename the file
+    renameFile(originalFileName, sharedFileName);
 
-    selectAppFromLeftSide('sharingin')
+    // Step 4: Verify the file has been renamed
+    ensureFileExists(sharedFileName);
 
-    cy.get('[data-file="oc1-to-oc2-sciencemesh-share.txt"]', { timeout: 10000 }).should('be.visible')
-  })
-})
+    // Step 5: Create a federated share for the recipient via ScienceMesh
+    // Note: The 'reva' prefix is added to the recipient domain as per application behavior
+    createScienceMeshShare(
+      sharedFileName,
+      recipientUsername,
+      `reva${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+    );
+
+    // TODO @MahdiBaghbani: Verify that the share was created successfully
+  });
+
+  /**
+   * Test Case: Receiving and accepting a ScienceMesh file share on ownCloud 2.
+   * This test verifies that the shared file appears in the "Sharing In" section.
+   */
+  it('Receive ScienceMesh share of a file from ownCloud v10 to ownCloud v10', () => {
+    // Step 1: Log in to the recipient's ownCloud instance
+    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
+
+    // Step 2: Wait for the share dialog to appear and accept the incoming federated share
+    acceptShare();
+
+    // Step 3: Navigate to the correct section
+    selectAppFromLeftSide('files');
+
+    // Step 4: Verify that the shared file is visible
+    ensureFileExists(sharedFileName);
+
+    // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
+  });
+});

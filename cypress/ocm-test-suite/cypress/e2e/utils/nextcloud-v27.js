@@ -1,207 +1,431 @@
+/**
+ * @fileoverview
+ * Utility functions for Cypress tests interacting with Nextcloud version 27.
+ * These functions provide abstractions for common actions such as sharing files,
+ * updating permissions, renaming files, and navigating the UI.
+ *
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
+
+import {
+  escapeCssSelector,
+} from './general';
+
+/**
+ * Ensures that a file with the specified name exists and is visible in the file list.
+ *
+ * This function waits for the file element to appear in the DOM within the specified timeout and checks that it is visible.
+ * If the file does not exist or is not visible within the timeout, the test will fail with an appropriate error message.
+ *
+ * @param {string} fileName - The name of the file to check.
+ * @param {number} [timeout=10000] - Optional timeout in milliseconds for the check. Defaults to 10000ms.
+ *
+ * @example
+ * // Ensure that the file 'example.txt' exists and is visible
+ * ensureFileExists('example.txt');
+ *
+ * @throws Will cause the test to fail if the file does not exist or is not visible within the timeout.
+ */
+export function ensureFileExistsV27(fileName, timeout = 10000) {
+  // Escape special characters in the file name to safely use it in a CSS selector
+  const escapedFileName = escapeCssSelector(fileName);
+
+  // Wait for the file row to exist in the DOM and be visible
+  cy.get(`[data-file="${escapedFileName}"]`, { timeout })
+    .should('exist')
+    .and('be.visible');
+}
+
+/**
+ * Accepts a share dialog by clicking the "primary" button.
+ */
 export function acceptShareV27() {
-	cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-		.should('be.visible')
-		.find('*[class^="oc-dialog-buttonrow"]')
-		.find('button[class="primary"]')
-		.click()
+  // Wait for the share dialog to appear and ensure it's visible
+  cy.get('div.oc-dialog', { timeout: 10000 })
+    .should('be.visible')
+    .within(() => {
+      // Locate the button row and click the primary button
+      cy.get('div.oc-dialog-buttonrow')
+        .find('button.primary')
+        .should('be.visible')
+        .click();
+    });
 }
 
+/**
+ * Creates a share for a specific file and user.
+ * @param {string} fileName - The name of the file to be shared.
+ * @param {string} username - The username of the recipient.
+ * @param {string} domain - The domain of the recipient.
+ */
 export function createShareV27(fileName, username, domain) {
-	openSharingPanelV27(fileName)
+  // Open the sharing panel for the specified file
+  openSharingPanelV27(fileName);
 
-	cy.get('#app-sidebar-vue').within(() => {
-		cy.get('#sharing-search-input').clear()
-		cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
-		cy.get('#sharing-search-input').type(username + '@' + domain)
-		cy.wait('@userSearch')
-	})
+  // Set up an intercept for the user search API request
+  cy.intercept('GET', '**/apps/files_sharing/api/v1/sharees?*').as('userSearch');
 
-	// ensure selecting remote [sharetype="6"] instead of email!
-	cy.get(`[user="${username}"]`).should('be.visible').click()
-	cy.get('div[class="button-group"]').contains('Save share').should('be.visible').click()
+  cy.get('#app-sidebar-vue').within(() => {
+    // Clear the search input and type the recipient's email
+    cy.get('#sharing-search-input')
+      .clear()
+      .type(`${username}@${domain}`);
+  });
+
+  // Wait for the user search API request to complete
+  cy.wait('@userSearch');
+
+  // Select the correct user from the search results
+  cy.get(`[user="${username}"]`)
+    .should('be.visible')
+    .click();
+
+  // Click the "Save share" button to finalize the share
+  cy.get('div.button-group')
+    .contains('Save share')
+    .should('be.visible')
+    .click();
 }
 
+/**
+ * Creates a shareable link for a file and returns the copied link.
+ * @param {string} fileName - The name of the file to create a link for.
+ * @returns {Cypress.Chainable<string>} - A chainable containing the copied share link.
+ */
 export function createShareLinkV27(fileName) {
-	openSharingPanelV27(fileName)
+  // Open the sharing panel for the specified file
+  openSharingPanelV27(fileName);
 
-	return cy.window().then(win => {
-		cy.stub(win.navigator.clipboard, 'writeText').as('copy');
+  // Stub the clipboard API to intercept the copied link
+  cy.window().then((win) => {
+    cy.stub(win.navigator.clipboard, 'writeText').as('copy');
+  });
 
-		cy.get('#app-sidebar-vue').within(() => {
-			cy.get('button[title="Create a new share link"]')
-				.should('be.visible')
-				.click()
-		})
+  cy.get('#app-sidebar-vue').within(() => {
+    // Locate and click the "Create a new share link" button
+    cy.get('button[title="Create a new share link"]')
+      .should('be.visible')
+      .click();
+  });
 
-		return cy.get('@copy').should('have.been.calledOnce').then((spy) => {
-			return (spy).lastCall.args[0];
-		});
-	})
+  // Verify that the link was copied to the clipboard and retrieve it
+  return cy.get('@copy').should('have.been.calledOnce').then((stub) => {
+    const copiedLink = stub.args[0][0];
+    return copiedLink;
+  });
 }
 
-export function createInviteTokenV27(senderDomain) {
+/**
+ * Generates an invite token for federated sharing.
+ * Extracts the token from the input field and returns it.
+ * @returns {Cypress.Chainable<string>} - A chainable containing the extracted invite token.
+ */
+export function createInviteToken() {
+  // Ensure the "Generate Token" button is visible and click it
+  cy.get('button#token-generator')
+    .should('be.visible')
+    .click();
 
-	cy.get('button[id="token-generator"]').should('be.visible').click()
-
-	return cy.get('input[class="generated-token-link"]')
-		.invoke('val')
-		.then(
-			sometext => {
-				// extract token from url.
-				const token = sometext.replace('https://meshdir.docker/meshdir?token=', '');
-
-				return token.replace(`&providerDomain=${senderDomain}`, '')
-			}
-		);
+  // Extract and process the token from the input field
+  return cy.get('input.generated-token-link')
+    .invoke('val')
+    .then((link) => {
+      if (!link) {
+        throw new Error('Token generation failed: No token found in the input field.');
+      }
+      // Use URLSearchParams to parse the link and extract the token
+      const url = new URL(link);
+      const token = url.searchParams.get('token');
+      if (!token) {
+        throw new Error('Token generation failed: Token parameter not found in the URL.');
+      }
+      return token;
+    });
 }
 
+/**
+ * Generates an invite link for federated sharing.
+ * Combines the extracted token with the target domain to create an invite link.
+ * @param {string} targetDomain - The domain of the recipient.
+ * @returns {Cypress.Chainable<string>} - A chainable containing the generated invite link.
+ */
 export function createInviteLinkV27(targetDomain) {
+  // Ensure the "Generate Token" button is visible and click it
+  cy.get('button#token-generator')
+    .should('be.visible')
+    .click();
 
-	cy.get('button[id="token-generator"]').should('be.visible').click()
-
-	return cy.get('input[class="generated-token-link"]')
-		.invoke('val')
-		.then(
-			sometext => {
-				// extract token from url.
-				const token = sometext.replace('https://meshdir.docker/meshdir?', '');
-
-				// put target efss domain and token together.
-				const inviteLink = `${targetDomain}/index.php/apps/sciencemesh/accept?${token}`
-
-				return inviteLink
-			}
-		);
+  // Extract the token and construct the invite link
+  return cy.get('input.generated-token-link')
+    .invoke('val')
+    .then((link) => {
+      if (!link) {
+        throw new Error('Invite link generation failed: No link found in the input field.');
+      }
+      // Extract the query parameters from the link
+      const url = new URL(link);
+      const queryParams = url.searchParams.toString();
+      // Construct the invite link with the target domain
+      return `${targetDomain}/index.php/apps/sciencemesh/accept?${queryParams}`;
+    });
 }
 
+/**
+ * Verifies a federated contact in the contacts table.
+ * @param {string} domain - The domain of the application.
+ * @param {string} displayName - The display name of the contact.
+ * @param {string} contactDomain - The expected domain of the contact.
+ */
 export function verifyFederatedContactV27(domain, displayName, contactDomain) {
-	cy.visit(`https://${domain}/index.php/apps/sciencemesh/contacts`)
+  cy.visit(`https://${domain}/index.php/apps/sciencemesh/contacts`);
 
-	cy.get('table[id="contact-table"]')
-		.find('p[class="displayname"]')
-		.should("have.text", displayName)
-
-	cy.get('table[id="contact-table"]')
-		.find('p[class="displayname"]')
-		.contains(displayName)
-		.parent()
-		.parent()
-		.find('p[class="username-provider"]')
-		.invoke('text')
-		.then(
-			usernameWithDomain => {
-				const extractedDomain = usernameWithDomain.substring(
-					usernameWithDomain.lastIndexOf("@") + 1, usernameWithDomain.length
-				)
-
-				expect(extractedDomain).equal(contactDomain);
-			}
-		)
+  cy.get('table#contact-table')
+    .find('p.displayname', { timeout: 10000 })
+    .contains(displayName) // Ensure the display name is present
+    .closest('tr') // Traverse to the parent row
+    .find('p.username-provider')
+    .invoke('text') // Extract the username and domain text
+    .then((usernameWithDomain) => {
+      const extractedDomain = usernameWithDomain.split('@').pop(); // Extract domain after '@'
+      expect(extractedDomain).to.equal(contactDomain); // Assert the domain matches
+    });
 }
 
+/**
+ * Accepts an invitation by clicking the accept button in the invitation dialog.
+ *
+ * This function waits for the invitation accept button to be visible and enabled within the specified timeout,
+ * and then clicks it to accept the invitation.
+ *
+ * @param {number} [timeout=10000] - Optional timeout in milliseconds for waiting for the accept button. Defaults to 10000ms.
+ *
+ * @example
+ * // Accept the invitation
+ * acceptScienceMeshInvitation(5000);
+ *
+ * @throws Will cause the test to fail if the accept button is not visible or interactable within the timeout.
+ */
+export function acceptScienceMeshInvitation(timeout = 10000) {
+  // Wait for the accept button to be visible and enabled
+  cy.get('input#accept-button', { timeout })
+    .should('be.visible')
+    // Ensure the button is not disabled
+    .and('not.be.disabled')
+    .click();
+}
+
+/**
+ * Retrieves the ScienceMesh contact ID from a display name and verifies the contact.
+ * @param {string} domain - The domain of the ScienceMesh instance.
+ * @param {string} displayName - The display name of the contact.
+ * @param {string} contactDomain - The expected domain of the contact.
+ * @returns {Cypress.Chainable<string>} - A chainable containing the contact ID in the format "username@domain".
+ */
 export function getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain) {
-	verifyFederatedContactV27(domain, displayName, contactDomain)
+  // Verify that the contact exists in the table
+  verifyFederatedContactV27(domain, displayName, contactDomain);
 
-	return cy.get('table[id="contact-table"]')
-		.find('p[class="displayname"]')
-		.contains(displayName)
-		.parent()
-		.parent()
-		.find('p[class="username-provider"]')
-		.invoke('text')
-		.then(
-			usernameWithDomain => {
-				// get the index of the last @
-				var lastIndex = usernameWithDomain.lastIndexOf('@');
-				var username = usernameWithDomain.substr(0, lastIndex)
-				var domain = usernameWithDomain.substr(lastIndex + 1)
+  // Locate the contact in the table and extract the username and domain
+  return cy.get('table#contact-table')
+    .find('p.displayname')
+    .contains(displayName) // Ensure the correct display name is found
+    .closest('tr') // Traverse to the parent row
+    .find('p.username-provider')
+    .invoke('text') // Extract the full username and domain text
+    .then((usernameWithDomain) => {
+      // Extract username and domain
+      const lastIndex = usernameWithDomain.lastIndexOf('@');
+      const username = usernameWithDomain.substring(0, lastIndex); // Extract username
+      let extractedDomain = usernameWithDomain.substring(lastIndex + 1); // Extract domain
 
-				// remove https:// or http:// from domain (reva likes to show username@https://domain sometimes)
-				// I'm too afraid to explain the regex here let's just say its from here: https://stackoverflow.com/a/8206299/8549230
-				domain = domain.replace(/^\/\/|^.*?:(\/\/)?/, '');
+      // Remove protocols (e.g., https:// or http://) from the domain
+      extractedDomain = extractedDomain.replace(/^https?:\/\/|^\/\/|www\./, '');
 
-				return username + '@' + domain
-			}
-		)
+      // Return the contact ID in the format "username@domain"
+      return `${username}@${extractedDomain}`;
+    });
 }
 
-export function createScienceMeshShareV27(domain, displayName, contactDomain, filename) {
-	getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain).then(
-		(shareWith) => {
-			cy.visit(`https://${domain}/index.php/apps/files`)
+/**
+ * Creates a ScienceMesh share for a specific contact and file.
+ * @param {string} domain - The domain of the ScienceMesh instance.
+ * @param {string} displayName - The display name of the contact.
+ * @param {string} contactDomain - The domain of the contact.
+ * @param {string} fileName - The name of the file to be shared.
+ */
+export function createScienceMeshShareV27(domain, displayName, contactDomain, fileName) {
+  // Retrieve the contact ID
+  getScienceMeshContactIdFromDisplayNameV27(domain, displayName, contactDomain).then((shareWith) => {
+    // Navigate to the files app
+    cy.visit(`https://${domain}/index.php/apps/files`);
 
-			openSharingPanelV27(filename)
+    // Open the sharing panel for the file
+    openSharingPanelV27(fileName);
 
-			cy.get('#app-sidebar-vue').within(() => {
-				cy.get('#sharing-search-input').clear()
-				cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
-				cy.get('#sharing-search-input').type(displayName)
-				cy.wait('@userSearch')
-			})
+    // Set up an intercept for the user search API request
+    cy.intercept('GET', '**/apps/files_sharing/api/v1/sharees?*').as('userSearch');
 
-			cy.get(`[sharewith="${shareWith}"]`)
-				.eq(0)
-				.should('be.visible')
-				.click()
+    cy.get('#app-sidebar-vue').within(() => {
+      // Clear the search input and type the contact's display name
+      cy.get('#sharing-search-input')
+        .clear()
+        .type(displayName);
+    });
 
-			cy.get('div[class="button-group"]')
-				.contains('Save share')
-				.should('be.visible')
-				.click()
-		}
-	)
+    // Wait for the user search API request to complete
+    cy.wait('@userSearch');
+
+    // Select the contact from the search results
+    cy.get(`[sharewith="${shareWith}"]`)
+      .eq(0) // Ensure the correct match is selected
+      .should('be.visible') // Assert visibility
+      .click(); // Click to select the contact
+
+    // Click the "Save share" button to finalize the share
+    cy.get('div.button-group')
+      .contains('Save share')
+      .should('be.visible')
+      .click();
+  });
 }
 
+/**
+ * Renames a file and waits for the move operation to complete.
+ * @param {string} fileName - The current name of the file.
+ * @param {string} newFileName - The new name for the file.
+ */
 export function renameFileV27(fileName, newFileName) {
-	triggerActionInFileMenuV27(fileName, 'Rename')
+  // Trigger the "Rename" action from the file's menu
+  triggerActionInFileMenuV27(fileName, 'Rename');
 
-	// intercept the move so we can wait for it.
-	cy.intercept('MOVE', /\/remote.php\/dav\/files\//).as('moveFile')
-	getRowForFileV27(fileName).find('form').find('input').clear()
-	getRowForFileV27(fileName).find('form').find('input').type(`${newFileName}{enter}`)
-	cy.wait('@moveFile')
+  // Intercept the MOVE API request for renaming files
+  cy.intercept('MOVE', /\/remote\.php\/dav\/files\//).as('moveFile');
+
+  // Find the file row and enter the new file name
+  const fileRow = getRowForFileV27(fileName);
+  fileRow.find('form input')
+    .clear()
+    .type(`${newFileName}{enter}`);
+
+  // Wait for the move operation to complete
+  cy.wait('@moveFile');
 }
 
+/**
+ * Opens the sharing panel for a specific file.
+ * @param {string} fileName - The name of the file.
+ */
 export function openSharingPanelV27(fileName) {
-	triggerActionForFileV27(fileName, 'Share')
+  triggerActionForFileV27(fileName, 'Share');
 
-	cy.get('#app-sidebar-vue')
-		.get('[aria-controls="tab-sharing"]')
-		.should('be.visible')
-		.click()
+  // Ensure the sharing tab is visible and click it
+  cy.get('#app-sidebar-vue').within(() => {
+    cy.get('[aria-controls="tab-sharing"]')
+      .should('be.visible')
+      .click();
+  });
 }
 
-// actionId possible values are:
-// 1. Open navigation
-// 2. Close navigation
+/**
+ * Toggles the left-side navigation panel based on the provided action.
+ * @param {string} actionId - The action to perform (e.g., "Open navigation", "Close navigation").
+ * Valid values:
+ * - "Open navigation"
+ * - "Close navigation"
+ */
 export function navigationSwitchLeftSideV27(actionId) {
-	cy.get('div[id="app-navigation-vue"]')
-		.find(`button[aria-label="${CSS.escape(actionId)}"]`)
-        .should('be.visible')
-		.click()
+  const validActions = ["Open navigation", "Close navigation"];
+
+  // Validate the actionId
+  if (!validActions.includes(actionId)) {
+    throw new Error(`Invalid actionId: "${actionId}". Valid options are ${validActions.join(", ")}.`);
+  }
+
+  // Find the button for the specified action and click it
+  cy.get('div#app-navigation-vue', { timeout: 10000 })
+    .find(`button[aria-label="${actionId}"]`)
+    .should('be.visible')
+    .click();
 }
 
-// appId possible values are:
-// 1. files
-// 2. recent
-// 3. favorites
-// 4. shareoverview
-// 5. systemtagsfilter
-// 6. trashbin
+/**
+ * Selects an app from the left-side navigation menu.
+ * @param {string} appId - The identifier of the app to select.
+ * Valid values:
+ * - "files"
+ * - "recent"
+ * - "favorites"
+ * - "shareoverview"
+ * - "systemtagsfilter"
+ * - "trashbin"
+ */
 export function selectAppFromLeftSideV27(appId) {
-	cy.get('div[id="app-navigation-vue"]')
-		.find(`li[data-cy-files-navigation-item="${CSS.escape(appId)}"]`)
-        .should('be.visible')
-		.click()
+  const validAppIds = [
+    "files",
+    "recent",
+    "favorites",
+    "shareoverview",
+    "systemtagsfilter",
+    "trashbin"
+  ];
+
+  // Validate the appId
+  if (!validAppIds.includes(appId)) {
+    throw new Error(`Invalid appId: "${appId}". Valid options are ${validAppIds.join(", ")}.`);
+  }
+
+  // Find the app in the navigation menu and click it
+  cy.get('div#app-navigation-vue', { timeout: 10000 })
+    .find(`li[data-cy-files-navigation-item="${appId}"]`)
+    .should('be.visible')
+    .click();
 }
 
+/**
+ * Triggers an action (e.g., rename, details) in a file's menu.
+ * @param {string} filename - The name of the file.
+ * @param {string} actionId - The action to trigger.
+ */
 export function triggerActionInFileMenuV27(fileName, actionId) {
-	triggerActionForFileV27(fileName, 'menu')
-	getRowForFileV27(fileName).find('*[class^="filename"]').find('*[class^="fileActionsMenu"]').find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
+  // Open the file's action menu
+  triggerActionForFileV27(fileName, 'menu');
+
+  // Find the specific action within the menu and click it
+  getRowForFileV27(fileName)
+    .find(`*[data-action="${actionId}"]`)
+    .should('be.visible')
+    .as('btn')
+    .click();
 }
 
-export const triggerActionForFileV27 = (filename, actionId) => getActionsForFileV27(filename).find(`[data-action="${CSS.escape(actionId)}"]`).should('be.visible').click()
+/**
+ * Triggers an action for a specific file.
+ * @param {string} fileName - The name of the file.
+ * @param {string} actionId - The action to trigger.
+ */
+export function triggerActionForFileV27(fileName, actionId) {
+  // Find the actions container for the file
+  getActionsForFileV27(fileName)
+    .find(`*[data-action="${actionId}"]`)
+    .should('be.visible')
+    .as('btn')
+    .click();
+}
 
-export const getActionsForFileV27 = (filename) => getRowForFileV27(filename).find('*[class^="filename"]').find('*[class^="name"]').find('*[class^="fileactions"]')
+/**
+ * Retrieves the actions container for a specific file.
+ * @param {string} fileName - The name of the file.
+ * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - The actions container element.
+ */
+export function getActionsForFileV27(fileName) {
+  return getRowForFileV27(fileName).find('.fileactions');
+}
 
-export const getRowForFileV27 = (filename) => cy.get(`[data-file="${CSS.escape(filename)}"]`)
+/**
+ * Retrieves the row element for a specific file.
+ * @param {string} fileName - The name of the file.
+ * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - The file row element.
+ */
+export function getRowForFileV27(fileName) {
+  return cy.get(`[data-file="${fileName}"]`);
+}
