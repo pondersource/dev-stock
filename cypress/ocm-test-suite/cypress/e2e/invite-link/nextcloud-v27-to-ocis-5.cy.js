@@ -17,7 +17,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
     cy.visit('https://nextcloud1.docker/index.php/apps/sciencemesh/contacts')
 
-    createInviteTokenV27('revanextcloud1.docker').then(
+    createInviteTokenV27().then(
       (result) => {
         // save invite link to file.
         cy.writeFile('invite-link-nc-ocis.txt', result)

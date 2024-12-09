@@ -16,7 +16,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
     cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/')
 
-    createInviteToken('revaowncloud1.docker').then(
+    createInviteToken().then(
       (result) => {
         // save invite link to file.
         cy.writeFile('invite-link-oc-ocis.txt', result)
