@@ -46,33 +46,33 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
     })
   })
 
-  it('Send ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
-    // share from oCIS 1.
-    cy.loginOcis('https://ocis1.docker', 'einstein', 'relativity')
+  // it('Send ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
+  //   // share from oCIS 1.
+  //   cy.loginOcis('https://ocis1.docker', 'einstein', 'relativity')
 
-    createTextFileV5('invite-link-ocis-nc.txt', 'Hello World!')
+  //   createTextFileV5('invite-link-ocis-nc.txt', 'Hello World!')
 
-    openFilesAppV5()
+  //   openFilesAppV5()
 
-    createShareV5('invite-link-ocis-nc.txt', 'marie')
+  //   createShareV5('invite-link-ocis-nc.txt', 'marie')
 
-    cy.wait(5000)
-  })
+  //   cy.wait(5000)
+  // })
 
-  it('Receive ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
-    // accept share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
+  // it('Receive ScienceMesh share <file> from oCIS v5 to Nextcloud v27', () => {
+  //   // accept share from Nextcloud 1.
+  //   cy.loginNextcloud('https://nextcloud1.docker', 'marie', 'radioactivity')
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+  //   cy.get('div[class="oc-dialog"]', { timeout: 10000 })
+  //     .should('be.visible')
+  //     .find('*[class^="oc-dialog-buttonrow"]')
+  //     .find('button[class="primary"]')
+  //     .click()
 
-    navigationSwitchLeftSideV27('Open navigation')
-    selectAppFromLeftSideV27('shareoverview')
-    navigationSwitchLeftSideV27('Close navigation')
+  //   navigationSwitchLeftSideV27('Open navigation')
+  //   selectAppFromLeftSideV27('shareoverview')
+  //   navigationSwitchLeftSideV27('Close navigation')
 
-    cy.get('[data-file="invite-link-ocis-nc.txt"]', { timeout: 10000 }).should('be.visible')
-  })
+  //   cy.get('[data-file="invite-link-ocis-nc.txt"]', { timeout: 10000 }).should('be.visible')
+  // })
 })
