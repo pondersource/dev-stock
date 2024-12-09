@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Test Nextcloud to Nextcloud OCM invite link flow tests.
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi-baghbani@azadehafzar.io>
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Restart the 'reva' Process in All Docker Containers with 'reva' in Their Names
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi-baghbani@azadehafzar.io>
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,

@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Execute MariaDB Commands Inside a Docker Container
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi-baghbani@azadehafzar.io>
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # Description:

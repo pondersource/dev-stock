@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Clean and Re-Initialize Docker Environment for Testing
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi-baghbani@azadehafzar.io>
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------
