@@ -24,8 +24,8 @@ EFSS_PLATFORM_1_VERSION=${1:-"v10.15.0"}
 
 # nextcloud version:
 #   - v27.1.11
-#   - v28.0.12
-EFSS_PLATFORM_2_VERSION=${2:-"v28.0.12"}
+#   - v28.0.14
+EFSS_PLATFORM_2_VERSION=${2:-"v28.0.14"}
 
 # script mode:   dev, ci. default is dev.
 SCRIPT_MODE=${3:-"dev"}

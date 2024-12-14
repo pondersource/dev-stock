@@ -36,4 +36,4 @@ docker build --build-arg CACHEBUST="default"                                  \
   .
 
 echo Building pondersource/dev-stock-nextcloud
-docker build --build-arg CACHEBUST="default" --build-arg BRANCH_NEXTCLOUD="v28.0.12" --file ./dockerfiles/nextcloud-base.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.12 --tag pondersource/dev-stock-nextcloud:latest .
+docker build --build-arg CACHEBUST="default" --build-arg NEXTCLOUD_BRANCH="v28.0.14" --file ./dockerfiles/nextcloud-base.Dockerfile --tag pondersource/dev-stock-nextcloud:v28.0.14 --tag pondersource/dev-stock-nextcloud:latest .

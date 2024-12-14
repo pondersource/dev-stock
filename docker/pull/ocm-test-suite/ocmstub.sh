@@ -5,7 +5,7 @@ set -e
 
 # nextcloud version:
 #   - v27.1.11
-#   - v28.0.12
+#   - v28.0.14
 EFSS_PLATFORM_VERSION=${1:-"1.0"}
 
 # dev-stock images.
