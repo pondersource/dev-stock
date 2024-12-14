@@ -1,4 +1,4 @@
-FROM php:8.2-apache-bookworm@sha256:b8d8c9d7882fdea9d2ef5b3829bf9e34fb368f833c52f13ea64706df27cb6561
+FROM php:8.2.26-apache-bookworm@sha256:b8d8c9d7882fdea9d2ef5b3829bf9e34fb368f833c52f13ea64706df27cb6561
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -162,6 +162,3 @@ RUN { \
 
 RUN curl --silent --show-error https://getcomposer.org/installer -o /root/composer-setup.php
 RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=composer
-
-ENTRYPOINT ["/entrypoint.sh"]
-CMD apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow /var/www/html/data/nextcloud.log
