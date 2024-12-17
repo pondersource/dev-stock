@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Automate EFSS OCM Test Suite Execution
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi-baghbani@azadehafzar.io>
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # Description:
@@ -25,7 +25,7 @@
 #   EFSS_PLATFORM_2         : (Optional) Secondary EFSS platform for interop tests (default: "nextcloud").
 #   EFSS_PLATFORM_2_VERSION : (Optional) Version of the secondary EFSS platform (default: "v27.1.11").
 
-# TODO @MahdiBaghbani: How about more documentation? what do we exatly need to run these tests? 
+# TODO @MahdiBaghbani: How about more documentation? what do we exatly need to run these tests?
 # Requirements:
 #   - Test scripts must exist in the folder structure: dev/ocm-test-suite/<test-case>/<platform>.sh
 #   - Required tools and dependencies must be installed.
@@ -236,27 +236,27 @@ main() {
 
     # Validate test case.
     case "${test_case}" in
-        "login"|"share-with"|"share-link"|"invite-link")
-            ;;
-        *)
-            error_exit "Unknown test case: '${test_case}'. Valid options are: login, share-with, share-link, invite-link."
-            ;;
+    "login" | "share-with" | "share-link" | "invite-link") ;;
+
+    *)
+        error_exit "Unknown test case: '${test_case}'. Valid options are: login, share-with, share-link, invite-link."
+        ;;
     esac
 
     # Route the test case to the appropriate handler.
     case "$test_case" in
-        "login")
-            handle_login "${efss_platform_1}" "${efss_platform_1_version}" "${script_mode}" "${browser_platform}"
-            ;;
-        "share-with")
-            handle_share_with "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
-            ;;
-        "share-link")
-            handle_share_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
-            ;;
-        "invite-link")
-            handle_invite_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
-            ;;
+    "login")
+        handle_login "${efss_platform_1}" "${efss_platform_1_version}" "${script_mode}" "${browser_platform}"
+        ;;
+    "share-with")
+        handle_share_with "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
+        ;;
+    "share-link")
+        handle_share_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
+        ;;
+    "invite-link")
+        handle_invite_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
+        ;;
     esac
 }
 
