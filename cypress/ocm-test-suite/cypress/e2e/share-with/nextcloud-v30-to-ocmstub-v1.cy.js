@@ -12,10 +12,6 @@ import {
   ensureFileExistsV28,
 } from '../utils/nextcloud-v28';
 
-import {
-  generateShareAssertions,
-} from '../utils/ocmstub-v1.js';
-
 describe('Native Federated Sharing Functionality for Nextcloud to OcmStub', () => {
 
   // Shared variables to avoid repetition and improve maintainability
@@ -31,13 +27,12 @@ describe('Native Federated Sharing Functionality for Nextcloud to OcmStub', () =
   const expectedShareDetails = {
     shareWith: `${recipientUsername}@${recipientUrl}`,
     fileName: sharedFileName,
-    owner: `${senderUsername}@${senderUrl}/`,
-    sender: `${senderUsername}@${senderUrl}/`,
+    owner: `${senderUsername}@${senderUrl}`,
+    sender: `${senderUsername}@${senderUrl}`,
     shareType: 'user',
     resourceType: 'file',
     protocol: 'webdav'
   };
-
   /**
    * Test Case: Sending a federated share from one Nextcloud instance to OcmStub.
    * Validates that a file can be successfully shared from Nextcloud to OcmStub.
@@ -65,7 +60,7 @@ describe('Native Federated Sharing Functionality for Nextcloud to OcmStub', () =
    * Test Case: Receiving a federated share on OcmStub from Nextcloud.
    * 
    */
-  it('Receive federated share of a file from from Nextcloud v28 to OcmStub v1', () => {
+  it('Receive federated share of a file from from Nextcloud v30 to OcmStub v1', () => {
     // Step 1: Log in to OcmStub
     cy.loginOcmStub(recipientUrl);
 

@@ -1,67 +1,133 @@
+/**
+ * @fileoverview
+ * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in Nextcloud v27 and ownCloud v10.
+ * This suite covers sending and accepting invitation links, sharing files via ScienceMesh,
+ * and verifying that the shares are received correctly.
+ *
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
+
 import {
   createInviteLinkV27,
   createScienceMeshShareV27,
-  renameFileV27
-} from '../utils/nextcloud-v27'
+  renameFileV27,
+  ensureFileExistsV27,
+} from '../utils/nextcloud-v27';
 
 import {
-  selectAppFromLeftSide
-} from '../utils/owncloud'
+  acceptShare,
+  verifyFederatedContact,
+  acceptScienceMeshInvitation,
+  ensureFileExists,
+  selectAppFromLeftSide,
+} from '../utils/owncloud';
 
 describe('Invite link federated sharing via ScienceMesh functionality for Nextcloud to ownCloud', () => {
+
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('OWNCLOUD1_URL') || 'https://owncloud1.docker';
+  const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
+  const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
+  const recipientUsername = Cypress.env('OWNCLOUD1_USERNAME') || 'marie';
+  const recipientPassword = Cypress.env('OWNCLOUD1_PASSWORD') || 'radioactivity';
+  const inviteLinkFileName = 'invite-link-nc-oc.txt';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'invite-link-nc-oc.txt';
+
+  /**
+   * Test case: Sending an invitation link from sender to recipient.
+   */
   it('Send invitation from Nextcloud v27 to ownCloud v10', () => {
+    // Step 1: Log in to the sender's Nextcloud instance
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
-    cy.visit('https://nextcloud1.docker/index.php/apps/sciencemesh/contacts')
+    // Step 2: Navigate to the ScienceMesh app
+    cy.visit(`${senderUrl}/index.php/apps/sciencemesh/contacts`);
 
-    createInviteLinkV27('https://owncloud1.docker').then(
-      (result) => {
-        // save invite link to file.
-        cy.writeFile('invite-link-nc-oc.txt', result)
-      }
-    )
-  })
+    // Step 3: Generate the invite link and save it to a file
+    createInviteLinkV27(recipientUrl).then((inviteLink) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteLink);
+    });
+  });
 
-  it('Accept invitation from Nextcloud v27 to ownCloud v10', () => {
+  /**
+   * Test case: Accepting the invitation link on the recipient's side.
+   */
+  it('Accept invitation from from Nextcloud v27 v10 to ownCloud v10', () => {
+    const expectedContactDisplayName = senderUsername;
+    // Extract domain without protocol or trailing slash
+    // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
+    const expectedContactDomain = `reva${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`;
 
-    // load invite link from file.
-    cy.readFile('invite-link-nc-oc.txt').then((url) => {
+    // Step 1: Read the invite link from the file
+    cy.readFile(inviteLinkFileName).then((inviteLink) => {
+      // Step 2: Ensure the invite link is valid
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
 
-      // accept invitation from Nextcloud 1.
-      cy.loginOwncloudCore(url, 'marie', 'radioactivity')
+      // Step 3: Login to the recipient's ownCloud instance using the invite link
+      cy.loginOwncloudCore(inviteLink, recipientUsername, recipientPassword);
 
-      cy.get('input[id="accept-button"]', { timeout: 10000 })
-        .click()
+      // Step 4: Accept the invitation
+      acceptScienceMeshInvitation();
 
-      // validate 'einstein' is shown as a contact.
-      cy.visit('https://owncloud1.docker/index.php/apps/sciencemesh/contacts')
+      // Step 5: Verify that the sender is now a contact in the recipient's contacts list
+      verifyFederatedContact(
+        recipientUrl.replace(/^https?:\/\/|\/$/g, ''),
+        expectedContactDisplayName,
+        expectedContactDomain
+      );
+    });
+  });
 
-      cy.get('table[id="contact-table"]')
-        .find('p[class="displayname"]')
-        .should("have.text", "einstein");
-    })
-  })
+  /**
+   * Test case: Sharing a file via ScienceMesh from sender to recipient.
+   */
+  it('Send ScienceMesh share of a file from Nextcloud v27 to ownCloud v10', () => {
+    // Step 1: Log in to the sender's Nextcloud instance
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
-  it('Send ScienceMesh share <file> from Nextcloud v27 to ownCloud v10', () => {
-    // share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+    // Step 2: Ensure the original file exists before renaming
+    ensureFileExistsV27(originalFileName);
 
-    renameFileV27('welcome.txt', 'invite-link-nc-oc.txt')
-    createScienceMeshShareV27('nextcloud1.docker', 'marie', 'revaowncloud1.docker', 'invite-link-nc-oc.txt')
-  })
+    // Step 3: Rename the file to prepare it for sharing
+    renameFileV27(originalFileName, sharedFileName);
 
-  it('Receive ScienceMesh share <file> from Nextcloud v27 to ownCloud v10', () => {
-    // accept share Nextcloud 1.
-    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
+    // Step 4: Verify the file has been renamed
+    ensureFileExistsV27(sharedFileName);
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+    // Step 5: Create a federated share for the recipient via ScienceMesh
+    // Note: The 'reva' prefix is added to the recipient domain as per application behavior
+    createScienceMeshShareV27(
+      senderUrl.replace(/^https?:\/\/|\/$/g, ''),
+      recipientUsername,
+      `reva${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+      sharedFileName
+    );
 
-    selectAppFromLeftSide('sharingin')
+    // TODO @MahdiBaghbani: Verify that the share was created successfully
+  });
 
-    cy.get('[data-file="invite-link-nc-oc.txt"]', { timeout: 10000 }).should('be.visible')
-  })
+  /**
+   * Test Case: Receiving and accepting a ScienceMesh file share on ownCloud.
+   * This test verifies that the shared file appears in the "Sharing In" section.
+   */
+  it('Receive ScienceMesh share of a file from Nextcloud v27 to ownCloud v10', () => {
+    // Step 1: Log in to the recipient's ownCloud instance
+    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
+
+    // Step 2: Wait for the share dialog to appear and accept the incoming federated share
+    acceptShare();
+
+    // Step 3: Navigate to the correct section
+    selectAppFromLeftSide('files');
+
+    // Step 4: Verify that the shared file is visible
+    ensureFileExists(sharedFileName);
+
+    // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
+  });
 })

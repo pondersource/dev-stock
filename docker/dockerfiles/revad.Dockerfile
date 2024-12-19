@@ -54,6 +54,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --ass
     bash                                                                                        \
     curl                                                                                        \
     tzdata                                                                                      \
+    iproute2                                                                                    \
     ca-certificates
 
 ENV TZ=Etc/UTC

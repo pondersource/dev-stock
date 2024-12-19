@@ -20,12 +20,12 @@ export ENV_ROOT=${ENV_ROOT}
 
 # nextcloud version:
 #   - v27.1.11
-#   - v28.0.12
+#   - v28.0.14
 EFSS_PLATFORM_1_VERSION=${1:-"v27.1.11"}
 
 # nextcloud version:
 #   - v27.1.11
-#   - v28.0.12
+#   - v28.0.14
 EFSS_PLATFORM_2_VERSION=${2:-"v27.1.11"}
 
 # script mode:  dev, ci. default is dev.
