@@ -67,16 +67,6 @@ WORKDIR /ocmstub
 RUN npm ci --production
 
 # ----------------------------------------------------------------------------
-# Install TLS Certificates
-# ----------------------------------------------------------------------------
-# Copy self signed certificates and link them to OS cert directory and update 
-# the systems trusted certificates
-COPY ./tls/certificates/* /tls/
-COPY ./tls/certificate-authority/* /tls/
-RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
-    update-ca-certificates
-
-# ----------------------------------------------------------------------------
 # Expose Ports
 # ----------------------------------------------------------------------------
 # The application listens on HTTPS port 443.
@@ -90,10 +80,23 @@ EXPOSE 443/tcp
 ENV NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # ----------------------------------------------------------------------------
+# Install TLS Certificates
+# ----------------------------------------------------------------------------
+# Copy self signed certificates and link them to OS cert directory and update 
+# the systems trusted certificates
+COPY ./tls/certificates/* /tls/
+COPY ./tls/certificate-authority/* /tls/
+
+# ----------------------------------------------------------------------------
 # Switch to Non-Root User
 # ----------------------------------------------------------------------------
 # The base Node image provides a 'node' user. We'll run as 'node' for better security.
-RUN chown -R node:node /ocmstub
+RUN chown -R node:root /ocmstub; \
+    chmod -R g=u /ocmstub; \
+    chown -R node:root /tls; \
+    chmod -R g=u /tls; \
+    ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
+    update-ca-certificates
 USER node
 
 # ----------------------------------------------------------------------------
@@ -103,8 +106,16 @@ USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -k -f https://localhost:443 || exit 1
 
+
+# ----------------------------------------------------------------------------
+# Add required scripts
+# ----------------------------------------------------------------------------
+# Scripts such as entrypoint.sh
+COPY ./scripts/ocmstub/*.sh /
+
 # ----------------------------------------------------------------------------
 # Startup Command
 # ----------------------------------------------------------------------------
 # Finally, run the Node.js application defined in stub.js.
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "stub.js"]
