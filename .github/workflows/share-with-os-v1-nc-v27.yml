@@ -1,4 +1,4 @@
-name: OCM Test Share Link NC v28.0.12 to OC v10.15.0
+name: OCM Test Share With OcmStub v1.0.0 to NC v27.1.11
 
 # Controls when the action will run.
 on:
@@ -21,21 +21,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  share-link:
+  share-with:
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
         sender: [
           {
-            platform: nextcloud,
-            version: v28.0.12
+            platform: ocmstub,
+            version: "v1.0.0"
           },
         ]
         receiver: [
           {
-            platform: owncloud,
-            version: v10.15.0
+            platform: nextcloud,
+            version: v27.1.11
           },
         ]
 
@@ -56,11 +56,11 @@ jobs:
 
       - name: Run tests.
         shell: bash
-        run: ./dev/ocm-test-suite.sh share-link ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+        run: ./dev/ocm-test-suite.sh share-with ${{ matrix.sender.platform }} ${{ matrix.sender.version }} ci electron ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
 
       - name: Upload Cypress video artifacts.
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: share-link from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
+          name: share-with from ${{ matrix.sender.platform }} ${{ matrix.sender.version }} to ${{ matrix.receiver.platform }} ${{ matrix.receiver.version }}
           path: ./cypress/ocm-test-suite/cypress/videos
