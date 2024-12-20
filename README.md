@@ -366,6 +366,12 @@ See [docs](./docs/xdebug.md)
 for development see [docs](./docs/solid-remotestorage.md)
 
 
+# OCM Test Suite Documents
+
+This is still a work in progress and will be moved to other place, for now I like to access it here.
+
+
+## Flow graph of complete OCM Test suite flow for share-with between Nextcloud and Nextcloud
 ### 1. Initial Setup (GitHub Actions Trigger, Docker Pulls, and Environment Initialization)
 ```mermaid
 flowchart TD
@@ -438,7 +444,8 @@ flowchart TD
 ```mermaid
 flowchart TD
     %% Conditional: Dev Mode vs CI Mode
-    J2c[Wait for Nextcloud2 Port 443] --> K{SCRIPT_MODE}
+    J1c[Wait for Nextcloud1 Port 443] --> K{SCRIPT_MODE}
+    J2c[Wait for Nextcloud2 Port 443] --> K
     K -- Dev --> L[Start Dev Mode Containers]
     K -- CI --> M[Start CI Mode Containers]
 
@@ -448,8 +455,11 @@ flowchart TD
     L --> L3[Start Cypress Container in Dev Mode]
 
     %% Provide Dev Mode Instructions
-    L3 --> N[Provide Dev Mode Access Instructions]
-    N --> O[Run Cypress Tests in Dev Mode]
+    L1 --> N[Provide Dev Mode Access Instructions]
+    L2 --> N
+    L3 --> N
+    N --> O1[Run Cypress Tests in Dev Mode via VNC on port 5700]
+    N --> O2[Manually Access Containers via Firefox on port 5800]
 
     %% CI Mode Setup
     M --> M1[Configure Cypress for CI Mode]
@@ -467,6 +477,16 @@ flowchart TD
     P --> Q{Test Success?}
     Q -- Yes --> R[Mark as Passed]
     Q -- No --> S[Mark as Failed]
+
+    %% Subgraphs for better organization
+    classDef success fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef failure fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    class R success;
+    class S failure;
+
+    %% Modify text color to black for specific nodes
+    style R fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#000000
+    style S fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#000000
 ```
 
 ### 5. Final Cleanup and Workflow Conclusion
