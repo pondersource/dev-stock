@@ -47,7 +47,10 @@ set -euo pipefail
 
 # Define a trap to clean up resources on script exit or error.
 # This ensures the /tls directory is removed if something goes wrong.
-trap 'rm -rf /tls' EXIT
+
+# @MahdiBaghbani: We don't need this, honestly, maybe we need it but I don't know
+# under what circumstances would it become necessary, I'll leave it here.
+# trap 'rm -rf /tls' EXIT
 
 # -----------------------------------------------------------------------------------
 # Directory and Certificate Setup
