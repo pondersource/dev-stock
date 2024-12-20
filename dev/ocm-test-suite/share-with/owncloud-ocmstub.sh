@@ -55,7 +55,7 @@ TEMP_DIR="temp"
 TLS_CA_DIR="docker/tls/certificate-authority"
 TLS_CERTIFICATES_DIR="docker/tls/certificates"
 
-# 3rd party containerS
+# 3rd party containers
 CYPRESS_REPO=cypress/included
 CYPRESS_TAG=13.13.1
 FIREFOX_REPO=jlesage/firefox
