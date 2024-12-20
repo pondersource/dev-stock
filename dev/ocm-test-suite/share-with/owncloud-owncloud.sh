@@ -39,7 +39,8 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 
 # Default versions
-DEFAULT_EFSS_VERSION="v10.15.0"
+DEFAULT_EFSS_1_VERSION="v10.15.0"
+DEFAULT_EFSS_2_VERSION="v10.15.0"
 DEFAULT_SCRIPT_MODE="dev"
 DEFAULT_BROWSER_PLATFORM="electron"
 
@@ -260,8 +261,8 @@ create_owncloud() {
 #   $@ - Command-line arguments
 # -----------------------------------------------------------------------------------
 parse_arguments() {
-    EFSS_PLATFORM_1_VERSION="${1:-$DEFAULT_EFSS_VERSION}"
-    EFSS_PLATFORM_2_VERSION="${2:-$DEFAULT_EFSS_VERSION}"
+    EFSS_PLATFORM_1_VERSION="${1:-$DEFAULT_EFSS_1_VERSION}"
+    EFSS_PLATFORM_2_VERSION="${2:-$DEFAULT_EFSS_2_VERSION}"
     SCRIPT_MODE="${3:-$DEFAULT_SCRIPT_MODE}"
     BROWSER_PLATFORM="${4:-$DEFAULT_BROWSER_PLATFORM}"
 }
@@ -316,10 +317,10 @@ main() {
         docker network create "${DOCKER_NETWORK}" >/dev/null 2>&1 || error_exit "Failed to create Docker network '${DOCKER_NETWORK}'."
     fi
 
-    # Create ownCloud containers
-    #               # id   # username    # password         # image                 # tag
-    create_owncloud 1      "marie"       "radioactivity"    pondersource/owncloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_owncloud 2      "mahdi"       "baghbani"         pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
+    # Create EFSS containers
+    #               # id   # username    # password        # image                 # tag
+    create_owncloud 1      "marie"       "radioactivity"   pondersource/owncloud   "${EFSS_PLATFORM_1_VERSION}"
+    create_owncloud 2      "mahdi"       "baghbani"        pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         echo "Setting up development environment..."

@@ -371,9 +371,9 @@ main() {
   fi
 
   # Create EFSS containers
-  #                # id   # username    # password        # image                 # tag
-  create_owncloud 1 "marie" "radioactivity" pondersource/owncloud "${EFSS_PLATFORM_2_VERSION}"
-  create_nextcloud 1 "einstein" "relativity" pondersource/nextcloud "${EFSS_PLATFORM_1_VERSION}"
+  #                # id   # username    # password       # image                 # tag
+  create_owncloud  1      "marie"       "radioactivity"  pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
+  create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud  "${EFSS_PLATFORM_1_VERSION}"
 
   if [ "${SCRIPT_MODE}" = "dev" ]; then
     echo "Setting up development environment..."
