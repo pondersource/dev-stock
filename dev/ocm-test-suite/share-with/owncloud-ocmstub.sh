@@ -12,7 +12,7 @@
 #   It supports both development and CI environments, with optional browser support.
 
 # Usage:
-#   ./nextcloud-ocmstub.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./owncloud-ocmstub.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 
 # Arguments:
 #   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v10.15.0").
@@ -26,7 +26,7 @@
 #   - Ensure that the necessary scripts (e.g., init scripts) and configurations exist.
 
 # Example:
-#   ./nextcloud-ocmstub.sh v10.15.0 v1.0.0 ci electron
+#   ./owncloud-ocmstub.sh v10.15.0 v1.0.0 ci electron
 
 # -----------------------------------------------------------------------------------
 
