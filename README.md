@@ -482,4 +482,8 @@ flowchart TD
     classDef failure fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
     class R success;
     class S failure;
+
+    %% Modify text color to black for specific nodes
+    style R fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#000000
+    style S fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#000000
 ```
