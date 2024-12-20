@@ -1,9 +1,9 @@
-FROM php:8.2.26-apache-bookworm@sha256:b8d8c9d7882fdea9d2ef5b3829bf9e34fb368f833c52f13ea64706df27cb6561
+FROM php:7.4.33-apache-bullseye@sha256:c9d7e608f73832673479770d66aacc8100011ec751d1905ff63fae3fe2e0ca6d
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="PonderSource Nextcloud Base Image"
+LABEL org.opencontainers.image.title="PonderSource ownCloud Base Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
@@ -24,13 +24,9 @@ RUN set -ex; \
     libmagickcore-6.q16-6-extra \
     ; \
     apt-get clean; \
-    rm -rf /var/lib/apt/lists/*; \
-    \
-    mkdir -p /var/spool/cron/crontabs; \
-    echo '*/5 * * * * php -f /var/www/html/cron.php' > /var/spool/cron/crontabs/www-data
+    rm -rf /var/lib/apt/lists/*
 
 # install the PHP extensions we need
-# see https://docs.nextcloud.com/server/stable/admin_manual/installation/source_installation.html
 ENV PHP_MEMORY_LIMIT 512M
 ENV PHP_UPLOAD_LIMIT 512M
 RUN set -ex; \
@@ -57,13 +53,11 @@ RUN set -ex; \
     ; \
     \
     debMultiarch="$(dpkg-architecture --query DEB_BUILD_MULTIARCH)"; \
-    docker-php-ext-configure ftp --with-openssl-dir=/usr; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
     docker-php-ext-configure ldap --with-libdir="lib/$debMultiarch"; \
     docker-php-ext-install -j "$(nproc)" \
     bcmath \
     exif \
-    ftp \
     gd \
     gmp \
     intl \
@@ -101,12 +95,11 @@ RUN set -ex; \
     | sort -u \
     | xargs -rt apt-mark manual; \
     \
-    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+    apt-get purge --assume-yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
 # set recommended PHP.ini settings
-# see https://docs.nextcloud.com/server/latest/admin_manual/installation/server_tuning.html#enable-php-opcache
 RUN { \
     echo 'opcache.enable=1'; \
     echo 'opcache.interned_strings_buffer=32'; \
@@ -124,7 +117,7 @@ RUN { \
     echo 'memory_limit=${PHP_MEMORY_LIMIT}'; \
     echo 'upload_max_filesize=${PHP_UPLOAD_LIMIT}'; \
     echo 'post_max_size=${PHP_UPLOAD_LIMIT}'; \
-    } > "${PHP_INI_DIR}/conf.d/nextcloud.ini"; \
+    } > "${PHP_INI_DIR}/conf.d/owncloud.ini"; \
     \
     mkdir /var/www/data; \
     mkdir -p /docker-entrypoint-hooks.d/pre-installation \
@@ -142,7 +135,7 @@ COPY ./tls/certificate-authority/* /tls/
 RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
     update-ca-certificates
 
-COPY ./configs/nextcloud/apache.conf /etc/apache2/sites-enabled/000-default.conf
+COPY ./configs/owncloud/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
 RUN a2enmod headers rewrite remoteip ssl; \
     { \
@@ -164,3 +157,11 @@ RUN { \
 
 RUN curl --silent --show-error https://getcomposer.org/installer -o /root/composer-setup.php
 RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+# install nodejs and yarn.
+RUN curl --silent --location https://deb.nodesource.com/setup_18.x | bash -; \
+    apt-get install --no-install-recommends --assume-yes nodejs; \
+    npm install --global yarn \
+    ; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*

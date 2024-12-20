@@ -1,86 +1,159 @@
-# stage 1: build stage
-FROM golang:1.22.1-bookworm@sha256:d996c645c9934e770e64f05fc2bc103755197b43fd999b3aa5419142e1ee6d78 AS build
+# ----------------------------------------------------------------------------
+# Multi-stage build of revad from the cs3org/reva repository.
+# This Dockerfile:
+# 1. Builds revad from source using Go in a reproducible, pinned environment.
+# 2. Creates a minimal runtime image with the revad binary, configurations, and certificates.
+#
+# ----------------------------------------------------------------------------
+# Stage 1: Build Stage
+# ----------------------------------------------------------------------------
+# Use a specific, pinned Go image to ensure reproducible and secure builds.
+FROM golang:1.23.4-bookworm@sha256:ef30001eeadd12890c7737c26f3be5b3a8479ccdcdc553b999c84879875a27ce AS build
 
+# Enable CGO for better performance on certain operations (e.g., SQLite).
 ENV CGO_ENABLED=1
 
-RUN apt-get update
+# ----------------------------------------------------------------------------
+# Install Required Packages
+# ----------------------------------------------------------------------------
+# Update package list and install build tools needed by revad and its dependencies.
+# Use --no-install-recommends to avoid unnecessary packages and reduce image size.
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes \
+    git \
+    bash \
+    make \
+    build-essential \
+    libsqlite3-dev; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes         \
-    git                                                                                         \
-    bash                                                                                        \
-    make                                                                                        \
-    build-essential                                                                             \
-    libsqlite3-dev
-
-# go to root directory.
+# Set the working directory to root to have a clean starting point.
 WORKDIR /
 
-# fetch revad from source.
-ARG REPO_REVA=https://github.com/cs3org/reva
-ARG BRANCH_REVA=v1.28.0
-# CACHEBUST forces docker to clone fresh source codes from git.
-# example: docker build -t your-image --build-arg CACHEBUST="default" .
-# $RANDOM returns random number each time.
+# ----------------------------------------------------------------------------
+# Build Arguments
+# ----------------------------------------------------------------------------
+# These allow customizing which repository and branch to clone at build time.
+# CACHEBUST is used to force rebuild steps when needed.
+ARG REVA_REPO=https://github.com/cs3org/reva
+ARG REVA_BRANCH=v1.28.0
 ARG CACHEBUST="default"
-RUN git clone                       \
-    --depth 1                       \
-    --branch ${BRANCH_REVA}         \
-    ${REPO_REVA}                    \
-    reva-git
 
-# change directory to reva git.
+# ----------------------------------------------------------------------------
+# Clone Repository
+# ----------------------------------------------------------------------------
+# Clone the specified branch of the OCM stub repository with minimal depth
+# to reduce build time and image size. Also fetch submodules if present.
+RUN git clone \
+    --depth 1 \
+    --recursive \
+    --shallow-submodules \
+    --branch ${REVA_BRANCH} \
+    ${REVA_REPO} \
+    /reva-git
+
+# ----------------------------------------------------------------------------
+# Set Working Directory
+# ----------------------------------------------------------------------------
+# Set the working directory to the application directory.
 WORKDIR /reva-git
 
-# copy and download dependencies.
+# ----------------------------------------------------------------------------
+# Install Dependencies
+# ----------------------------------------------------------------------------
+# Download Go module dependencies specified in go.mod to improve build caching.
 RUN go mod download
 
-# only build revad, leave out reva and test and lint and docs.
+# ----------------------------------------------------------------------------
+# Build Reva
+# ----------------------------------------------------------------------------
+# Build the `revad` binary.
+# Using `make revad` as per repository instructions. 
 RUN make revad
 
-# stage 2: app image.
-FROM debian:bookworm@sha256:aadf411dc9ed5199bc7dab48b3e6ce18f8bbee4f170127f5ff1b75cd8035eb36
+# ----------------------------------------------------------------------------
+# Stage 2: Application Image
+# ----------------------------------------------------------------------------
+# Use a minimal Debian-based image for the runtime environment.
+FROM debian:bookworm-slim@sha256:1537a6a1cbc4b4fd401da800ee9480207e7dc1f23560c21259f681db56768f63
 
-# keys for oci taken from:
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-LABEL org.opencontainers.image.licenses=MIT
+# ----------------------------------------------------------------------------
+# OCI Image Metadata
+# ----------------------------------------------------------------------------
+# Provide metadata that describes this image, its source, and authorship.
+LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.title="Pondersource Revad Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
-# set the timezone and install CA certificates.
-RUN apt-get update
+# ----------------------------------------------------------------------------
+# Install Required Packages
+# ----------------------------------------------------------------------------
+# Update package list and install:
+# - bash: shell for scripts and operations.
+# - curl: common utility for network operations.
+# - tzdata: for time zone data, set to UTC for consistency.
+# - iproute2: networking utilities that might be needed.
+# - ca-certificates: to trust system certificates including custom ones.
+# Use --no-install-recommends to avoid unnecessary packages and reduce image size.
+RUN apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes \
+    bash \
+    curl \
+    tzdata \
+    iproute2 \
+    ca-certificates; \
+    apt-get clean; \
+    rm -rf /var/lib/apt/lists/*
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --assume-yes         \
-    bash                                                                                        \
-    curl                                                                                        \
-    tzdata                                                                                      \
-    iproute2                                                                                    \
-    ca-certificates
-
+# Set timezone to UTC for consistent logging and operations.
 ENV TZ=Etc/UTC
 
-# copy the binary from the build stage.
-COPY --from=build /reva-git/cmd                                 /reva-git/cmd
+# Copy the pre-built `revad` binary and related tools from the build stage.
+# The `revad` binary is found under /reva-git/cmd in the build stage.
+COPY --from=build /reva-git/cmd /reva-git/cmd
 
-# copy the reva config files from host.
-COPY ./configs/revad                                            /configs/revad
+# Copy configuration files for revad into the container.
+# These configurations will control revad behavior at runtime.
+COPY ./configs/revad /configs/revad
 
-# trust all the certificates:
-COPY ./tls/certificates/reva*                                   /tls/
-COPY ./tls/certificate-authority/*                              /tls/
-RUN ln -sf /tls/*.crt                                           /usr/local/share/ca-certificates
-RUN update-ca-certificates
+# Copy TLS certificates from the host and trust them.
+# This ensures revad can serve HTTPS or verify other services.
+COPY ./tls/certificates/reva* /tls/
+COPY ./tls/certificate-authority/* /tls/
 
+# Update the CA certificates store with newly added certificates.
+RUN ln -sf /tls/*.crt /usr/local/share/ca-certificates; \
+    update-ca-certificates
+
+# Create necessary directories for runtime operations (e.g., logs, temp files).
 RUN mkdir -p /var/tmp/reva/
 
-# update path to include revad bin directory.
-ENV PATH="${PATH}:/reva/cmd/revad"
+# Add the revad binary directory to PATH for convenience.
+ENV PATH="${PATH}:/reva-git/cmd/revad"
 
-COPY ./scripts/reva/*                                           /usr/bin/
+# Copy utility scripts (e.g., entrypoint, run, kill) into the container.
+# Ensure these scripts have appropriate shebang lines and `chmod +x` done.
+# These scripts are responsible for container lifecycle management.
+COPY ./scripts/reva/* /usr/bin/
+RUN chmod +x /usr/bin/run.sh /usr/bin/kill.sh /usr/bin/entrypoint.sh
 
-RUN chmod +x /usr/bin/run.sh && chmod +x /usr/bin/kill.sh && chmod +x /usr/bin/entrypoint.sh
-
+# ----------------------------------------------------------------------------
+# Entrypoint script.
+# ----------------------------------------------------------------------------
+# Set the container entrypoint. This script can handle preparation steps before starting revad.
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
 
-# keep Docker Container Running for Debugging.
-CMD tail -F /var/log/revad.log
+# ----------------------------------------------------------------------------
+# Startup Command
+# ----------------------------------------------------------------------------
+# The default command is currently to follow the revad log.
+CMD ["tail", "-F", "/var/log/revad.log"]
+
+# ----------------------------------------------------------------------------
+# Healthcheck
+# ----------------------------------------------------------------------------
+# Check if the application responds on port 443. Using curl with -k to ignore TLS.
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+#   CMD curl -k -f http://localhost:... || exit 1

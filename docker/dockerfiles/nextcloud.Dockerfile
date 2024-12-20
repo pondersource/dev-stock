@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-nextcloud-base:latest
+FROM pondersource/nextcloud-base:latest
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -27,6 +27,9 @@ RUN set -ex; \
     mkdir -p /usr/src/nextcloud/data; \
     mkdir -p /usr/src/nextcloud/custom_apps; \
     chmod +x /usr/src/nextcloud/occ
+
+# After cloning, `git` is no longer needed at runtime, so remove it to reduce image size.
+RUN apt-get purge -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY ./scripts/nextcloud/*.sh /
 COPY ./scripts/nextcloud/upgrade.exclude /
