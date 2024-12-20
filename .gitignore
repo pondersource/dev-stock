@@ -10,8 +10,8 @@ core
 temp
 server
 rd-sram
-owncloud
-nextcloud
+./owncloud
+./nextcloud
 owncloud-sciencemesh
 nextcloud-sciencemesh
 open-id-connect

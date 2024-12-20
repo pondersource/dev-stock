@@ -1,223 +1,266 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts.
-set -e
+# -----------------------------------------------------------------------------------
+# Script to Automate EFSS OCM Test Suite Execution
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+# -----------------------------------------------------------------------------------
 
-# find this scripts location.
-SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
-  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
-  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
-done
-DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+# Description:
+#   This script automates EFSS (Enterprise File Synchronization and Sharing) OCM (Open Cloud Mesh) test suite case execution.
+#   It supports operations such as login, share-with, share-link, and invite-link for platforms like
+#   Nextcloud, ownCloud, Seafile, and others.
 
-cd "${DIR}/.." || exit
+# Usage:
+#   ./ocm-test-suite.sh [TEST_CASE] [EFSS_PLATFORM_1] [EFSS_PLATFORM_1_VERSION] [SCRIPT_MODE]
+#                  [BROWSER_PLATFORM] [EFSS_PLATFORM_2] [EFSS_PLATFORM_2_VERSION]
 
-ENV_ROOT=$(pwd)
-export ENV_ROOT=${ENV_ROOT}
+# Arguments:
+#   TEST_CASE               : Test case to execute (default: "login").
+#                             Options: login, share-with, share-link, invite-link.
+#   EFSS_PLATFORM_1         : Primary EFSS platform (default: "nextcloud").
+#   EFSS_PLATFORM_1_VERSION : Version of the primary EFSS platform (default: "v27.1.11").
+#   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
+#   BROWSER_PLATFORM        : Browser platform (default: "electron").
+#                             Options: chrome, edge, firefox, electron.
+#   EFSS_PLATFORM_2         : (Optional) Secondary EFSS platform for interop tests (default: "nextcloud").
+#   EFSS_PLATFORM_2_VERSION : (Optional) Version of the secondary EFSS platform (default: "v27.1.11").
 
-# test case:
-#   - login
-#   - share-with
-#   - share-link
-TEST_CASE=${1:-"login"}
+# TODO @MahdiBaghbani: How about more documentation? what do we exatly need to run these tests?
+# Requirements:
+#   - Test scripts must exist in the folder structure: dev/ocm-test-suite/<test-case>/<platform>.sh
+#   - Required tools and dependencies must be installed.
 
-# efss platform:
-#   - nextcloud
-#   - owncloud
-#   - seafile
-EFSS_PLATFORM_1=${2:-"nextcloud"}
+# Example:
+#   ./ocm-test-suite.sh login nextcloud v27.1.11 ci electron
 
-EFSS_PLATFORM_1_VERSION=${3:-"unknown"}
+# Exit Codes:
+#   0 - Success
+#   1 - Failure or unknown test case/script.
 
-# script mode:   dev, ci. default is dev.
-SCRIPT_MODE=${4:-"dev"}
+# -----------------------------------------------------------------------------------
 
-# browser platform: chrome, edge, firefox, electron. default is electron.
-# only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${5:-"electron"}
+# Exit immediately on any error, treat unset variables as an error, and catch errors in pipelines.
+set -euo pipefail
 
-# efss platform:
-#   - nextcloud
-#   - owncloud
-#   - seafile
-EFSS_PLATFORM_2=${6:-"nextcloud"}
+# -----------------------------------------------------------------------------------
+# Function: resolve_script_dir
+# Purpose: Resolves the absolute path of the script's directory, handling symlinks.
+# Returns:
+#   The absolute path to the script's directory.
+# -----------------------------------------------------------------------------------
+resolve_script_dir() {
+    local source="${BASH_SOURCE[0]}"
+    local dir
+    while [ -L "${source}" ]; do
+        dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+        source="$(readlink "${source}")"
+        # Resolve relative symlink
+        [[ "${source}" != /* ]] && source="${dir}/${source}"
+    done
+    dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+    printf "%s" "${dir}"
+}
 
-EFSS_PLATFORM_2_VERSION=${7:-"unknown"}
+# -----------------------------------------------------------------------------------
+# Function: initialize_environment
+# Purpose: Initialize the environment and set global variables.
+# -----------------------------------------------------------------------------------
+initialize_environment() {
+    local script_dir
+    script_dir="$(resolve_script_dir)"
+    cd "$script_dir/.." || error_exit "Failed to change directory to script root."
+    ENV_ROOT="$(pwd)"
+    export ENV_ROOT="${ENV_ROOT}"
+}
 
-case "${TEST_CASE}" in
+# -----------------------------------------------------------------------------------
+# Function: print_error
+# Purpose: Print an error message to stderr.
+# Arguments:
+#   $1 - The error message to display.
+# -----------------------------------------------------------------------------------
+print_error() {
+    local message="${1}"
+    printf "Error: %s\n" "$message" >&2
+}
 
-  "login")
-    case "${EFSS_PLATFORM_1}" in
+# -----------------------------------------------------------------------------------
+# Function: error_exit
+# Purpose: Print an error message and exit with code 1.
+# Arguments:
+#   $1 - The error message to display.
+# -----------------------------------------------------------------------------------
+error_exit() {
+    print_error "${1}"
+    exit 1
+}
 
-      "nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
+# -----------------------------------------------------------------------------------
+# Function: run_test_script
+# Purpose: Check if a test script exists and is executable, then run it with provided arguments.
+# Arguments:
+#   $1 - The path to the test script.
+#   $@ - Additional arguments to pass to the test script.
+# -----------------------------------------------------------------------------------
+run_test_script() {
+    local script_path="${1}"
+    shift
+    if [[ -x "${script_path}" ]]; then
+        "${script_path}" "$@"
+    else
+        error_exit "Test script not found or not executable: ${script_path}"
+    fi
+}
 
-      "owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
+# -----------------------------------------------------------------------------------
+# Function: handle_login
+# Purpose: Handle the "login" test case.
+# Arguments:
+#   $1 - EFSS platform.
+#   $2 - EFSS platform version.
+#   $3 - Script mode.
+#   $4 - Browser platform.
+# -----------------------------------------------------------------------------------
+handle_login() {
+    local platform="${1}"
+    local version="${2}"
+    local mode="${3}"
+    local browser="${4}"
+    local script_path="${ENV_ROOT}/dev/ocm-test-suite/login/${platform}.sh"
+    run_test_script "${script_path}" "${version}" "${mode}" "${browser}"
+}
 
-      "ocis")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
+# -----------------------------------------------------------------------------------
+# Function: handle_share_with
+# Purpose: Handle the "share-with" test case.
+# Arguments:
+#   $1 - EFSS platform 1.
+#   $2 - EFSS platform 1 version.
+#   $3 - EFSS platform 2.
+#   $4 - EFSS platform 2 version.
+#   $5 - Script mode.
+#   $6 - Browser platform.
+# -----------------------------------------------------------------------------------
+handle_share_with() {
+    local platform1="${1}"
+    local version1="${2}"
+    local platform2="${3}"
+    local version2="${4}"
+    local mode="${5}"
+    local browser="${6}"
+    local script_path="${ENV_ROOT}/dev/ocm-test-suite/share-with/${platform1}-${platform2}.sh"
 
-      "seafile")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
+    # Check for unsupported combinations.
+    if [[ "${platform1}-${platform2}" =~ ^(nextcloud-seafile|owncloud-seafile|seafile-nextcloud|seafile-owncloud)$ ]]; then
+        print_error "Combination '${platform1}-${platform2}' is not supported for 'share-with' test case."
+        exit 1
+    else
+        run_test_script "${script_path}" "${version1}" "${version2}" "${mode}" "${browser}"
+    fi
+}
 
-      "ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/login/ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
+# -----------------------------------------------------------------------------------
+# Function: handle_share_link
+# Purpose: Handle the "share-link" test case.
+# Arguments:
+#   $1 - EFSS platform 1.
+#   $2 - EFSS platform 1 version.
+#   $3 - EFSS platform 2.
+#   $4 - EFSS platform 2 version.
+#   $5 - Script mode.
+#   $6 - Browser platform.
+# -----------------------------------------------------------------------------------
+handle_share_link() {
+    local platform1="${1}"
+    local version1="${2}"
+    local platform2="${3}"
+    local version2="${4}"
+    local mode="${5}"
+    local browser="${6}"
+    local script_path="${ENV_ROOT}/dev/ocm-test-suite/share-link/${platform1}-${platform2}.sh"
 
-      *)
-        echo -n "unknown login"
+    # Check for unsupported combinations.
+    if [[ "${platform1}-${platform2}" =~ ^(nextcloud-seafile|owncloud-seafile|seafile-nextcloud|seafile-owncloud)$ ]]; then
+        print_error "Combination '${platform1}-${platform2}' is not supported for 'share-link' test case."
+        exit 1
+    else
+        run_test_script "${script_path}" "${version1}" "${version2}" "${mode}" "${browser}"
+    fi
+}
+
+# -----------------------------------------------------------------------------------
+# Function: handle_invite_link
+# Purpose: Handle the "invite-link" test case.
+# Arguments:
+#   $1 - EFSS platform 1.
+#   $2 - EFSS platform 1 version.
+#   $3 - EFSS platform 2.
+#   $4 - EFSS platform 2 version.
+#   $5 - Script mode.
+#   $6 - Browser platform.
+# -----------------------------------------------------------------------------------
+handle_invite_link() {
+    local platform1="${1}"
+    local version1="${2}"
+    local platform2="${3}"
+    local version2="${4}"
+    local mode="${5}"
+    local browser="${6}"
+    local script_path="${ENV_ROOT}/dev/ocm-test-suite/invite-link/${platform1}-${platform2}.sh"
+
+    # Check for unsupported combinations.
+    if [[ "${platform1}-${platform2}" =~ ^(nextcloud-seafile|owncloud-seafile|seafile-nextcloud|seafile-owncloud)$ ]]; then
+        print_error "Combination '${platform1}-${platform2}' is not supported for 'invite-link' test case."
+        exit 1
+    else
+        run_test_script "${script_path}" "${version1}" "${version2}" "${mode}" "${browser}"
+    fi
+}
+
+# -----------------------------------------------------------------------------------
+# Function: main
+# Purpose: Main function to manage the flow of the script.
+# -----------------------------------------------------------------------------------
+main() {
+    # Initialize environment.
+    initialize_environment
+
+    # Parse arguments with default values.
+    local test_case="${1:-login}"
+    local efss_platform_1="${2:-nextcloud}"
+    local efss_platform_1_version="${3:-unknown}"
+    local script_mode="${4:-dev}"
+    local browser_platform="${5:-electron}"
+    local efss_platform_2="${6:-nextcloud}"
+    local efss_platform_2_version="${7:-unknown}"
+
+    # Validate test case.
+    case "${test_case}" in
+    "login" | "share-with" | "share-link" | "invite-link") ;;
+
+    *)
+        error_exit "Unknown test case: '${test_case}'. Valid options are: login, share-with, share-link, invite-link."
         ;;
     esac
-    ;;
 
-  "share-with")
-    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
-
-      "nextcloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+    # Route the test case to the appropriate handler.
+    case "$test_case" in
+    "login")
+        handle_login "${efss_platform_1}" "${efss_platform_1_version}" "${script_mode}" "${browser_platform}"
         ;;
-
-      "nextcloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
+    "share-with")
+        handle_share_with "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
         ;;
-
-      "nextcloud-seafile")
-        echo -n "not supported"
+    "share-link")
+        handle_share_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
         ;;
-
-      "nextcloud-ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/nextcloud-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-seafile")
-        echo -n "not supported"
-        ;;
-
-      "owncloud-ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/owncloud-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "seafile-nextcloud")
-        echo -n "not supported"
-        ;;
-
-      "seafile-owncloud")
-        echo -n "not supported"
-        ;;
-
-      "seafile-seafile")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/seafile-seafile.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-      
-      "ocmstub-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/ocmstub-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "ocmstub-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/ocmstub-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "ocmstub-ocmstub")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-with/ocmstub-ocmstub.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      *)
-        echo -n "unknown share-with"
+    "invite-link")
+        handle_invite_link "${efss_platform_1}" "${efss_platform_1_version}" "${efss_platform_2}" "${efss_platform_2_version}" "${script_mode}" "${browser_platform}"
         ;;
     esac
-    ;;
+}
 
-  "share-link")
-    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
-
-      "nextcloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-link/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "nextcloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/share-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      *)
-        echo -n "unknown share-link"
-        ;;
-    esac
-    ;;
-
-  "invite-link")
-    case "${EFSS_PLATFORM_1}-${EFSS_PLATFORM_2}" in
-
-      "nextcloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "nextcloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "nextcloud-ocis")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/nextcloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "owncloud-ocis")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/owncloud-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "ocis-ocis")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-ocis.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "ocis-owncloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-owncloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "ocis-nextcloud")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/ocis-nextcloud.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      "cernbox-cernbox")
-        "${ENV_ROOT}/dev/ocm-test-suite/invite-link/cernbox-cernbox.sh" "${EFSS_PLATFORM_1_VERSION}" "${EFSS_PLATFORM_2_VERSION}" "${SCRIPT_MODE}" "${BROWSER_PLATFORM}"
-        ;;
-
-      *)
-        echo -n "unknown invite-link"
-        ;;
-    esac
-    ;;
-
-  *)
-    echo -n "unknown"
-    ;;
-esac
+# -----------------------------------------------------------------------------------
+# Execute the main function and pass all script arguments.
+# -----------------------------------------------------------------------------------
+main "$@"

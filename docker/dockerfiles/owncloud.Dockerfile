@@ -1,4 +1,4 @@
-FROM pondersource/dev-stock-php-base:latest
+FROM pondersource/owncloud-base:latest
 
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
@@ -7,48 +7,37 @@ LABEL org.opencontainers.image.title="PonderSource ownCloud Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
-RUN rm --recursive --force /var/www/html
-USER www-data
+ARG OWNCLOUD_REPO=https://github.com/owncloud/core
+ARG OWNCLOUD_BRANCH=v10.15.0
 
-ARG REPO_OWNCLOUD=https://github.com/owncloud/core
-ARG BRANCH_OWNCLOUD=v10.15.0
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .
 # $RANDOM returns random number each time.
 ARG CACHEBUST="default"
-RUN git clone                       \
-    --depth 1                       \
-    --recursive                     \
-    --shallow-submodules            \
-    --branch ${BRANCH_OWNCLOUD}     \
-    ${REPO_OWNCLOUD}                \
-    html
+RUN set -ex; \
+    cd /usr/src/; \
+    git clone \
+    --depth 1 \
+    --recursive \
+    --shallow-submodules \
+    --branch ${OWNCLOUD_BRANCH} \
+    ${OWNCLOUD_REPO} \
+    owncloud; \
+    rm -rf /usr/src/owncloud/.git; \
+    mkdir -p /usr/src/owncloud/data; \
+    mkdir -p /usr/src/owncloud/custom_apps; \
+    chmod +x /usr/src/owncloud/occ
 
-USER root
-WORKDIR /var/www/html
+RUN cd /usr/src/owncloud; \
+    composer install --no-dev; \
+    make install-nodejs-deps
 
-# switch php version for ownCloud.
-RUN switch-php.sh 7.4
+# After cloning, `git` is no longer needed at runtime, so remove it to reduce image size.
+RUN apt-get purge -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ENV PHP_MEMORY_LIMIT="512M"
+COPY ./scripts/owncloud/*.sh /
+COPY ./scripts/owncloud/upgrade.exclude /
+COPY ./configs/owncloud/* /usr/src/owncloud/config/
 
-RUN curl --silent --show-error https://getcomposer.org/installer -o /root/composer-setup.php
-RUN php /root/composer-setup.php --install-dir=/usr/local/bin --filename=composer
-
-# install nodejs and yarn.
-RUN curl --silent --location https://deb.nodesource.com/setup_18.x | bash -
-RUN apt install nodejs
-RUN npm install --global yarn
-
-USER www-data
-# this file can be overrided in docker run or docker compose.yaml.
-# example: docker run --volume new-init.sh:/init.sh:ro
-COPY ./scripts/init/owncloud.sh /init.sh
-RUN mkdir -p data; touch data/owncloud.log
-
-RUN composer install --no-dev
-RUN make install-nodejs-deps
-
-USER root
-RUN cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt
-CMD /usr/sbin/apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow data/owncloud.log
+ENTRYPOINT ["/entrypoint.sh"]
+CMD apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow /var/www/html/data/owncloud.log
