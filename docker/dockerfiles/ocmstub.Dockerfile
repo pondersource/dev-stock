@@ -22,8 +22,9 @@ LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 # - git: required to clone the repository
 # Use --no-install-recommends to avoid unnecessary packages and reduce image size.
 RUN apt-get update && apt-get install --no-install-recommends --assume-yes \
+    git \    
     iproute2 \
-    git; \
+    ca-certificates; \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------------------------------------------
@@ -64,6 +65,16 @@ WORKDIR /ocmstub
 # Use npm ci to install dependencies as listed in package-lock.json for reproducibility.
 # --production ensures only production dependencies are installed, reducing size.
 RUN npm ci --production
+
+# ----------------------------------------------------------------------------
+# Install TLS Certificates
+# ----------------------------------------------------------------------------
+# Copy self signed certificates and link them to OS cert directory and update 
+# the systems trusted certificates
+COPY ./tls/certificates/* /tls/
+COPY ./tls/certificate-authority/* /tls/
+RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
+    update-ca-certificates
 
 # ----------------------------------------------------------------------------
 # Expose Ports
