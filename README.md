@@ -364,3 +364,180 @@ See [docs](./docs/xdebug.md)
 
 # SOLID RemoteStorage
 for development see [docs](./docs/solid-remotestorage.md)
+
+
+```mermaid
+flowchart TD
+    %% Start of the workflow
+    A[GitHub Actions Triggered] --> B[Checkout Repository]
+
+    %% Pull Docker Images
+    B --> C[Pull Docker Images]
+    C --> C1[Pull MariaDB:11.4.2]
+    C --> C2[Pull Cypress:13.13.1]
+    C --> C3[Pull pondersource/dev-stock-nextcloud:v27.1.11]
+
+    %% Initialize Environment
+    C3 --> D[Initialize Environment]
+    D --> D1[Resolve Script Directory]
+    D --> D2[Set ENV_ROOT]
+    D --> D3[Export ENV_ROOT]
+
+    %% Validate Files and Directories
+    D --> E[Validate Required Files & Directories]
+    E --> E1[Check TLS Certificates]
+    E --> E2[Check Cypress Configuration]
+
+    %% Parse Arguments
+    E --> F[Parse Command-Line Arguments]
+    F --> F1[Set EFSS_PLATFORM_1_VERSION]
+    F --> F2[Set EFSS_PLATFORM_2_VERSION]
+    F --> F3[Set SCRIPT_MODE dev/ci]
+    F --> F4[Set BROWSER_PLATFORM electron/chrome/edge/firefox]
+
+    %% Clean Up Previous Resources
+    F --> G[Clean Up Previous Resources]
+    G --> G1[Run clean.sh]
+    G --> G2[Remove Temporary Directories]
+    G --> G3[Remove Old Docker Containers]
+
+    %% Create Docker Network
+    G --> H[Create Docker Network: testnet]
+    H --> H1{Does testnet exist?}
+    H1 -- Yes --> H2[Use Existing testnet]
+    H1 -- No --> H3[Create testnet]
+
+    %% Start MariaDB Container
+    H2 --> I[Start MariaDB Container]
+    I --> I1[Configure MariaDB Environment Variables]
+    I --> I2[Connect to testnet]
+    I --> I3[Wait for MariaDB Port 3306]
+
+    %% Start Nextcloud Containers
+    I --> J[Start Nextcloud Containers]
+    J --> J1[Start nextcloud1.docker]
+    J1 --> J1a[Configure Nextcloud1 with MariaDB]
+    J1 --> J1b[Set Admin Credentials einstein/relativity]
+    J1 --> J1c[Wait for Nextcloud1 Port 443]
+
+    J --> J2[Start nextcloud2.docker]
+    J2 --> J2a[Configure Nextcloud2 with MariaDB]
+    J2 --> J2b[Set Admin Credentials michiel/dejong]
+    J2 --> J2c[Wait for Nextcloud2 Port 443]
+
+    %% Conditional: Dev Mode vs CI Mode
+    J2c --> K{SCRIPT_MODE}
+    K -- Dev --> L[Start Dev Mode Containers]
+    K -- CI --> M[Start CI Mode Containers]
+
+    %% Dev Mode Setup
+    L --> L1[Start Firefox Container]
+    L --> L2[Start VNC Server Container]
+    L --> L3[Start Cypress Container in Dev Mode]
+
+    %% Provide Dev Mode Instructions
+    L3 --> N[Provide Dev Mode Access Instructions]
+    N --> O[Run Cypress Tests in Dev Mode]
+
+    %% CI Mode Setup
+    M --> M1[Configure Cypress for CI Mode]
+    M1 --> M2[Run Cypress Tests in CI Mode]
+
+    %% Cypress Test Execution
+    O --> P[Cypress Executes Federated Share Test Suite]
+    M2 --> P
+
+    %% Verify Test Results
+    P --> Q{Test Success?}
+    Q -- Yes --> R[Mark as Passed]
+    Q -- No --> S[Mark as Failed]
+
+    %% Cleanup Resources
+    R --> T[Cleanup Resources]
+    S --> T
+    T --> U[End Workflow]
+
+    %% Subgraphs for better organization
+    subgraph Docker Image Pulling
+        C1
+        C2
+        C3
+    end
+
+    subgraph Environment Initialization
+        D1
+        D2
+        D3
+    end
+
+    subgraph File Validation
+        E1
+        E2
+    end
+
+    subgraph Argument Parsing
+        F1
+        F2
+        F3
+        F4
+    end
+
+    subgraph Resource Cleanup
+        G1
+        G2
+        G3
+    end
+
+    subgraph Network Setup
+        H1
+        H2
+        H3
+    end
+
+    subgraph MariaDB Setup
+        I1
+        I2
+        I3
+    end
+
+    subgraph Nextcloud Setup
+        J1a
+        J1b
+        J1c
+        J2a
+        J2b
+        J2c
+    end
+
+    subgraph Dev Mode Containers
+        L1
+        L2
+        L3
+    end
+
+    subgraph CI Mode Containers
+        M1
+        M2
+    end
+
+    subgraph Test Execution
+        P
+    end
+
+    subgraph Test Results
+        Q
+        R
+        S
+    end
+
+    subgraph Final Cleanup
+        T
+        U
+    end
+
+    %% Style Adjustments
+    classDef success fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef failure fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    class R success;
+    class S failure;
+```
