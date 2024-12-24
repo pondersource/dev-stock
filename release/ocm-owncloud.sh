@@ -47,7 +47,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                                             \
   -v "${REPO_ROOT}/oc-ocm-release:/var/www/html/apps/oc-opencloudmesh"                                            \
   -v "${REPO_ROOT}/release/opencloudmesh.key:/var/www/opencloudmesh.key"                                          \
-  pondersource/dev-stock-owncloud-opencloudmesh
+  pondersource/owncloud-opencloudmesh
 
 
 docker exec --user root oc-release.docker bash -c "chown www-data:www-data -R /var/www/html/apps/oc-opencloudmesh && chown www-data:www-data /var/www/opencloudmesh.key"

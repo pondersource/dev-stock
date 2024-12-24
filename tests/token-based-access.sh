@@ -89,7 +89,7 @@ docker run --detach --network=testnet                                           
   -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                           \
   -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                    \
   -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                 \
-  pondersource/dev-stock-owncloud-token-based-access
+  pondersource/owncloud-token-based-access
 
 echo "starting redis2.docker service"
 docker run --detach --network=testnet                                                               \
@@ -119,7 +119,7 @@ docker run --detach --network=testnet                                           
   -v "${ENV_ROOT}/temp/oc-token-based-access.sh:/init.sh"                                           \
   -v "${ENV_ROOT}/surf-token-based-access:/var/www/html/apps/token-based-access"                    \
   -v "${ENV_ROOT}/open-id-connect:/var/www/html/apps/openidconnect"                                 \
-  pondersource/dev-stock-owncloud-token-based-access
+  pondersource/owncloud-token-based-access
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443

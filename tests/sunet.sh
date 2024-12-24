@@ -66,7 +66,7 @@ docker run --detach --network=testnet                                           
   -v "${ENV_ROOT}/server/apps/workflowengine:/var/www/html/apps/workflowengine"                                                   \
   -v "${ENV_ROOT}/server/dist/workflowengine-workflowengine.js:/var/www/html/dist/workflowengine-workflowengine.js"               \
   -v "${ENV_ROOT}/server/dist/workflowengine-workflowengine.js.map:/var/www/html/dist/workflowengine-workflowengine.js.map"       \
-  "pondersource/dev-stock-nextcloud-sunet"
+  "pondersource/nextcloud-sunet"
 
 docker run --detach --network=testnet                                                                                             \
   --name=sunet-ssp-mdb                                                                                                            \

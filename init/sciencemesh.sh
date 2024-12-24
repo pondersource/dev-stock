@@ -49,7 +49,7 @@ BRANCH_REVA=v1.28.0
     docker run -it --rm                                                                             \
     -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                \
     --workdir /var/www/html/apps/sciencemesh                                                        \
-    pondersource/dev-stock-nextcloud-sciencemesh                                                    \
+    pondersource/nextcloud-sciencemesh                                                    \
     make composer
 
 # move app to its place inside efss and create symbolic links.
@@ -74,7 +74,7 @@ BRANCH_REVA=v1.28.0
     docker run -it --rm                                                                             \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
     --workdir /var/www/html/apps/sciencemesh                                                        \
-    pondersource/dev-stock-owncloud-sciencemesh                                                     \
+    pondersource/owncloud-sciencemesh                                                     \
     composer install
 
 [ ! -d "owncloud/apps/sciencemesh" ] &&                                                             \

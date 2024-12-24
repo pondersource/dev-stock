@@ -49,7 +49,7 @@ docker run --detach --network=testnet                                           
   -e PASS="relativity"                                                                              \
   -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  pondersource/dev-stock-owncloud-opencloudmesh
+  pondersource/owncloud-opencloudmesh
 
 echo "starting maria2.docker"
 docker run --detach --network=testnet                                                               \
@@ -72,7 +72,7 @@ docker run --detach --network=testnet                                           
   -e PASS="radioactivity"                                                                           \
   -v "${REPO_ROOT}/temp/oc-opencloudmesh.sh:/init.sh"                                               \
   -v "${REPO_ROOT}/ocm:/var/www/html/apps/oc-opencloudmesh"                                         \
-  pondersource/dev-stock-owncloud-opencloudmesh
+  pondersource/owncloud-opencloudmesh
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443

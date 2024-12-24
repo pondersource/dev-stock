@@ -49,10 +49,10 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 
 | **Repository**                   | **Tag**         | **Branch**                                                                | **Upstream**                                                                 |
 |----------------------------------|-----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| pondersource/dev-stock-nextcloud | latest, v30.0.2 | [v30.0.2](https://github.com/nextcloud/server/releases/tag/v30.0.2)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v29.0.10         | [v29.0.10](https://github.com/nextcloud/server/releases/tag/v29.0.10)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v28.0.14        | [v28.0.14](https://github.com/nextcloud/server/releases/tag/v28.0.14)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v27.1.11        | [v27.1.11](https://github.com/nextcloud/server/releases/tag/v27.1.11)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | latest, v30.0.2 | [v30.0.2](https://github.com/nextcloud/server/releases/tag/v30.0.2)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v29.0.10         | [v29.0.10](https://github.com/nextcloud/server/releases/tag/v29.0.10)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v28.0.14        | [v28.0.14](https://github.com/nextcloud/server/releases/tag/v28.0.14)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v27.1.11        | [v27.1.11](https://github.com/nextcloud/server/releases/tag/v27.1.11)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
 
 ---
 
@@ -60,7 +60,7 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 
 | **Repository**                   | **Tag**       | **Branch**                                                                 | **Upstream**                                                                 |
 |----------------------------------|---------------|----------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| pondersource/dev-stock-owncloud  | v10.15.0      | [v10.15.0](https://github.com/owncloud/core/releases/tag/v10.15.0)         | [Official ownCloud Core](https://github.com/owncloud/core)                   |
+| pondersource/owncloud  | v10.15.0      | [v10.15.0](https://github.com/owncloud/core/releases/tag/v10.15.0)         | [Official ownCloud Core](https://github.com/owncloud/core)                   |
 
 
 #### Docker Pull Commands
@@ -68,14 +68,14 @@ To pull the Docker images for EFSS, use the following commands:
 
 ```bash
 # Pull the latest version of Nextcloud
-docker pull pondersource/dev-stock-nextcloud:latest
+docker pull pondersource/nextcloud:latest
 
 # Pull a specific version of Nextcloud
-docker pull pondersource/dev-stock-nextcloud:v30.0.2
-docker pull pondersource/dev-stock-nextcloud:v29.0.10
+docker pull pondersource/nextcloud:v30.0.2
+docker pull pondersource/nextcloud:v29.0.10
 
 # Pull a specific version of ownCloud
-docker pull pondersource/dev-stock-owncloud:v10.15.0
+docker pull pondersource/owncloud:v10.15.0
 ```
 
 ## Our Dockerized Reva Images 🚀
@@ -391,7 +391,7 @@ flowchart TD
     B --> C[Pull Docker Images]
     C --> C1[Pull MariaDB:11.4.2]
     C --> C2[Pull Cypress:13.13.1]
-    C --> C3[Pull pondersource/dev-stock-nextcloud:v27.1.11]
+    C --> C3[Pull pondersource/nextcloud:v27.1.11]
 
     %% Initialize Environment
     C3 --> D[Initialize Environment]

@@ -46,7 +46,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/temp/oc-rd-sram.sh:/init.sh"                                                                   \
   -v "${REPO_ROOT}/rd-sram-release:/var/www/html/apps/rd-sram-integration"                                        \
   -v "${REPO_ROOT}/release/federatedgroups.key:/var/www/federatedgroups.key"                                      \
-  pondersource/dev-stock-owncloud-rd-sram
+  pondersource/owncloud-rd-sram
 
 
 docker exec --user root oc-release.docker bash -c "chown www-data:www-data -R /var/www/html/apps/rd-sram-integration && chown www-data:www-data /var/www/federatedgroups.key"

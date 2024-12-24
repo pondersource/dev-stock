@@ -63,7 +63,7 @@ docker run --detach --network=testnet                                           
   -v "${ENV_ROOT}/temp/oc-surf-trashbin.sh:/init.sh"                                                \
   -v "${ENV_ROOT}/surf-trashbin-app:/var/www/html/apps/surf-trashbin-app"                           \
   -v "${ENV_ROOT}/docker/tls:/tls-host"                                                             \
-  pondersource/dev-stock-owncloud-surf-trashbin
+  pondersource/owncloud-surf-trashbin
 
 waitForPort maria1.docker 3306
 waitForPort oc1.docker 443
