@@ -50,7 +50,7 @@ restart_reva_in_container() {
     printf "Restarting 'reva' process in container: %s\n" "$container_name"
 
     # Kill 'reva' process inside the container
-    if ! docker exec "$container_name" bash -c "reva-kill.sh"; then
+    if ! docker exec "$container_name" bash -c "/terminate.sh"; then
         print_error "Failed to kill 'reva' process in container: $container_name"
         success=false
     else
@@ -58,7 +58,7 @@ restart_reva_in_container() {
     fi
 
     # Start 'reva' process inside the container
-    if ! docker exec "$container_name" bash -c "reva-run.sh"; then
+    if ! docker exec "$container_name" bash -c "/init.sh"; then
         print_error "Failed to start 'reva' process in container: $container_name"
         success=false
     else

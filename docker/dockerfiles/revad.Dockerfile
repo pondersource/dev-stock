@@ -137,7 +137,7 @@ ENV PATH="${PATH}:/reva-git/cmd/revad"
 # Ensure these scripts have appropriate shebang lines and `chmod +x` done.
 # These scripts are responsible for container lifecycle management.
 COPY ./scripts/reva/* /usr/bin/
-RUN chmod +x /usr/bin/run.sh /usr/bin/kill.sh /usr/bin/entrypoint.sh
+RUN chmod +x /usr/bin/entrypoint.sh /usr/bin/init.sh /usr/bin/terminate.sh
 
 # ----------------------------------------------------------------------------
 # Entrypoint script.
