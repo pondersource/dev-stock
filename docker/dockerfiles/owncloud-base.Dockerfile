@@ -137,7 +137,7 @@ RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
 
 COPY ./configs/owncloud/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
-RUN a2enmod headers rewrite remoteip ssl; \
+RUN a2enmod headers rewrite remoteip ssl log_forensic; \
     { \
     echo 'RemoteIPHeader X-Real-IP'; \
     echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
