@@ -22,6 +22,7 @@ RUN set -ex; \
     libldap-common \
     ca-certificates \
     libmagickcore-6.q16-6-extra \
+    libapache2-mod-security2 \
     ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \
@@ -104,6 +105,14 @@ RUN set -ex; \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
+
+RUN { \
+    echo 'SecRuleEngine On'; \
+    echo 'SecAuditEngine On'; \
+    echo 'SecAuditLog /var/log/apache2/modsec_audit.log'; \
+    echo 'SecRequestBodyAccess on'; \
+    echo 'SecAuditLogParts ABIJDFHZ'; \
+    } > "/etc/modsecurity/modsecurity.conf";
 
 # set recommended PHP.ini settings
 # see https://docs.nextcloud.com/server/latest/admin_manual/installation/server_tuning.html#enable-php-opcache

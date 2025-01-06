@@ -343,6 +343,15 @@ Use ci for automated pipelines with concise output.
 ### Cross-Platform Tests:
 For scenarios requiring two platforms (e.g., `share-with`, `invite-link`), specify both Platform 1 and Platform 2 along with their versions.
 
+### Forensic Logs:
+The Nextcloud images have [`mod_log_forensic`](https://httpd.apache.org/docs/2.4/mod/mod_log_forensic.html) and [`mod_security`](https://stackoverflow.com/a/47456612)
+enabled, so you can try this for debugging:
+
+```bash
+docker exec -it nextcloud1.docker tail -f /etc/apache2/forensic.log
+docker exec -it nextcloud1.docker tail -f /var/log/apache2/modsec_audit.log
+```
+
 # Debugging
 ## RD-SRAM
 
