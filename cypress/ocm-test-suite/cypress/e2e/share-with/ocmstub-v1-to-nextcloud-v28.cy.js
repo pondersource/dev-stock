@@ -16,21 +16,10 @@ describe('Native federated sharing functionality from OcmStub to Nextcloud', () 
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
   const recipientUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
-  const senderUsername = Cypress.env('OCMSTUB1_USERNAME') || 'tester';
   const recipientUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
   const recipientPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const expectedMessage = 'yes shareWith';
-
-  // Expected details of the federated share
-  const expectedShareDetails = {
-    shareWith: `${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    fileName: 'Test share from stub',
-    owner: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    sender: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    shareType: 'user',
-    resourceType: 'file',
-    protocol: 'webdav'
-  };
+  const sharedFileName = '/Test share from stub';
 
   /**
    * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
