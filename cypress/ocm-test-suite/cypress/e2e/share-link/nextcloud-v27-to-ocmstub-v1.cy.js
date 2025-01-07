@@ -59,11 +59,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
     // Create an array of strings to verify. Each string is a snippet of text expected to be found on the page.
     // These assertions represent lines or properties that should appear in the OcmStub's displayed share metadata.
     // Adjust these strings if the page format changes.
-    const shareAssertions = generateShareAssertions(expectedShareDetails);
-
-    // work around https://github.com/nextcloud/server/issues/36340
-    shareAssertions['sharedBy'] = shareAssertions['sender'];
-    delete shareAssertions['sender'];
+    const shareAssertions = generateShareAssertions(expectedShareDetails, true);
 
     // Step 2: Loop through all assertions and verify their presence on the page
     // We use `cy.contains()` to search for the text anywhere on the page.

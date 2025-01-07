@@ -39,7 +39,7 @@
  * // The returned array can then be used with `cy.contains()` calls in Cypress tests:
  * // shareAssertions.forEach(assertion => cy.contains(assertion).should('be.visible'));
  */
-export function generateShareAssertions(expectedDetails) {
+export function generateShareAssertions(expectedDetails, allowNcDivergence = false) {
   // Required fields that must be present and non-empty strings
   const requiredFields = [
     'shareWith',
@@ -73,7 +73,7 @@ export function generateShareAssertions(expectedDetails) {
     `"providerId":`,
     `"shareType": "${expectedDetails.shareType}"`,
     `"owner": "${expectedDetails.owner}"`,
-    `"sender": "${expectedDetails.sender}"`,
+    (allowNcDivergence? `"sharedBy": "${expectedDetails.sender}"` : `"sender": "${expectedDetails.sender}"`),
     `"resourceType": "${expectedDetails.resourceType}"`,
     // For protocol, we know 'name' but 'sharedSecret' may vary.
     // We assert on part of the structure to ensure the protocol block is present.
