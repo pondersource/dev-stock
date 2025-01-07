@@ -128,6 +128,9 @@ docker network inspect testnet >/dev/null 2>&1 || docker network create testnet 
 # Utility Functions Copied From dev/ocm-test-suite/share-with/nextcloud-ocmstub.sh
 # -----------------------------------------------------------------------------------
 
+# Docker network name
+DOCKER_NETWORK="testnet"
+
 # -----------------------------------------------------------------------------------
 # Function: print_error
 # Purpose: Print an error message to stderr.
