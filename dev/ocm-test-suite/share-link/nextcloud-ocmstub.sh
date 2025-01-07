@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test Nextcloud to OcmStub OCM share-with flow tests.
+# Script to Test Nextcloud to OcmStub OCM share-link flow tests.
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
@@ -431,7 +431,7 @@ main() {
             "${CYPRESS_REPO}":"${CYPRESS_TAG}" \
             cypress run \
             --browser "${BROWSER_PLATFORM}" \
-            --spec "cypress/e2e/share-with/nextcloud-${P1_VER}-to-ocmstub-${P2_VER}.cy.js" || error_exit "Cypress tests failed."
+            --spec "cypress/e2e/share-link/nextcloud-${P1_VER}-to-ocmstub-${P2_VER}.cy.js" || error_exit "Cypress tests failed."
 
         # Revert Cypress configuration changes
         if [ "${BROWSER_PLATFORM}" != "electron" ]; then
