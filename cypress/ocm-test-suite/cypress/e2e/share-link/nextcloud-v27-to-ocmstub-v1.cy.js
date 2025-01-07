@@ -11,7 +11,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
   const recipientUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
-  const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
+  const recipientDomain = 'ocmstub1.docker'; // recipientUrl.replace(/^https?:\/\/|\/$/g, '');
   const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
   const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const recipientUsername = Cypress.env('OCMSTUB1_USERNAME') || 'michiel';
