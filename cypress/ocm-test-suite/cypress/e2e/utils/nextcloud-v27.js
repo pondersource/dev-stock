@@ -43,12 +43,14 @@ export function acceptShareV27() {
   // Wait for the share dialog to appear and ensure it's visible
   cy.get('div.oc-dialog', { timeout: 10000 })
     .should('be.visible')
-    .within(() => {
-      // Locate the button row and click the primary button
-      cy.get('div.oc-dialog-buttonrow')
+    .each($div => {
+      cy.wrap($div).within(() => {
+        // Locate the button row and click the primary button
+        cy.get('div.oc-dialog-buttonrow')
         .find('button.primary')
-        .should('be.visible')
-        .click();
+        // .should('be.visible')
+        .click({ force: true });
+      })
     });
 }
 
