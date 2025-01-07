@@ -1,17 +1,40 @@
 import {
   createShareLinkV27,
   renameFileV27,
-  navigationSwitchLeftSideV27,
-  selectAppFromLeftSideV27,
-} from '../utils/nextcloud-v27'
+} from '../utils/nextcloud-v27';
+
+import {
+  generateShareAssertions,
+} from '../utils/ocmstub-v1.js';
 
 describe('Share link federated sharing functionality for Nextcloud', () => {
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
+  const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
+  const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
+  const recipientUsername = Cypress.env('OCMSTUB1_USERNAME') || 'michiel';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'nc1-to-os1-share.txt';
+  const sharedWith = 'michiel@ocmstub1.docker';
+
+  // Expected details of the federated share
+  const expectedShareDetails = {
+    shareWith: `${recipientUsername}@${recipientUrl}`,
+    fileName: sharedFileName,
+    owner: `${senderUsername}@${senderUrl}/`,
+    sender: `${senderUsername}@${senderUrl}/`,
+    shareType: 'user',
+    resourceType: 'file',
+    protocol: 'webdav'
+  };
+
   it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
     // send share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword)
 
-    renameFileV27('welcome.txt', 'nc1-to-nc2-share-link.txt')
-    createShareLinkV27('nc1-to-nc2-share-link.txt').then(
+    renameFileV27(originalFileName, sharedFileName)
+    createShareLinkV27(sharedFileName).then(
       (result) => {
         cy.visit(result)
 
@@ -19,7 +42,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
         cy.get('button[id="save-external-share"]').click()
 
         cy.get('form[class="save-form"]').within(() => {
-          cy.get('input[id="remote_address"]').type('michiel@nextcloud2.docker')
+          cy.get('input[id="remote_address"]').type(sharedWith)
           cy.get('input[id="save-button-confirm"]').click()
         })
       }
