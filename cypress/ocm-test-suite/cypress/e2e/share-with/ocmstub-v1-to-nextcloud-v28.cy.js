@@ -19,7 +19,7 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
   const recipientUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
   const recipientPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const expectedMessage = 'yes shareWith';
-  const sharedFileName = '/from-stub.txt';
+  const sharedFileName = 'from-stub.txt';
 
   /**
    * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
