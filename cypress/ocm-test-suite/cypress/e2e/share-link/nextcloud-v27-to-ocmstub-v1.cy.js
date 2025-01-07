@@ -38,6 +38,10 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
     // Adjust these strings if the page format changes.
     const shareAssertions = generateShareAssertions(expectedShareDetails);
 
+    // work around https://github.com/nextcloud/server/issues/36340
+    shareAssertions['sharedBy'] = shareAssertions['sender'];
+    delete shareAssertions['sender'];
+
     // Step 2: Loop through all assertions and verify their presence on the page
     // We use `cy.contains()` to search for the text anywhere on the page.
     // The `should('be.visible')` ensures that the text is actually visible, not hidden or off-screen.
