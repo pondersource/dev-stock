@@ -11,7 +11,7 @@ import {
   ensureFileExistsV28,
 } from '../utils/nextcloud-v28';
 
-describe('Native federated sharing functionality from OcmStub to Nextcloud', () => {
+describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
 
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -19,12 +19,12 @@ describe('Native federated sharing functionality from OcmStub to Nextcloud', () 
   const recipientUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
   const recipientPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const expectedMessage = 'yes shareWith';
-  const sharedFileName = '/Test share from stub';
+  const sharedFileName = '/from-stub.txt';
 
   /**
    * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
    */
-  it('should successfully send a federated share of a file from OcmStub 1.0 to OcmStub 1.0', () => {
+  it('should successfully send a federated share of a file from OcmStub v1 to Nextcloud v28', () => {
     // Step 1: Navigate to the federated share link on OcmStub 1.0
     // Remove trailing slash and leading https or http from recipientUrl
     cy.visit(`${senderUrl}/shareWith?${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`);
@@ -38,7 +38,7 @@ describe('Native federated sharing functionality from OcmStub to Nextcloud', () 
    * Test Case: Receiving and accepting a federated share on the recipient's Nextcloud instance.
    * Validates that the recipient can successfully accept the share and view the shared file.
    */
-  it('Receive federated share of a file from Nextcloud v28 to Nextcloud v28', () => {
+  it('Receive federated share of a file from OcmStub v1 to Nextcloud v28', () => {
     // Step 1: Log in to the recipient's Nextcloud instance
     cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
 
