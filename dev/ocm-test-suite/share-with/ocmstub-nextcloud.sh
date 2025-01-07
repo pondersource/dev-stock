@@ -272,7 +272,7 @@ function create_ocmstub() {
   run_quietly_if_ci docker run --detach --network="${DOCKER_NETWORK}" \
     --name="ocmstub${number}.docker" \
     -e HOST="ocmstub${number}" \
-    "${image}:${tag}" || error_exit "Failed to start EFSS container for ocmstub ${number}."
+    "${image}:${tag}" sleep 30000 || error_exit "Failed to start EFSS container for ocmstub ${number}."
 
   # Wait for EFSS port to open
   run_quietly_if_ci wait_for_port "ocmstub${number}.docker" 443
