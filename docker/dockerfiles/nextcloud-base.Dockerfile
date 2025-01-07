@@ -111,7 +111,8 @@ RUN { \
     echo 'SecAuditEngine On'; \
     echo 'SecAuditLog /var/log/apache2/modsec_audit.log'; \
     echo 'SecRequestBodyAccess on'; \
-    echo 'SecAuditLogParts ABIJDFHZ'; \
+    echo 'SecResponseBodyAccess On'; \
+    echo 'SecAuditLogParts ABIJEFHZ'; \
     } > "/etc/modsecurity/modsecurity.conf";
 
 # set recommended PHP.ini settings
