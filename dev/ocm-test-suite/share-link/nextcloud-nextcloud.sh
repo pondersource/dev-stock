@@ -1,41 +1,160 @@
 #!/usr/bin/env bash
 
-# @michielbdejong halt on error in docker init scripts.
-set -e
+# -----------------------------------------------------------------------------------
+# Script to Test Nextcloud to Nextcloud OCM share-link flow tests.
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+# -----------------------------------------------------------------------------------
 
-# find this scripts location.
-SOURCE=${BASH_SOURCE[0]}
-while [ -L "${SOURCE}" ]; do # resolve "${SOURCE}" until the file is no longer a symlink.
-  DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
-  SOURCE=$(readlink "${SOURCE}")
-   # if "${SOURCE}" was a relative symlink, we need to resolve it relative to the path where the symlink file was located.
-  [[ "${SOURCE}" != /* ]] && SOURCE="${DIR}/${SOURCE}"
-done
-DIR=$( cd -P "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
+# -----------------------------------------------------------------------------------
+# Description:
+#   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
+#   such as Nextcloud, using Cypress, and Docker containers.
+#   It supports both development and CI environments, with optional browser support.
 
-cd "${DIR}/../../.." || exit
+# Usage:
+#   ./nextcloud-nextcloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 
-ENV_ROOT=$(pwd)
-export ENV_ROOT=${ENV_ROOT}
+# Arguments:
+#   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v27.1.11").
+#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v27.1.11").
+#   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
+#   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 
-# nextcloud version:
-#   - v27.1.11
-#   - v28.0.14
-EFSS_PLATFORM_1_VERSION=${1:-"v27.1.11"}
+# Requirements:
+#   - Docker and required images must be installed.
+#   - Test scripts and configurations must be located in the expected directories.
+#   - Ensure that the necessary scripts (e.g., init scripts) and configurations exist.
 
-# nextcloud version:
-#   - v27.1.11
-#   - v28.0.14
-EFSS_PLATFORM_2_VERSION=${2:-"v27.1.11"}
+# Example:
+#   ./nextcloud-nextcloud.sh v28.0.14 v27.1.11 ci electron
 
-# script mode:  dev, ci. default is dev.
-SCRIPT_MODE=${3:-"dev"}
+# -----------------------------------------------------------------------------------
 
-# browser platform: chrome, edge, firefox, electron. default is electron.
-# only applies on SCRIPT_MODE=ci
-BROWSER_PLATFORM=${4:-"electron"}
+# Exit immediately if a command exits with a non-zero status,
+# a variable is used but not defined, or a command in a pipeline fails
+set -euo pipefail
 
-function redirect_to_null_cmd() {
+# -----------------------------------------------------------------------------------
+# Constants and Default Values
+# -----------------------------------------------------------------------------------
+
+# Default versions
+DEFAULT_EFSS_1_VERSION="v27.1.11"
+DEFAULT_EFSS_2_VERSION="v27.1.11"
+DEFAULT_SCRIPT_MODE="dev"
+DEFAULT_BROWSER_PLATFORM="electron"
+
+# Docker network name
+DOCKER_NETWORK="testnet"
+
+# MariaDB root password
+MARIADB_ROOT_PASSWORD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
+
+# Paths to required directories
+TEMP_DIR="temp"
+TLS_CA_DIR="docker/tls/certificate-authority"
+TLS_CERTIFICATES_DIR="docker/tls/certificates"
+
+# 3rd party containers
+CYPRESS_REPO=cypress/included
+CYPRESS_TAG=13.13.1
+FIREFOX_REPO=jlesage/firefox
+FIREFOX_TAG=v24.11.1
+MARIADB_REPO=mariadb
+MARIADB_TAG=11.4.4
+VNC_REPO=theasp/novnc
+VNC_TAG=latest
+
+# -----------------------------------------------------------------------------------
+# Utility Functions
+# -----------------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------------
+# Function: print_error
+# Purpose: Print an error message to stderr.
+# Arguments:
+#   $1 - The error message to display.
+# -----------------------------------------------------------------------------------
+print_error() {
+    local message="${1}"
+    printf "Error: %s\n" "${message}" >&2
+}
+
+# -----------------------------------------------------------------------------------
+# Function: error_exit
+# Purpose: Print an error message and exit with code 1.
+# Arguments:
+#   $1 - The error message to display.
+# -----------------------------------------------------------------------------------
+error_exit() {
+    print_error "${1}"
+    exit 1
+}
+
+# -----------------------------------------------------------------------------------
+# Function: resolve_script_dir
+# Purpose: Resolves the absolute path of the script's directory, handling symlinks.
+# Returns:
+#   The absolute path to the script's directory.
+# -----------------------------------------------------------------------------------
+resolve_script_dir() {
+    local source="${BASH_SOURCE[0]}"
+    local dir
+    while [ -L "${source}" ]; do
+        dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+        source="$(readlink "${source}")"
+        # Resolve relative symlink
+        [[ "${source}" != /* ]] && source="${dir}/${source}"
+    done
+    dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+    printf "%s" "${dir}"
+}
+
+# -----------------------------------------------------------------------------------
+# Function: initialize_environment
+# Purpose: Initialize the environment and set global variables.
+# -----------------------------------------------------------------------------------
+initialize_environment() {
+    local script_dir
+    script_dir="$(resolve_script_dir)"
+    cd "${script_dir}/../../.." || error_exit "Failed to change directory to the script root."
+    ENV_ROOT="$(pwd)"
+    export ENV_ROOT="${ENV_ROOT}"
+
+    # Ensure required commands are available
+    for cmd in docker; do
+        if ! command_exists "${cmd}"; then
+            error_exit "Required command '${cmd}' is not available. Please install it and try again."
+        fi
+    done
+}
+
+# -----------------------------------------------------------------------------------
+# Function: wait_for_port
+# Purpose: Wait for a Docker container to open a specific port.
+# Arguments:
+#   $1 - The name of the Docker container.
+#   $2 - The port number to check.
+# -----------------------------------------------------------------------------------
+wait_for_port() {
+    local container="${1}"
+    local port="${2}"
+
+    run_quietly_if_ci echo "Waiting for port ${port} on container ${container}..."
+    until docker exec "${container}" sh -c "ss -tulpn | grep -q 'LISTEN.*:${port}'" >/dev/null 2>&1; do
+        run_quietly_if_ci echo "Port ${port} not open yet on ${container}. Retrying..."
+        sleep 1
+    done
+    run_quietly_if_ci echo "Port ${port} is now open on ${container}."
+}
+
+# -----------------------------------------------------------------------------------
+# Function: run_quietly_if_ci
+# Purpose: Run a command, suppressing stdout in CI mode.
+# Arguments:
+#   $@ - The command and arguments to execute.
+# -----------------------------------------------------------------------------------
+run_quietly_if_ci() {
     if [ "${SCRIPT_MODE}" = "ci" ]; then
         "$@" >/dev/null 2>&1
     else
@@ -43,202 +162,269 @@ function redirect_to_null_cmd() {
     fi
 }
 
-function waitForPort () {
-  redirect_to_null_cmd echo waitForPort "${1} ${2}"
-  # the "| cat" after the "| grep" is to prevent the command from exiting with 1 if no match is found by grep.
-  x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" | cat)
-  until [ "${x}" -ne 0 ]
-  do
-    redirect_to_null_cmd echo Waiting for "${1} to open port ${2}, this usually takes about 10 seconds ... ${x}"
-    sleep 1
-    x=$(docker exec "${1}" ss -tulpn | grep -c "${2}" |  cat)
-  done
-  redirect_to_null_cmd echo "${1} port ${2} is open"
+# -----------------------------------------------------------------------------------
+# Function: run_docker_container
+# Purpose: Start a Docker container with the provided arguments.
+# Arguments:
+#   $@ - Docker run command arguments
+# -----------------------------------------------------------------------------------
+run_docker_container() {
+    run_quietly_if_ci docker run "$@" || error_exit "Failed to start Docker container: $*"
 }
 
-function createEfss() {
-  local platform="${1}"
-  local number="${2}"
-  local user="${3}"
-  local password="${4}"
-  local init_script="${5}"
-  local tag="${6-latest}"
-  local image="${7}"
-
-  if [[ -z "${image}" ]]; then
-    local image="pondersource/dev-stock-${platform}"
-  else
-    local image="pondersource/dev-stock-${platform}-${image}"
-  fi
-
-  redirect_to_null_cmd echo "creating efss ${platform} ${number}"
-
-  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
-    --name="maria${platform}${number}.docker"                                                                               \
-    -e MARIADB_ROOT_PASSWORD=eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek                                                       \
-    mariadb:11.4.2                                                                                                          \
-    --transaction-isolation=READ-COMMITTED                                                                                  \
-    --binlog-format=ROW                                                                                                     \
-    --innodb-file-per-table=1                                                                                               \
-    --skip-innodb-read-only-compressed
-
-  redirect_to_null_cmd docker run --detach --network=testnet                                                                \
-    --name="${platform}${number}.docker"                                                                                    \
-    --add-host "host.docker.internal:host-gateway"                                                                          \
-    -e HOST="${platform}${number}"                                                                                          \
-    -e DBHOST="maria${platform}${number}.docker"                                                                            \
-    -e USER="${user}"                                                                                                       \
-    -e PASS="${password}"                                                                                                   \
-    -v "${ENV_ROOT}/docker/tls/certificates:/certificates"                                                                  \
-    -v "${ENV_ROOT}/docker/tls/certificate-authority:/certificate-authority"                                                \
-    -v "${ENV_ROOT}/temp/${init_script}:/${platform}-init.sh"                                                               \
-    -v "${ENV_ROOT}/docker/scripts/entrypoint.sh:/entrypoint.sh"                                                            \
-    "${image}:${tag}"
-
-  # wait for hostname port to be open.
-  waitForPort "maria${platform}${number}.docker"  3306
-  waitForPort "${platform}${number}.docker"       443
-
-  # add self-signed certificates to os and trust them. (use >/dev/null 2>&1 to shut these up)
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificates/*.crt                    /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /certificate-authority/*.crt           /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cp -f /tls/*.crt                             /usr/local/share/ca-certificates/ || true"            >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" update-ca-certificates                                                                                      >/dev/null 2>&1
-  docker exec "${platform}${number}.docker" bash -c "cat /etc/ssl/certs/ca-certificates.crt >> /var/www/html/resources/config/ca-bundle.crt"            >/dev/null 2>&1
-
-  # run init script inside efss.
-  redirect_to_null_cmd docker exec -u www-data "${platform}${number}.docker" bash "/${platform}-init.sh"
-
-  redirect_to_null_cmd echo ""
+# -----------------------------------------------------------------------------------
+# Function: remove_directory
+# Purpose: Safely remove a directory if it exists.
+# Arguments:
+#   $1 - Directory path
+# -----------------------------------------------------------------------------------
+remove_directory() {
+    local dir="${1}"
+    if [ -d "${dir}" ]; then
+        run_quietly_if_ci rm -rf "${dir}" || error_exit "Failed to remove directory: ${dir}"
+    fi
 }
 
-# delete and create temp directory.
-rm -rf "${ENV_ROOT}/temp" && mkdir -p "${ENV_ROOT}/temp"
+# -----------------------------------------------------------------------------------
+# Function: command_exists
+# Purpose: Check if a command exists on the system.
+# Arguments:
+#   $1 - The command to check.
+# Returns:
+#   0 if the command exists, 1 otherwise.
+# -----------------------------------------------------------------------------------
+command_exists() {
+    command -v "${1}" >/dev/null 2>&1
+}
 
-# copy init files.
-cp -f "${ENV_ROOT}/docker/scripts/init/nextcloud-ocm-test-suite.sh"   "${ENV_ROOT}/temp/nextcloud.sh"
+# -----------------------------------------------------------------------------------
+# Setup Functions
+# -----------------------------------------------------------------------------------
 
-# auto clean before starting.
-"${ENV_ROOT}/scripts/clean.sh" "no"
+# -----------------------------------------------------------------------------------
+# Function: create_nextcloud
+# Purpose: Create a Nextcloud container with a MariaDB backend.
+# Arguments:
+#   $1 - Instance number.
+#   $2 - Admin username.
+#   $3 - Admin password.
+#   $4 - Image name.
+#   $5 - Image tag.
+# -----------------------------------------------------------------------------------
+create_nextcloud() {
+    local number="${1}"
+    local user="${2}"
+    local password="${3}"
+    local image="${4}"
+    local tag="${5}"
 
-# make sure network exists.
-docker network inspect testnet >/dev/null 2>&1 || docker network create testnet >/dev/null 2>&1
+    run_quietly_if_ci echo "Creating EFSS instance: nextcloud ${number}"
 
-#################
-### Nextcloud ###
-#################
+    # Start MariaDB container
+    run_docker_container --detach --network="${DOCKER_NETWORK}" \
+        --name="marianextcloud${number}.docker" \
+        -e MARIADB_ROOT_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+        "${MARIADB_REPO}":"${MARIADB_TAG}" \
+        --transaction-isolation=READ-COMMITTED \
+        --log-bin=binlog \
+        --binlog-format=ROW \
+        --innodb-file-per-table=1 \
+        --skip-innodb-read-only-compressed || error_exit "Failed to start MariaDB container for nextcloud ${number}."
 
-# syntax:
-# createEfss platform number username password image.
-#
-#
-# platform:       owncloud, nextcloud.
-# number:         should be unique for each platform, for example: you cannot have two Nextclouds with same number.
-# username:       username for sign in into efss.
-# password:       password for sign in into efss.
-# init script:    script for initializing efss.
-# tag:            tag for the image, use latest if not sure.
-# image:          which image variation to use for container.
+    # Wait for MariaDB port to open
+    wait_for_port "marianextcloud${number}.docker" 3306
 
-# Nextclouds.
-createEfss    nextcloud    1    einstein    relativity    nextcloud.sh    "${EFSS_PLATFORM_1_VERSION}"
-createEfss    nextcloud    2    michiel     dejong        nextcloud.sh    "${EFSS_PLATFORM_2_VERSION}"
+    # Start EFSS container
+    run_docker_container --detach --network="${DOCKER_NETWORK}" \
+        --name="nextcloud${number}.docker" \
+        --add-host "host.docker.internal:host-gateway" \
+        -e HOST="nextcloud${number}" \
+        -e NEXTCLOUD_HOST="nextcloud${number}.docker" \
+        -e NEXTCLOUD_TRUSTED_DOMAINS="nextcloud${number}.docker" \
+        -e NEXTCLOUD_ADMIN_USER="${user}" \
+        -e NEXTCLOUD_ADMIN_PASSWORD="${password}" \
+        -e NEXTCLOUD_APACHE_LOGLEVEL="warn" \
+        -e MYSQL_HOST="marianextcloud${number}.docker" \
+        -e MYSQL_DATABASE="efss" \
+        -e MYSQL_USER="root" \
+        -e MYSQL_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+        "${image}:${tag}" || error_exit "Failed to start EFSS container for nextcloud ${number}."
 
-# disable cypress editing javascript files. it would make adding share to your own efss fail.
-sed -i 's/.*modifyObstructiveCode: true,.*/  modifyObstructiveCode: false,/'          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    # Wait for EFSS port to open
+    run_quietly_if_ci wait_for_port "nextcloud${number}.docker" 443
+}
 
-if [ "${SCRIPT_MODE}" = "dev" ]; then
-  ###############
-  ### Firefox ###
-  ###############
+# -----------------------------------------------------------------------------------
+# Function: parse_arguments
+# Purpose: Parse command-line arguments and set global variables.
+# Arguments:
+#   $@ - Command-line arguments
+# -----------------------------------------------------------------------------------
+parse_arguments() {
+    EFSS_PLATFORM_1_VERSION="${1:-$DEFAULT_EFSS_1_VERSION}"
+    EFSS_PLATFORM_2_VERSION="${2:-$DEFAULT_EFSS_2_VERSION}"
+    SCRIPT_MODE="${3:-$DEFAULT_SCRIPT_MODE}"
+    BROWSER_PLATFORM="${4:-$DEFAULT_BROWSER_PLATFORM}"
+}
 
-  docker run --detach --network=testnet                                                                     \
-    --name=firefox                                                                                          \
-    -p 5800:5800                                                                                            \
-    --shm-size 2g                                                                                           \
-    -e USER_ID="${UID}"                                                                                     \
-    -e GROUP_ID="${UID}"                                                                                    \
-    -e DARK_MODE=1                                                                                          \
-    -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw"                       \
-    -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw"     \
-    jlesage/firefox:latest                                                                                  \
-    >/dev/null 2>&1
+# -----------------------------------------------------------------------------------
+# Function: validate_files
+# Purpose: Validate that required files and directories exist.
+# -----------------------------------------------------------------------------------
+validate_files() {
+    # Check if TLS certificate files exist
+    if [ ! -d "${ENV_ROOT}/${TLS_CERTIFICATES_DIR}" ]; then
+        error_exit "TLS certificates directory not found: ${ENV_ROOT}/${TLS_CERTIFICATES_DIR}"
+    fi
+    if [ ! -d "${ENV_ROOT}/${TLS_CA_DIR}" ]; then
+        error_exit "TLS certificate authority directory not found: ${ENV_ROOT}/${TLS_CA_DIR}"
+    fi
 
-  ##################
-  ### VNC Server ###
-  ##################
+    # Check if Firefox certificate files exist
+    if [ ! -f "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db" ]; then
+        error_exit "Firefox cert9.db file not found: ${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db"
+    fi
+    if [ ! -f "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt" ]; then
+        error_exit "Firefox cert_override.txt file not found: ${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt"
+    fi
 
-  # remove previous x11 unix socket file, avoid any problems while mounting new one.
-  sudo rm -rf "${ENV_ROOT}/temp/.X11-unix"
+    # Check if Cypress configuration exists
+    if [ ! -f "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js" ]; then
+        error_exit "Cypress configuration file not found: ${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+    fi
+}
 
-  # try to change DISPLAY_WIDTH, DISPLAY_HEIGHT to make it fit in your screen,
-  # NOTE: please do not commit any change related to resolution.
-  docker run --detach --network=testnet                                                                     \
-    --name=vnc-server                                                                                       \
-    -p 5700:8080                                                                                            \
-    -e RUN_XTERM=no                                                                                         \
-    -e DISPLAY_WIDTH=1920                                                                                   \
-    -e DISPLAY_HEIGHT=1080                                                                                  \
-    -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
-    theasp/novnc:latest
+# -----------------------------------------------------------------------------------
+# Main Execution
+# -----------------------------------------------------------------------------------
+main() {
+    # Initialize environment and parse arguments
+    initialize_environment
+    parse_arguments "$@"
+    validate_files
 
-  ###############
-  ### Cypress ###
-  ###############
+    # Prepare temporary directories and copy necessary files
+    remove_directory "${ENV_ROOT}/${TEMP_DIR}" && mkdir -p "${ENV_ROOT}/${TEMP_DIR}"
 
-  # create cypress and attach its display to the VNC server container.
-  # this way you can view inside cypress container through vnc server.
-  docker run --detach --network=testnet                                                                     \
-    --name="cypress.docker"                                                                                 \
-    -e DISPLAY=vnc-server:0.0                                                                               \
-    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                                            \
-    -v "${ENV_ROOT}/temp/.X11-unix:/tmp/.X11-unix"                                                          \
-    -w /ocm                                                                                                 \
-    --entrypoint cypress                                                                                    \
-    cypress/included:13.13.1                                                                                \
-    open --project .
+    # Clean up previous resources and ensure Docker network exists
+    if [ -x "${ENV_ROOT}/scripts/clean.sh" ]; then
+        "${ENV_ROOT}/scripts/clean.sh" "no"
+    else
+        print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'. Continuing without cleanup."
+    fi
 
-  # print instructions.
-  clear
-  echo "Now browse to :"
-  echo "Cypress inside VNC Server -> http://localhost:5700/vnc.html, scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
-  echo "Embedded Firefox          -> http://localhost:5800"
-  echo ""
-  echo "Inside Embedded Firefox browse to EFSS hostname and enter the related credentials:"
-  echo "https://nextcloud1.docker -> username: einstein               password: relativity"
-  echo "https://nextcloud2.docker -> username: michiel                password: dejong"
-else
-  # only record when testing on electron.
-  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
-    sed -i 's/.*video: true,.*/video: false,/'                                        "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-    sed -i 's/.*videoCompression: true,.*/videoCompression: false,/'                  "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-  fi
-  ##################
-  ### Cypress CI ###
-  ##################
+    if ! docker network inspect "${DOCKER_NETWORK}" >/dev/null 2>&1; then
+        docker network create "${DOCKER_NETWORK}" >/dev/null 2>&1 || error_exit "Failed to create Docker network '${DOCKER_NETWORK}'."
+    fi
 
-  # extract version up until first dot . , example: v27.1.17 becomes v27
-  P1_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_1_VERSION}" )"
-  P2_VER="$( cut -d '.' -f 1 <<< "${EFSS_PLATFORM_2_VERSION}" )"
+    # Create EFSS containers
+    #                # id   # username    # password       # image                  # tag
+    create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
+    create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
 
-  # for some reason this test fails on ci! so lets sleep a bit.
-  sleep 60
+    # disable cypress editing javascript files. it would make adding share to your own efss fail.
+    sed -i 's/.*modifyObstructiveCode: true,.*/  modifyObstructiveCode: false,/'          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
 
-  # run Cypress test suite headlessly and with the defined browser.
-  docker run --network=testnet                                                  \
-    --name="cypress.docker"                                                     \
-    -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm"                                \
-    -w /ocm                                                                     \
-    cypress/included:13.13.1 cypress run                                        \
-    --browser "${BROWSER_PLATFORM}"                                             \
-    --spec "cypress/e2e/share-link/nextcloud-${P1_VER}-to-nextcloud-${P2_VER}.cy.js"
+    if [ "${SCRIPT_MODE}" = "dev" ]; then
+        echo "Setting up development environment..."
 
-  # revert config file back to normal.
-  if [ "${BROWSER_PLATFORM}" != "electron" ]; then
-    sed -i 's/.*video: false,.*/  video: true,/'                                      "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-    sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/'                "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
-  fi
+        # Start Firefox container
+        run_quietly_if_ci echo "Starting Firefox container..."
+        run_docker_container --detach --network="${DOCKER_NETWORK}" \
+            --name="firefox" \
+            -p 5800:5800 \
+            --shm-size=2g \
+            -e USER_ID="$(id -u)" \
+            -e GROUP_ID="$(id -g)" \
+            -e DARK_MODE=1 \
+            -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert9.db:/config/profile/cert9.db:rw" \
+            -v "${ENV_ROOT}/docker/tls/browsers/firefox/cert_override.txt:/config/profile/cert_override.txt:rw" \
+            "${FIREFOX_REPO}":"${FIREFOX_TAG}"
 
-  # auto clean after running tests in ci mode. do not clear terminal.
-  "${ENV_ROOT}/scripts/clean.sh" "no"
-fi
+        # Start VNC Server container
+        run_quietly_if_ci echo "Starting VNC Server..."
+        local x11_socket="${ENV_ROOT}/${TEMP_DIR}/.X11-unix"
+        # Ensure previous socket files are removed
+        remove_directory "${x11_socket}"
+        mkdir -p "${x11_socket}"
+        run_docker_container --detach --network="${DOCKER_NETWORK}" \
+            --name="vnc-server" \
+            -p 5700:8080 \
+            -e RUN_XTERM=no \
+            -e DISPLAY_WIDTH=1920 \
+            -e DISPLAY_HEIGHT=1080 \
+            -v "${x11_socket}:/tmp/.X11-unix" \
+            "${VNC_REPO}":"${VNC_TAG}"
+
+        # Start Cypress container
+        echo "Starting Cypress container..."
+        run_docker_container --detach --network="${DOCKER_NETWORK}" \
+            --name="cypress.docker" \
+            -e DISPLAY="vnc-server:0.0" \
+            -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm" \
+            -v "${x11_socket}:/tmp/.X11-unix" \
+            -w /ocm \
+            --entrypoint cypress \
+            "${CYPRESS_REPO}":"${CYPRESS_TAG}" \
+            open --project .
+
+        # Display setup instructions
+        echo ""
+        echo "Development environment setup complete."
+        echo "Access the following URLs in your browser:"
+        echo "  Cypress inside VNC Server -> http://localhost:5700/vnc.html"
+        echo "  Embedded Firefox          -> http://localhost:5800"
+        echo "Note:"
+        echo "  Scale VNC to get to the Continue button, and run the appropriate test from ./cypress/ocm-test-suite/cypress/e2e/"
+        echo ""
+        echo "Log in to EFSS platforms using the following credentials:"
+        echo "  https://nextcloud1.docker (username: einstein, password: relativity)"
+        echo "  https://nextcloud2.docker (username: michiel, password: dejong)"
+
+    else
+        echo "Running tests in CI mode..."
+
+        # Cypress configuration file
+        local cypress_config="${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
+
+        # Adjust Cypress configurations for non-default browser platforms
+        if [ "${BROWSER_PLATFORM}" != "electron" ]; then
+            sed -i 's/.*video: true,.*/video: false,/' "${cypress_config}"
+            sed -i 's/.*videoCompression: true,.*/videoCompression: false,/' "${cypress_config}"
+        fi
+
+        # Extract major version numbers for EFSS platforms
+        local P1_VER="${EFSS_PLATFORM_1_VERSION%%.*}"
+        local P2_VER="${EFSS_PLATFORM_2_VERSION%%.*}"
+
+        # Run Cypress tests in headless mode
+        echo "Running Cypress tests..."
+        docker run --network="${DOCKER_NETWORK}" \
+            --name="cypress.docker" \
+            -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm" \
+            -w /ocm \
+            "${CYPRESS_REPO}":"${CYPRESS_TAG}" \
+            cypress run \
+            --browser "${BROWSER_PLATFORM}" \
+            --spec "cypress/e2e/share-link/nextcloud-${P1_VER}-to-nextcloud-${P2_VER}.cy.js" || error_exit "Cypress tests failed."
+
+        # Revert Cypress configuration changes
+        if [ "${BROWSER_PLATFORM}" != "electron" ]; then
+            sed -i 's/.*video: false,.*/  video: true,/' "${cypress_config}"
+            sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/' "${cypress_config}"
+        fi
+
+        # Perform cleanup after CI tests
+        echo "Cleaning up test environment..."
+        if [ -x "${ENV_ROOT}/scripts/clean.sh" ]; then
+            "${ENV_ROOT}/scripts/clean.sh" "no"
+        else
+            print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'."
+        fi
+    fi
+}
+
+# -----------------------------------------------------------------------------------
+# Execute the main function with passed arguments
+# -----------------------------------------------------------------------------------
+main "$@"
