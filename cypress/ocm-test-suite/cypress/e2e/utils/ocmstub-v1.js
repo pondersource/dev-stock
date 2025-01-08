@@ -18,6 +18,7 @@
  * @param {string} expectedDetails.sender - The sender of the shared resource (e.g., "einstein@nextcloud.com").
  * @param {string} expectedDetails.resourceType - The type of the shared resource ("file", "folder", etc.).
  * @param {string} expectedDetails.protocol - The protocol used for the share (e.g., "webdav").
+ * @param {boolean} isNextcloud - Whether the instance being checked is nectcloud or not.
  * @returns {string[]} - An array of strings representing expected lines of text that should appear in the UI.
  *
  * @throws {Error} Throws an error if any required field in expectedDetails is missing or not a string.
@@ -35,11 +36,11 @@
  * };
  *
  * // Generate the share assertions
- * const shareAssertions = generateShareAssertions(expectedDetails);
+ * const shareAssertions = generateShareAssertions(expectedDetails, true);
  * // The returned array can then be used with `cy.contains()` calls in Cypress tests:
  * // shareAssertions.forEach(assertion => cy.contains(assertion).should('be.visible'));
  */
-export function generateShareAssertions(expectedDetails, allowNcDivergence = false) {
+export function generateShareAssertions(expectedDetails, isNextcloud = false) {
   // Required fields that must be present and non-empty strings
   const requiredFields = [
     'shareWith',
@@ -73,7 +74,10 @@ export function generateShareAssertions(expectedDetails, allowNcDivergence = fal
     `"providerId":`,
     `"shareType": "${expectedDetails.shareType}"`,
     `"owner": "${expectedDetails.owner}"`,
-    (allowNcDivergence? `"sharedBy": "${expectedDetails.sender}"` : `"sender": "${expectedDetails.sender}"`),
+    // Nextcloud is not following OCM specification at this moment, see: https://github.com/nextcloud/server/issues/36340#issuecomment-2575333222
+    // this should be fixed via https://github.com/nextcloud/server/pull/50069
+    // TODO @MahdiBaghbani: rename this to isLegacyNextcloud once the PR is merged and available in a new Nextcloud release.
+    (isNextcloud? `"sharedBy": "${expectedDetails.sender}"` : `"sender": "${expectedDetails.sender}"`),
     `"resourceType": "${expectedDetails.resourceType}"`,
     // For protocol, we know 'name' but 'sharedSecret' may vary.
     // We assert on part of the structure to ensure the protocol block is present.
