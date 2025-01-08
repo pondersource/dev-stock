@@ -35,5 +35,6 @@ COPY ./scripts/nextcloud/*.sh /
 COPY ./scripts/nextcloud/upgrade.exclude /
 COPY ./configs/nextcloud/* /usr/src/nextcloud/config/
 
+SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/entrypoint.sh"]
 CMD apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow /var/www/html/data/nextcloud.log
