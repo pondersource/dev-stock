@@ -43,6 +43,7 @@ export function acceptShare() {
   // Wait for the share dialog to appear and ensure it's visible
   cy.get('div.oc-dialog', { timeout: 10000 })
     .should('be.visible')
+    .first()
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
