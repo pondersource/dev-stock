@@ -47,9 +47,9 @@ export function acceptShareV28() {
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
-      .find('button.primary')
-      // .should('be.visible')
-      .click({ force: true });
+        .find('button.primary')
+        .should('exist')
+        .click({ force: true });
     });
 }
 

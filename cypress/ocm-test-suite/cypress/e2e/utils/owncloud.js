@@ -47,9 +47,9 @@ export function acceptShare() {
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
-      .find('button.primary')
-      // .should('be.visible')
-      .click({ force: true });
+        .find('button.primary')
+        .should('exist')
+        .click({ force: true });
     });
 }
 
@@ -366,8 +366,8 @@ export function selectAppFromLeftSide(appId) {
   cy.get('div#app-navigation', { timeout: 10000 })
     .should('be.visible')
     .find(`li[data-id="${appId}"]`)
-    // .should('be.visible')
-    .click({force: true});
+    .should('exist')
+    .click({ force: true });
 }
 
 /**
