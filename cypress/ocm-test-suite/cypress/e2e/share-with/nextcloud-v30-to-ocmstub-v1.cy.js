@@ -2,7 +2,7 @@
  * @fileoverview
  * Cypress test suite for testing native federated sharing functionality in Nextcloud v28 and OcmStub v1.
  *
- * @author Michiel De Jong <michiel@pondersource.com>
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
@@ -67,7 +67,7 @@ describe('Native Federated Sharing Functionality for Nextcloud to OcmStub', () =
     // Create an array of strings to verify. Each string is a snippet of text expected to be found on the page.
     // These assertions represent lines or properties that should appear in the OcmStub's displayed share metadata.
     // Adjust these strings if the page format changes.
-    const shareAssertions = generateShareAssertions(expectedShareDetails);
+    const shareAssertions = generateShareAssertions(expectedShareDetails, true);
 
     // Step 2: Loop through all assertions and verify their presence on the page
     // We use `cy.contains()` to search for the text anywhere on the page.
