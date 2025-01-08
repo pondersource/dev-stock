@@ -1,3 +1,11 @@
+/**
+ * @fileoverview
+ * Cypress test suite for testing federated sharing functionality via share-link flow in Nextcloud v27 and OcmStub v1.
+ *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
+
 import {
   createShareLinkV27,
   renameFileV27,
@@ -7,7 +15,7 @@ import {
   generateShareAssertions,
 } from '../utils/ocmstub-v1.js';
 
-describe('Share link federated sharing functionality for Nextcloud', () => {
+describe('Share link federated sharing functionality for Nextcloud to OcmStub', () => {
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
   const recipientUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -29,7 +37,7 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
     protocol: 'webdav'
   };
 
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v27', () => {
+  it('Send federated share <file> from Nextcloud v27 to OcmStub v1', () => {
     // send share from Nextcloud 1.
     cy.loginNextcloud(senderUrl, senderUsername, senderPassword)
 
@@ -56,12 +64,12 @@ describe('Share link federated sharing functionality for Nextcloud', () => {
     // Step 1: Log in to OcmStub
     cy.loginOcmStub(recipientUrl);
 
-    // Create an array of strings to verify. Each string is a snippet of text expected to be found on the page.
+    // Step 2: Create an array of strings to verify. Each string is a snippet of text expected to be found on the page.
     // These assertions represent lines or properties that should appear in the OcmStub's displayed share metadata.
     // Adjust these strings if the page format changes.
     const shareAssertions = generateShareAssertions(expectedShareDetails, true);
 
-    // Step 2: Loop through all assertions and verify their presence on the page
+    // Step 3: Loop through all assertions and verify their presence on the page
     // We use `cy.contains()` to search for the text anywhere on the page.
     // The `should('be.visible')` ensures that the text is actually visible, not hidden or off-screen.
     shareAssertions.forEach((assertion) => {
