@@ -23,9 +23,10 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
   const sharedFileName = 'from-stub.txt';
 
   /**
-   * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
+   * Test Case: Sending a federated share from OcmStub to Nextcloud.
+   * Validates that a file can be successfully shared from OcmStub to Nextcloud.
    */
-  it('should successfully send a federated share of a file from OcmStub v1 to Nextcloud v27', () => {
+  it('Send a federated share of a file from OcmStub v1 to Nextcloud v27', () => {
     // Step 1: Navigate to the federated share link on OcmStub 1.0
     // Remove trailing slash and leading https or http from recipientUrl
     cy.visit(`${senderUrl}/shareWith?${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`);

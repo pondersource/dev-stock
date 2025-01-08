@@ -37,11 +37,25 @@ describe('Share link federated sharing functionality for Nextcloud to OcmStub', 
     protocol: 'webdav'
   };
 
+  /**
+   * Test Case: Sending a federated share from one Nextcloud instance to OcmStub.
+   * Validates that a file can be successfully shared from Nextcloud to OcmStub.
+   */
   it('Send federated share <file> from Nextcloud v27 to OcmStub v1', () => {
-    // send share from Nextcloud 1.
+    // Step 1: Log in to the sender's Nextcloud instance
     cy.loginNextcloud(senderUrl, senderUsername, senderPassword)
 
-    renameFileV27(originalFileName, sharedFileName)
+    // Step 2: Ensure the original file exists before renaming
+    ensureFileExistsV27(originalFileName);
+
+    // Step 3: Rename the file to prepare it for sharing
+    renameFileV27(originalFileName, sharedFileName);
+    
+    // Step 4: Verify the file has been renamed
+    ensureFileExistsV27(sharedFileName);
+
+    // Step 5: Create a federated share for the recipient
+    // TODO @MahdiBaghbani: We should hide any complexity in .cy.js files and move them to utils/*.js files
     createShareLinkV27(sharedFileName).then(
       (result) => {
         cy.visit(result)

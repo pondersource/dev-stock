@@ -3,6 +3,7 @@
  * Cypress test suite for testing native federated sharing functionality in OcmStub v1 and ownCloud v10.
  * This suite verifies the ability to send and receive federated file shares between OcmStub and ownCloud.
  *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
@@ -23,9 +24,10 @@ describe('Federated sharing functionality from OcmStub to ownCloud', () => {
   const sharedFileName = 'from-stub.txt';
 
   /**
-   * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
+   * Test Case: Sending a federated share from OcmStub to ownCloud .
+   * Validates that a file can be successfully shared from OcmStub to ownCloud.
    */
-  it('should successfully send a federated share of a file from OcmStub v1 to ownCloud v10', () => {
+  it('Send a federated share of a file from OcmStub v1 to ownCloud v10', () => {
     // Step 1: Navigate to the federated share link on OcmStub 1.0
     // Remove trailing slash and leading https or http from recipientUrl
     cy.visit(`${senderUrl}/shareWith?${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`);
