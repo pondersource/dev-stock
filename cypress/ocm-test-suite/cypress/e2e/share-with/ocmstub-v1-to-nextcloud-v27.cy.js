@@ -3,6 +3,7 @@
  * Cypress test suite for testing native federated sharing functionality in OcmStub v1 and Nextcloud v27.
  * This suite verifies the ability to send and receive federated file shares between OcmStub and Nextcloud.
  *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
