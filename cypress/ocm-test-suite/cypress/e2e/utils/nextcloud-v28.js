@@ -4,6 +4,7 @@
  * These functions provide abstractions for common actions such as sharing files,
  * updating permissions, renaming files, and navigating the UI.
  *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 

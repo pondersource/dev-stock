@@ -4,6 +4,7 @@
  * These functions provide abstractions for common actions such as accepting shares,
  * creating federated shares, renaming files, and interacting with the file menu.
  *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
