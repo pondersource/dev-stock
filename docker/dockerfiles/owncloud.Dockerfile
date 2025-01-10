@@ -39,5 +39,6 @@ COPY ./scripts/owncloud/*.sh /
 COPY ./scripts/owncloud/upgrade.exclude /
 COPY ./configs/owncloud/* /usr/src/owncloud/config/
 
+SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/entrypoint.sh"]
 CMD apache2ctl -DFOREGROUND & tail --follow /var/log/apache2/access.log & tail --follow /var/log/apache2/error.log & tail --follow /var/www/html/data/owncloud.log

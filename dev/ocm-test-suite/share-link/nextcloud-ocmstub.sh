@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test Nextcloud to Nextcloud OCM share-link flow tests.
+# Script to Test Nextcloud to OcmStub OCM share-link flow tests.
 # Authors:
 #   1. Michiel B. de Jong <michiel@pondersource.com>
 #   2. Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
@@ -10,15 +10,15 @@
 # -----------------------------------------------------------------------------------
 # Description:
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
-#   such as Nextcloud, using Cypress, and Docker containers.
+#   such as Nextcloud, OcmStub, using Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
 
 # Usage:
-#   ./nextcloud-nextcloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./nextcloud-ocmstub.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 
 # Arguments:
 #   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v27.1.11").
-#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v27.1.11").
+#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v1.0.0").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 
@@ -28,7 +28,7 @@
 #   - Ensure that the necessary scripts (e.g., init scripts) and configurations exist.
 
 # Example:
-#   ./nextcloud-nextcloud.sh v28.0.14 v27.1.11 ci electron
+#   ./nextcloud-ocmstub.sh v28.0.14 v1.0.0 ci electron
 
 # -----------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ set -euo pipefail
 
 # Default versions
 DEFAULT_EFSS_1_VERSION="v27.1.11"
-DEFAULT_EFSS_2_VERSION="v27.1.11"
+DEFAULT_EFSS_2_VERSION="v1.0.0"
 DEFAULT_SCRIPT_MODE="dev"
 DEFAULT_BROWSER_PLATFORM="electron"
 
@@ -78,8 +78,8 @@ VNC_TAG=latest
 #   $1 - The error message to display.
 # -----------------------------------------------------------------------------------
 print_error() {
-    local message="${1}"
-    printf "Error: %s\n" "${message}" >&2
+  local message="${1}"
+  printf "Error: %s\n" "${message}" >&2
 }
 
 # -----------------------------------------------------------------------------------
@@ -89,8 +89,8 @@ print_error() {
 #   $1 - The error message to display.
 # -----------------------------------------------------------------------------------
 error_exit() {
-    print_error "${1}"
-    exit 1
+  print_error "${1}"
+  exit 1
 }
 
 # -----------------------------------------------------------------------------------
@@ -100,16 +100,16 @@ error_exit() {
 #   The absolute path to the script's directory.
 # -----------------------------------------------------------------------------------
 resolve_script_dir() {
-    local source="${BASH_SOURCE[0]}"
-    local dir
-    while [ -L "${source}" ]; do
-        dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
-        source="$(readlink "${source}")"
-        # Resolve relative symlink
-        [[ "${source}" != /* ]] && source="${dir}/${source}"
-    done
+  local source="${BASH_SOURCE[0]}"
+  local dir
+  while [ -L "${source}" ]; do
     dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
-    printf "%s" "${dir}"
+    source="$(readlink "${source}")"
+    # Resolve relative symlink
+    [[ "${source}" != /* ]] && source="${dir}/${source}"
+  done
+  dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+  printf "%s" "${dir}"
 }
 
 # -----------------------------------------------------------------------------------
@@ -117,18 +117,18 @@ resolve_script_dir() {
 # Purpose: Initialize the environment and set global variables.
 # -----------------------------------------------------------------------------------
 initialize_environment() {
-    local script_dir
-    script_dir="$(resolve_script_dir)"
-    cd "${script_dir}/../../.." || error_exit "Failed to change directory to the script root."
-    ENV_ROOT="$(pwd)"
-    export ENV_ROOT="${ENV_ROOT}"
+  local script_dir
+  script_dir="$(resolve_script_dir)"
+  cd "${script_dir}/../../.." || error_exit "Failed to change directory to the script root."
+  ENV_ROOT="$(pwd)"
+  export ENV_ROOT="${ENV_ROOT}"
 
-    # Ensure required commands are available
-    for cmd in docker; do
-        if ! command_exists "${cmd}"; then
-            error_exit "Required command '${cmd}' is not available. Please install it and try again."
-        fi
-    done
+  # Ensure required commands are available
+  for cmd in docker; do
+    if ! command_exists "${cmd}"; then
+      error_exit "Required command '${cmd}' is not available. Please install it and try again."
+    fi
+  done
 }
 
 # -----------------------------------------------------------------------------------
@@ -139,15 +139,15 @@ initialize_environment() {
 #   $2 - The port number to check.
 # -----------------------------------------------------------------------------------
 wait_for_port() {
-    local container="${1}"
-    local port="${2}"
+  local container="${1}"
+  local port="${2}"
 
-    run_quietly_if_ci echo "Waiting for port ${port} on container ${container}..."
-    until docker exec "${container}" sh -c "ss -tulpn | grep -q 'LISTEN.*:${port}'" >/dev/null 2>&1; do
-        run_quietly_if_ci echo "Port ${port} not open yet on ${container}. Retrying..."
-        sleep 1
-    done
-    run_quietly_if_ci echo "Port ${port} is now open on ${container}."
+  run_quietly_if_ci echo "Waiting for port ${port} on container ${container}..."
+  until docker exec "${container}" sh -c "ss -tulpn | grep -q 'LISTEN.*:${port}'" >/dev/null 2>&1; do
+    run_quietly_if_ci echo "Port ${port} not open yet on ${container}. Retrying..."
+    sleep 1
+  done
+  run_quietly_if_ci echo "Port ${port} is now open on ${container}."
 }
 
 # -----------------------------------------------------------------------------------
@@ -157,11 +157,11 @@ wait_for_port() {
 #   $@ - The command and arguments to execute.
 # -----------------------------------------------------------------------------------
 run_quietly_if_ci() {
-    if [ "${SCRIPT_MODE}" = "ci" ]; then
-        "$@" >/dev/null 2>&1
-    else
-        "$@"
-    fi
+  if [ "${SCRIPT_MODE}" = "ci" ]; then
+    "$@" >/dev/null 2>&1
+  else
+    "$@"
+  fi
 }
 
 # -----------------------------------------------------------------------------------
@@ -171,7 +171,7 @@ run_quietly_if_ci() {
 #   $@ - Docker run command arguments
 # -----------------------------------------------------------------------------------
 run_docker_container() {
-    run_quietly_if_ci docker run "$@" || error_exit "Failed to start Docker container: $*"
+  run_quietly_if_ci docker run "$@" || error_exit "Failed to start Docker container: $*"
 }
 
 # -----------------------------------------------------------------------------------
@@ -181,10 +181,10 @@ run_docker_container() {
 #   $1 - Directory path
 # -----------------------------------------------------------------------------------
 remove_directory() {
-    local dir="${1}"
-    if [ -d "${dir}" ]; then
-        run_quietly_if_ci rm -rf "${dir}" || error_exit "Failed to remove directory: ${dir}"
-    fi
+  local dir="${1}"
+  if [ -d "${dir}" ]; then
+    run_quietly_if_ci rm -rf "${dir}" || error_exit "Failed to remove directory: ${dir}"
+  fi
 }
 
 # -----------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ remove_directory() {
 #   0 if the command exists, 1 otherwise.
 # -----------------------------------------------------------------------------------
 command_exists() {
-    command -v "${1}" >/dev/null 2>&1
+  command -v "${1}" >/dev/null 2>&1
 }
 
 # -----------------------------------------------------------------------------------
@@ -214,47 +214,72 @@ command_exists() {
 #   $5 - Image tag.
 # -----------------------------------------------------------------------------------
 create_nextcloud() {
-    local number="${1}"
-    local user="${2}"
-    local password="${3}"
-    local image="${4}"
-    local tag="${5}"
+  local number="${1}"
+  local user="${2}"
+  local password="${3}"
+  local image="${4}"
+  local tag="${5}"
 
-    run_quietly_if_ci echo "Creating EFSS instance: nextcloud ${number}"
+  run_quietly_if_ci echo "Creating EFSS instance: nextcloud ${number}"
 
-    # Start MariaDB container
-    run_docker_container --detach --network="${DOCKER_NETWORK}" \
-        --name="marianextcloud${number}.docker" \
-        -e MARIADB_ROOT_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
-        "${MARIADB_REPO}":"${MARIADB_TAG}" \
-        --transaction-isolation=READ-COMMITTED \
-        --log-bin=binlog \
-        --binlog-format=ROW \
-        --innodb-file-per-table=1 \
-        --skip-innodb-read-only-compressed || error_exit "Failed to start MariaDB container for nextcloud ${number}."
+  # Start MariaDB container
+  run_docker_container --detach --network="${DOCKER_NETWORK}" \
+    --name="marianextcloud${number}.docker" \
+    -e MARIADB_ROOT_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+    "${MARIADB_REPO}":"${MARIADB_TAG}" \
+    --transaction-isolation=READ-COMMITTED \
+    --log-bin=binlog \
+    --binlog-format=ROW \
+    --innodb-file-per-table=1 \
+    --skip-innodb-read-only-compressed || error_exit "Failed to start MariaDB container for nextcloud ${number}."
 
-    # Wait for MariaDB port to open
-    wait_for_port "marianextcloud${number}.docker" 3306
+  # Wait for MariaDB port to open
+  wait_for_port "marianextcloud${number}.docker" 3306
 
-    # Start EFSS container
-    run_docker_container --detach --network="${DOCKER_NETWORK}" \
-        --name="nextcloud${number}.docker" \
-        --add-host "host.docker.internal:host-gateway" \
-        -e HOST="nextcloud${number}" \
-        -e NEXTCLOUD_HOST="nextcloud${number}.docker" \
-        -e NEXTCLOUD_TRUSTED_DOMAINS="nextcloud${number}.docker" \
-        -e NEXTCLOUD_ADMIN_USER="${user}" \
-        -e NEXTCLOUD_ADMIN_PASSWORD="${password}" \
-        -e NEXTCLOUD_APACHE_LOGLEVEL="warn" \
-        -e MYSQL_HOST="marianextcloud${number}.docker" \
-        -e MYSQL_DATABASE="efss" \
-        -e MYSQL_USER="root" \
-        -e MYSQL_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
-        "${image}:${tag}" || error_exit "Failed to start EFSS container for nextcloud ${number}."
+  # Start EFSS container
+  run_docker_container --detach --network="${DOCKER_NETWORK}" \
+    --name="nextcloud${number}.docker" \
+    --add-host "host.docker.internal:host-gateway" \
+    -e HOST="nextcloud${number}" \
+    -e NEXTCLOUD_HOST="nextcloud${number}.docker" \
+    -e NEXTCLOUD_TRUSTED_DOMAINS="nextcloud${number}.docker" \
+    -e NEXTCLOUD_ADMIN_USER="${user}" \
+    -e NEXTCLOUD_ADMIN_PASSWORD="${password}" \
+    -e NEXTCLOUD_APACHE_LOGLEVEL="warn" \
+    -e MYSQL_HOST="marianextcloud${number}.docker" \
+    -e MYSQL_DATABASE="efss" \
+    -e MYSQL_USER="root" \
+    -e MYSQL_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+    "${image}:${tag}" || error_exit "Failed to start EFSS container for nextcloud ${number}."
 
-    # Wait for EFSS port to open
-    run_quietly_if_ci wait_for_port "nextcloud${number}.docker" 443
+  # Wait for EFSS port to open
+  run_quietly_if_ci wait_for_port "nextcloud${number}.docker" 443
 }
+
+# -----------------------------------------------------------------------------------
+# Function:  create_ocmstub
+# Purpose: Create a OcmStub container.
+# Arguments:
+#   $1 - Instance number.
+#   $2 - Image name.
+#   $3 - Image tag.
+# -----------------------------------------------------------------------------------
+function create_ocmstub() {
+  local number="${1}"
+  local image="${2}"
+  local tag="${3}"
+
+  run_quietly_if_ci echo "Creating EFSS instance: ocmstub ${number}"
+
+  run_quietly_if_ci docker run --detach --network="${DOCKER_NETWORK}" \
+    --name="ocmstub${number}.docker" \
+    -e HOST="ocmstub${number}" \
+    "${image}:${tag}" || error_exit "Failed to start EFSS container for ocmstub ${number}."
+
+  # Wait for EFSS port to open
+  run_quietly_if_ci wait_for_port "ocmstub${number}.docker" 443
+}
+
 
 # -----------------------------------------------------------------------------------
 # Function: parse_arguments
@@ -320,9 +345,9 @@ main() {
     fi
 
     # Create EFSS containers
-    #                # id   # username    # password       # image                  # tag
-    create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
+    #                # id   # username    # password       # image                 # tag
+    create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud  "${EFSS_PLATFORM_1_VERSION}"
+    create_ocmstub   1                                     pondersource/ocmstub    "${EFSS_PLATFORM_2_VERSION}"
 
     # disable cypress editing javascript files. it would make adding share to your own efss fail.
     sed -i 's/.*modifyObstructiveCode: true,.*/  modifyObstructiveCode: false,/'          "${ENV_ROOT}/cypress/ocm-test-suite/cypress.config.js"
@@ -381,7 +406,7 @@ main() {
         echo ""
         echo "Log in to EFSS platforms using the following credentials:"
         echo "  https://nextcloud1.docker (username: einstein, password: relativity)"
-        echo "  https://nextcloud2.docker (username: michiel, password: dejong)"
+        echo "  https://ocmstub1.docker (just click 'Log in')"
 
     else
         echo "Running tests in CI mode..."
@@ -408,7 +433,7 @@ main() {
             "${CYPRESS_REPO}":"${CYPRESS_TAG}" \
             cypress run \
             --browser "${BROWSER_PLATFORM}" \
-            --spec "cypress/e2e/share-link/nextcloud-${P1_VER}-to-nextcloud-${P2_VER}.cy.js" || error_exit "Cypress tests failed."
+            --spec "cypress/e2e/share-link/nextcloud-${P1_VER}-to-ocmstub-${P2_VER}.cy.js" || error_exit "Cypress tests failed."
 
         # Revert Cypress configuration changes
         if [ "${BROWSER_PLATFORM}" != "electron" ]; then

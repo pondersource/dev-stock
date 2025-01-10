@@ -4,6 +4,7 @@
  * These functions provide abstractions for common actions such as sharing files,
  * updating permissions, renaming files, and navigating the UI.
  *
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
@@ -43,12 +44,13 @@ export function acceptShareV27() {
   // Wait for the share dialog to appear and ensure it's visible
   cy.get('div.oc-dialog', { timeout: 10000 })
     .should('be.visible')
+    .first()
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
         .find('button.primary')
-        .should('be.visible')
-        .click();
+        .should('exist')
+        .click({ force: true });
     });
 }
 

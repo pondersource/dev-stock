@@ -2,7 +2,7 @@
  * @fileoverview
  * Cypress test suite for testing native federated sharing functionality in ownCloud v10 and OcmStub v1.
  *
- * @author Michiel De Jong <michiel@pondersource.com>
+ * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 

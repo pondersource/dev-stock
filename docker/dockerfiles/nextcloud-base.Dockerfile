@@ -5,7 +5,7 @@ FROM php:8.2.26-apache-bookworm@sha256:b8d8c9d7882fdea9d2ef5b3829bf9e34fb368f833
 LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.title="PonderSource Nextcloud Base Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
-LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
+LABEL org.opencontainers.image.authors="Michiel B. de Jong,Mohammad Mahdi Baghbani Pourvahid"
 
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
@@ -21,6 +21,7 @@ RUN set -ex; \
     busybox-static \
     libldap-common \
     ca-certificates \
+    libapache2-mod-security2 \
     libmagickcore-6.q16-6-extra \
     ; \
     apt-get clean; \
@@ -105,6 +106,15 @@ RUN set -ex; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
+RUN { \
+    echo 'SecRuleEngine On'; \
+    echo 'SecAuditEngine On'; \
+    echo 'SecAuditLog /var/log/apache2/modsec_audit.log'; \
+    echo 'SecRequestBodyAccess on'; \
+    echo 'SecResponseBodyAccess On'; \
+    echo 'SecAuditLogParts ABIJEFHZ'; \
+    } > "/etc/modsecurity/modsecurity.conf";
+
 # set recommended PHP.ini settings
 # see https://docs.nextcloud.com/server/latest/admin_manual/installation/server_tuning.html#enable-php-opcache
 RUN { \
@@ -144,7 +154,7 @@ RUN ln --symbolic --force /tls/*.crt /usr/local/share/ca-certificates; \
 
 COPY ./configs/nextcloud/apache.conf /etc/apache2/sites-enabled/000-default.conf
 
-RUN a2enmod headers rewrite remoteip ssl; \
+RUN a2enmod headers rewrite remoteip ssl log_forensic; \
     { \
     echo 'RemoteIPHeader X-Real-IP'; \
     echo 'RemoteIPInternalProxy 10.0.0.0/8'; \
