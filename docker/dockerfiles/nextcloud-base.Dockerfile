@@ -5,7 +5,7 @@ FROM php:8.2.26-apache-bookworm@sha256:b8d8c9d7882fdea9d2ef5b3829bf9e34fb368f833
 LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.title="PonderSource Nextcloud Base Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
-LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
+LABEL org.opencontainers.image.authors="Michiel B. de Jong,Mohammad Mahdi Baghbani Pourvahid"
 
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
@@ -21,8 +21,8 @@ RUN set -ex; \
     busybox-static \
     libldap-common \
     ca-certificates \
-    libmagickcore-6.q16-6-extra \
     libapache2-mod-security2 \
+    libmagickcore-6.q16-6-extra \
     ; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \

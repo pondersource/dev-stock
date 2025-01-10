@@ -5,7 +5,7 @@ FROM php:7.4.33-apache-bullseye@sha256:c9d7e608f73832673479770d66aacc8100011ec75
 LABEL org.opencontainers.image.licenses=MIT
 LABEL org.opencontainers.image.title="PonderSource ownCloud Base Image"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
-LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
+LABEL org.opencontainers.image.authors="Michiel B. de Jong,Mohammad Mahdi Baghbani Pourvahid"
 
 # entrypoint.sh and cron.sh dependencies
 RUN set -ex; \
@@ -21,6 +21,7 @@ RUN set -ex; \
     busybox-static \
     libldap-common \
     ca-certificates \
+    libapache2-mod-security2 \
     libmagickcore-6.q16-6-extra \
     ; \
     apt-get clean; \
@@ -98,6 +99,15 @@ RUN set -ex; \
     apt-get purge --assume-yes --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
+
+RUN { \
+    echo 'SecRuleEngine On'; \
+    echo 'SecAuditEngine On'; \
+    echo 'SecAuditLog /var/log/apache2/modsec_audit.log'; \
+    echo 'SecRequestBodyAccess on'; \
+    echo 'SecResponseBodyAccess On'; \
+    echo 'SecAuditLogParts ABIJEFHZ'; \
+    } > "/etc/modsecurity/modsecurity.conf";
 
 # set recommended PHP.ini settings
 RUN { \
