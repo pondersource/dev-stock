@@ -2,7 +2,9 @@
 
 # -----------------------------------------------------------------------------------
 # Script to Test OcmStub to Nextcloud OCM share-with flow tests.
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+# Authors:
+#   1. Michiel B. de Jong <michiel@pondersource.com>
+#   2. Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------
