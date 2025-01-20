@@ -30,6 +30,7 @@ source_module "errors.sh"
 source_module "environment.sh"
 source_module "docker.sh"
 source_module "validation.sh"
+source_module "setup.sh"
 
 # Source container modules
 for module in "${MODULES_DIR}/container"/*.sh; do
