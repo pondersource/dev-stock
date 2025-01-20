@@ -5,13 +5,15 @@ run_ci() {
     # Print message (quiet in CI mode)
     run_quietly_if_ci echo "Running tests in CI mode..."
 
-    # Validate arguments
-    local test_scenario="${1}"
-    local efss_platform_1="${2}"
-    local efss_platform_2="${3}"
-
-    if [[ -z "${test_scenario}" || -z "${efss_platform_1}" || -z "${efss_platform_2}" ]]; then
-        error_exit "Usage: run_ci <test_scenario> <efss_platform_1> <efss_platform_2>"
+    # Validate arguments based on scenario
+    if [ "${TEST_SCENARIO}" = "login" ]; then
+        if [[ -z "${EFSS_PLATFORM_1}" ]]; then
+            error_exit "Usage for login: <platform> <version> ci <browser>"
+        fi
+    else
+        if [[ -z "${EFSS_PLATFORM_1}" || -z "${EFSS_PLATFORM_2}" ]]; then
+            error_exit "Usage for share: <platform1> <platform2> <version1> <version2> ci <browser>"
+        fi
     fi
 
     # Cypress config file path
@@ -29,12 +31,18 @@ run_ci() {
         sed -i 's/.*videoCompression: true,.*/videoCompression: false,/' "${cypress_config}"
     fi
 
-    # Extract major version numbers for EFSS platforms
-    local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
-    local p2_ver="${EFSS_PLATFORM_2_VERSION%%.*}"
-
-    # Construct spec file path from the arguments
-    local spec_path="cypress/e2e/${test_scenario}/${efss_platform_1}-${p1_ver}-to-${efss_platform_2}-${p2_ver}.cy.js"
+    # Construct spec file path based on scenario
+    local spec_path
+    if [ "${TEST_SCENARIO}" = "login" ]; then
+        # For login tests, we only need one platform version
+        local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
+        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}-${p1_ver}.cy.js"
+    else
+        # For share tests, we need both platform versions
+        local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
+        local p2_ver="${EFSS_PLATFORM_2_VERSION%%.*}"
+        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}-${p1_ver}-to-${EFSS_PLATFORM_2}-${p2_ver}.cy.js"
+    fi
 
     # Run Cypress tests in headless mode
     if ! create_cypress_ci "${spec_path}"; then
