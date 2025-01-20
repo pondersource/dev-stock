@@ -10,7 +10,15 @@ extract_platform_variables() {
     local filename
     filename="$(basename "${SOURCE}" .sh)"
 
-    # Split the filename by '-' to get EFSS_PLATFORM_1 and EFSS_PLATFORM_2
+    # For login scenario, we only have one platform
+    if [ "${test_scenario}" = "login" ]; then
+        export TEST_SCENARIO="${test_scenario}"
+        export EFSS_PLATFORM_1="${filename}"
+        export EFSS_PLATFORM_2=""
+        return
+    fi
+
+    # For other scenarios, split the filename by '-' to get both platforms
     local platform1 platform2
     IFS='-' read -r platform1 platform2 <<< "${filename}"
 
@@ -29,8 +37,12 @@ setup() {
     ensure_required_commands
     ensure_docker_running
 
-    # Parse CLI arguments
-    parse_arguments "$@"
+    # Parse CLI arguments based on test scenario
+    if [ "${TEST_SCENARIO}" = "login" ]; then
+        parse_login_arguments "$@"
+    else
+        parse_share_arguments "$@"
+    fi
 
     # Validate required files/directories
     validate_files

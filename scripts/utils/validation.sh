@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Default values for script modes and browser platform
+DEFAULT_SCRIPT_MODE="dev"
+DEFAULT_BROWSER_PLATFORM="electron"
+export DEFAULT_SCRIPT_MODE DEFAULT_BROWSER_PLATFORM
+
 # Validate that required files and directories exist
 validate_files() {
     # Check if TLS certificate files exist
@@ -24,8 +29,22 @@ validate_files() {
     fi
 }
 
-# Parse command-line arguments
-parse_arguments() {
+# Parse command-line arguments for login scenario
+parse_login_arguments() {
+    EFSS_PLATFORM_1_VERSION="${1:-$DEFAULT_EFSS_1_VERSION}"
+    SCRIPT_MODE="${2:-$DEFAULT_SCRIPT_MODE}"
+    BROWSER_PLATFORM="${3:-$DEFAULT_BROWSER_PLATFORM}"
+
+    export EFSS_PLATFORM_1_VERSION="${EFSS_PLATFORM_1_VERSION}"
+    export SCRIPT_MODE="${SCRIPT_MODE}"
+    export BROWSER_PLATFORM="${BROWSER_PLATFORM}"
+    
+    # Set EFSS_PLATFORM_2_VERSION to empty for login scenario
+    export EFSS_PLATFORM_2_VERSION=""
+}
+
+# Parse command-line arguments for share scenarios
+parse_share_arguments() {
     EFSS_PLATFORM_1_VERSION="${1:-$DEFAULT_EFSS_1_VERSION}"
     EFSS_PLATFORM_2_VERSION="${2:-$DEFAULT_EFSS_2_VERSION}"
     SCRIPT_MODE="${3:-$DEFAULT_SCRIPT_MODE}"

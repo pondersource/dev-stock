@@ -24,6 +24,11 @@ MARIADB_TAG=11.4.4
 VNC_REPO=theasp/novnc
 VNC_TAG=latest
 
-# Export the constants
+# Default script modes and platforms
+DEFAULT_SCRIPT_MODE="dev"
+DEFAULT_BROWSER_PLATFORM="electron"
+
+# Export all constants
 export CYPRESS_REPO CYPRESS_TAG FIREFOX_REPO FIREFOX_TAG
 export MARIADB_REPO MARIADB_TAG VNC_REPO VNC_TAG
+export DEFAULT_SCRIPT_MODE DEFAULT_BROWSER_PLATFORM
