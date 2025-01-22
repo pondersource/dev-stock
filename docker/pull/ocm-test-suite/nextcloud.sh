@@ -13,4 +13,4 @@ docker pull mariadb:11.4.2
 docker pull cypress/included:13.13.1
 
 # dev-stock images.
-docker pull "pondersource/dev-stock-nextcloud:${EFSS_PLATFORM_VERSION}"
+docker pull "pondersource/nextcloud:${EFSS_PLATFORM_VERSION}"

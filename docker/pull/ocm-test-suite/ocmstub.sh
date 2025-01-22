@@ -6,7 +6,7 @@ set -e
 # nextcloud version:
 #   - v27.1.11
 #   - v28.0.14
-EFSS_PLATFORM_VERSION=${1:-"1.0"}
+EFSS_PLATFORM_VERSION=${1:-"V1.0.0"}
 
 # dev-stock images.
-docker pull "pondersource/dev-stock-ocmstub:${EFSS_PLATFORM_VERSION}"
+docker pull "pondersource/ocmstub:${EFSS_PLATFORM_VERSION}"
