@@ -29,5 +29,6 @@ create_ocis() {
         -c "ocis init || true; ocis server" || error_exit "Failed to start EFSS container for ocis ${number}."
 
     # Wait for EFSS port to open
-    run_quietly_if_ci wait_for_port "ocis${number}.docker" 443
+    # TODO @MahdiBaghbani: we might need custom images with ss installed.
+    # run_quietly_if_ci wait_for_port "ocis${number}.docker" 443
 }
