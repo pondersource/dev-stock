@@ -132,11 +132,11 @@ main() {
     setup "$@"
 
     # Create EFSS containers
-    #                # id   # username    # password       # image                  # tag                           # remote_ocm_server
-    create_seafile   1      "einstein"    "relativity"     seafileltd/seafile-mc     "${EFSS_PLATFORM_1_VERSION}"   seafile1
+    #                # id   # username                # password       # image                  # tag                           # remote_ocm_server
+    create_seafile   1      "jonathan@seafile.com"    "xu"             seafileltd/seafile-mc     "${EFSS_PLATFORM_1_VERSION}"   seafile1
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev "https://seafile1.docker (username: einstein, password: relativity)" ""
+        run_dev "https://seafile1.docker (username: jonathan@seafile.com, password: xu)" ""
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi
