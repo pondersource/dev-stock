@@ -48,6 +48,7 @@ create_seafile() {
         -v "${TLS_CERT_DIR}:/certificates" \
         -v "${TLS_CERT_DIR}/seafile${number}.crt:/shared/ssl/seafile${number}.docker.crt" \
         -v "${TLS_CERT_DIR}/seafile${number}.key:/shared/ssl/seafile${number}.docker.key" \
+        -v "${DOCKER_SCRIPTS_DIR}/seafile/seafile.sh:/init.sh" \
         "${image}:${tag#v}" || error_exit "Failed to start EFSS container for seafile ${number}."
     
     # Wait for EFSS port to open
