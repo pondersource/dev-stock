@@ -59,7 +59,7 @@ create_seafile() {
     sleep 5
 
     # run init script inside seafile.
-    run_quietly_if_ci docker exec -e remote_ocm_server="${remote_ocm_server}" "seafile${number}.docker" bash -c "/init.sh ${remote_ocm_server}"
+    run_quietly_if_ci docker exec -e remote_ocm_server="${remote_ocm_server}" "seafile${number}.docker" bash -c "chmod +x /init.sh && /init.sh ${remote_ocm_server}"
 
     # restart seafile to apply our changes.
     sleep 2
