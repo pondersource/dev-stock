@@ -22,8 +22,8 @@ create_ocis() {
         -e PROXY_ENABLE_BASIC_AUTH=true \
         -e IDM_ADMIN_PASSWORD=admin \
         -e IDM_CREATE_DEMO_USERS=true \
-        -v "${ENV_ROOT}/temp/certificates:/certificates" \
-        -v "${ENV_ROOT}/temp/certificate-authority:/certificate-authority" \
+        -v "${TLS_CERT_DIR}:/certificates" \
+        -v "${TLS_CA_DIR}:/certificate-authority" \
         --entrypoint /bin/sh \
         "${image}:${tag#v}" \
         -c "ocis init || true; ocis server" || error_exit "Failed to start EFSS container for ocis ${number}."
