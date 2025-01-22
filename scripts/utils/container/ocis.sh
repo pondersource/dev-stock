@@ -16,10 +16,10 @@ create_ocis() {
         -e OCIS_LOG_PRETTY=true \
         -e PROXY_HTTP_ADDR=0.0.0.0:443 \
         -e OCIS_URL="https://ocis${number}.docker" \
-        -e OCIS_INSECURE=true\
-        -e PROXY_TRANSPORT_TLS_KEY="/certificates/ocis${number}.key"                                                            
-        -e PROXY_TRANSPORT_TLS_CERT="/certificates/ocis${number}.crt"                                                           
-        -e PROXY_ENABLE_BASIC_AUTH=true \                                                                                        
+        -e OCIS_INSECURE=true \
+        -e PROXY_TRANSPORT_TLS_KEY="/certificates/ocis${number}.key" \
+        -e PROXY_TRANSPORT_TLS_CERT="/certificates/ocis${number}.crt" \
+        -e PROXY_ENABLE_BASIC_AUTH=true \
         -e IDM_ADMIN_PASSWORD=admin \
         -e IDM_CREATE_DEMO_USERS=true \
         -v "${ENV_ROOT}/temp/certificates:/certificates" \
