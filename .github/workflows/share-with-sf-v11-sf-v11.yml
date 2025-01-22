@@ -29,13 +29,13 @@ jobs:
         sender: [
           {
             platform: seafile,
-            version: 11.0.5
+            version: v11.0.5
           },
         ]
         receiver: [
           {
             platform: seafile,
-            version: 11.0.5
+            version: v11.0.5
           },
         ]
 
