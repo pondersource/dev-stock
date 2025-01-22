@@ -51,7 +51,8 @@ create_seafile() {
         "${image}:${tag#v}" || error_exit "Failed to start EFSS container for seafile ${number}."
     
     # Wait for EFSS port to open
-    run_quietly_if_ci wait_for_port "seafile${number}.docker" 443
+    # TODO @MahdiBaghbani: we might need custom images with ss installed.
+    # run_quietly_if_ci wait_for_port "seafile${number}.docker" 443
 
     # seafile needs time to bootstrap itself.
     sleep 5
@@ -65,5 +66,6 @@ create_seafile() {
     sleep 2
 
     # Wait for EFSS port to open
-    run_quietly_if_ci wait_for_port "seafile${number}.docker" 443
+    # TODO @MahdiBaghbani: we might need custom images with ss installed.
+    # run_quietly_if_ci wait_for_port "seafile${number}.docker" 443
 }
