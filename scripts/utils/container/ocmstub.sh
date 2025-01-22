@@ -12,7 +12,8 @@ create_ocmstub() {
     run_docker_container --detach --network="${DOCKER_NETWORK}" \
         --name="ocmstub${number}.docker" \
         -e HOST="ocmstub${number}.docker" \
-        -v "${ENV_ROOT}/docker/tls/certificates:/certificates" \
+        -v "${TLS_CERT_DIR}:/tls" \
+        -v "${TLS_CA_DIR}:/tls-ca" \
         "${image}:${tag}" || error_exit "Failed to start EFSS container for ocmstub ${number}."
 
     # Wait for EFSS port to open
