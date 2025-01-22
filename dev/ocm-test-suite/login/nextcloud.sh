@@ -40,7 +40,8 @@ set -euo pipefail
 
 # Default versions
 DEFAULT_EFSS_1_VERSION="v27.1.11"
-DEFAULT_EFSS_2_VERSION="v27.1.11"
+# For login tests, we don't need a second platform version
+DEFAULT_EFSS_2_VERSION=""
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
