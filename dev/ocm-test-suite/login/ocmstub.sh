@@ -136,7 +136,7 @@ main() {
     create_ocmstub   1       pondersource/ocmstub     "${EFSS_PLATFORM_1_VERSION}"
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev "https://ocmstub1.docker (username: einstein, password: relativity)"
+        run_dev "https://ocmstub1.docker (username: einstein, password: relativity)" ""
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi

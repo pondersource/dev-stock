@@ -136,7 +136,7 @@ main() {
     create_seafile   1      "einstein"    "relativity"     seafileltd/seafile-mc     "${EFSS_PLATFORM_1_VERSION}"   seafile1
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev "https://seafile1.docker (username: einstein, password: relativity)"
+        run_dev "https://seafile1.docker (username: einstein, password: relativity)" ""
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi

@@ -137,7 +137,7 @@ main() {
     create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev "https://nextcloud1.docker (username: einstein, password: relativity)"
+        run_dev "https://nextcloud1.docker (username: einstein, password: relativity)" ""
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi

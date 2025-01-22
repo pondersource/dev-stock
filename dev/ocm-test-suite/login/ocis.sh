@@ -136,7 +136,7 @@ main() {
     create_ocis      1       owncloud/ocis      "${EFSS_PLATFORM_1_VERSION}"
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev "https://ocis1.docker (username: einstein, password: relativity)"
+        run_dev "https://ocis1.docker (username: einstein, password: relativity)" ""
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi
