@@ -9,10 +9,10 @@ MARIADB_ROOT_PASSWORD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
 export MARIADB_ROOT_PASSWORD
 
 # Paths to required directories
-TEMP_DIR="temp"
-TLS_CA_DIR="docker/tls/certificate-authority"
-TLS_CERTIFICATES_DIR="docker/tls/certificates"
-export TEMP_DIR TLS_CA_DIR TLS_CERTIFICATES_DIR
+TEMP_DIR="${ENV_ROOT}/temp"
+TLS_CA_DIR="${ENV_ROOT}/docker/tls/certificate-authority"
+TLS_CERT_DIR="${ENV_ROOT}/docker/tls/certificates"
+export TEMP_DIR TLS_CA_DIR TLS_CERT_DIR
 
 # 3rd party containers
 CYPRESS_REPO=cypress/included
@@ -21,6 +21,8 @@ FIREFOX_REPO=jlesage/firefox
 FIREFOX_TAG=v24.11.1
 MARIADB_REPO=mariadb
 MARIADB_TAG=11.4.4
+MEMCACHED_REPO=memcached
+MEMCACHED_TAG=1.6.18
 VNC_REPO=theasp/novnc
 VNC_TAG=latest
 
@@ -30,5 +32,6 @@ DEFAULT_BROWSER_PLATFORM="electron"
 
 # Export all constants
 export CYPRESS_REPO CYPRESS_TAG FIREFOX_REPO FIREFOX_TAG
-export MARIADB_REPO MARIADB_TAG VNC_REPO VNC_TAG
+export MARIADB_REPO MARIADB_TAG MEMCACHED_REPO MEMCACHED_TAG 
+export VNC_REPO VNC_TAG
 export DEFAULT_SCRIPT_MODE DEFAULT_BROWSER_PLATFORM

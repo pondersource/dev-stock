@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
 
-# Default values for script modes and browser platform
-DEFAULT_SCRIPT_MODE="dev"
-DEFAULT_BROWSER_PLATFORM="electron"
-export DEFAULT_SCRIPT_MODE DEFAULT_BROWSER_PLATFORM
-
 # Validate that required files and directories exist
 validate_files() {
     # Check if TLS certificate files exist
-    if [ ! -d "${ENV_ROOT}/${TLS_CERTIFICATES_DIR}" ]; then
-        error_exit "TLS certificates directory not found: ${ENV_ROOT}/${TLS_CERTIFICATES_DIR}"
+    if [ ! -d "${TLS_CERT_DIR}" ]; then
+        error_exit "TLS certificates directory not found: ${TLS_CERT_DIR}"
     fi
-    if [ ! -d "${ENV_ROOT}/${TLS_CA_DIR}" ]; then
-        error_exit "TLS certificate authority directory not found: ${ENV_ROOT}/${TLS_CA_DIR}"
+    if [ ! -d "${TLS_CA_DIR}" ]; then
+        error_exit "TLS certificate authority directory not found: ${TLS_CA_DIR}"
     fi
 
     # Check if Firefox certificate files exist
