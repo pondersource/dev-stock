@@ -58,15 +58,10 @@ Cypress.Commands.add('loginNextcloud', (url, username, password) => {
 Cypress.Commands.add('loginSeafile', (url, username, password) => {
   cy.visit(url);
 
-  // Ensure the login page is visible
-  cy.get('#wrapper #log-in-panel #login-form', { timeout: 10000 }).should('be.visible');
-
   // Fill in login credentials and submit
-  cy.get('#wrapper #log-in-panel #login-form').within(() => {
-    cy.get('input[name="login"]').type(username);
-    cy.get('input[name="password"]').type(password);
-    cy.get('button[type="submit"]').click();
-  });
+  cy.get('input[name="login"]').type(username);
+  cy.get('input[name="password"]').type(password);
+  cy.get('button[type="submit"]').click();
 });
 
 /**
