@@ -149,11 +149,13 @@ export function createShareLink(fileName) {
   });
 
   // Extract and return the public share link
-  return cy.get('#app-sidebar').within(() => {
-    return cy.get('.shareLink input')
+  cy.get('#app-sidebar').within(() => {
+    cy.get('.link-entry .linkText')
       .invoke('val')
       .then((link) => {
-        return link;
+        cy.visit(link)
+        // save share url to file.
+        cy.writeFile('share-link-url.txt', link)
       });
   });
 }

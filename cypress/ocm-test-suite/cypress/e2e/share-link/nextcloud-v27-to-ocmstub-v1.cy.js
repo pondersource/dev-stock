@@ -8,6 +8,7 @@
 
 import {
   createShareLinkV27,
+  ensureFileExistsV27,
   renameFileV27,
 } from '../utils/nextcloud-v27';
 

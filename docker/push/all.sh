@@ -59,7 +59,7 @@ parse_arguments "$@"  # Parse any arguments passed to the script.
 
 # Ensure successful login to Docker before pushing images.
 echo "Logging in to Docker as pondersource..."
-if ! docker login; then
+if ! docker login -u pondersource; then
     echo "Docker login failed. Exiting."
     exit 1
 fi
@@ -71,8 +71,12 @@ run_quietly_if_ci echo "Pushing PonderSource-specific Docker images..."
 
 # Push the core PonderSource images.
 run_quietly_if_ci docker push pondersource/revad:latest
-run_quietly_if_ci docker push pondersource/ocmstub:latest
-run_quietly_if_ci docker push pondersource/ocmstub:v1.0.0
+
+# OcmStub: push multiple versions of the OcmStub Docker image.
+ocmstub_versions=("latest" "v1.0.0")
+for version in "${ocmstub_versions[@]}"; do
+    run_quietly_if_ci docker push "pondersource/ocmstub:${version}"
+done
 
 # Nextcloud: push multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker push pondersource/nextcloud-base:latest

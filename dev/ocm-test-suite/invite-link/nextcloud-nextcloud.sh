@@ -52,7 +52,7 @@ MARIADB_ROOT_PASSWORD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
 # Paths to required directories
 TEMP_DIR="temp"
 TLS_CA_DIR="docker/tls/certificate-authority"
-TLS_CERTIFICATES_DIR="docker/tls/certificates"
+TLS_CERT_DIR="docker/tls/certificates"
 
 # 3rd party containerS
 CYPRESS_REPO=cypress/included
@@ -248,7 +248,7 @@ create_nextcloud() {
         -e DBHOST="marianextcloud${number}.docker" \
         -e USER="${user}" \
         -e PASS="${password}" \
-        -v "${ENV_ROOT}/${TLS_CERTIFICATES_DIR}:/certificates" \
+        -v "${ENV_ROOT}/${TLS_CERT_DIR}:/certificates" \
         -v "${ENV_ROOT}/${TLS_CA_DIR}:/certificate-authority" \
         -v "${ENV_ROOT}/${TEMP_DIR}/${init_script}":"/init.sh" \
         -v "${ENV_ROOT}/docker/scripts/entrypoint.sh":"/entrypoint.sh" \
@@ -284,7 +284,7 @@ create_reva() {
     run_docker_container --detach --network="${DOCKER_NETWORK}" \
         --name="reva${platform}${number}.docker" \
         -e HOST="reva${platform}${number}" \
-        -v "${ENV_ROOT}/${TLS_CERTIFICATES_DIR}:/certificates" \
+        -v "${ENV_ROOT}/${TLS_CERT_DIR}:/certificates" \
         -v "${ENV_ROOT}/${TLS_CA_DIR}:/certificate-authority" \
         -v "${ENV_ROOT}/${TEMP_DIR}/reva/configs:/configs/revad" \
         -v "${ENV_ROOT}/${TEMP_DIR}/reva/run.sh":"/usr/bin/run.sh" \
@@ -338,8 +338,8 @@ parse_arguments() {
 # -----------------------------------------------------------------------------------
 validate_files() {
     # Check if TLS certificate files exist
-    if [ ! -d "${ENV_ROOT}/${TLS_CERTIFICATES_DIR}" ]; then
-        error_exit "TLS certificates directory not found: ${ENV_ROOT}/${TLS_CERTIFICATES_DIR}"
+    if [ ! -d "${ENV_ROOT}/${TLS_CERT_DIR}" ]; then
+        error_exit "TLS certificates directory not found: ${ENV_ROOT}/${TLS_CERT_DIR}"
     fi
     if [ ! -d "${ENV_ROOT}/${TLS_CA_DIR}" ]; then
         error_exit "TLS certificate authority directory not found: ${ENV_ROOT}/${TLS_CA_DIR}"

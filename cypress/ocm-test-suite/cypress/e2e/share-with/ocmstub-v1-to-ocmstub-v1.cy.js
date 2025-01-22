@@ -18,11 +18,12 @@ describe('Native federated sharing functionality for OcmStub', () => {
   const senderUsername = Cypress.env('OCMSTUB1_USERNAME') || 'einstein';
   const recipientUsername = Cypress.env('OCMSTUB2_USERNAME') || 'mahdi';
   const expectedMessage = 'yes shareWith';
+  const sharedFileName = 'from-stub.txt';
 
   // Expected details of the federated share
   const expectedShareDetails = {
     shareWith: `${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    fileName: 'Test share from stub',
+    fileName: `${sharedFileName}`,
     owner: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
     sender: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
     shareType: 'user',

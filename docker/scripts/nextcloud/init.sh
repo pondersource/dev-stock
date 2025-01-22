@@ -253,8 +253,24 @@ if expr "$1" : "apache" 1>/dev/null || [ "$1" = "php-fpm" ] || [ "${NEXTCLOUD_UP
 
                         # disable first run wizard
                         run_as "php /var/www/html/console.php app:disable firstrunwizard"
-                        # create the log file
-                        run_as "touch /var/www/html/data/nextcloud.log"
+
+                        # create the log files
+                        apache_log_access="/var/log/apache2/access.log"
+                        apache_log_error="/var/log/apache2/error.log"
+                        efss_log="/var/www/html/data/nextcloud.log"
+
+                        rm "${apache_log_access}"
+                        rm "${apache_log_error}"
+                        rm "${efss_log}"
+
+                        touch "${apache_log_access}"
+                        touch "${apache_log_error}"
+                        touch "${efss_log}"
+
+                        chown -R www-data:root /var/log/apache2
+                        chmod -R g=u /var/log/apache2
+                        chown -R www-data:root /var/www/html/data
+                        chmod -R g=u /var/www/html/data
 
                         run_path post-installation
                     fi

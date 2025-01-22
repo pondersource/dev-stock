@@ -13,10 +13,10 @@ describe('Seafile Login Tests', () => {
    */
   it('should successfully log into Seafile with valid credentials', () => {
     // Define the Seafile instance URL and credentials from environment variables or use default values
-    const seafileUrl = Cypress.env('SEAFILE1_URL') || 'https://seafile1.docker';
+    const seafileUrl = Cypress.env('SEAFILE1_URL') || 'http://seafile1.docker';
     const username = Cypress.env('SEAFILE1_USERNAME') || 'jonathan@seafile.com';
     const password = Cypress.env('SEAFILE1_PASSWORD') || 'xu';
 
-    cy.loginOcis(seafileUrl, username, password);
+    cy.loginSeafile(seafileUrl, username, password);
   });
 });
