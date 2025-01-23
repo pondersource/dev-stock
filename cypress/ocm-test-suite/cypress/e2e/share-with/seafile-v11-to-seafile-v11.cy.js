@@ -6,7 +6,6 @@
  */
 
 import {
-  loginSeafile,
   dismissModalIfPresentV11,
   openShareDialog,
   openFederatedSharingTab,
@@ -32,7 +31,7 @@ describe('Native federated sharing functionality for Seafile v11', () => {
    */
   it('should successfully send a federated share of a file from Seafile 1 to Seafile 2', () => {
     // Step 1: Log in to Seafile 1
-    loginSeafile(senderUrl, senderUsername, senderPassword);
+    cy.loginSeafile(senderUrl, senderUsername, senderPassword);
 
     // Step 2: Dismiss any modals if present
     dismissModalIfPresentV11();
@@ -55,7 +54,7 @@ describe('Native federated sharing functionality for Seafile v11', () => {
    */
   it('should successfully receive and display a federated share of a file on Seafile 2', () => {
     // Step 1: Log in to Seafile 2
-    loginSeafile(recipientUrl, recipientUsername, recipientPassword);
+    cy.loginSeafile(recipientUrl, recipientUsername, recipientPassword);
 
     // Step 2: Dismiss any modals if present
     dismissModalIfPresentV11();

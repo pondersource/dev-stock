@@ -8,19 +8,6 @@
  */
 
 /**
- * Login to Seafile instance.
- * @param {string} url - The URL of the Seafile instance
- * @param {string} username - The username to log in with
- * @param {string} password - The password to log in with
- */
-export function loginSeafile(url, username, password) {
-  cy.visit(url);
-  cy.get('input[name="login"]').type(username);
-  cy.get('input[name="password"]').type(password);
-  cy.get('button[type="submit"]').click();
-}
-
-/**
  * Dismiss any modal dialogs that might be present (e.g., welcome or info dialogs).
  */
 export function dismissModalIfPresentV11() {
