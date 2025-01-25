@@ -23,8 +23,6 @@ describe('Native federated sharing functionality for Seafile v11', () => {
   const senderPassword = Cypress.env('SEAFILE1_PASSWORD') || 'xu';
   const recipientUsername = Cypress.env('SEAFILE2_USERNAME') || 'giuseppe@cern.ch';
   const recipientPassword = Cypress.env('SEAFILE2_PASSWORD') || 'lopresti';
-  const originalFileName = 'welcome.txt';
-  const sharedFileName = 'share-with-nc1-to-nc2.txt';
 
   /**
    * Test Case: Sending a federated share from Seafile 1 to Seafile 2.
@@ -63,6 +61,6 @@ describe('Native federated sharing functionality for Seafile v11', () => {
     navigateToReceivedShares();
 
     // Step 4: Verify the received share is visible
-    verifyReceivedShare();
+    verifyReceivedShare(senderUsername);
   });
 });

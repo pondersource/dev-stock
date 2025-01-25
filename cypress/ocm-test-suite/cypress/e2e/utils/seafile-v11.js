@@ -93,9 +93,12 @@ export function navigateToReceivedShares() {
 /**
  * Verify that a received share is visible in the list.
  */
-export function verifyReceivedShare() {
-  cy.get('.received-shares-table')
+export function verifyReceivedShare(remoteUsername) {
+  cy.get('#wrapper .main-panel .reach-router .main-panel-center .cur-view-container .cur-view-content')
+    .find('table tbody')
+    .eq(0) // First file
+    .find('tr td')
+    .eq(3) // Column containing the Share sender
     .should('be.visible')
-    .find('tr')
-    .should('have.length.greaterThan', 0);
+    .should('contain', remoteUsername);
 }
