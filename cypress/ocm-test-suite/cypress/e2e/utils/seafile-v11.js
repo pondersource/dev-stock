@@ -9,14 +9,27 @@
 
 /**
  * Dismiss any modal dialogs that might be present (e.g., welcome or info dialogs).
+ * Waits up to 3.5 seconds for a modal to appear before attempting to dismiss it.
  */
 export function dismissModalIfPresentV11() {
-  // Add any modal dismissal logic specific to v11 here
-  cy.get('body').then($body => {
-    if ($body.find('.modal-dialog').length > 0) {
-      cy.get('.modal-dialog .close').click();
-    }
-  });
+  // Wait for up to 1 seconds for any modal to appear
+  cy.get('body')
+    .wait(1000) // Wait for potential delayed modals
+    .then($body => {
+      // Check for modal every 250ms for up to 2.5 seconds
+      const checkModal = (attempts = 0) => {
+        if (attempts >= 10) return; // Max 10 attempts (2.5 seconds)
+        
+        if ($body.find('.modal-dialog').length > 0) {
+          cy.get('.modal-dialog .close').click();
+        } else {
+          // If no modal found, wait 500ms and check again
+          cy.wait(250).then(() => checkModal(attempts + 1));
+        }
+      };
+      
+      checkModal();
+    });
 }
 
 /**
@@ -93,12 +106,19 @@ export function navigateToReceivedShares() {
 /**
  * Verify that a received share is visible in the list.
  */
-export function verifyReceivedShare(remoteUsername) {
+export function verifyReceivedShare(remoteUsername, remoteServer) {
   cy.get('#wrapper .main-panel .reach-router .main-panel-center .cur-view-container .cur-view-content')
     .find('table tbody')
     .eq(0) // First file
-    .find('tr td')
-    .eq(3) // Column containing the Share sender
-    .should('be.visible')
-    .should('contain', remoteUsername);
+    .within(() => {
+      cy.get('tr td')
+        .eq(2) // Column containing the Share sender
+        .should('be.visible')
+        .should('contain', remoteUsername);
+
+      cy.get('tr td')
+        .eq(3) // Column containing the Share receiver
+        .should('be.visible')
+        .should('contain', remoteServer);
+    });
 }

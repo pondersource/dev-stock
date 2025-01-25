@@ -61,6 +61,6 @@ describe('Native federated sharing functionality for Seafile v11', () => {
     navigateToReceivedShares();
 
     // Step 4: Verify the received share is visible
-    verifyReceivedShare(senderUsername);
+    verifyReceivedShare(senderUsername, senderUrl);
   });
 });
