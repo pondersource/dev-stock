@@ -11,7 +11,7 @@ echo "127.0.0.1 ${HOST}.docker" >> /etc/hosts
 touch /var/log/revad.log
 
 # run revad.
-run.sh
+init.sh
 
 # This will exec the CMD from your Dockerfile, i.e. "npm start"
 exec "$@"
