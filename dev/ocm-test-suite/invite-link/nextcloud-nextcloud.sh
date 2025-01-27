@@ -125,9 +125,10 @@ main() {
     create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
     create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
     
-    # Create Reva containers
-    create_reva "nextcloud" 1       pondersource/revad      latest
-    create_reva "nextcloud" 2       pondersource/revad      latest
+    # Create Reva containers with disabled app configs
+    local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
+    create_reva "nextcloud" 1       pondersource/revad      latest      "${disabled_configs}"
+    create_reva "nextcloud" 2       pondersource/revad      latest      "${disabled_configs}"
     
     # Configure ScienceMesh integration
     configure_sciencemesh "nextcloud" 1 "https://revanextcloud1.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
@@ -135,7 +136,6 @@ main() {
     
     # Start Mesh Directory
     create_meshdir pondersource/ocmstub v1.0.0
-    
     
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
