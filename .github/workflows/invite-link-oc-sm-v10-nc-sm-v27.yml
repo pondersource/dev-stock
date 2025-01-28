@@ -1,4 +1,4 @@
-name: OCM Test Invite Link oCIS v5.0.9 to OC v10.15.0
+name: OCM Test Invite Link OC SM v10.15.0 to NC SM v27.1.11
 
 # Controls when the action will run.
 on:
@@ -28,14 +28,14 @@ jobs:
       matrix:
         sender: [
           {
-            platform: ocis,
-            version: v5.0.9
+            platform: owncloud-sm,
+            version: v10.15.0-sm
           },
         ]
         receiver: [
           {
-            platform: owncloud,
-            version: v10.15.0
+            platform: nextcloud-sm,
+            version: v27.1.11-sm
           },
         ]
 
