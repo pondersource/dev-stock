@@ -10,19 +10,15 @@
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
 #   such as ownCloud, using ScienceMesh integration and tools like Reva, Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
-
 # Usage:
 #   ./owncloud-owncloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
-
 # Arguments:
 #   EFSS_PLATFORM_1_VERSION : Version of the primary EFSS platform (default: "v10.15.0").
 #   EFSS_PLATFORM_2_VERSION : Version of the secondary EFSS platform (default: "v10.15.0").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
-
 # Example:
 #   ./owncloud-owncloud.sh v10.15.0 v10.15.0 ci electron
-
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
