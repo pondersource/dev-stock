@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test Nextcloud to Nextcloud OCM invite link flow tests.
+# Script to Test ownCloud to ownCloud OCM invite link flow tests.
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------
 # Description:
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
-#   such as Nextcloud, using ScienceMesh integration and tools like Reva, Cypress, and Docker containers.
+#   such as ownCloud, using ScienceMesh integration and tools like Reva, Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
 
 # Usage:
-#   ./nextcloud-nextcloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./owncloud-owncloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of the primary EFSS platform (default: "v27.1.11").
-#   EFSS_PLATFORM_2_VERSION : Version of the secondary EFSS platform (default: "v27.1.11").
+#   EFSS_PLATFORM_1_VERSION : Version of the primary EFSS platform (default: "v10.15.0").
+#   EFSS_PLATFORM_2_VERSION : Version of the secondary EFSS platform (default: "v10.15.0").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 
 # Example:
-#   ./nextcloud-nextcloud.sh v28.0.12 v27.1.11 ci electron
+#   ./owncloud-owncloud.sh v10.15.0 v10.15.0 ci electron
 
 # -----------------------------------------------------------------------------------
 
@@ -34,8 +34,8 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 
 # Default versions
-DEFAULT_EFSS_1_VERSION="v27.1.11-sm"
-DEFAULT_EFSS_2_VERSION="v27.1.11-sm"
+DEFAULT_EFSS_1_VERSION="v10.15.0-sm"
+DEFAULT_EFSS_2_VERSION="v10.15.0-sm"
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
@@ -117,25 +117,25 @@ main() {
     setup "$@"
     
     # Create EFSS containers
-    create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
+    create_owncloud 1      "marie"    "radioactivity"     pondersource/owncloud   "${EFSS_PLATFORM_1_VERSION}"
+    create_owncloud 2      "mahdi"    "baghbani"          pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
-    create_reva "nextcloud" 1       pondersource/revad      latest      "${disabled_configs}"
-    create_reva "nextcloud" 2       pondersource/revad      latest      "${disabled_configs}"
+    create_reva "owncloud" 1       pondersource/revad      latest      "${disabled_configs}"
+    create_reva "owncloud" 2       pondersource/revad      latest      "${disabled_configs}"
     
     # Configure ScienceMesh integration
-    configure_sciencemesh "nextcloud" 1 "https://revanextcloud1.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
-    configure_sciencemesh "nextcloud" 2 "https://revanextcloud2.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
+    configure_sciencemesh "owncloud" 1 "https://revaowncloud1.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
+    configure_sciencemesh "owncloud" 2 "https://revaowncloud2.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
     
     # Start Mesh Directory
     create_meshdir pondersource/ocmstub v1.0.0
     
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-        "https://nextcloud1.docker (username: einstein, password: relativity)" \
-        "https://nextcloud2.docker (username: michiel, password: dejong)"
+        "https://owncloud1.docker (username: marie, password: radioactivity)" \
+        "https://owncloud2.docker (username: mahdi, password: baghbani)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi
