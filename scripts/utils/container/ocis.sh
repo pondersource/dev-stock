@@ -46,6 +46,24 @@ create_ocis() {
 }
 
 # -----------------------------------------------------------------------------------
+# Function: prepare_ocis_environment
+# Purpose : Prepare the environment for oCIS instances
+# Arguments:
+#   $1 - First instance configuration (optional)
+#   $2 - Second instance configuration (optional)
+# -----------------------------------------------------------------------------------
+prepare_ocis_environment() {
+    local instance1_config="${1:-}"
+    local instance2_config="${2:-}"
+
+    # copy init files.
+    cp -fr "${ENV_ROOT}/docker/configs/ocis" "${TEMP_DIR}/ocis"
+
+    # Configure OCM providers
+    configure_ocm_providers "${instance1_config}" "${instance2_config}"
+}
+
+# -----------------------------------------------------------------------------------
 # Function: configure_ocm_providers
 # Purpose : Configure OCM providers for oCIS instances
 # Arguments:
@@ -90,20 +108,10 @@ configure_ocm_providers() {
     changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--host--|"  "${webdav2_domain}"
 }
 
-# -----------------------------------------------------------------------------------
-# Function: prepare_ocis_environment
-# Purpose : Prepare the environment for oCIS instances
-# Arguments:
-#   $1 - First instance configuration (optional)
-#   $2 - Second instance configuration (optional)
-# -----------------------------------------------------------------------------------
-prepare_ocis_environment() {
-    local instance1_config="${1:-}"
-    local instance2_config="${2:-}"
+function changeInFile() {
+  local file_path="${1}"
+  local original="${2}"
+  local replacement="${3}"
 
-    # copy init files.
-    cp -fr "${ENV_ROOT}/docker/configs/ocis" "${TEMP_DIR}/ocis"
-
-    # Configure OCM providers
-    configure_ocm_providers "${instance1_config}" "${instance2_config}"
+  sed -i "s#${original}#${replacement}#g" "${file_path}"
 }
