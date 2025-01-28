@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# @michielbdejong halt on error in docker init scripts
+set -e
+
 # Target paths
 APP_SOURCE="/ponder/apps/sciencemesh"
 APP_TARGET="/var/www/html/apps/sciencemesh"

@@ -1,5 +1,5 @@
-ARG NEXTCLOUD_VERSION=latest
-FROM pondersource/nextcloud:${NEXTCLOUD_VERSION}
+ARG OWNCLOUD_VERSION=latest
+FROM pondersource/owncloud:${OWNCLOUD_VERSION}
 
 # App installation arguments
 ARG APP_NAME
@@ -12,10 +12,10 @@ ARG INIT_SCRIPT=""
 # keys for oci taken from:
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
 LABEL org.opencontainers.image.licenses=MIT
-LABEL org.opencontainers.image.title="PonderSource Nextcloud with ${APP_NAME}"
+LABEL org.opencontainers.image.title="PonderSource ownCloud with ${APP_NAME}"
 LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock"
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
-LABEL org.opencontainers.image.description="Nextcloud image with ${APP_NAME} pre-installed"
+LABEL org.opencontainers.image.description="ownCloud image with ${APP_NAME} pre-installed"
 
 USER root
 
@@ -55,7 +55,6 @@ USER root
 # After cloning, `git` is no longer needed at runtime, so remove it to reduce image size.
 RUN apt-get purge -y git && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-# Copy init script if provided  
+# Copy init script if provided
 COPY ${INIT_SCRIPT} "/docker-entrypoint-hooks.d/before-starting/${APP_NAME}.sh"
 RUN chmod +x /docker-entrypoint-hooks.d/before-starting/${APP_NAME}.sh

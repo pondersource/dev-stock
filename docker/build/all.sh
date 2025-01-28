@@ -162,7 +162,7 @@ build_docker_image() {
 build_nextcloud_app_image() {
     local app_name="${1}"
     local app_repo="${2}"
-    local app_branch="${3:-main}"
+    local app_branch="${3:-master}"
     local app_build_cmd="${4:-}"
     local init_script="${5:-}"
     local nextcloud_version="${6}"
@@ -194,6 +194,56 @@ build_nextcloud_app_image() {
     fi
     
     echo "Successfully built Nextcloud app image: ${app_name}"
+    echo
+}
+
+# -----------------------------------------------------------------------------------
+# Function: build_nextcloud_app_image
+# Purpose: Build a Nextcloud image with a specific app installed
+# Arguments:
+#   1. app_name - Name of the app (e.g., "sciencemesh")
+#   2. app_repo - Git repository URL
+#   3. app_branch - Git branch (default: "main")
+#   4. app_build_cmd - Build command if required (optional)
+#   5. init_script - Path to initialization script (optional)
+#   6. nextcloud_version - Nextcloud version to use as base
+#   7. image_tag_suffix - Suffix for the image tag (optional)
+# -----------------------------------------------------------------------------------
+build_owncloud_app_image() {
+    local app_name="${1}"
+    local app_repo="${2}"
+    local app_branch="${3:-master}"
+    local app_build_cmd="${4:-}"
+    local init_script="${5:-}"
+    local owncloud_version="${6}"
+    local image_tag_suffix="${7:-${app_name}}"
+    
+    local build_args=""
+    
+    # Construct build arguments string
+    build_args="--build-arg OWNCLOUD_VERSION=${owncloud_version}"
+    build_args="${build_args} --build-arg APP_NAME=${app_name}"
+    build_args="${build_args} --build-arg APP_REPO=${app_repo}"
+    build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    
+    # Add optional build arguments if provided
+    [[ -n "${app_build_cmd}" ]] && build_args="${build_args} --build-arg APP_BUILD_CMD=${app_build_cmd}"
+    [[ -n "${init_script}" ]] && build_args="${build_args} --build-arg INIT_SCRIPT=${init_script}"
+    
+    # Construct the image tag
+    local image_tag="${owncloud_version}-${image_tag_suffix}"
+    
+    echo "Building ownCloud app image: ${app_name} (${image_tag})"
+    if ! docker build \
+        ${build_args} \
+        --file "./dockerfiles/owncloud-app.Dockerfile" \
+        --tag "pondersource/owncloud:${image_tag}" \
+        .; then
+        print_error "Failed to build ownCloud app image: ${app_name}"
+        return 1
+    fi
+    
+    echo "Successfully built ownCloud app image: ${app_name}"
     echo
 }
 
@@ -290,6 +340,17 @@ main() {
             DEFAULT \
             "--build-arg OWNCLOUD_BRANCH=${version}"
     done
+
+    # Build ownCloud App Variants
+    # ScienceMesh
+    build_owncloud_app_image \
+        "sciencemesh" \
+        "https://github.com/sciencemesh/nc-sciencemesh" \
+        "owncloud" \
+        "make" \
+        "./scripts/init/owncloud-sciencemesh.sh" \
+        "v10.15.0" \
+        "sm"
 
     echo "All builds attempted."
     echo "Check the above output for any build failures or errors."
