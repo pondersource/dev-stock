@@ -12,7 +12,7 @@ run_ci() {
         fi
     else
         if [[ -z "${EFSS_PLATFORM_1}" || -z "${EFSS_PLATFORM_2}" ]]; then
-            error_exit "Usage for share: <platform1> <platform2> <version1> <version2> ci <browser>"
+            error_exit "Usage for test script: <platform1>-<platform2>.sh <version1> <version2> ci <browser>"
         fi
     fi
 
