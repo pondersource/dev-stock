@@ -130,8 +130,8 @@ main() {
     
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-        "https://nextcloud1.docker (username: einstein, password: relativity)" \
-        "https://nextcloud2.docker (username: michiel, password: dejong)"
+            "https://nextcloud1.docker (username: einstein, password: relativity)" \
+            "https://nextcloud2.docker (username: michiel, password: dejong)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

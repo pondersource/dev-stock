@@ -87,7 +87,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
   /**
    * Test case: Sharing a file via ScienceMesh from sender to recipient.
    */
-  it('Send ScienceMesh share of a file from Nextcloud v27 to Nextcloud v27', () => {
+  it('Send ScienceMesh share of a <file> from Nextcloud v27 to Nextcloud v27', () => {
     // Step 1: Log in to the sender's Nextcloud instance
     cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
@@ -115,7 +115,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
   /**
    * Test case: Receiving and verifying the ScienceMesh share on the recipient's side.
    */
-  it('Receive ScienceMesh share of a file from Nextcloud v27 to Nextcloud v27', () => {
+  it('Receive ScienceMesh share of a <file> from Nextcloud v27 to Nextcloud v27', () => {
     // Step 1: Log in to the recipient's Nextcloud instance
     cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
 

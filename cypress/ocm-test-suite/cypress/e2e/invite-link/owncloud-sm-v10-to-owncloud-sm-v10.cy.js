@@ -38,7 +38,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   /**
    * Test case: Sending an invitation link from sender to recipient.
    */
-  it('Send invitation from from ownCloud v10 to ownCloud v10', () => {
+  it('Send invitation from ownCloud v10 to ownCloud v10', () => {
     // Step 1: Log in to the sender's ownCloud instance
     cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
@@ -57,7 +57,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   /**
    * Test case: Accepting the invitation link on the recipient's side.
    */
-  it('Accept invitation from from ownCloud v10 to ownCloud v10', () => {
+  it('Accept invitation from ownCloud v10 to ownCloud v10', () => {
     const expectedContactDisplayName = senderUsername;
     // Extract domain without protocol or trailing slash
     // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
@@ -86,7 +86,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   /**
    * Test case: Sharing a file via ScienceMesh from sender to recipient.
    */
-  it('Send ScienceMesh share of a file from ownCloud v10 to ownCloud v10', () => {
+  it('Send ScienceMesh share of a <file> from ownCloud v10 to ownCloud v10', () => {
     // Step 1: Log in to the sender's ownCloud instance
     cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
@@ -114,7 +114,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
    * Test Case: Receiving and accepting a ScienceMesh file share on ownCloud 2.
    * This test verifies that the shared file appears in the "Sharing In" section.
    */
-  it('Receive ScienceMesh share of a file from ownCloud v10 to ownCloud v10', () => {
+  it('Receive ScienceMesh share of a <file> from ownCloud v10 to ownCloud v10', () => {
     // Step 1: Log in to the recipient's ownCloud instance
     cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
 
