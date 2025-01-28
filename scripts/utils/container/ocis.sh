@@ -88,24 +88,24 @@ configure_ocm_providers() {
     IFS=',' read -r ocm2_domain webdav2_domain webdav2_path <<< "${instance2_config}"
 
     # Configure instance1
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--domain--|"        "${ocm1_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--homepage--|"      "${ocm1_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--|"           "${ocm1_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--path--|"     "${ocm1_domain}/ocm/"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--ocm--host--|"     "${ocm1_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--|"        "${webdav1_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--path--|"  "${webdav1_domain}/${webdav1_path}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance1--webdav--host--|"  "${webdav1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--domain--|"        "${ocm1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--homepage--|"      "${ocm1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--ocm--|"           "${ocm1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--ocm--path--|"     "${ocm1_domain}/ocm/"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--ocm--host--|"     "${ocm1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--webdav--|"        "${webdav1_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--webdav--path--|"  "${webdav1_domain}/${webdav1_path}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance1--webdav--host--|"  "${webdav1_domain}"
 
     # Configure instance2
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--domain--|"        "${ocm2_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--homepage--|"      "${ocm2_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--|"           "${ocm2_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "${ocm2_domain}/ocm/"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--ocm--host--|"     "${ocm2_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--|"        "${webdav2_domain}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--path--|"  "${webdav2_domain}/${webdav2_path}"
-    changeInFile "${ENV_ROOT}/temp/ocis/ocmproviders.json" "|--instance2--webdav--host--|"  "${webdav2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--domain--|"        "${ocm2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--homepage--|"      "${ocm2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--ocm--|"           "${ocm2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--ocm--path--|"     "${ocm2_domain}/ocm/"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--ocm--host--|"     "${ocm2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--webdav--|"        "${webdav2_domain}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--webdav--path--|"  "${webdav2_domain}/${webdav2_path}"
+    changeInFile "${TEMP_DIR}/ocis/ocmproviders.json" "|--instance2--webdav--host--|"  "${webdav2_domain}"
 }
 
 function changeInFile() {
