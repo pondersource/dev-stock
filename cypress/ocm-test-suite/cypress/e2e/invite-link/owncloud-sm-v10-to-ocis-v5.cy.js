@@ -8,6 +8,7 @@
  */
 
 import {
+  createInviteToken,
   createScienceMeshShare,
   renameFile,
   ensureFileExists,

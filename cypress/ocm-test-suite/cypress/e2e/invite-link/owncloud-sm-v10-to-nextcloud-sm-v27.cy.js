@@ -9,7 +9,6 @@
 
 import {
   createInviteLink,
-  acceptScienceMeshInvitation,
   createScienceMeshShare,
   renameFile,
   ensureFileExists,

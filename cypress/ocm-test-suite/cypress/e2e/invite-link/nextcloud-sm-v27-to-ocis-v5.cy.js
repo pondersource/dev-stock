@@ -8,16 +8,17 @@
  */
 
 import {
-  createInviteTokenV27,
+  createInviteToken,
   createScienceMeshShareV27,
   renameFileV27,
   ensureFileExistsV27,
 } from '../utils/nextcloud-v27';
 
 import {
-  openFilesAppV5,
   acceptInviteLinkV5,
   verifyFederatedContactV5,
+  acceptShareV5,
+  verifyShareV5
 } from '../utils/ocis-5';
 
 describe('Invite link federated sharing via ScienceMesh functionality between Nextcloud and oCIS', () => {
@@ -57,7 +58,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
     cy.visit(`${senderUrl}/index.php/apps/sciencemesh/contacts`);
 
     // Step 3: Generate the invite token and save it to a file
-    createInviteTokenV27().then((inviteToken) => {
+    createInviteToken().then((inviteToken) => {
       // Ensure the invite token is not empty
       expect(inviteToken).to.be.a('string').and.not.be.empty;
       // Save the invite token to a file for later use
@@ -119,8 +120,8 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
     // Step 5: Create the share for the recipient
     createScienceMeshShareV27(
       senderDomain,
-      recipientUsername,
-      recipientDomain,
+      recipientDisplayName,
+      recipientUrl,
       sharedFileName
     );
   });

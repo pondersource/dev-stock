@@ -126,9 +126,9 @@ main() {
     prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "ocis2.docker,ocis2.docker,dav/"
     
     # Create EFSS containers
-    #           # id   # image                # tag
-    create_ocis 1      "owncloud/ocis"        "${EFSS_PLATFORM_1_VERSION}"
-    create_ocis 2      "owncloud/ocis"        "${EFSS_PLATFORM_2_VERSION}"
+    #           # id   # image              # tag
+    create_ocis 1      owncloud/ocis        "${EFSS_PLATFORM_1_VERSION}"
+    create_ocis 2      owncloud/ocis        "${EFSS_PLATFORM_2_VERSION}"
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \

@@ -401,10 +401,16 @@ export function triggerActionInFileMenu(fileName, actionId) {
 export function triggerActionForFile(fileName, actionId) {
   // Find the actions container for the file and click the desired action
   getActionsForFile(fileName)
-    .find(`[data-action="${actionId}"]`)
-    .should('be.visible')
-    .as('btn')
-    .click();
+    .should('exist')
+    .and('be.visible')
+    .within(() => {
+      // Find the action button and ensure it's properly loaded
+      cy.get(`*[data-action="${actionId}"]`)
+        .should('exist')
+        .and('be.visible')
+        .and('not.be.disabled')
+        .click({ force: true });
+    });
 }
 
 /**

@@ -116,8 +116,8 @@ main() {
     prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revaowncloud1.docker,owncloud1.docker,remote.php/webdav/"
     
     # Create EFSS containers
-    create_owncloud  1      "marie"       "radioactivity"   pondersource/owncloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_ocis      2      "${EFSS_PLATFORM_2_VERSION}"
+    create_owncloud  1      "marie"         "radioactivity"   pondersource/owncloud   "${EFSS_PLATFORM_1_VERSION}"
+    create_ocis      1                                        owncloud/ocis           "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
@@ -132,7 +132,7 @@ main() {
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
             "https://owncloud1.docker (username: marie, password: radioactivity)" \
-            "https://ocis2.docker (username: einstein, password: relativity)"
+            "https://ocis1.docker (username: einstein, password: relativity)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

@@ -113,18 +113,18 @@ main() {
     setup "$@"
     
     # Configure OCM providers for oCIS
-    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revaowncloud2.docker,owncloud2.docker,remote.php/webdav/"
+    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revaowncloud1.docker,owncloud1.docker,remote.php/webdav/"
     
     # Create EFSS containers
-    create_ocis      1      "${EFSS_PLATFORM_1_VERSION}"
-    create_owncloud  2      "marie"       "radioactivity"   pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
+    create_ocis      1                                      owncloud/ocis           "${EFSS_PLATFORM_1_VERSION}"
+    create_owncloud  1      "marie"       "radioactivity"   pondersource/owncloud   "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
-    create_reva "owncloud" 2       pondersource/revad      latest      "${disabled_configs}"
+    create_reva "owncloud" 1       pondersource/revad      latest      "${disabled_configs}"
     
     # Configure ScienceMesh integration
-    configure_sciencemesh "owncloud" 2 "https://revaowncloud2.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
+    configure_sciencemesh "owncloud" 1 "https://revaowncloud1.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
 
     # Start Mesh Directory
     create_meshdir pondersource/ocmstub v1.0.0
@@ -132,7 +132,7 @@ main() {
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
             "https://ocis1.docker (username: einstein, password: relativity)" \
-            "https://owncloud2.docker (username: marie, password: radioactivity)"
+            "https://owncloud1.docker (username: marie, password: radioactivity)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

@@ -116,8 +116,8 @@ main() {
     prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revanextcloud1.docker,nextcloud1.docker,remote.php/webdav/"
     
     # Create EFSS containers
-    create_ocis       1      "${EFSS_PLATFORM_1_VERSION}"
-    create_nextcloud  1      "marie"       "radioactivity"   pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
+    create_ocis       1                                      owncloud/ocis            "${EFSS_PLATFORM_1_VERSION}"
+    create_nextcloud  1      "michiel"       "dejong"        pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
@@ -132,7 +132,7 @@ main() {
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
           "https://ocis1.docker (username: einstein, password: relativity)" \
-          "https://nextcloud1.docker (username: marie, password: radioactivity)"
+          "https://nextcloud1.docker (username: michiel, password: dejong)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

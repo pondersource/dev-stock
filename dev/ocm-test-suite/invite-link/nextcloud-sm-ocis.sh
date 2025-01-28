@@ -117,7 +117,7 @@ main() {
     
     # Create EFSS containers
     create_nextcloud  1      "marie"       "radioactivity"   pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_ocis       1      "${EFSS_PLATFORM_2_VERSION}"
+    create_ocis       1                                      owncloud/ocis            "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
