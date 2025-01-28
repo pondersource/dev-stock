@@ -30,6 +30,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
 
     // load invite token from file.
     cy.readFile('invite-link-ocis-ocis.txt').then((token) => {
+      // Verify token exists and is not empty
+      expect(token).to.exist
+      expect(token.trim()).to.not.be.empty
+      cy.log('Read token from file:', token)
 
       cy.loginOcis('https://ocis2.docker', 'marie', 'radioactivity')
 
