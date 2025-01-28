@@ -32,6 +32,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
   const originalFileName = 'welcome.txt';
   const sharedFileName = 'invite-link-nc-nc.txt';
 
+  // Extract domain without protocol or trailing slash
+  const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
+  const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
+
   /**
    * Test case: Sending an invitation link from sender to recipient.
    */
@@ -58,7 +62,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
     const expectedContactDisplayName = senderUsername;
     // Extract domain without protocol or trailing slash
     // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
-    const expectedContactDomain = `reva${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`;
+    const expectedContactDomain = `reva${senderDomain}`;
 
     // Step 1: Load the invite link from the saved file
     cy.readFile(inviteLinkFileName).then((inviteLink) => {
@@ -73,7 +77,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
 
       // Step 5: Verify that the sender is now a contact in the recipient's contacts list
       verifyFederatedContactV27(
-        recipientUrl.replace(/^https?:\/\/|\/$/g, ''),
+        recipientDomain,
         expectedContactDisplayName,
         expectedContactDomain
       );
@@ -99,9 +103,9 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
     // Step 5: Create a federated share for the recipient via ScienceMesh
     // Note: The 'reva' prefix is added to the recipient domain as per application behavior
     createScienceMeshShareV27(
-      senderUrl.replace(/^https?:\/\/|\/$/g, ''),
+      senderDomain,
       recipientUsername,
-      `reva${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+      `reva${recipientDomain}`,
       sharedFileName
     );
 

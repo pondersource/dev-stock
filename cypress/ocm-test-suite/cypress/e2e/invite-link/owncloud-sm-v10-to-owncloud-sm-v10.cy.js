@@ -31,6 +31,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   const originalFileName = 'welcome.txt';
   const sharedFileName = 'invite-link-oc-oc.txt';
 
+  // Extract domain without protocol or trailing slash
+  const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
+  const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
+
   /**
    * Test case: Sending an invitation link from sender to recipient.
    */
@@ -57,7 +61,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     const expectedContactDisplayName = senderUsername;
     // Extract domain without protocol or trailing slash
     // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
-    const expectedContactDomain = `reva${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`;
+    const expectedContactDomain = `reva${senderDomain}`;
 
     // Step 1: Read the invite link from the file
     cy.readFile(inviteLinkFileName).then((inviteLink) => {
@@ -72,7 +76,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
 
       // Step 5: Verify that the sender is now a contact in the recipient's contacts list
       verifyFederatedContact(
-        recipientUrl.replace(/^https?:\/\/|\/$/g, ''),
+        recipientDomain,
         expectedContactDisplayName,
         expectedContactDomain
       );
@@ -100,7 +104,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     createScienceMeshShare(
       sharedFileName,
       recipientUsername,
-      `reva${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+      `reva${recipientDomain}`,
     );
 
     // TODO @MahdiBaghbani: Verify that the share was created successfully
