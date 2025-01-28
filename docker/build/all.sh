@@ -256,7 +256,7 @@ main() {
         "https://github.com/sciencemesh/nc-sciencemesh" \
         "nextcloud" \
         "make" \
-        "./scripts/init/nc-sm.sh" \
+        "./scripts/init/nextcloud-sciencemesh.sh" \
         "v27.1.11" \
         "sm"
 
