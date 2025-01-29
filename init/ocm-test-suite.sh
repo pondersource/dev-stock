@@ -102,7 +102,7 @@ fi
     redirect_to_null_cmd docker run --rm                                                                \
     -v "$(pwd)/nextcloud-sciencemesh:/var/www/html/apps/sciencemesh"                                    \
     --workdir /var/www/html/apps/sciencemesh                                                            \
-    pondersource/dev-stock-nextcloud-sciencemesh                                                        \
+    pondersource/nextcloud-sciencemesh                                                        \
     make composer
 
 # move app to its place inside efss and create symbolic links.
@@ -121,7 +121,7 @@ fi
     redirect_to_null_cmd docker run --rm                                                                \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                     \
     --workdir /var/www/html/apps/sciencemesh                                                            \
-    pondersource/dev-stock-owncloud-sciencemesh                                                         \
+    pondersource/owncloud-sciencemesh                                                         \
     composer install
 
 [ ! -d "owncloud/apps/sciencemesh" ] &&                                                                 \

@@ -11,6 +11,5 @@ ENV PATH="/dev-stock/bin:${PATH}"
 
 # initialize act rc with medium images.
 RUN echo "-P ubuntu-latest=catthehacker/ubuntu:act-latest" >> /home/gitpod/.actrc
+RUN echo "-P ubuntu-24.04=catthehacker/ubuntu:act-24.04" >> /home/gitpod/.actrc
 RUN echo "-P ubuntu-22.04=catthehacker/ubuntu:act-22.04" >> /home/gitpod/.actrc
-RUN echo "-P ubuntu-20.04=catthehacker/ubuntu:act-20.04" >> /home/gitpod/.actrc
-RUN echo "-P ubuntu-18.04=catthehacker/ubuntu:act-18.04" >> /home/gitpod/.actrc

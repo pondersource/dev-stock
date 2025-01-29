@@ -29,13 +29,13 @@ jobs:
         sender: [
           {
             platform: ocmstub,
-            version: "v1.0.0"
+            version: v1.0.0
           },
         ]
         receiver: [
           {
             platform: ocmstub,
-            version: "v1.0.0"
+            version: v1.0.0
           },
         ]
 

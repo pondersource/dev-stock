@@ -1,4 +1,4 @@
-name: OCM Test Share With NC v28.0.12 to OcmStub v1.0.0
+name: OCM Test Share With NC v28.0.14 to OcmStub v1.0.0
 
 # Controls when the action will run.
 on:
@@ -29,13 +29,13 @@ jobs:
         sender: [
           {
             platform: nextcloud,
-            version: v28.0.12
+            version: v28.0.14
           },
         ]
         receiver: [
           {
             platform: ocmstub,
-            version: "v1.0.0"
+            version: v1.0.0
           },
         ]
 

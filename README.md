@@ -49,10 +49,10 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 
 | **Repository**                   | **Tag**         | **Branch**                                                                | **Upstream**                                                                 |
 |----------------------------------|-----------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| pondersource/dev-stock-nextcloud | latest, v30.0.0 | [v30.0.0](https://github.com/nextcloud/server/releases/tag/v30.0.0)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v29.0.8         | [v29.0.8](https://github.com/nextcloud/server/releases/tag/v29.0.8)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v28.0.12        | [v28.0.12](https://github.com/nextcloud/server/releases/tag/v28.0.12)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
-| pondersource/dev-stock-nextcloud | v27.1.11        | [v27.1.11](https://github.com/nextcloud/server/releases/tag/v27.1.11)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | latest, v30.0.2 | [v30.0.2](https://github.com/nextcloud/server/releases/tag/v30.0.2)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v29.0.10         | [v29.0.10](https://github.com/nextcloud/server/releases/tag/v29.0.10)       | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v28.0.14        | [v28.0.14](https://github.com/nextcloud/server/releases/tag/v28.0.14)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
+| pondersource/nextcloud | v27.1.11        | [v27.1.11](https://github.com/nextcloud/server/releases/tag/v27.1.11)     | [Official Nextcloud Server](https://github.com/nextcloud/server)             |
 
 ---
 
@@ -60,7 +60,7 @@ Some popular EFSS platforms include **Nextcloud** and **ownCloud**, which provid
 
 | **Repository**                   | **Tag**       | **Branch**                                                                 | **Upstream**                                                                 |
 |----------------------------------|---------------|----------------------------------------------------------------------------|------------------------------------------------------------------------------|
-| pondersource/dev-stock-owncloud  | v10.15.0      | [v10.15.0](https://github.com/owncloud/core/releases/tag/v10.15.0)         | [Official ownCloud Core](https://github.com/owncloud/core)                   |
+| pondersource/owncloud  | v10.15.0      | [v10.15.0](https://github.com/owncloud/core/releases/tag/v10.15.0)         | [Official ownCloud Core](https://github.com/owncloud/core)                   |
 
 
 #### Docker Pull Commands
@@ -68,14 +68,14 @@ To pull the Docker images for EFSS, use the following commands:
 
 ```bash
 # Pull the latest version of Nextcloud
-docker pull pondersource/dev-stock-nextcloud:latest
+docker pull pondersource/nextcloud:latest
 
 # Pull a specific version of Nextcloud
-docker pull pondersource/dev-stock-nextcloud:v30.0.0
-docker pull pondersource/dev-stock-nextcloud:v29.0.8
+docker pull pondersource/nextcloud:v30.0.2
+docker pull pondersource/nextcloud:v29.0.10
 
 # Pull a specific version of ownCloud
-docker pull pondersource/dev-stock-owncloud:v10.15.0
+docker pull pondersource/owncloud:v10.15.0
 ```
 
 ## Our Dockerized Reva Images 🚀
@@ -206,19 +206,19 @@ To learn more about the **Open Cloud Mesh** standard, visit: [OCM-API](https://g
 ## Login Tests 🔐
 Verifies authentication mechanisms for supported EFSS platforms, ensuring users can securely log in.
 
-| Test Name | Nextcloud v27.1.11 | Nextcloud v28.0.12 | oCIS v5.0.9 | OcmStub v1.0.0 | ownCloud v10.15.0 | Seafile v11.0.5 |
+| Test Name | Nextcloud v27.1.11 | Nextcloud v28.0.14 | oCIS v5.0.9 | OcmStub v1.0.0 | ownCloud v10.15.0 | Seafile v11.0.5 |
 |-----------|--------------------|--------------------|-------------|----------------|-------------------|-----------------|
-| **Login** | [![NC v27.1.11](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v27.yml) | [![NC v28.0.12](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v28.yml) | [![oCIS v5.0.9](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocis-v5.yml) | [![OcmStub v1.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocmstub-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocmstub-v1.yml) | [![ownCloud v10.15.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-owncloud-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-owncloud-v10.yml) | [![Seafile v11.0.5](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-seafile-v11.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-seafile-v11.yml) |
+| **Login** | [![NC v27.1.11](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v27.yml) | [![NC v28.0.14](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-nextcloud-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-nextcloud-v28.yml) | [![oCIS v5.0.9](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocis-v5.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocis-v5.yml) | [![OcmStub v1.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-ocmstub-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-ocmstub-v1.yml) | [![ownCloud v10.15.0](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-owncloud-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-owncloud-v10.yml) | [![Seafile v11.0.5](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/login-seafile-v11.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/login-seafile-v11.yml) |
 
 ---
 
 ## Share Link Tests 🔗
 Tests the ability to create and manage public links for file sharing, and their integration into EFSS platforms.
 
-| Sender (R) / Receiver (C) | Nextcloud v27.1.11 | Nextcloud v28.0.12 | ownCloud v10.15.0 |
+| Sender (R) / Receiver (C) | Nextcloud v27.1.11 | Nextcloud v28.0.14 | ownCloud v10.15.0 |
 |---------------------------|--------------------|--------------------|-------------------|
 | **Nextcloud v27.1.11**    | [![NC v27 ↔ NC v27](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-nc-v27.yml) | [![NC v27 ↔ NC v28](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-nc-v28.yml) | [![NC v27 ↔ OC v10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v27-oc-v10.yml) |
-| **Nextcloud v28.0.12**    | [![NC v28 ↔ NC v27](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-nc-v27.yml) | [![NC v28 ↔ NC v28](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-nc-v28.yml) | [![NC v28 ↔ OC v10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-oc-v10.yml) |
+| **Nextcloud v28.0.14**    | [![NC v28 ↔ NC v27](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-nc-v27.yml) | [![NC v28 ↔ NC v28](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-nc-v28.yml) | [![NC v28 ↔ OC v10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-nc-v28-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-nc-v28-oc-v10.yml) |
 | **ownCloud v10.15.0**     | [![OC v10 ↔ NC v27](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-oc-v10-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-oc-v10-nc-v27.yml) | [![OC v10 ↔ NC v28](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-oc-v10-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-oc-v10-nc-v28.yml) | [![OC v10 ↔ OC v10](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-link-oc-v10-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-link-oc-v10-oc-v10.yml) |
 
 ---
@@ -226,10 +226,10 @@ Tests the ability to create and manage public links for file sharing, and their 
 ## Share With Tests 🤝
 Validates direct file sharing between users on different EFSS platforms, ensuring seamless collaboration.
 
-| Sender (R) / Receiver (C) | Nextcloud v27.1.11 | Nextcloud v28.0.12 | OcmStub v1.0.0 | ownCloud v10.15.0 | Seafile v11.0.5 |
+| Sender (R) / Receiver (C) | Nextcloud v27.1.11 | Nextcloud v28.0.14 | OcmStub v1.0.0 | ownCloud v10.15.0 | Seafile v11.0.5 |
 |---------------------------|--------------------|--------------------|----------------|-------------------|-----------------|
 | **Nextcloud v27.1.11**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-nc-v27.yml) | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-nc-v28.yml) | [![NC ↔ OS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-os-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-os-v1.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v27-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v27-oc-v10.yml) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
-| **Nextcloud v28.0.12**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-nc-v27.yml) | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-nc-v28.yml) | [![NC ↔ OS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-os-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-os-v1.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-oc-v10.yml) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
+| **Nextcloud v28.0.14**    | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-nc-v27.yml) | [![NC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-nc-v28.yml) | [![NC ↔ OS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-os-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-os-v1.yml) | [![NC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-nc-v28-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-nc-v28-oc-v10.yml) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
 | **OcmStub v1.0.0**        | ![Possible](https://img.shields.io/badge/Possible-blue?style=flat-square) | ![Possible](https://img.shields.io/badge/Possible-blue?style=flat-square) | [![OS ↔ OS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-os-v1-os-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-os-v1-os-v1.yml) | ![Possible](https://img.shields.io/badge/Possible-blue?style=flat-square) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
 | **ownCloud v10.15.0**     | [![OC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-oc-v10-nc-v27.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-oc-v10-nc-v27.yml) | [![OC ↔ NC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-oc-v10-nc-v28.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-oc-v10-nc-v28.yml) | [![OC ↔ OS](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-oc-v10-os-v1.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-oc-v10-os-v1.yml) | [![OC ↔ OC](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-oc-v10-oc-v10.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-oc-v10-oc-v10.yml) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) |
 | **Seafile v11.0.5**       | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) | ![Impossible](https://img.shields.io/badge/Impossible-orange?style=flat-square) | [![SF ↔ SF](https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/share-with-sf-v11-sf-v11.yml?branch=main&style=flat-square&label=)](https://github.com/pondersource/dev-stock/actions/workflows/share-with-sf-v11-sf-v11.yml) |
@@ -298,7 +298,7 @@ To run specific tests, use the following command syntax:
         4. `ocis`
 
 7. **Platform 2 Version (Optional):**
-    - The specific version of Platform 2. For example: `v28.0.12`.
+    - The specific version of Platform 2. For example: `v28.0.14`.
 
 
 ## Example Usage 📘
@@ -320,10 +320,10 @@ Run a "login" test on a Seafile instance using version `v11.0.5`, in development
 ```
 
 ### Running a share-link Test:
-Run a "share-link" test between ownCloud and Nextcloud instances, using versions `v10.15.0` and `v29.0.8`, respectively, in CI mode with Firefox:
+Run a "share-link" test between ownCloud and Nextcloud instances, using versions `v10.15.0` and `v29.0.10`, respectively, in CI mode with Firefox:
 
 ```bash
-./dev/ocm-test-suite.sh share-link owncloud v10.15.0 ci firefox nextcloud v29.0.8
+./dev/ocm-test-suite.sh share-link owncloud v10.15.0 ci firefox nextcloud v29.0.10
 ```
 
 ## Notes 📝
@@ -342,6 +342,15 @@ Use ci for automated pipelines with concise output.
 
 ### Cross-Platform Tests:
 For scenarios requiring two platforms (e.g., `share-with`, `invite-link`), specify both Platform 1 and Platform 2 along with their versions.
+
+### Forensic Logs:
+The Nextcloud images have [`mod_log_forensic`](https://httpd.apache.org/docs/2.4/mod/mod_log_forensic.html) and [`mod_security`](https://stackoverflow.com/a/47456612)
+enabled, so you can try this for debugging:
+
+```bash
+docker exec -it nextcloud1.docker tail -f /etc/apache2/forensic.log
+docker exec -it nextcloud1.docker tail -f /var/log/apache2/modsec_audit.log
+```
 
 # Debugging
 ## RD-SRAM
@@ -364,3 +373,146 @@ See [docs](./docs/xdebug.md)
 
 # SOLID RemoteStorage
 for development see [docs](./docs/solid-remotestorage.md)
+
+
+# OCM Test Suite Documents
+
+This is still a work in progress and will be moved to other place, for now I like to access it here.
+
+
+## Flow graph of complete OCM Test suite flow for share-with between Nextcloud and Nextcloud
+### 1. Initial Setup (GitHub Actions Trigger, Docker Pulls, and Environment Initialization)
+```mermaid
+flowchart TD
+    %% Start of the workflow
+    A[GitHub Actions Triggered] --> B[Checkout Repository]
+
+    %% Pull Docker Images
+    B --> C[Pull Docker Images]
+    C --> C1[Pull MariaDB:11.4.2]
+    C --> C2[Pull Cypress:13.13.1]
+    C --> C3[Pull pondersource/nextcloud:v27.1.11]
+
+    %% Initialize Environment
+    C3 --> D[Initialize Environment]
+    D --> D1[Resolve Script Directory]
+    D --> D2[Set ENV_ROOT]
+    D --> D3[Export ENV_ROOT]
+
+    %% Validate Files and Directories
+    D --> E[Validate Required Files & Directories]
+    E --> E1[Check TLS Certificates]
+    E --> E2[Check Cypress Configuration]
+```
+
+### 2. Docker Network and Container Management
+```mermaid
+flowchart TD
+    %% Parse Arguments
+    E[Validate Required Files & Directories] --> F[Parse Command-Line Arguments]
+    F --> F1[Set EFSS_PLATFORM_1_VERSION]
+    F --> F2[Set EFSS_PLATFORM_2_VERSION]
+    F --> F3[Set SCRIPT_MODE - dev/ci]
+    F --> F4[Set BROWSER_PLATFORM - electron/chrome/edge/firefox]
+
+    %% Clean Up Previous Resources
+    F --> G[Clean Up Previous Resources]
+    G --> G1[Run clean.sh]
+    G --> G2[Remove Temporary Directories]
+    G --> G3[Remove Old Docker Containers]
+
+    %% Create Docker Network
+    G --> H[Create Docker Network: testnet]
+    H --> H1{Does testnet exist?}
+    H1 -- Yes --> H2[Use Existing testnet]
+    H1 -- No --> H3[Create testnet]
+```
+
+```mermaid
+flowchart TD
+    %% Start MariaDB Container
+    H2[Use Existing testnet] --> I[Start MariaDB Container]
+    I --> I1[Configure MariaDB Environment Variables]
+    I --> I2[Connect to testnet]
+    I --> I3[Wait for MariaDB Port 3306]
+
+    %% Start Nextcloud Containers
+    I --> J[Start Nextcloud Containers]
+    J --> J1[Start nextcloud1.docker]
+    J1 --> J1a[Configure Nextcloud1 with MariaDB]
+    J1 --> J1b[Set Admin Credentials - einstein/relativity]
+    J1 --> J1c[Wait for Nextcloud1 Port 443]
+
+    J --> J2[Start nextcloud2.docker]
+    J2 --> J2a[Configure Nextcloud2 with MariaDB]
+    J2 --> J2b[Set Admin Credentials - michiel/dejong]
+    J2 --> J2c[Wait for Nextcloud2 Port 443]
+```
+
+### 3. Dev Mode and CI Mode Execution
+```mermaid
+flowchart TD
+    %% Conditional: Dev Mode vs CI Mode
+    J1c[Wait for Nextcloud1 Port 443] --> K{SCRIPT_MODE}
+    J2c[Wait for Nextcloud2 Port 443] --> K
+    K -- Dev --> L[Start Dev Mode Containers]
+    K -- CI --> M[Start CI Mode Containers]
+
+    %% Dev Mode Setup
+    L --> L1[Start Firefox Container]
+    L --> L2[Start VNC Server Container]
+    L --> L3[Start Cypress Container in Dev Mode]
+
+    %% Provide Dev Mode Instructions
+    L1 --> N[Provide Dev Mode Access Instructions]
+    L2 --> N
+    L3 --> N
+    N --> O1[Run Cypress Tests in Dev Mode via VNC on port 5700]
+    N --> O2[Manually Access Containers via Firefox on port 5800]
+
+    %% CI Mode Setup
+    M --> M1[Configure Cypress for CI Mode]
+    M1 --> M2[Run Cypress Tests in CI Mode]
+```
+
+### 4. Cypress Test Execution and Result Verification
+```mermaid
+flowchart TD
+    %% Cypress Test Execution
+    O[Run Cypress Tests in Dev Mode] --> P[Cypress Executes Open Cloud Mesh Test Suite]
+    M2[Run Cypress Tests in CI Mode] --> P
+
+    %% Verify Test Results
+    P --> Q{Test Success?}
+    Q -- Yes --> R[Mark as Passed]
+    Q -- No --> S[Mark as Failed]
+
+    %% Subgraphs for better organization
+    classDef success fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef failure fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    class R success;
+    class S failure;
+
+    %% Modify text color to black for specific nodes
+    style R fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#000000
+    style S fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#000000
+```
+
+### 5. Final Cleanup and Workflow Conclusion
+```mermaid
+flowchart TD
+    %% Final Cleanup
+    R[Mark as Passed] --> T[Cleanup Resources]
+    S[Mark as Failed] --> T
+    T --> U[End Workflow]
+
+    %% Subgraphs for better organization
+    classDef success fill:#d4edda,stroke:#28a745,stroke-width:2px;
+    classDef failure fill:#f8d7da,stroke:#dc3545,stroke-width:2px;
+    class R success;
+    class S failure;
+
+    %% Modify text color to black for specific nodes
+    style R fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#000000
+    style S fill:#f8d7da,stroke:#dc3545,stroke-width:2px,color:#000000
+```

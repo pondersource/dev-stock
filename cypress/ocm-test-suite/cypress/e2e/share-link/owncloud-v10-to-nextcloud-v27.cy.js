@@ -1,7 +1,7 @@
 import {
   createShareLink,
   renameFile
-} from '../utils/owncloud'
+} from '../utils/owncloud-v10'
 
 import {
   navigationSwitchLeftSideV27,
@@ -14,14 +14,7 @@ describe('Share link federated sharing functionality for ownCloud', () => {
     cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
 
     renameFile('welcome.txt', 'oc1-to-nc1-share-link.txt')
-    createShareLink('oc1-to-nc1-share-link.txt').then(
-      (result) => {
-        cy.visit(result)
-
-        // save share url to file.
-        cy.writeFile('share-link-url.txt', result)
-      }
-    )
+    createShareLink('oc1-to-nc1-share-link.txt')
   })
 
   it('Receive federated share <file> from ownCloud v10 to Nextcloud v27', () => {
@@ -30,7 +23,7 @@ describe('Share link federated sharing functionality for ownCloud', () => {
     cy.readFile('share-link-url.txt').then((result) => {
 
       // extract token from url.
-      const token = result.replace('https://owncloud1.docker/index.php/s/','');
+      const token = result.replace('https://owncloud1.docker/s/','');
 
       // put token into the link.
       const url = `https://nextcloud1.docker/index.php/login?redirect_url=%252Findex.php%252Fapps%252Ffiles#remote=https%3A%2F%2Fowncloud1.docker&token=${token}&owner=marie&ownerDisplayName=marie&name=oc1-to-oc2-share-link.txt&protected=0`

@@ -1,27 +1,74 @@
-import { createShareV27, renameFileV27 } from '../utils/nextcloud-v27'
+/**
+ * @fileoverview
+ * Cypress test suite for testing native federated sharing functionality in Nextcloud v27 and v28.
+ * This suite verifies the ability to send and receive federated file shares between two Nextcloud instances with different versions.
+ *
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
 
-describe('Native federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v28', () => {
-    // share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+import {
+  createShareV27,
+  renameFileV27,
+  ensureFileExistsV27,
+} from '../utils/nextcloud-v27';
 
-    renameFileV27('welcome.txt', 'nc1-to-nc2-share.txt')
-    createShareV27('nc1-to-nc2-share.txt', 'michiel', 'nextcloud2.docker')
-  })
+import {
+  acceptShareV28,
+  ensureFileExistsV28,
+} from '../utils/nextcloud-v28';
 
-  it('Receive federated share <file> from Nextcloud v27 to Nextcloud v28', () => {
-    // accept share from Nextcloud 2.
-    cy.loginNextcloud('https://nextcloud2.docker', 'michiel', 'dejong')
+describe('Native Federated Sharing Functionality for Nextcloud', () => {
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('NEXTCLOUD2_URL') || 'https://nextcloud2.docker';
+  const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
+  const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
+  const recipientUsername = Cypress.env('NEXTCLOUD2_USERNAME') || 'michiel';
+  const recipientPassword = Cypress.env('NEXTCLOUD2_PASSWORD') || 'dejong';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'share-with-nc1-to-nc2.txt';
 
-    // force reload the page for share to apear.
-    cy.reload(true)
+  /**
+   * Test Case: Sending a federated share from one Nextcloud instance to another.
+   * Validates that a file can be successfully shared from Nextcloud Instance 1 to Nextcloud Instance 2.
+   */
+  it('Send a federated share of a file from Nextcloud v27 to Nextcloud v28', () => {
+    // Step 1: Log in to the sender's Nextcloud instance
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
-    cy.get('[data-cy-files-list-row-name="nc1-to-nc2-share.txt"]', { timeout: 10000 }).should('be.visible')
-  })
+    // Step 2: Ensure the original file exists before renaming
+    ensureFileExistsV27(originalFileName);
+
+    // Step 3: Rename the file to prepare it for sharing
+    renameFileV27(originalFileName, sharedFileName);
+
+    // Step 4: Verify the file has been renamed
+    ensureFileExistsV27(sharedFileName);
+
+    // Step 5: Create a federated share for the recipient
+    createShareV27(sharedFileName, recipientUsername, recipientUrl.replace(/^https?:\/\/|\/$/g, ''));
+
+    // TODO @MahdiBaghbani: Verify that the share was created successfully
+  });
+
+  /**
+   * Test Case: Receiving and accepting a federated share on the recipient's Nextcloud instance.
+   * Validates that the recipient can successfully accept the share and view the shared file.
+   */
+  it('Receive federated share of a file from Nextcloud v27 to Nextcloud v28', () => {
+    // Step 1: Log in to the recipient's Nextcloud instance
+    cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
+
+    // Step 2: Wait for the share dialog to appear and accept the incoming federated share
+    acceptShareV28();
+
+    // Step 3: Reload the page to ensure the shared file appears in the file list
+    cy.reload(true);
+
+    // Step 4: Verify the shared file is visible
+    ensureFileExistsV28(sharedFileName);
+
+    // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
+  });
 })

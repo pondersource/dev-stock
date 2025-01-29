@@ -50,7 +50,7 @@ BRANCH_SOLID=main
     docker run -it --rm                                                                             \
     -v "${ENV_ROOT}/nextcloud/apps/solid:/var/www/html/apps/solid"                                  \
     --workdir /var/www/html/apps/solid                                                              \
-    "pondersource/dev-stock-nextcloud-solid"                                                        \
+    "pondersource/nextcloud-solid"                                                        \
     bash -c "composer install"                                                                      \
     &&                                                                                              \
     cd ../..

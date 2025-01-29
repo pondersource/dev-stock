@@ -16,7 +16,7 @@ BRANCH_OWNCLOUD_APP=nextcloud
 cp -f ./docker/scripts/init/nextcloud-sciencemesh.sh ./temp/nc.sh
 
 # add additional tagging for docker images.
-docker tag pondersource/dev-stock-nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
+docker tag pondersource/nextcloud-sciencemesh pondersource/dev-stock-nc1-sciencemesh
 
 # ownCloud Sciencemesh source code.
 [ ! -d "nc-sciencemesh-release" ] &&                                                                              \
@@ -53,7 +53,7 @@ docker run --detach --network=testnet                                           
   -v "${REPO_ROOT}/temp/nc.sh:/nc-init.sh"                                                                        \
   -v "${REPO_ROOT}/nc-sciencemesh-release:/var/www/html/apps/sciencemesh"                                         \
   -v "${REPO_ROOT}/release/sciencemesh.key:/var/www/sciencemesh.key"                                              \
-  "pondersource/dev-stock-nextcloud-sciencemesh"
+  "pondersource/nextcloud-sciencemesh"
 
 docker exec --user root nc-release.docker bash -c "chown www-data:www-data -R /var/www/html/apps/sciencemesh      \
                                                   &&                                                              \

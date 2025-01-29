@@ -54,7 +54,7 @@ BRANCH_RD_SRAM=compatibility-with-sciencemesh
     docker run -it --rm                                                                             \
     -v "$(pwd)/owncloud-sciencemesh:/var/www/html/apps/sciencemesh"                                 \
     --workdir /var/www/html/apps/sciencemesh                                                        \
-    pondersource/dev-stock-owncloud-sciencemesh                                                     \
+    pondersource/owncloud-sciencemesh                                                     \
     composer install
 
 [ ! -d "owncloud/apps/sciencemesh" ] &&                                                             \

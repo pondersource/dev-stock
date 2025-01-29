@@ -1,112 +1,249 @@
 #!/usr/bin/env python3
 
-# Python Standard Library
 import os
 import sys
 import subprocess
+import xml.etree.ElementTree as ET
+import argparse
 
-args = sys.argv
+def parse_arguments():
+    """
+    Parses command-line arguments using argparse.
 
-platform_tag = args[1] if not args[1] == "none" else ""
-pre_release_tag = f"-{args[2]}" if not args[2] == "none" else ""
-directory_name = args[3]
+    Returns:
+        argparse.Namespace: Parsed command-line arguments.
+    """
+    parser = argparse.ArgumentParser(description="Version tagging script.")
+    parser.add_argument("platform_tag", help="Platform tag")
+    parser.add_argument("pre_release_tag", help="Pre-release tag (or 'none')")
+    parser.add_argument("directory_name", help="Directory name of the project")
+    parser.add_argument("--new-version", help="New version number in X.Y.Z format")
+    parser.add_argument("--auto-push", action="store_true", help="Automatically push changes without confirmation")
+    return parser.parse_args()
 
-# get path to this file's directory, then go one directory up.
-file_path = os.path.abspath(os.path.dirname(__file__))
-base_path = os.path.abspath(os.path.dirname(file_path))
-project_path = os.path.join(base_path, f"{directory_name}")
-version_file_path = os.path.join(project_path, "appinfo", "info.xml")
+def get_version_info(version_file_path):
+    """
+    Reads the 'info.xml' file and extracts the version information.
 
-# open version file.
-with open(version_file_path) as file:
-    version_file = file.readlines()
+    Args:
+        version_file_path (str): Path to the 'info.xml' file.
 
-# set version and version_info to None, so if we didn't find
-# a version in info.xml, we can throw an error.
-version = None
-version_info = None
+    Returns:
+        tuple: A tuple containing the version string and version tuple.
 
-# find version
-for line in version_file:
-    if "<version>" in line:
-        # find versioninside info.xml and reformat it to
-        # standard x.y.z version format
-        tuple_left = line.index(">")
-        tuple_right = line.index("/")
-        version = line[tuple_left + 1:tuple_right -
-                       1].replace(",", ".").replace(" ", "")
-        # creat a list from x.y.z string which has [x, y, z]
-        # notice that x, y , z must be converted to integer
-        version_info = [int(number) for number in version.split(".")]
+    Raises:
+        FileNotFoundError: If the 'info.xml' file does not exist.
+        ValueError: If the version tag is missing or malformed.
+    """
+    try:
+        tree = ET.parse(version_file_path)
+        root = tree.getroot()
+        version_element = root.find('version')
+        if version_element is None or version_element.text is None:
+            raise ValueError("Version tag not found or empty in info.xml.")
+        version = version_element.text.strip()
+        version_info = tuple(map(int, version.split('.')))
+        return version, version_info
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Version file not found: {version_file_path}")
+    except ET.ParseError as e:
+        raise ValueError("Malformed XML in info.xml.") from e
+    except ValueError as e:
+        raise ValueError(f"Malformed version in info.xml: {e}") from e
 
-# throw error if version not found
-if not version or not version_info:
-    raise ValueError("ERROR: version not found at info.xml.")
+def validate_version_format(version_tuple):
+    """
+    Validates the format of the version tuple.
 
-print("This program will tag a new release of the app\n"
-      + "and it will push the new tag to github.\n")
+    Args:
+        version_tuple (tuple): The version tuple to validate.
 
-# read and convert to integer.
-print("Version is in X.Y.Z form.\n"
-      "X is version major, Y is version minor, Z is version minor.\n\n")
+    Raises:
+        ValueError: If the version tuple does not have exactly three integer components.
+    """
+    if len(version_tuple) != 3 or not all(isinstance(x, int) for x in version_tuple):
+        raise ValueError("Version must be in X.Y.Z format (e.g., 1.0.0).")
 
-print(f"Current version is {version} .\n\n")
+def validate_new_version(new_version_info, current_version_info):
+    """
+    Validates that the new version is greater than the current version.
 
-new_major = int(input("Enter version major number:\n"))
-new_minor = int(input("Enter version minor  number:\n"))
-new_patch = int(input("Enter version patch number:\n"))
+    Args:
+        new_version_info (tuple): New version tuple.
+        current_version_info (tuple): Current version tuple.
 
-new_version = ".".join(map(str, [new_major, new_minor, new_patch]))
+    Raises:
+        ValueError: If the new version is not greater than the current version.
+    """
+    if new_version_info <= current_version_info:
+        raise ValueError("New version must be greater than the current version!")
 
-# check version to be bigger than last version.
-if new_version == version:
-    raise ValueError("Version can't be same as current version!")
+def update_version_file(version_file_path, new_version):
+    """
+    Updates the 'info.xml' file with the new version.
 
-if new_major < version_info[0]:
-    raise ValueError(
-        "Major version can't be less than the current major version!")
-elif new_major > version_info[0]:
-    pass
-elif new_minor < version_info[1]:
-    raise ValueError(
-        "Minor version can't be less than the current minor version!")
-elif new_minor > version_info[1]:
-    pass
-elif new_patch < version_info[2]:
-    raise ValueError(
-        "Patch version can't be less than the current patch version!")
+    Args:
+        version_file_path (str): Path to the 'info.xml' file.
+        new_version (str): New version string.
 
+    Raises:
+        RuntimeError: If the version file cannot be updated.
+    """
+    try:
+        tree = ET.parse(version_file_path)
+        root = tree.getroot()
+        version_element = root.find('version')
+        if version_element is None:
+            raise ValueError("Version tag not found in info.xml.")
+        version_element.text = new_version
+        tree.write(version_file_path, encoding='UTF-8', xml_declaration=True)
+    except Exception as e:
+        raise RuntimeError("Failed to update version file.") from e
 
-# creat an empty list for new info.xml file
-print("Creating new version. \n\n")
+def git_commit_tag(project_path, version_file_path, tag):
+    """
+    Performs Git commit and tagging operations.
 
-new_xml_file = list()
+    Args:
+        project_path (str): Path to the project directory.
+        version_file_path (str): Path to the version file.
+        tag (str): Tag name to create.
 
-# write new version_info and in info.xml.
-new_version_info = f"    <version>{new_major}.{new_minor}.{new_patch}</version>\n"
+    Raises:
+        RuntimeError: If any Git operation fails.
+    """
+    try:
+        # Stage the version file
+        subprocess.check_call(["git", "-C", project_path, "add", version_file_path])
+        # Commit the change
+        subprocess.check_call(["git", "-C", project_path, "commit", "-m", f"version: {tag}"])
+        # Create a new tag
+        subprocess.check_call(["git", "-C", project_path, "tag", tag])
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("Git operation failed.") from e
 
-# read current info.xml, and update version
-# then append to new_xml_file list.
-with open(version_file_path, "r") as file:
-    lines = file.readlines()
-    for line in lines:
-        if "<version>" in line:
-            new_xml_file.append(new_version_info)
+def git_revert_tag(project_path, tag):
+    """
+    Reverts the Git tag and commit if the push is declined.
+
+    Args:
+        project_path (str): Path to the project directory.
+        tag (str): Tag name to delete.
+
+    Raises:
+        RuntimeError: If reverting the Git tag and commit fails.
+    """
+    try:
+        # Delete the tag
+        subprocess.check_call(["git", "-C", project_path, "tag", "-d", tag])
+        # Undo the last commit
+        subprocess.check_call(["git", "-C", project_path, "reset", "--hard", "HEAD~1"])
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("Failed to revert Git tag and commit.") from e
+
+def git_push(project_path, tag):
+    """
+    Pushes the commit and tag to the remote repository.
+
+    Args:
+        project_path (str): Path to the project directory.
+        tag (str): Tag name to push.
+
+    Raises:
+        RuntimeError: If the Git push fails.
+    """
+    try:
+        # Push the commit and the tag
+        subprocess.check_call(["git", "-C", project_path, "push", "origin", "HEAD"])
+        subprocess.check_call(["git", "-C", project_path, "push", "origin", tag])
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("Git push failed.") from e
+
+def main():
+    """
+    Main function that orchestrates the version tagging process.
+
+    Steps:
+    - Parses command-line arguments.
+    - Reads the current version from 'info.xml'.
+    - Obtains the new version (either via arguments or user input).
+    - Validates the new version.
+    - Updates 'info.xml' with the new version.
+    - Commits the change and creates a Git tag.
+    - Optionally pushes the changes to the remote repository.
+    """
+    try:
+        # Parse command-line arguments
+        args = parse_arguments()
+        platform_tag = args.platform_tag
+        pre_release_tag = args.pre_release_tag
+        directory_name = args.directory_name
+        new_version_arg = args.new_version
+        auto_push = args.auto_push
+
+        # Build pre-release suffix
+        pre_release_suffix = f"-{pre_release_tag}" if pre_release_tag != "none" else ""
+
+        # Derive paths
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        project_path = os.path.join(base_path, directory_name)
+        version_file_path = os.path.join(project_path, "appinfo", "info.xml")
+
+        # Read current version
+        current_version, current_version_info = get_version_info(version_file_path)
+        print(f"Current version: {current_version}")
+
+        # Get new version from the user or arguments
+        if new_version_arg:
+            new_version = new_version_arg.strip()
+            new_version_info = tuple(map(int, new_version.split('.')))
         else:
-            new_xml_file.append(line)
+            print("Enter the new version in X.Y.Z format.")
+            new_major = int(input("Enter major version: "))
+            new_minor = int(input("Enter minor version: "))
+            new_patch = int(input("Enter patch version: "))
+            new_version_info = (new_major, new_minor, new_patch)
+            new_version = '.'.join(map(str, new_version_info))
 
-# write updated content from new_xml_file
-# back into info.xml file
-with open(version_file_path, "w+") as file:
-    file.writelines(new_xml_file)
+        # Validate new version
+        validate_version_format(new_version_info)
+        validate_new_version(new_version_info, current_version_info)
 
-# do git commit and tag and push to upstreams
-print("Commit and Tag and Push to upstream. \n\n")
+        # Update version in the file
+        update_version_file(version_file_path, new_version)
+        print("Version updated successfully.")
 
-tag = f"v{new_version}-{platform_tag}{pre_release_tag}"
+        # Create tag and commit
+        tag = f"v{new_version}-{platform_tag}{pre_release_suffix}"
+        git_commit_tag(project_path, version_file_path, tag)
+        print(f"Tag '{tag}' created.")
 
-subprocess.call(
-    f"cd {project_path} && git commit {version_file_path} -m \"version: {tag}\"", shell=True)
-subprocess.call(f"cd {project_path} && git tag \"{tag}\"", shell=True)
-subprocess.call(
-    f"cd {project_path} && git push origin HEAD \"{tag}\"", shell=True)
+        # Confirm push
+        if auto_push:
+            confirm_push = "yes"
+        else:
+            confirm_push = input("Do you want to push the changes to the repository? (yes/no): ").strip().lower()
+
+        if confirm_push == "yes":
+            git_push(project_path, tag)
+            print(f"Tag '{tag}' pushed to the repository.")
+        else:
+            print("Push declined. Reverting tag and commit.")
+            git_revert_tag(project_path, tag)
+            print("Reverted tag and commit.")
+
+    except ValueError as ve:
+        print(f"Error: {ve}")
+        sys.exit(1)
+    except FileNotFoundError as fe:
+        print(f"Error: {fe}")
+        sys.exit(1)
+    except RuntimeError as re:
+        print(f"Error: {re}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,4 @@
-name: OCM Test Share Link OC v10.15.0 to NC v28.0.12
+name: OCM Test Share Link OC v10.15.0 to NC v28.0.14
 
 # Controls when the action will run.
 on:
@@ -35,7 +35,7 @@ jobs:
         receiver: [
           {
             platform: nextcloud,
-            version: v28.0.12
+            version: v28.0.14
           },
         ]
 
