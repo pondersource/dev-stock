@@ -18,10 +18,37 @@ extract_platform_variables() {
         return
     fi
 
-    # For other scenarios, split the filename by '-' to get both platforms
-    local platform1 platform2
-    IFS='-' read -r platform1 platform2 <<< "${filename}"
-
+    # For other scenarios, split the filename at the correct hyphen
+    # First remove the .sh extension
+    local name_without_extension="${filename%.sh}"
+    
+    # Check if there's at least one hyphen
+    if [[ "${name_without_extension}" != *-* ]]; then
+        error_exit "Invalid filename format: ${filename}. Expected format: platform1-platform2.sh"
+    fi
+    
+    # For cases like nextcloud-sm-nextcloud-sm.sh, we need to split at the middle
+    # For cases like nextcloud-sm-owncloud.sh, we need to split after nextcloud-sm
+    # We can do this by counting from the right and splitting at the correct position
+    if [[ "${name_without_extension}" == *-*-*-* ]]; then
+        # Case with 3 hyphens (like nextcloud-sm-nextcloud-sm)
+        # Split at the second hyphen
+        local platform1=$(echo "${name_without_extension}" | cut -d'-' -f1-2)
+        local platform2=$(echo "${name_without_extension}" | cut -d'-' -f3-)
+    else
+        # Case with 1 or 2 hyphens
+        # If it matches known pattern with platform1 containing a hyphen,
+        # split at the second hyphen, otherwise split at the first
+        if [[ "${name_without_extension}" == nextcloud-sm-* ]] || 
+           [[ "${name_without_extension}" == owncloud-sm-* ]]; then
+            local platform1=$(echo "${name_without_extension}" | cut -d'-' -f1-2)
+            local platform2=$(echo "${name_without_extension}" | cut -d'-' -f3)
+        else
+            local platform1=$(echo "${name_without_extension}" | cut -d'-' -f1)
+            local platform2=$(echo "${name_without_extension}" | cut -d'-' -f2-)
+        fi
+    fi
+    
     # Export the variables so the rest of the script can use them
     export TEST_SCENARIO="${test_scenario}"
     export EFSS_PLATFORM_1="${platform1}"

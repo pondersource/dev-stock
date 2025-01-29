@@ -10,7 +10,7 @@ import {
   createShare,
   renameFile,
   ensureFileExists,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 import {
   generateShareAssertions,

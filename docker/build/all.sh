@@ -111,7 +111,7 @@ command_exists() {
 }
 
 # -----------------------------------------------------------------------------------
-# Docker Build Function
+# Docker Build Functions
 # -----------------------------------------------------------------------------------
 # A helper function to streamline the Docker build process.
 # Arguments:
@@ -120,12 +120,6 @@ command_exists() {
 #   3. Tags (space-separated string of tags)
 #   4. Cache Bust to force rebuild.
 #   5. Additional build arguments (optional)
-#
-# The function:
-#   - Validates the Dockerfile existence.
-#   - Prints a build message and runs 'docker build' with specified args.
-#   - Applies a CACHEBUST build-arg by default to help with cache invalidation.
-#   - Prints success or error messages accordingly.
 build_docker_image() {
     local dockerfile="${1}"
     local image_name="${2}"
@@ -135,36 +129,132 @@ build_docker_image() {
 
     # Validate that the Dockerfile exists
     if [[ ! -f "./dockerfiles/${dockerfile}" ]]; then
-        printf "Error: Dockerfile not found at '%s'. Skipping build of %s.\n" "${dockerfile}" "${image_name}" >&2
+        print_error "Dockerfile not found at '${dockerfile}'. Skipping build of ${image_name}."
         return 1
     fi
 
-    printf "Building image: %s from Dockerfile: %s\n" "${image_name}" "${dockerfile}"
+    echo "Building image: ${image_name} from Dockerfile: ${dockerfile}"
     if ! docker build \
         --build-arg CACHEBUST="${cache_bust}" ${build_args} \
         --file "./dockerfiles/${dockerfile}" \
         $(for tag in ${tags}; do printf -- "--tag ${image_name}:%s " "${tag}"; done) \
         .; then
-        printf "Error: Failed to build image %s.\n" "${image_name}" >&2
+        print_error "Failed to build image ${image_name}."
         return 1
     fi
 
-    printf "Successfully built: %s\n\n" "${image_name}"
+    echo "Successfully built: ${image_name}"
+    echo
 }
 
 # -----------------------------------------------------------------------------------
-# Function: main
-# Purpose: Main function to manage the flow of the script.
+# Function: build_nextcloud_app_image
+# Purpose: Build a Nextcloud image with a specific app installed
+# Arguments:
+#   1. app_name - Name of the app (e.g., "sciencemesh")
+#   2. app_repo - Git repository URL
+#   3. app_branch - Git branch (default: "main")
+#   4. app_build_cmd - Build command if required (optional)
+#   5. init_script - Path to initialization script (optional)
+#   6. nextcloud_version - Nextcloud version to use as base
+#   7. image_tag_suffix - Suffix for the image tag (optional)
+# -----------------------------------------------------------------------------------
+build_nextcloud_app_image() {
+    local app_name="${1}"
+    local app_repo="${2}"
+    local app_branch="${3:-master}"
+    local app_build_cmd="${4:-}"
+    local init_script="${5:-}"
+    local nextcloud_version="${6}"
+    local image_tag_suffix="${7:-${app_name}}"
+    
+    local build_args=""
+    
+    # Construct build arguments string
+    build_args="--build-arg NEXTCLOUD_VERSION=${nextcloud_version}"
+    build_args="${build_args} --build-arg APP_NAME=${app_name}"
+    build_args="${build_args} --build-arg APP_REPO=${app_repo}"
+    build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    
+    # Add optional build arguments if provided
+    [[ -n "${app_build_cmd}" ]] && build_args="${build_args} --build-arg APP_BUILD_CMD=${app_build_cmd}"
+    [[ -n "${init_script}" ]] && build_args="${build_args} --build-arg INIT_SCRIPT=${init_script}"
+    
+    # Construct the image tag
+    local image_tag="${nextcloud_version}-${image_tag_suffix}"
+    
+    echo "Building Nextcloud app image: ${app_name} (${image_tag})"
+    if ! docker build \
+        ${build_args} \
+        --file "./dockerfiles/nextcloud-app.Dockerfile" \
+        --tag "pondersource/nextcloud:${image_tag}" \
+        .; then
+        print_error "Failed to build Nextcloud app image: ${app_name}"
+        return 1
+    fi
+    
+    echo "Successfully built Nextcloud app image: ${app_name}"
+    echo
+}
+
+# -----------------------------------------------------------------------------------
+# Function: build_nextcloud_app_image
+# Purpose: Build a Nextcloud image with a specific app installed
+# Arguments:
+#   1. app_name - Name of the app (e.g., "sciencemesh")
+#   2. app_repo - Git repository URL
+#   3. app_branch - Git branch (default: "main")
+#   4. app_build_cmd - Build command if required (optional)
+#   5. init_script - Path to initialization script (optional)
+#   6. nextcloud_version - Nextcloud version to use as base
+#   7. image_tag_suffix - Suffix for the image tag (optional)
+# -----------------------------------------------------------------------------------
+build_owncloud_app_image() {
+    local app_name="${1}"
+    local app_repo="${2}"
+    local app_branch="${3:-master}"
+    local app_build_cmd="${4:-}"
+    local init_script="${5:-}"
+    local owncloud_version="${6}"
+    local image_tag_suffix="${7:-${app_name}}"
+    
+    local build_args=""
+    
+    # Construct build arguments string
+    build_args="--build-arg OWNCLOUD_VERSION=${owncloud_version}"
+    build_args="${build_args} --build-arg APP_NAME=${app_name}"
+    build_args="${build_args} --build-arg APP_REPO=${app_repo}"
+    build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    
+    # Add optional build arguments if provided
+    [[ -n "${app_build_cmd}" ]] && build_args="${build_args} --build-arg APP_BUILD_CMD=${app_build_cmd}"
+    [[ -n "${init_script}" ]] && build_args="${build_args} --build-arg INIT_SCRIPT=${init_script}"
+    
+    # Construct the image tag
+    local image_tag="${owncloud_version}-${image_tag_suffix}"
+    
+    echo "Building ownCloud app image: ${app_name} (${image_tag})"
+    if ! docker build \
+        ${build_args} \
+        --file "./dockerfiles/owncloud-app.Dockerfile" \
+        --tag "pondersource/owncloud:${image_tag}" \
+        .; then
+        print_error "Failed to build ownCloud app image: ${app_name}"
+        return 1
+    fi
+    
+    echo "Successfully built ownCloud app image: ${app_name}"
+    echo
+}
+
+# -----------------------------------------------------------------------------------
+# Main Execution
 # -----------------------------------------------------------------------------------
 main() {
-    # Initialize environment.
+    # Initialize environment and source utilities
     initialize_environment
 
-    # -----------------------------------------------------------------------------------
     # Enable Docker BuildKit (Optional)
-    # -----------------------------------------------------------------------------------
-    # Allow enabling or disabling BuildKit via the first script argument.
-    # Default: BuildKit enabled (value 1).
     USE_BUILDKIT=${1:-1}
     export DOCKER_BUILDKIT="${USE_BUILDKIT}"
 
@@ -173,17 +263,11 @@ main() {
     # -----------------------------------------------------------------------------------
     # Build Images
     # -----------------------------------------------------------------------------------
-    # Below is a list of images to build along with their Dockerfiles and tags.
-    # Modify these as necessary to fit your environment and requirements.
-
     # OCM Stub
     build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"     DEFAULT
 
     # Revad
     build_docker_image revad.Dockerfile             pondersource/revad               "latest"           DEFAULT
-
-    # PHP Base
-    # build_docker_image php-base.Dockerfile          pondersource/php-base           "latest"           DEFAULT
 
     # Nextcloud Base
     build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"           DEFAULT
@@ -203,15 +287,10 @@ main() {
     # Iterate over the array of versions
     for i in "${!nextcloud_versions[@]}"; do
         version="${nextcloud_versions[i]}"
-
+        tags="${version}"
         # If this is the first element (index 0), also add the "latest" tag
-        if [[ "$i" -eq 0 ]]; then
-            tags="${version} latest"
-        else
-            tags="${version}"
-        fi
+        [[ "$i" -eq 0 ]] && tags="${version} latest"
 
-        # Build the Docker image with the determined tags and build-arg
         build_docker_image \
             nextcloud.Dockerfile \
             pondersource/nextcloud \
@@ -220,12 +299,29 @@ main() {
             "--build-arg NEXTCLOUD_BRANCH=${version}"
     done
     
-    # nextcloud Variants
-    # build_docker_image nextcloud-solid.Dockerfile               pondersource/nextcloud-solid              "latest"    DEFAULT
-    # build_docker_image nextcloud-sciencemesh.Dockerfile         pondersource/nextcloud-sciencemesh        "latest"    DEFAULT
+    # Build Nextcloud App Variants
+    # ScienceMesh
+    build_nextcloud_app_image \
+        "sciencemesh" \
+        "https://github.com/sciencemesh/nc-sciencemesh" \
+        "nextcloud" \
+        "make" \
+        "./scripts/init/nextcloud-sciencemesh.sh" \
+        "v27.1.11" \
+        "sm"
+
+    # Example: Solid (commented out)
+    # build_nextcloud_app_image \
+    #     "solid" \
+    #     "https://github.com/pondersource/solid-nextcloud" \
+    #     "main" \
+    #     "make" \
+    #     "./scripts/init/solid.sh" \
+    #     "v27.1.11" \
+    #     "solid"
 
     # ownCloud Base
-    build_docker_image owncloud-base.Dockerfile                 pondersource/owncloud-base                "latest"    DEFAULT
+    build_docker_image owncloud-base.Dockerfile     pondersource/owncloud-base     "latest"           DEFAULT
 
     # ownCloud Versions
     # The first element in this array is considered the "latest".
@@ -234,15 +330,9 @@ main() {
     # Iterate over the array of versions
     for i in "${!owncloud_versions[@]}"; do
         version="${owncloud_versions[i]}"
+        tags="${version}"
+        [[ "$i" -eq 0 ]] && tags="${version} latest"
 
-        # If this is the first element (index 0), also add the "latest" tag
-        if [[ "$i" -eq 0 ]]; then
-            tags="${version} latest"
-        else
-            tags="${version}"
-        fi
-
-        # Build the Docker image with the determined tags and build-arg
         build_docker_image \
             owncloud.Dockerfile \
             pondersource/owncloud \
@@ -251,19 +341,19 @@ main() {
             "--build-arg OWNCLOUD_BRANCH=${version}"
     done
 
-    # OwnCloud Variants
-    # build_docker_image owncloud-sciencemesh.Dockerfile          pondersource/owncloud-sciencemesh         "latest"    DEFAULT
-    # build_docker_image owncloud-surf-trashbin.Dockerfile        pondersource/owncloud-surf-trashbin       "latest"    DEFAULT
-    # build_docker_image owncloud-token-based-access.Dockerfile   pondersource/owncloud-token-based-access  "latest"    DEFAULT
-    # build_docker_image owncloud-opencloudmesh.Dockerfile        pondersource/owncloud-opencloudmesh       "latest"    DEFAULT
-    # build_docker_image owncloud-federatedgroups.Dockerfile      pondersource/owncloud-federatedgroups     "latest"    DEFAULT
-    # build_docker_image owncloud-ocm-test-suite.Dockerfile       pondersource/owncloud-ocm-test-suite      "latest"    DEFAULT
+    # Build ownCloud App Variants
+    # ScienceMesh
+    build_owncloud_app_image \
+        "sciencemesh" \
+        "https://github.com/sciencemesh/nc-sciencemesh" \
+        "owncloud" \
+        "make" \
+        "./scripts/init/owncloud-sciencemesh.sh" \
+        "v10.15.0" \
+        "sm"
 
-    # -----------------------------------------------------------------------------------
-    # Completion Message
-    # -----------------------------------------------------------------------------------
-    printf "All builds attempted.\n"
-    printf "Check the above output for any build failures or errors.\n"
+    echo "All builds attempted."
+    echo "Check the above output for any build failures or errors."
 }
 
 # -----------------------------------------------------------------------------------

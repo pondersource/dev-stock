@@ -1,7 +1,7 @@
 import {
   createShareLink,
   renameFile
-} from '../utils/owncloud'
+} from '../utils/owncloud-v10'
 
 import {
   navigationSwitchLeftSideV27,

@@ -5,7 +5,7 @@ import {
 
 import {
   selectAppFromLeftSide
-} from '../utils/owncloud'
+} from '../utils/owncloud-v10'
 
 describe('Share link federated sharing functionality for Nextcloud', () => {
   it('Send federated share <file> from Nextcloud v27 to ownCloud v10', () => {

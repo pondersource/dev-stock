@@ -1,4 +1,4 @@
-import { createShareLink, renameFile } from '../utils/owncloud'
+import { createShareLink, renameFile } from '../utils/owncloud-v10'
 
 describe('Share link federated sharing functionality for ownCloud', () => {
   it('Send federated share <file> from ownCloud v10 to Nextcloud v28', () => {

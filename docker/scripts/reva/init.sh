@@ -51,6 +51,7 @@ TLS_DIR="/tls"                             # Directory where certificates/keys a
 CERTS_DIR="/certificates"                  # Directory containing optional certificate files
 CA_DIR="/certificate-authority"            # Directory containing optional CA certificate/key files
 HOST="${HOST:-localhost}"                  # Hostname for the environment, defaults to "localhost"
+DISABLED_CONFIGS="${DISABLED_CONFIGS:-}"   # Space-separated list of config files to disable
 
 # -----------------------------------------------------------------------------------
 # Function: create_directory
@@ -103,6 +104,32 @@ populate_reva_binaries() {
 }
 
 # -----------------------------------------------------------------------------------
+# Function: disable_config_files
+# Purpose:  Remove specified configuration files from /etc/revad.
+# Behavior:
+#   - Takes a space-separated list of config files from DISABLED_CONFIGS.
+#   - Removes each specified file from /etc/revad if it exists.
+# Returns:
+#   0 on success, does not fail if files don't exist.
+# -----------------------------------------------------------------------------------
+disable_config_files() {
+    if [[ -z "$DISABLED_CONFIGS" ]]; then
+        return 0
+    fi
+
+    printf "Disabling specified configuration files...\n"
+    for config in $DISABLED_CONFIGS; do
+        local config_path="$REVA_CONFIG_DIR/$config"
+        if [[ -f "$config_path" ]]; then
+            printf "Removing config file: %s\n" "$config"
+            rm -f "$config_path"
+        else
+            printf "Config file not found: %s\n" "$config"
+        fi
+    done
+}
+
+# -----------------------------------------------------------------------------------
 # Function: prepare_configuration
 # Purpose:  Copy Reva configuration files to /etc/revad and replace placeholders.
 # Behavior:
@@ -110,6 +137,7 @@ populate_reva_binaries() {
 #   - Remove any existing /etc/revad directory.
 #   - Copy /configs/revad to /etc/revad.
 #   - Replace placeholder hostnames in .toml files with $HOST.docker or derived host.
+#   - Disable specified configuration files.
 # Returns:
 #   0 on success, 1 on failure.
 # -----------------------------------------------------------------------------------
@@ -133,6 +161,9 @@ prepare_configuration() {
     sed -i "s/localhost/${HOST}.docker/g" "$REVA_CONFIG_DIR"/*.toml || true
     sed -i "s/your.efss.org/${HOST//reva/}.docker/g" "$REVA_CONFIG_DIR"/*.toml || true
     sed -i "s/your.nginx.org/${HOST//reva/}.docker/g" "$REVA_CONFIG_DIR"/*.toml || true
+
+    # Disable specified configuration files
+    disable_config_files
 }
 
 # -----------------------------------------------------------------------------------

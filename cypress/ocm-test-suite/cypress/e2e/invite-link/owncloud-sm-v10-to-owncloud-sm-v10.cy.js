@@ -1,45 +1,44 @@
 /**
  * @fileoverview
- * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in ownCloud v10 and Nextcloud v27.
+ * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in ownCloud v10.
  * This suite covers sending and accepting invitation links, sharing files via ScienceMesh,
  * and verifying that the shares are received correctly.
- *
+ * 
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
 import {
-  acceptShareV27,
-  verifyFederatedContactV27,
-  acceptScienceMeshInvitation,
-  ensureFileExistsV27,
-  navigationSwitchLeftSideV27,
-  selectAppFromLeftSideV27,
-} from '../utils/nextcloud-v27';
-
-import {
+  acceptShare,
   createInviteLink,
+  verifyFederatedContact,
+  acceptScienceMeshInvitation,
   createScienceMeshShare,
   renameFile,
   ensureFileExists,
-} from '../utils/owncloud';
+  selectAppFromLeftSide,
+} from '../utils/owncloud-v10';
 
-describe('Invite link federated sharing via ScienceMesh functionality for ownCloud to Nextcloud', () => {
+describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
 
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('OWNCLOUD1_URL') || 'https://owncloud1.docker';
-  const recipientUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('OWNCLOUD2_URL') || 'https://owncloud2.docker';
   const senderUsername = Cypress.env('OWNCLOUD1_USERNAME') || 'marie';
   const senderPassword = Cypress.env('OWNCLOUD1_PASSWORD') || 'radioactivity';
-  const recipientUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
-  const recipientPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
-  const inviteLinkFileName = 'invite-link-oc-nc.txt';
+  const recipientUsername = Cypress.env('OWNCLOUD2_USERNAME') || 'mahdi';
+  const recipientPassword = Cypress.env('OWNCLOUD2_PASSWORD') || 'baghbani';
+  const inviteLinkFileName = 'invite-link-oc-oc.txt';
   const originalFileName = 'welcome.txt';
-  const sharedFileName = 'invite-link-oc-nc.txt';
+  const sharedFileName = 'invite-link-oc-oc.txt';
+
+  // Extract domain without protocol or trailing slash
+  const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
+  const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
 
   /**
    * Test case: Sending an invitation link from sender to recipient.
    */
-  it('Send invitation from from ownCloud v10 to Nextcloud v27', () => {
+  it('Send invitation from ownCloud v10 to ownCloud v10', () => {
     // Step 1: Log in to the sender's ownCloud instance
     cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
@@ -58,26 +57,26 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   /**
    * Test case: Accepting the invitation link on the recipient's side.
    */
-  it('Accept invitation from ownCloud v10 to Nextcloud v27', () => {
+  it('Accept invitation from ownCloud v10 to ownCloud v10', () => {
     const expectedContactDisplayName = senderUsername;
     // Extract domain without protocol or trailing slash
     // Note: The 'reva' prefix is added to the expected contact domain as per application behavior
-    const expectedContactDomain = `reva${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`;
+    const expectedContactDomain = `reva${senderDomain}`;
 
-    // Step 1: Load the invite link from the saved file
+    // Step 1: Read the invite link from the file
     cy.readFile(inviteLinkFileName).then((inviteLink) => {
       // Step 2: Ensure the invite link is valid
       expect(inviteLink).to.be.a('string').and.not.be.empty;
 
-      // Step 3: Login to the recipient's Nextcloud instance using the invite link
-      cy.loginNextcloudCore(inviteLink, recipientUsername, recipientPassword);
+      // Step 3: Login to the recipient's ownCloud instance using the invite link
+      cy.loginOwncloudCore(inviteLink, recipientUsername, recipientPassword);
 
       // Step 4: Accept the invitation
       acceptScienceMeshInvitation();
 
       // Step 5: Verify that the sender is now a contact in the recipient's contacts list
-      verifyFederatedContactV27(
-        recipientUrl.replace(/^https?:\/\/|\/$/g, ''),
+      verifyFederatedContact(
+        recipientDomain,
         expectedContactDisplayName,
         expectedContactDomain
       );
@@ -87,7 +86,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
   /**
    * Test case: Sharing a file via ScienceMesh from sender to recipient.
    */
-  it('Send ScienceMesh share of a file from ownCloud v10 to Nextcloud v27', () => {
+  it('Send ScienceMesh share of a <file> from ownCloud v10 to ownCloud v10', () => {
     // Step 1: Log in to the sender's ownCloud instance
     cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
@@ -105,30 +104,29 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
     createScienceMeshShare(
       sharedFileName,
       recipientUsername,
-      `reva${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+      `reva${recipientDomain}`,
     );
 
     // TODO @MahdiBaghbani: Verify that the share was created successfully
   });
 
   /**
-   * Test case: Receiving and verifying the ScienceMesh share on the recipient's side.
+   * Test Case: Receiving and accepting a ScienceMesh file share on ownCloud 2.
+   * This test verifies that the shared file appears in the "Sharing In" section.
    */
-  it('Receive ScienceMesh share of a file from ownCloud v10 to Nextcloud v27', () => {
-    // Step 1: Log in to the recipient's Nextcloud instance
-    cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
+  it('Receive ScienceMesh share of a <file> from ownCloud v10 to ownCloud v10', () => {
+    // Step 1: Log in to the recipient's ownCloud instance
+    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
 
     // Step 2: Wait for the share dialog to appear and accept the incoming federated share
-    acceptShareV27();
+    acceptShare();
 
     // Step 3: Navigate to the correct section
-    navigationSwitchLeftSideV27('Open navigation');
-    selectAppFromLeftSideV27('files');
-    navigationSwitchLeftSideV27('Close navigation');
+    selectAppFromLeftSide('files');
 
-    // Step 4: Verify the shared file is visible
-    ensureFileExistsV27(sharedFileName);
+    // Step 4: Verify that the shared file is visible
+    ensureFileExists(sharedFileName);
 
     // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
   });
-})
+});
