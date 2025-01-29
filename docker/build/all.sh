@@ -347,7 +347,7 @@ main() {
             "https://github.com/nextcloud-releases/contacts/releases/download/${CONTACTS_VERSION}/contacts.tar.gz" \
             "" \
             "" \
-            "" \
+            "./scripts/init/nextcloud-contacts.sh" \
             "${version}" \
             "contacts"
     done
