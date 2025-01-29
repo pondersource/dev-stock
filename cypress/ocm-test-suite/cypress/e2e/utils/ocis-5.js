@@ -52,10 +52,18 @@ export function createLegacyInviteLinkV5(domain, providerDomain) {
 export function acceptInviteLinkV5(token) {
     openScienceMeshAppV5()
 
+    // Log the token for debugging
+    cy.log('Attempting to use token:', token)
+
     getScienceMeshAcceptInvitePartV5('label', 'token').within(() => {
         cy.get('input[type="text"]')
-            .type(token)
+            .clear()  // Clear any existing value
+            .type(token, { delay: 100 })  // Type slower to ensure input
+            .should('have.value', token)  // Verify the value is actually set
     })
+
+    // Wait a bit after token verification
+    cy.wait(1000)
 
     getScienceMeshAcceptInvitePartV5('label', 'institution').within(() => {
         cy.get('div[class="vs__actions"').should('be.visible').click()
@@ -63,7 +71,10 @@ export function acceptInviteLinkV5(token) {
         cy.get('ul[role="listbox"]').find('li').first().should('be.visible').click()
     })
 
-    getScienceMeshAcceptInvitePartV5('span', 'accept').click()
+    // Wait for button to be enabled after valid input
+    getScienceMeshAcceptInvitePartV5('span', 'accept')
+        .should('not.be.disabled')
+        .click()
 }
 
 export function verifyFederatedContactV5(name, domain) {

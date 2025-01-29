@@ -3,17 +3,17 @@
 # @michielbdejong halt on error in docker init scripts
 set -e
 
-php console.php maintenance:install --admin-user "${USER}" --admin-pass "${PASS}" --database "mysql"            \
-                                    --database-name "efss" --database-user "root" --database-host "${DBHOST}"   \
-                                    --database-pass "eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
-php console.php app:disable firstrunwizard
+# Target paths
+APP_SOURCE="/ponder/apps/sciencemesh"
+APP_TARGET="/var/www/html/apps/sciencemesh"
 
-# change/add lines in config.php
-sed -i "8 i\    1 => 'oc1.docker',"                                                             /var/www/html/config/config.php
-sed -i "9 i\    2 => 'oc2.docker',"                                                             /var/www/html/config/config.php
-sed -i "10 i\    3 => 'owncloud1.docker',"                                                      /var/www/html/config/config.php
-sed -i "11 i\    4 => 'owncloud2.docker',"                                                      /var/www/html/config/config.php
-sed -i "12 i\    5 => (isset(\$_SERVER['HTTP_HOST']) ? \$_SERVER['HTTP_HOST'] : 'localhost'),"  /var/www/html/config/config.php
+# Remove existing directory or symlink if it exists
+if [ -e "${APP_TARGET}" ] || [ -L "${APP_TARGET}" ]; then
+    rm -rf "${APP_TARGET}"
+fi
+
+# Create new symlink
+ln -sf "${APP_SOURCE}" "${APP_TARGET}"
 
 php console.php app:enable sciencemesh
 

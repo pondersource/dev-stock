@@ -8,7 +8,8 @@ run_docker_container() {
 # Prepare Docker environment (network, cleanup)
 prepare_environment() {
     # Prepare temporary directories and copy necessary files
-    remove_directory "${ENV_ROOT}/${TEMP_DIR}" && mkdir -p "${ENV_ROOT}/${TEMP_DIR}"
+    remove_directory "${TEMP_DIR}"
+    mkdir -p "${TEMP_DIR}"
 
     # Clean up previous resources (if the cleanup script is available)
     if [ -x "${ENV_ROOT}/scripts/clean.sh" ]; then

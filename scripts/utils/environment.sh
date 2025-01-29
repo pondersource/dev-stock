@@ -33,11 +33,24 @@ remove_directory() {
 wait_for_port() {
     local container="${1}"
     local port="${2}"
+    local timeout=60  # Maximum wait time in seconds
+    local start_time=$(date +%s)
 
     run_quietly_if_ci echo "Waiting for port ${port} on container ${container}..."
-    until docker exec "${container}" sh -c "ss -tulpn | grep -q 'LISTEN.*:${port}'" >/dev/null 2>&1; do
+    while true; do
+        if docker exec "${container}" sh -c "ss -tulpn | grep -q 'LISTEN.*:${port}'" >/dev/null 2>&1; then
+            run_quietly_if_ci echo "Port ${port} is now open on ${container}."
+            return 0
+        fi
+
+        current_time=$(date +%s)
+        elapsed_time=$((current_time - start_time))
+        
+        if [ ${elapsed_time} -ge ${timeout} ]; then
+            error_exit "Timeout waiting for port ${port} on container ${container} after ${timeout} seconds"
+        fi
+
         run_quietly_if_ci echo "Port ${port} not open yet on ${container}. Retrying..."
         sleep 1
     done
-    run_quietly_if_ci echo "Port ${port} is now open on ${container}."
 }
