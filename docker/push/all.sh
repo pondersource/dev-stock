@@ -85,7 +85,7 @@ for version in "${nextcloud_versions[@]}"; do
     run_quietly_if_ci docker push "pondersource/nextcloud:${version}"
 done
 
-run_quietly_if_ci docker push pondersource/nextcloud:v27.1.11
+run_quietly_if_ci docker push pondersource/nextcloud:v27.1.11-sm
 
 # ownCloud: push multiple versions of the ownCloud Docker image.
 run_quietly_if_ci docker push pondersource/owncloud-base:latest
