@@ -18,8 +18,12 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 
 # Default Nextcloud versions for both instances
-DEFAULT_EFSS_1_VERSION="v30.0.2"
-DEFAULT_EFSS_2_VERSION="v30.0.2"
+DEFAULT_EFSS_1_VERSION="v30.0.2-contacts"
+DEFAULT_EFSS_2_VERSION="v30.0.2-contacts"
+
+# Volume mounts for development
+# Format: "local_path:container_path,local_path2:container_path2"
+NEXTCLOUD_DEV_VOLUMES=""
 
 # ------------------------------------------------------------------------------
 # Function: resolve_script_dir
@@ -93,7 +97,7 @@ initialize_environment() {
 #
 # This function orchestrates the test execution:
 # 1. Initializes the environment
-# 2. Creates Nextcloud containers
+# 2. Creates Nextcloud containers with development mounts
 # 3. Sets up test configuration
 # 4. Executes tests based on mode
 #
@@ -102,12 +106,15 @@ initialize_environment() {
 # ------------------------------------------------------------------------------
 main() {
     # Initialize environment and parse arguments
-    initialize_environment "../../.."
+    initialize_environment ".."
     setup "$@"
     
-    # Create Nextcloud container with specified configuration
-    #            ID    Username     Password      Image                  Version
-    create_nextcloud 1  "einstein"  "relativity"  pondersource/nextcloud "${EFSS_PLATFORM_1_VERSION}"
+    # Create Nextcloud container with development configuration and volume mounts
+    #                    ID    Username     Password      Image                  Version                      Volumes
+    create_nextcloud_dev 1     "einstein"   "relativity"  pondersource/nextcloud "${EFSS_PLATFORM_1_VERSION}" "${ENV_ROOT}/contatcs:/ponder/apps/contacts"
+
+    # Create container for Firefox
+    create_firefox
     
     # Show reduced output in CI mode
     run_quietly_if_ci echo "Setting up development environment..."
