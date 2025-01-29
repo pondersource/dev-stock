@@ -281,4 +281,4 @@ export const getRowForFileV5 = (filename) => cy.get(`[data-test-resource-name="$
     .parent()
     .parent()
     .parent()
-    .parent()
+    .parent() 

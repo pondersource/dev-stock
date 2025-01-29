@@ -13,7 +13,7 @@ import {
   createLegacyInviteLinkV5,
   createTextFileV5,
   createShareV5,
-} from '../utils/ocis-5'
+} from '../utils/ocis-v5'
 
 import {
   acceptShare,

@@ -19,7 +19,7 @@ import {
   verifyFederatedContactV5,
   acceptShareV5,
   verifyShareV5
-} from '../utils/ocis-5';
+} from '../utils/ocis-v5';
 
 describe('Invite link federated sharing via ScienceMesh functionality between Nextcloud and oCIS', () => {
   // Shared variables to avoid repetition and improve maintainability
