@@ -11,7 +11,7 @@ import {
   acceptShare,
   ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('Federated sharing functionality from OcmStub to ownCloud', () => {
 

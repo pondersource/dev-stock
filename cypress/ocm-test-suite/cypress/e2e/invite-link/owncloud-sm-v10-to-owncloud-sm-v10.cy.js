@@ -16,7 +16,7 @@ import {
   renameFile,
   ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('Invite link federated sharing via ScienceMesh functionality for ownCloud', () => {
 

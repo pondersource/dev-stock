@@ -15,7 +15,7 @@ import {
   createShare,
   renameFile,
   ensureFileExists,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('OCM federated sharing functionality for ownCloud', () => {
 

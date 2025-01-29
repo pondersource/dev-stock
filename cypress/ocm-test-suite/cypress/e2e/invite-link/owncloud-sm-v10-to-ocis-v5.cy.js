@@ -12,7 +12,7 @@ import {
   createScienceMeshShare,
   renameFile,
   ensureFileExists,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 import {
   acceptInviteLinkV5,

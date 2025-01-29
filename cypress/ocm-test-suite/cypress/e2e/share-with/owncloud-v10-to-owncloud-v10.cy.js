@@ -12,7 +12,7 @@ import {
   renameFile,
   ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('Native federated sharing functionality for ownCloud', () => {
 

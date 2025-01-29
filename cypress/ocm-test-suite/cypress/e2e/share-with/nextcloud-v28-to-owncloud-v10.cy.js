@@ -16,7 +16,7 @@ import {
   acceptShare,
   ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('Native Federated Sharing Functionality for Nextcloud to ownCloud', () => {
 

@@ -21,7 +21,7 @@ import {
   acceptScienceMeshInvitation,
   ensureFileExists,
   selectAppFromLeftSide,
-} from '../utils/owncloud';
+} from '../utils/owncloud-v10';
 
 describe('Invite link federated sharing via ScienceMesh functionality between oCIS and ownCloud', () => {
   // Shared variables to avoid repetition and improve maintainability

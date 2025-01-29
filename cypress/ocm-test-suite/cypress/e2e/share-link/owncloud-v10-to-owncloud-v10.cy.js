@@ -2,7 +2,7 @@ import {
   createShareLink,
   renameFile,
   selectAppFromLeftSide
-} from '../utils/owncloud'
+} from '../utils/owncloud-v10'
 
 describe('Share link federated sharing functionality for ownCloud', () => {
   it('Send federated share <file> from ownCloud v10 to ownCloud v10', () => {

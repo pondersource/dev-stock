@@ -1,4 +1,4 @@
-import { createShareGroup, renameFile } from '../utils/owncloud'
+import { createShareGroup, renameFile } from '../utils/owncloud-v10'
 
 before(() => {
   // makes custom commands available to all subsequent cy.origin('url')
