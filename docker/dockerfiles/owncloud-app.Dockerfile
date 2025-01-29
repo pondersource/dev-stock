@@ -87,7 +87,7 @@ RUN set -ex; \
 USER root
 
 # After installation, cleanup unnecessary packages
-RUN apt-get purge -y git wget tar && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get purge -y git wget && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy init script if provided
 COPY ${INIT_SCRIPT} "/docker-entrypoint-hooks.d/before-starting/${APP_NAME}.sh"
