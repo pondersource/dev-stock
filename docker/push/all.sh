@@ -85,7 +85,14 @@ for version in "${nextcloud_versions[@]}"; do
     run_quietly_if_ci docker push "pondersource/nextcloud:${version}"
 done
 
+# Push Nextcloud app variants
+# ScienceMesh variant
 run_quietly_if_ci docker push pondersource/nextcloud:v27.1.11-sm
+
+# Contacts app variants for each Nextcloud version
+for version in "${nextcloud_versions[@]}"; do
+    run_quietly_if_ci docker push "pondersource/nextcloud:${version}-contacts"
+done
 
 # ownCloud: push multiple versions of the ownCloud Docker image.
 run_quietly_if_ci docker push pondersource/owncloud-base:latest
@@ -94,6 +101,7 @@ for version in "${owncloud_versions[@]}"; do
     run_quietly_if_ci docker push "pondersource/owncloud:${version}"
 done
 
+# Push ownCloud app variants
 run_quietly_if_ci docker push pondersource/owncloud:v10.15.0-sm
 
 # -----------------------------------------------------------------------------------

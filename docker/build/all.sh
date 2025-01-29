@@ -329,6 +329,29 @@ main() {
         "v27.1.11" \
         "sm"
 
+    # Get latest stable contacts app release
+    echo "Fetching latest stable contacts app release..."
+    CONTACTS_VERSION=$(curl -s https://api.github.com/repos/nextcloud-releases/contacts/releases/latest | grep -oP '"tag_name": "\K[^"]+')
+    if [ -z "${CONTACTS_VERSION}" ]; then
+        print_error "Failed to fetch latest contacts app version"
+        return 1
+    fi
+    echo "Latest stable contacts app version: ${CONTACTS_VERSION}"
+
+    # Build contacts app variant for each supported Nextcloud version
+    for version in "${nextcloud_versions[@]}"; do
+        echo "Building contacts app for Nextcloud ${version}..."
+        build_nextcloud_app_image \
+            "contacts" \
+            "tarball" \
+            "https://github.com/nextcloud-releases/contacts/releases/download/${CONTACTS_VERSION}/contacts.tar.gz" \
+            "" \
+            "" \
+            "" \
+            "${version}" \
+            "contacts"
+    done
+
     # ownCloud Base
     build_docker_image owncloud-base.Dockerfile     pondersource/owncloud-base     "latest"           DEFAULT
 
