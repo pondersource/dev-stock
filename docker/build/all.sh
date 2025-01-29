@@ -159,6 +159,7 @@ build_docker_image() {
 #   6. init_script - Path to initialization script (optional)
 #   7. nextcloud_version - Nextcloud version to use as base
 #   8. image_tag_suffix - Suffix for the image tag (optional)
+#   9. cache_bust - Cache bust value (optional, defaults to "DEFAULT")
 # -----------------------------------------------------------------------------------
 build_nextcloud_app_image() {
     local app_name="${1}"
@@ -169,6 +170,7 @@ build_nextcloud_app_image() {
     local init_script="${6:-}"
     local nextcloud_version="${7}"
     local image_tag_suffix="${8:-${app_name}}"
+    local cache_bust="${9:-DEFAULT}"
     
     local build_args=""
     
@@ -176,6 +178,7 @@ build_nextcloud_app_image() {
     build_args="--build-arg NEXTCLOUD_VERSION=${nextcloud_version}"
     build_args="${build_args} --build-arg APP_NAME=${app_name}"
     build_args="${build_args} --build-arg INSTALL_METHOD=${install_method}"
+    build_args="${build_args} --build-arg CACHEBUST=${cache_bust}"
     
     # Add source-specific arguments based on installation method
     if [[ "${install_method}" == "git" ]]; then
@@ -218,6 +221,7 @@ build_nextcloud_app_image() {
 #   6. init_script - Path to initialization script (optional)
 #   7. owncloud_version - ownCloud version to use as base
 #   8. image_tag_suffix - Suffix for the image tag (optional)
+#   9. cache_bust - Cache bust value (optional, defaults to "DEFAULT")
 # -----------------------------------------------------------------------------------
 build_owncloud_app_image() {
     local app_name="${1}"
@@ -228,6 +232,7 @@ build_owncloud_app_image() {
     local init_script="${6:-}"
     local owncloud_version="${7}"
     local image_tag_suffix="${8:-${app_name}}"
+    local cache_bust="${9:-DEFAULT}"
     
     local build_args=""
     
@@ -235,6 +240,7 @@ build_owncloud_app_image() {
     build_args="--build-arg OWNCLOUD_VERSION=${owncloud_version}"
     build_args="${build_args} --build-arg APP_NAME=${app_name}"
     build_args="${build_args} --build-arg INSTALL_METHOD=${install_method}"
+    build_args="${build_args} --build-arg CACHEBUST=${cache_bust}"
     
     # Add source-specific arguments based on installation method
     if [[ "${install_method}" == "git" ]]; then
@@ -327,16 +333,20 @@ main() {
         "make" \
         "./scripts/init/nextcloud-sciencemesh.sh" \
         "v27.1.11" \
-        "sm"
+        "sm" \
+        DEFAULT
 
     # Get latest stable contacts app release
     echo "Fetching latest stable contacts app release..."
-    CONTACTS_VERSION=$(curl -s https://api.github.com/repos/nextcloud-releases/contacts/releases/latest | grep -oP '"tag_name": "\K[^"]+')
-    if [ -z "${CONTACTS_VERSION}" ]; then
-        print_error "Failed to fetch latest contacts app version"
+    CONTACTS_RELEASE=$(curl -s https://api.github.com/repos/nextcloud-releases/contacts/releases/latest)
+    CONTACTS_VERSION=$(echo "${CONTACTS_RELEASE}" | grep -oP '"tag_name": "\K[^"]+')
+    CONTACTS_FILENAME=$(echo "${CONTACTS_RELEASE}" | grep -oP '"name": "contacts-[^"]+\.tar\.gz"' | grep -oP 'contacts-[^"]+\.tar\.gz')
+    if [ -z "${CONTACTS_VERSION}" ] || [ -z "${CONTACTS_FILENAME}" ]; then
+        print_error "Failed to fetch latest contacts app version or filename"
         return 1
     fi
     echo "Latest stable contacts app version: ${CONTACTS_VERSION}"
+    echo "Contacts app filename: ${CONTACTS_FILENAME}"
 
     # Build contacts app variant for each supported Nextcloud version
     for version in "${nextcloud_versions[@]}"; do
@@ -344,12 +354,13 @@ main() {
         build_nextcloud_app_image \
             "contacts" \
             "tarball" \
-            "https://github.com/nextcloud-releases/contacts/releases/download/${CONTACTS_VERSION}/contacts.tar.gz" \
+            "https://github.com/nextcloud-releases/contacts/releases/download/${CONTACTS_VERSION}/${CONTACTS_FILENAME}" \
             "" \
             "" \
             "./scripts/init/nextcloud-contacts.sh" \
             "${version}" \
-            "contacts"
+            "contacts" \
+            DEFAULT
     done
 
     # ownCloud Base
@@ -383,7 +394,8 @@ main() {
         "make" \
         "./scripts/init/owncloud-sciencemesh.sh" \
         "v10.15.0" \
-        "sm"
+        "sm" \
+        DEFAULT
 
     echo "All builds attempted."
     echo "Check the above output for any build failures or errors."

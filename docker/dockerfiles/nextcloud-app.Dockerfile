@@ -35,6 +35,11 @@ RUN mkdir -p ${APP_SOURCE_DIR}; \
 
 USER www-data
 
+# CACHEBUST forces docker to clone fresh source codes from git.
+# example: docker build -t your-image --build-arg CACHEBUST="default" .
+# $RANDOM returns random number each time.
+ARG CACHEBUST="default"
+
 # Install the app using either git or tarball method
 RUN set -ex; \
     if [ -z "${APP_NAME}" ]; then \
