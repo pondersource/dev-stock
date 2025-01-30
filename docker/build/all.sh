@@ -300,6 +300,14 @@ main() {
     # The first element in this array is considered the "latest".
     nextcloud_versions=("v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
 
+    # Define contacts app versions for each Nextcloud version
+    declare -A contacts_versions=(
+        ["v30.0.2"]="v6.1.3"
+        ["v29.0.10"]="v6.0.2"
+        ["v28.0.14"]="v5.5.3"
+        ["v27.1.11"]="v5.5.3"
+    )
+
     # shellcheck disable=SC2207
     # TODO @MahdiBaghbani: Decide that if we want to do this automatically or manually. 
     # Automatically get latest images
@@ -351,10 +359,26 @@ main() {
     # Build contacts app variant for each supported Nextcloud version
     for version in "${nextcloud_versions[@]}"; do
         echo "Building contacts app for Nextcloud ${version}..."
+        
+        # Get the corresponding contacts app version
+        contacts_version="${contacts_versions[${version}]}"
+        if [ -z "${contacts_version}" ]; then
+            print_error "No compatible contacts app version defined for Nextcloud ${version}"
+            continue
+        fi
+
+        # Construct the filename and URL
+        contacts_filename="contacts-${contacts_version}.tar.gz"
+        contacts_url="https://github.com/nextcloud-releases/contacts/releases/download/${contacts_version}/${contacts_filename}"
+
+        echo "Using contacts app version: ${contacts_version}"
+        echo "Contacts app filename: ${contacts_filename}"
+        echo "Download URL: ${contacts_url}"
+
         build_nextcloud_app_image \
             "contacts" \
             "tarball" \
-            "https://github.com/nextcloud-releases/contacts/releases/download/${CONTACTS_VERSION}/${CONTACTS_FILENAME}" \
+            "${contacts_url}" \
             "" \
             "" \
             "./scripts/init/nextcloud-contacts.sh" \
