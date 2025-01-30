@@ -1,31 +1,27 @@
 #!/usr/bin/env bash
 
 # ------------------------------------------------------------------------------
-# Nextcloud ScienceMesh App Initialization Script
+# Nextcloud Contacts App Initialization Script
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # ------------------------------------------------------------------------------
 #
 # Description:
-#   This script initializes the ScienceMesh app in a Nextcloud Docker container.
-#   It creates necessary symlinks, modifies version compatibility, and enables
-#   the app through Nextcloud console.
+#   This script initializes the Nextcloud Contacts app in a Docker container.
+#   It creates necessary symlinks and enables the app through Nextcloud console.
 #
 # Operations:
 #   1. Creates a symlink from the source directory to Nextcloud apps directory
-#   2. Modifies app compatibility version in info.xml
-#   3. Enables the ScienceMesh app using Nextcloud console
+#   2. Enables the Contacts app using Nextcloud console
 #
 # Environment:
 #   - Requires root or appropriate permissions to create symlinks
 #   - Needs access to Nextcloud console.php
-#   - Needs write access to app's info.xml
 #
 # Exit Codes:
 #   0 - Success
 #   1 - General error
 #   2 - Permission error
 #   3 - App activation error
-#   4 - Version modification error
 # ------------------------------------------------------------------------------
 
 # Exit on error, undefined vars, or pipe failures
@@ -36,10 +32,9 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 
 # Path configuration
-readonly APP_SOURCE="/ponder/apps/sciencemesh"     # Source directory containing the app
-readonly APP_TARGET="/var/www/html/apps/sciencemesh" # Target directory in Nextcloud
-readonly CONSOLE_PATH="/var/www/html/console.php"    # Path to Nextcloud console
-readonly INFO_XML="${APP_TARGET}/appinfo/info.xml"   # Path to app info.xml
+readonly APP_SOURCE="/ponder/apps/contacts"     # Source directory containing the app
+readonly APP_TARGET="/var/www/html/apps/contacts" # Target directory in Nextcloud
+readonly CONSOLE_PATH="/var/www/html/console.php" # Path to Nextcloud console
 
 # ------------------------------------------------------------------------------
 # Function: log_message
@@ -94,7 +89,7 @@ check_prerequisites() {
 #   1 - Error creating symlink
 # ------------------------------------------------------------------------------
 setup_symlink() {
-    log_message "INFO" "Setting up ScienceMesh app symlink..."
+    log_message "INFO" "Setting up Contacts app symlink..."
 
     # Remove existing directory or symlink if it exists
     if [[ -e "${APP_TARGET}" ]] || [[ -L "${APP_TARGET}" ]]; then
@@ -113,47 +108,22 @@ setup_symlink() {
 }
 
 # ------------------------------------------------------------------------------
-# Function: modify_version_compatibility
-# Purpose: Modifies the minimum version requirement in info.xml
-#
-# Returns:
-#   0 - Version modified successfully
-#   1 - Error modifying version
-# ------------------------------------------------------------------------------
-modify_version_compatibility() {
-    log_message "INFO" "Modifying version compatibility..."
-
-    if [[ ! -f "${INFO_XML}" ]]; then
-        log_message "ERROR" "info.xml not found at ${INFO_XML}"
-        return 1
-    fi
-
-    if ! sed -i -e 's/min-version="28"/min-version="27"/g' "${INFO_XML}"; then
-        log_message "ERROR" "Failed to modify version compatibility"
-        return 1
-    fi
-
-    log_message "INFO" "Version compatibility modified successfully"
-    return 0
-}
-
-# ------------------------------------------------------------------------------
 # Function: enable_app
-# Purpose: Enables the ScienceMesh app in Nextcloud
+# Purpose: Enables the Contacts app in Nextcloud
 #
 # Returns:
 #   0 - App enabled successfully
 #   1 - Error enabling app
 # ------------------------------------------------------------------------------
 enable_app() {
-    log_message "INFO" "Enabling ScienceMesh app..."
+    log_message "INFO" "Enabling Contacts app..."
 
-    if ! php "${CONSOLE_PATH}" app:enable sciencemesh; then
-        log_message "ERROR" "Failed to enable ScienceMesh app"
+    if ! php "${CONSOLE_PATH}" app:enable contacts; then
+        log_message "ERROR" "Failed to enable Contacts app"
         return 1
     fi
 
-    log_message "INFO" "ScienceMesh app enabled successfully"
+    log_message "INFO" "Contacts app enabled successfully"
     return 0
 }
 
@@ -161,7 +131,7 @@ enable_app() {
 # Main Script Execution
 # ------------------------------------------------------------------------------
 main() {
-    log_message "INFO" "Starting ScienceMesh app initialization..."
+    log_message "INFO" "Starting Contacts app initialization..."
 
     # Check prerequisites
     if ! check_prerequisites; then
@@ -175,19 +145,13 @@ main() {
         exit 2
     fi
 
-    # Modify version compatibility
-    if ! modify_version_compatibility; then
-        log_message "ERROR" "Version modification failed"
-        exit 4
-    fi
-
     # Enable the app
     if ! enable_app; then
         log_message "ERROR" "App activation failed"
         exit 3
     fi
 
-    log_message "INFO" "ScienceMesh app initialization completed successfully"
+    log_message "INFO" "Contacts app initialization completed successfully"
     exit 0
 }
 

@@ -152,29 +152,41 @@ build_docker_image() {
 # Purpose: Build a Nextcloud image with a specific app installed
 # Arguments:
 #   1. app_name - Name of the app (e.g., "sciencemesh")
-#   2. app_repo - Git repository URL
-#   3. app_branch - Git branch (default: "main")
-#   4. app_build_cmd - Build command if required (optional)
-#   5. init_script - Path to initialization script (optional)
-#   6. nextcloud_version - Nextcloud version to use as base
-#   7. image_tag_suffix - Suffix for the image tag (optional)
+#   2. install_method - Installation method ("git" or "tarball")
+#   3. source - Git repository URL or tarball URL
+#   4. app_branch - Git branch (default: "main", ignored for tarball)
+#   5. app_build_cmd - Build command if required (optional)
+#   6. init_script - Path to initialization script (optional)
+#   7. nextcloud_version - Nextcloud version to use as base
+#   8. image_tag_suffix - Suffix for the image tag (optional)
+#   9. cache_bust - Cache bust value (optional, defaults to "DEFAULT")
 # -----------------------------------------------------------------------------------
 build_nextcloud_app_image() {
     local app_name="${1}"
-    local app_repo="${2}"
-    local app_branch="${3:-master}"
-    local app_build_cmd="${4:-}"
-    local init_script="${5:-}"
-    local nextcloud_version="${6}"
-    local image_tag_suffix="${7:-${app_name}}"
+    local install_method="${2:-git}"
+    local source="${3}"
+    local app_branch="${4:-master}"
+    local app_build_cmd="${5:-}"
+    local init_script="${6:-}"
+    local nextcloud_version="${7}"
+    local image_tag_suffix="${8:-${app_name}}"
+    local cache_bust="${9:-DEFAULT}"
     
     local build_args=""
     
     # Construct build arguments string
     build_args="--build-arg NEXTCLOUD_VERSION=${nextcloud_version}"
     build_args="${build_args} --build-arg APP_NAME=${app_name}"
-    build_args="${build_args} --build-arg APP_REPO=${app_repo}"
-    build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    build_args="${build_args} --build-arg INSTALL_METHOD=${install_method}"
+    build_args="${build_args} --build-arg CACHEBUST=${cache_bust}"
+    
+    # Add source-specific arguments based on installation method
+    if [[ "${install_method}" == "git" ]]; then
+        build_args="${build_args} --build-arg APP_REPO=${source}"
+        build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    else
+        build_args="${build_args} --build-arg TARBALL_URL=${source}"
+    fi
     
     # Add optional build arguments if provided
     [[ -n "${app_build_cmd}" ]] && build_args="${build_args} --build-arg APP_BUILD_CMD=${app_build_cmd}"
@@ -183,7 +195,7 @@ build_nextcloud_app_image() {
     # Construct the image tag
     local image_tag="${nextcloud_version}-${image_tag_suffix}"
     
-    echo "Building Nextcloud app image: ${app_name} (${image_tag})"
+    echo "Building Nextcloud app image: ${app_name} (${image_tag}) using ${install_method} method"
     if ! docker build \
         ${build_args} \
         --file "./dockerfiles/nextcloud-app.Dockerfile" \
@@ -198,33 +210,45 @@ build_nextcloud_app_image() {
 }
 
 # -----------------------------------------------------------------------------------
-# Function: build_nextcloud_app_image
-# Purpose: Build a Nextcloud image with a specific app installed
+# Function: build_owncloud_app_image
+# Purpose: Build an ownCloud image with a specific app installed
 # Arguments:
 #   1. app_name - Name of the app (e.g., "sciencemesh")
-#   2. app_repo - Git repository URL
-#   3. app_branch - Git branch (default: "main")
-#   4. app_build_cmd - Build command if required (optional)
-#   5. init_script - Path to initialization script (optional)
-#   6. nextcloud_version - Nextcloud version to use as base
-#   7. image_tag_suffix - Suffix for the image tag (optional)
+#   2. install_method - Installation method ("git" or "tarball")
+#   3. source - Git repository URL or tarball URL
+#   4. app_branch - Git branch (default: "main", ignored for tarball)
+#   5. app_build_cmd - Build command if required (optional)
+#   6. init_script - Path to initialization script (optional)
+#   7. owncloud_version - ownCloud version to use as base
+#   8. image_tag_suffix - Suffix for the image tag (optional)
+#   9. cache_bust - Cache bust value (optional, defaults to "DEFAULT")
 # -----------------------------------------------------------------------------------
 build_owncloud_app_image() {
     local app_name="${1}"
-    local app_repo="${2}"
-    local app_branch="${3:-master}"
-    local app_build_cmd="${4:-}"
-    local init_script="${5:-}"
-    local owncloud_version="${6}"
-    local image_tag_suffix="${7:-${app_name}}"
+    local install_method="${2:-git}"
+    local source="${3}"
+    local app_branch="${4:-master}"
+    local app_build_cmd="${5:-}"
+    local init_script="${6:-}"
+    local owncloud_version="${7}"
+    local image_tag_suffix="${8:-${app_name}}"
+    local cache_bust="${9:-DEFAULT}"
     
     local build_args=""
     
     # Construct build arguments string
     build_args="--build-arg OWNCLOUD_VERSION=${owncloud_version}"
     build_args="${build_args} --build-arg APP_NAME=${app_name}"
-    build_args="${build_args} --build-arg APP_REPO=${app_repo}"
-    build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    build_args="${build_args} --build-arg INSTALL_METHOD=${install_method}"
+    build_args="${build_args} --build-arg CACHEBUST=${cache_bust}"
+    
+    # Add source-specific arguments based on installation method
+    if [[ "${install_method}" == "git" ]]; then
+        build_args="${build_args} --build-arg APP_REPO=${source}"
+        build_args="${build_args} --build-arg APP_BRANCH=${app_branch}"
+    else
+        build_args="${build_args} --build-arg TARBALL_URL=${source}"
+    fi
     
     # Add optional build arguments if provided
     [[ -n "${app_build_cmd}" ]] && build_args="${build_args} --build-arg APP_BUILD_CMD=${app_build_cmd}"
@@ -233,7 +257,7 @@ build_owncloud_app_image() {
     # Construct the image tag
     local image_tag="${owncloud_version}-${image_tag_suffix}"
     
-    echo "Building ownCloud app image: ${app_name} (${image_tag})"
+    echo "Building ownCloud app image: ${app_name} (${image_tag}) using ${install_method} method"
     if ! docker build \
         ${build_args} \
         --file "./dockerfiles/owncloud-app.Dockerfile" \
@@ -276,6 +300,14 @@ main() {
     # The first element in this array is considered the "latest".
     nextcloud_versions=("v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
 
+    # Define contacts app versions for each Nextcloud version
+    declare -A contacts_versions=(
+        ["v30.0.2"]="v6.1.3"
+        ["v29.0.10"]="v6.0.2"
+        ["v28.0.14"]="v5.5.3"
+        ["v27.1.11"]="v5.5.3"
+    )
+
     # shellcheck disable=SC2207
     # TODO @MahdiBaghbani: Decide that if we want to do this automatically or manually. 
     # Automatically get latest images
@@ -300,25 +332,60 @@ main() {
     done
     
     # Build Nextcloud App Variants
-    # ScienceMesh
+    # ScienceMesh using git
     build_nextcloud_app_image \
         "sciencemesh" \
+        "git" \
         "https://github.com/sciencemesh/nc-sciencemesh" \
         "nextcloud" \
         "make" \
         "./scripts/init/nextcloud-sciencemesh.sh" \
         "v27.1.11" \
-        "sm"
+        "sm" \
+        DEFAULT
 
-    # Example: Solid (commented out)
-    # build_nextcloud_app_image \
-    #     "solid" \
-    #     "https://github.com/pondersource/solid-nextcloud" \
-    #     "main" \
-    #     "make" \
-    #     "./scripts/init/solid.sh" \
-    #     "v27.1.11" \
-    #     "solid"
+    # Get latest stable contacts app release
+    echo "Fetching latest stable contacts app release..."
+    CONTACTS_RELEASE=$(curl -s https://api.github.com/repos/nextcloud-releases/contacts/releases/latest)
+    CONTACTS_VERSION=$(echo "${CONTACTS_RELEASE}" | grep -oP '"tag_name": "\K[^"]+')
+    CONTACTS_FILENAME=$(echo "${CONTACTS_RELEASE}" | grep -oP '"name": "contacts-[^"]+\.tar\.gz"' | grep -oP 'contacts-[^"]+\.tar\.gz')
+    if [ -z "${CONTACTS_VERSION}" ] || [ -z "${CONTACTS_FILENAME}" ]; then
+        print_error "Failed to fetch latest contacts app version or filename"
+        return 1
+    fi
+    echo "Latest stable contacts app version: ${CONTACTS_VERSION}"
+    echo "Contacts app filename: ${CONTACTS_FILENAME}"
+
+    # Build contacts app variant for each supported Nextcloud version
+    for version in "${nextcloud_versions[@]}"; do
+        echo "Building contacts app for Nextcloud ${version}..."
+        
+        # Get the corresponding contacts app version
+        contacts_version="${contacts_versions[${version}]}"
+        if [ -z "${contacts_version}" ]; then
+            print_error "No compatible contacts app version defined for Nextcloud ${version}"
+            continue
+        fi
+
+        # Construct the filename and URL
+        contacts_filename="contacts-${contacts_version}.tar.gz"
+        contacts_url="https://github.com/nextcloud-releases/contacts/releases/download/${contacts_version}/${contacts_filename}"
+
+        echo "Using contacts app version: ${contacts_version}"
+        echo "Contacts app filename: ${contacts_filename}"
+        echo "Download URL: ${contacts_url}"
+
+        build_nextcloud_app_image \
+            "contacts" \
+            "tarball" \
+            "${contacts_url}" \
+            "" \
+            "" \
+            "./scripts/init/nextcloud-contacts.sh" \
+            "${version}" \
+            "contacts" \
+            DEFAULT
+    done
 
     # ownCloud Base
     build_docker_image owncloud-base.Dockerfile     pondersource/owncloud-base     "latest"           DEFAULT
@@ -342,15 +409,17 @@ main() {
     done
 
     # Build ownCloud App Variants
-    # ScienceMesh
+    # ScienceMesh using git
     build_owncloud_app_image \
         "sciencemesh" \
+        "git" \
         "https://github.com/sciencemesh/nc-sciencemesh" \
         "owncloud" \
         "make" \
         "./scripts/init/owncloud-sciencemesh.sh" \
         "v10.15.0" \
-        "sm"
+        "sm" \
+        DEFAULT
 
     echo "All builds attempted."
     echo "Check the above output for any build failures or errors."
