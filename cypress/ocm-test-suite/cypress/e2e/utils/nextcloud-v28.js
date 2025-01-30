@@ -80,7 +80,7 @@ export function handleShareAcceptanceV28(fileName, timeout = 10000) {
         // Wait for page load after reload
         cy.wait(500);
         // Recursively check for more pop-ups
-        handleSharePopupsV28(fileName, timeout);
+        handleShareAcceptanceV28(fileName, timeout);
       });
     } else {
       // No more pop-ups, wait for the file list to be loaded
