@@ -44,7 +44,6 @@ export function acceptShareV28() {
   // Wait for the share dialog to appear and ensure it's visible
   cy.get('div.oc-dialog', { timeout: 10000 })
     .should('be.visible')
-    .first()
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
@@ -52,6 +51,44 @@ export function acceptShareV28() {
         .should('exist')
         .click({ force: true });
     });
+}
+
+/**
+ * Handles multiple share acceptance pop-ups that may appear after reloads.
+ * This function recursively checks for and accepts share dialogs until none remain,
+ * then verifies the shared file exists.
+ * 
+ * @param {string} fileName - The name of the shared file to verify exists.
+ * @param {number} [timeout=10000] - Optional timeout for the final file existence check.
+ */
+export function handleShareAcceptanceV28(fileName, timeout = 10000) {
+  // Wait for the page to be fully loaded
+  cy.wait(500);
+  
+  // Try to find the share dialog with a reasonable timeout
+  cy.get('body', { timeout: 10000 }).then($body => {
+    // Check if dialog exists and is visible
+    const hasDialog = $body.find('div.oc-dialog:visible').length > 0;
+    
+    if (hasDialog) {
+      // If dialog exists, accept it
+      acceptShareV28();
+      // Wait a bit for the acceptance to be processed
+      cy.wait(500);
+      // Reload and continue checking
+      cy.reload(true).then(() => {
+        // Wait for page load after reload
+        cy.wait(500);
+        // Recursively check for more pop-ups
+        handleSharePopupsV28(fileName, timeout);
+      });
+    } else {
+      // No more pop-ups, wait for the file list to be loaded
+      cy.wait(1000);
+      // Verify the shared file exists with specified timeout
+      ensureFileExistsV28(fileName, timeout);
+    }
+  });
 }
 
 /**

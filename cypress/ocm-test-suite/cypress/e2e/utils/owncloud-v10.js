@@ -44,7 +44,6 @@ export function acceptShare() {
   // Wait for the share dialog to appear and ensure it's visible
   cy.get('div.oc-dialog', { timeout: 10000 })
     .should('be.visible')
-    .first()
     .within(() => {
       // Locate the button row and click the primary button
       cy.get('div.oc-dialog-buttonrow')
@@ -327,13 +326,14 @@ export function openSharingPanel(fileName) {
   // Trigger the "Share" action for the specified file
   triggerActionForFile(fileName, 'Share');
 
-  // Ensure the sharing tab is visible and click it
+  // Wait for the sharing panel to be fully loaded
   cy.get('#app-sidebar')
     .should('be.visible')
     .within(() => {
       cy.get('[data-tabid="shareTabView"]')
         .should('be.visible')
-        .click();
+        .click()
+        .should('have.class', 'selected');
     });
 }
 
@@ -401,14 +401,13 @@ export function triggerActionInFileMenu(fileName, actionId) {
 export function triggerActionForFile(fileName, actionId) {
   // Find the actions container for the file and click the desired action
   getActionsForFile(fileName)
-    .should('exist')
-    .and('be.visible')
     .within(() => {
       // Find the action button and ensure it's properly loaded
       cy.get(`*[data-action="${actionId}"]`)
         .should('exist')
         .and('be.visible')
         .and('not.be.disabled')
+        // Use { force: true } to handle cases where the element might be covered
         .click({ force: true });
     });
 }
@@ -419,9 +418,13 @@ export function triggerActionForFile(fileName, actionId) {
  * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - The actions container element.
  */
 export function getActionsForFile(fileName) {
+  // Wait for the file row to be stable before proceeding
   return getRowForFile(fileName)
-    .find('.fileactions')
-    .should('be.visible');
+    .within(() => {
+      return cy.get('.fileactions')
+        .should('exist')
+        .and('be.visible');
+    });
 }
 
 /**
@@ -430,5 +433,7 @@ export function getActionsForFile(fileName) {
  * @returns {Cypress.Chainable<JQuery<HTMLElement>>} - The row element for the file.
  */
 export function getRowForFile(fileName) {
-  return cy.get(`[data-file="${fileName}"]`).should('exist');
+  return cy.get(`[data-file="${escapeCssSelector(fileName)}"]`)
+    .should('exist')
+    .and('be.visible');
 }
