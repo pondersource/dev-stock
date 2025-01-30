@@ -80,8 +80,16 @@ done
 
 # Nextcloud: push multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker push pondersource/nextcloud-base:latest
-nextcloud_versions=("latest" "v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
-for version in "${nextcloud_versions[@]}"; do
+nextcloud_versions=("v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
+
+for i in "${!nextcloud_versions[@]}"; do
+    version="${nextcloud_versions[i]}"
+
+    # If this is the first element (index 0), also push "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker push "pondersource/nextcloud:latest"
+    fi
+
     run_quietly_if_ci docker push "pondersource/nextcloud:${version}"
 done
 
@@ -96,8 +104,16 @@ done
 
 # ownCloud: push multiple versions of the ownCloud Docker image.
 run_quietly_if_ci docker push pondersource/owncloud-base:latest
-owncloud_versions=("latest" "v10.15.0")
-for version in "${owncloud_versions[@]}"; do
+owncloud_versions=("v10.15.0")
+
+for i in "${!owncloud_versions[@]}"; do
+    version="${owncloud_versions[i]}"
+
+    # If this is the first element (index 0), also push "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker push "pondersource/owncloud:latest"
+    fi
+
     run_quietly_if_ci docker push "pondersource/owncloud:${version}"
 done
 
