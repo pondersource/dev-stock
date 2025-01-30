@@ -131,6 +131,9 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
+    # Configure OCM providers for oCIS
+    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "ocis2.docker,ocis2.docker,dav/"
+
     # Create EFSS containers
     #                # id    # image            # tag
     create_ocis      1       owncloud/ocis      "${EFSS_PLATFORM_1_VERSION}"

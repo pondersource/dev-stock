@@ -8,8 +8,7 @@
  */
 
 import {
-  acceptShareV28,
-  ensureFileExistsV28,
+  handleShareAcceptanceV28,
 } from '../utils/nextcloud-v28';
 
 describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
@@ -44,14 +43,8 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
     // Step 1: Log in to the recipient's Nextcloud instance
     cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
 
-    // Step 2: Wait for the share dialog to appear and accept the incoming federated share
-    acceptShareV28();
-
-    // Step 3: Reload the page to ensure the shared file appears in the file list
-    cy.reload(true);
-
-    // Step 4: Verify the shared file is visible
-    ensureFileExistsV28(sharedFileName);
+    // Step 2: Handle any share acceptance pop-ups and verify the file exists
+    handleShareAcceptanceV28(sharedFileName);
 
     // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
   });
