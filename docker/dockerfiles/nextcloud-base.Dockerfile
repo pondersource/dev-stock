@@ -107,7 +107,7 @@ RUN set -ex; \
     rm -rf /var/lib/apt/lists/*
 
 RUN { \
-    echo 'SecStatusEngine On'; \
+    echo 'SecStatusEngine Off'; \
     echo 'SecRuleEngine On'; \
     echo 'SecAuditEngine On'; \
     echo 'SecAuditLog /var/log/apache2/modsec_audit.log'; \
