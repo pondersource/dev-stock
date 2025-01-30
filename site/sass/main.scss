@@ -1,0 +1,107 @@
+// Variables
+$primary-color: #2ea44f;
+$secondary-color: #0969da;
+$text-color: #24292f;
+$background-color: #ffffff;
+$border-color: #d0d7de;
+
+// Base styles
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: $text-color;
+    background-color: $background-color;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #f6f8fa;
+    border-bottom: 1px solid $border-color;
+    padding: 1rem;
+    
+    nav {
+        max-width: 1200px;
+        margin: 0 auto;
+        
+        a {
+            color: $text-color;
+            text-decoration: none;
+            font-weight: 600;
+            
+            &:hover {
+                color: $primary-color;
+            }
+        }
+    }
+}
+
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+// Matrix specific styles
+.matrix-container {
+    overflow-x: auto;
+    
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1rem 0;
+        
+        th, td {
+            border: 1px solid $border-color;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #f6f8fa;
+        }
+    }
+}
+
+.badge-wrapper {
+    position: relative;
+    display: inline-block;
+    
+    &:hover .artifacts-list {
+        display: block;
+    }
+}
+
+.artifacts-list {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    padding: 0.5rem;
+    z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    
+    a {
+        display: block;
+        color: $secondary-color;
+        text-decoration: none;
+        padding: 0.25rem 0.5rem;
+        
+        &:hover {
+            background-color: #f6f8fa;
+        }
+    }
+}
+
+footer {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f6f8fa;
+    border-top: 1px solid $border-color;
+    
+    p {
+        margin: 0;
+        color: #57606a;
+    }
+} 

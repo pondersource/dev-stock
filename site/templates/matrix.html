@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="matrix-container">
+    <h1>{{ page.title }}</h1>
+    {{ page.content | safe }}
+
+    <script>
+        // Function to fetch and display artifact information
+        async function fetchArtifacts(workflowId) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/pondersource/dev-stock/actions/workflows/${workflowId}/runs`);
+                const data = await response.json();
+                if (data.workflow_runs && data.workflow_runs.length > 0) {
+                    const latestRun = data.workflow_runs[0];
+                    const artifactsUrl = latestRun.artifacts_url;
+                    const artifactsResponse = await fetch(artifactsUrl);
+                    const artifactsData = await artifactsResponse.json();
+                    return artifactsData.artifacts;
+                }
+            } catch (error) {
+                console.error('Error fetching artifacts:', error);
+            }
+            return null;
+        }
+
+        // Function to update badge links with artifact information
+        async function updateBadgeLinks() {
+            const badges = document.querySelectorAll('img[src*="actions/workflow"]');
+            badges.forEach(async (badge) => {
+                const workflowPath = badge.src.match(/workflow\/(.+?)\.yml/)?.[1];
+                if (workflowPath) {
+                    const artifacts = await fetchArtifacts(`${workflowPath}.yml`);
+                    if (artifacts && artifacts.length > 0) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'badge-wrapper';
+                        badge.parentNode.insertBefore(wrapper, badge);
+                        wrapper.appendChild(badge);
+                        
+                        const artifactsList = document.createElement('div');
+                        artifactsList.className = 'artifacts-list';
+                        artifacts.forEach(artifact => {
+                            const link = document.createElement('a');
+                            link.href = artifact.archive_download_url;
+                            link.textContent = `Download ${artifact.name}`;
+                            artifactsList.appendChild(link);
+                        });
+                        wrapper.appendChild(artifactsList);
+                    }
+                }
+            });
+        }
+
+        // Call the update function when the page loads
+        document.addEventListener('DOMContentLoaded', updateBadgeLinks);
+    </script>
+</div>
+{% endblock content %} 
