@@ -71,7 +71,7 @@ jobs:
                   input="$1"
                   output="${input%.mp4}.webm"
                   echo "Converting $input to $output"
-                  ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y && \
+                  ffmpeg -hide_banner -loglevel error -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y && \
                   rm "$input"  # Remove the original MP4 after successful conversion
                 ' sh {} \;
                 
