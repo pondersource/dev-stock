@@ -1,7 +1,7 @@
 base_url = "https://pondersource.github.io/dev-stock"
 title = "OCM Compatibility Matrix"
 description = "Compatibility status of various file sharing and collaboration features across different platforms"
-theme = ""
+theme = "ocm"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
