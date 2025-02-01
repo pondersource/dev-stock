@@ -71,7 +71,6 @@
 
         // Function to create a test card
         function createTestCard(videoData) {
-            console.log('Creating card for video:', videoData);
             const template = document.getElementById('test-card-template');
             const card = template.content.cloneNode(true);
             
@@ -86,9 +85,6 @@
             source.src = `${baseUrl}/${videoPath}`;
             video.poster = `${baseUrl}/${thumbnailPath}`;
             
-            console.log('Video source:', source.src);
-            console.log('Video poster:', video.poster);
-            
             const title = card.querySelector('.test-name');
             title.textContent = formatWorkflowName(videoData.workflow);
             
@@ -101,42 +97,31 @@
         // Load videos and organize them into categories
         async function loadVideos() {
             try {
-                console.log('Starting to load videos...');
-                const baseUrl = '{{ get_url(path="/") | safe }}'.replace(/\/+$/, ''); // Remove trailing slashes
+                const baseUrl = '{{ get_url(path="/") | safe }}'.replace(/\/+$/, '');
                 const manifestUrl = `${baseUrl}/artifacts/manifest.json`;
-                console.log('Fetching manifest from:', manifestUrl);
                 
                 const response = await fetch(manifestUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                console.log('Loaded manifest data:', data);
                 
                 if (!data.videos || !Array.isArray(data.videos)) {
-                    console.error('Invalid manifest format - missing videos array');
-                    return;
+                    throw new Error('Invalid manifest format - missing videos array');
                 }
                 
                 data.videos.forEach(videoData => {
-                    console.log('Processing video:', videoData);
                     const category = getCategory(videoData.workflow);
-                    console.log('Category:', category);
                     if (category) {
                         const container = document.querySelector(`#${category} .test-grid`);
                         if (container) {
                             const card = createTestCard(videoData);
                             container.appendChild(card);
-                        } else {
-                            console.error('Container not found for category:', category);
                         }
-                    } else {
-                        console.warn('No category found for workflow:', videoData.workflow);
                     }
                 });
             } catch (error) {
                 console.error('Error loading videos:', error);
-                // Add visible error message to the page
                 const errorDiv = document.createElement('div');
                 errorDiv.style.color = 'red';
                 errorDiv.style.padding = '1em';
@@ -146,10 +131,7 @@
         }
 
         // Initialize the gallery
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, initializing gallery...');
-            loadVideos();
-        });
+        document.addEventListener('DOMContentLoaded', loadVideos);
     </script>
 </div>
 {% endblock content %} 

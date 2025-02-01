@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% if section.title %}{{ section.title }} - {% endif %}{{ config.title }}{% endblock title %}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path="favicon-32x32.png") | safe }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ get_url(path="favicon-16x16.png") | safe }}">
+    <link rel="shortcut icon" href="{{ get_url(path="favicon.ico") | safe }}">
     <link rel="stylesheet" href="{{ get_url(path="main.css") | safe }}">
 </head>
 <body>
