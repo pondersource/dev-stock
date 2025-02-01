@@ -25,6 +25,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg jq
+
       - name: Setup directories
         run: mkdir -p site/static/artifacts
 
@@ -66,7 +71,8 @@ jobs:
                   input="$1"
                   output="${input%.mp4}.webm"
                   echo "Converting $input to $output"
-                  ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y
+                  ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y && \
+                  rm "$input"  # Remove the original MP4 after successful conversion
                 ' sh {} \;
                 
                 # Cleanup
@@ -85,17 +91,17 @@ jobs:
 
           # Generate artifact manifest
           echo "Generating artifact manifest..."
-          find site/static/artifacts -type f \( -name "*.webm" -o -name "*.mp4" \) | jq -R -s 'split("\n")[:-1]' > site/static/artifacts/manifest.json
+          find site/static/artifacts -type f -name "*.webm" | jq -R -s 'split("\n")[:-1]' > site/static/artifacts/manifest.json
           
           # Debug output
           echo "Contents of artifacts directory:"
           ls -R site/static/artifacts
 
-      - name: Upload artifact manifest
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifact-manifest
-          path: site/static/artifacts/manifest.json
+          name: site-artifacts
+          path: site/static/artifacts/
 
   build:
     needs: fetch-artifacts
@@ -110,14 +116,11 @@ jobs:
           wget -q "https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
           tar xzf "zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
           sudo mv zola /usr/local/bin
-
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
       
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: artifact-manifest
+          name: site-artifacts
           path: site/static/artifacts
       
       - name: Build
