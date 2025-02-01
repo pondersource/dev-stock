@@ -1,9 +1,25 @@
 +++
-title = "OCM Compatibility Matrix"
-template = "matrix.html"
+title = "OCM Test Suite Gallery"
+sort_by = "none"
+template = "gallery.html"
+page_template = "gallery.html"
 +++
 
-# OCM Compatibility Matrix 🔄
+Welcome to the OCM Test Suite Gallery! This page showcases automated test recordings for various OCM (Open Cloud Mesh) features. Each test demonstrates the interoperability between different cloud storage platforms.
+
+The tests are organized into four main categories:
+
+1. **Authentication Tests** 🔐 - Verify user authentication and session management
+2. **Public Link Sharing** 🔗 - Test creation and access of public share links
+3. **Direct User Sharing** 🤝 - Validate direct file/folder sharing between users
+4. **ScienceMesh Federation** 🌐 - Test federated sharing via ScienceMesh
+
+Each test card shows:
+- A video recording of the test execution
+- Current test status (passing/failing)
+- Test description and details
+
+Click on any video to watch the test execution in detail. The status badge below each video shows the current state of that particular test in our continuous integration pipeline.
 
 ## Overview
 This matrix displays the current compatibility status of various file sharing and collaboration features across different platforms. Each cell shows the real-time status of automated tests between different platform combinations.

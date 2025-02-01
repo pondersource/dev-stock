@@ -4,6 +4,8 @@ on:
   push:
     branches: ["main"]
   workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'  # Run every 6 hours to fetch new artifacts
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -17,7 +19,56 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  fetch-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p site/static/artifacts
+          # Function to download artifacts from a workflow
+          download_artifacts() {
+            local workflow=$1
+            local latest_run=$(gh api repos/pondersource/dev-stock/actions/workflows/$workflow/runs --jq '.workflow_runs[0].id')
+            if [ ! -z "$latest_run" ]; then
+              # Get artifacts from the run
+              artifacts=$(gh api repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts --jq '.artifacts[]')
+              if [ ! -z "$artifacts" ]; then
+                echo "$artifacts" | while read -r artifact; do
+                  id=$(echo "$artifact" | jq -r '.id')
+                  name=$(echo "$artifact" | jq -r '.name')
+                  # Download and extract the artifact
+                  gh api repos/pondersource/dev-stock/actions/artifacts/$id/zip -H "Accept: application/vnd.github+json" --output temp.zip
+                  unzip -o temp.zip -d "site/static/artifacts/$workflow-$name"
+                  rm temp.zip
+                  # Convert any videos to web-friendly format
+                  find "site/static/artifacts/$workflow-$name" -name "*.mp4" -exec sh -c '
+                    input="$1"
+                    output="${input%.mp4}.webm"
+                    ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y
+                  ' sh {} \;
+                done
+              fi
+            fi
+          }
+
+          # Download artifacts from all test workflows
+          for workflow in $(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | grep -E 'share-|login-|invite-'); do
+            workflow_name=$(basename $workflow)
+            echo "Downloading artifacts from $workflow_name"
+            download_artifacts $workflow_name
+          done
+
+          # Generate artifact manifest
+          echo "Generating artifact manifest..."
+          find site/static/artifacts -type f -name "*.webm" -o -name "*.mp4" | jq -R -s 'split("\n")[:-1]' > site/static/artifacts/manifest.json
+
   build:
+    needs: fetch-artifacts
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,12 +80,20 @@ jobs:
           wget -q "https://github.com/getzola/zola/releases/download/v${ZOLA_VERSION}/zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
           tar xzf "zola-v${ZOLA_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
           sudo mv zola /usr/local/bin
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      
+      - name: Download artifact manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-manifest
+          path: site/static/artifacts
       
       - name: Build
         run: |
           cd site
           zola build
-          ls -la public
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
