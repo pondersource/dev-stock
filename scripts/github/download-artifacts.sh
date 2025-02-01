@@ -224,12 +224,13 @@ generate_manifest() {
     info "Generating artifact manifest..."
     local manifest="$ARTIFACTS_DIR/manifest.json"
     
-    # Use jq to build the manifest
+    # Use jq to build the manifest with correct relative paths
+    # Remove 'site/static/' prefix from paths as it's not needed in the final URL
     find "$ARTIFACTS_DIR" -type f -name "*.webm" -print0 | sort -z | jq -R -s -c 'split("\u0000")[:-1] | 
         map(select(length > 0) | {
             workflow: capture("artifacts/(?<wf>[^/]+)").wf,
-            video: .,
-            thumbnail: sub("\\.webm$"; ".jpg")
+            video: (. | sub("^site/static/"; "")),
+            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".jpg"))
         }) | { videos: . }' > "$manifest"
     
     if [[ ! -f "$manifest" ]]; then
