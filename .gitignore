@@ -28,8 +28,8 @@ nc-sciencemesh-release
 surf-token-based-access
 
 # site ignored files
-./site/public
-./site/static/artifacts/*
+site/public
+site/static/artifacts
 
 # cypress temporary files.
 cypress/ocm-test-suite/cypress/videos/*
