@@ -3,8 +3,53 @@
 {% block content %}
 <div class="gallery-container">
     <h1>{{ section.title }}</h1>
+    
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search tests..." aria-label="Search tests">
+            <button id="clear-search" aria-label="Clear search">×</button>
+        </div>
+        
+        <div class="filter-controls">
+            <select id="status-filter" aria-label="Filter by status">
+                <option value="all">All Status</option>
+                <option value="passing">Passing</option>
+                <option value="failing">Failing</option>
+                <option value="pending">Pending</option>
+            </select>
+            
+            <select id="platform-filter" aria-label="Filter by platform">
+                <option value="all">All Platforms</option>
+                <option value="nextcloud">Nextcloud</option>
+                <option value="owncloud">ownCloud</option>
+                <option value="ocis">oCIS</option>
+                <option value="seafile">Seafile</option>
+            </select>
+        </div>
+    </div>
+
     {{ section.content | safe }}
     
+    <!-- Interactive Compatibility Matrix -->
+    <div class="compatibility-matrix">
+        <h2>Compatibility Matrix</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th class="platform-cell">Nextcloud v27</th>
+                    <th class="platform-cell">Nextcloud v28</th>
+                    <th class="platform-cell">ownCloud v10</th>
+                    <th class="platform-cell">oCIS v5</th>
+                    <th class="platform-cell">Seafile v11</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Matrix rows will be populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
     <div class="test-categories">
         <div class="category" id="auth-tests">
             <h2>Authentication Tests 🔐</h2>
@@ -35,6 +80,18 @@
         </div>
     </div>
 
+    <!-- Skeleton Loading Template -->
+    <template id="skeleton-template">
+        <div class="test-card test-card-skeleton">
+            <div class="video-placeholder"></div>
+            <div class="content-placeholder">
+                <div class="title-placeholder"></div>
+                <div class="status-placeholder"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Test Card Template -->
     <template id="test-card-template">
         <div class="test-card">
             <div class="video-container">
@@ -50,6 +107,17 @@
             </div>
         </div>
     </template>
+
+    <!-- Artifacts Download Panel -->
+    <div class="artifacts-panel">
+        <div class="panel-header">
+            <h3>Test Artifacts</h3>
+            <button class="close-panel" aria-label="Close panel">×</button>
+        </div>
+        <div class="artifacts-list">
+            <!-- Artifacts will be populated by JavaScript -->
+        </div>
+    </div>
 
     <script>
         // Function to format workflow name into a readable title
@@ -69,12 +137,124 @@
             return null;
         }
 
-        // Function to create a test card
+        // Function to get test status from badge
+        function getTestStatus(statusBadge) {
+            const statusText = statusBadge.alt || statusBadge.getAttribute('alt') || '';
+            if (statusText.includes('success')) return 'passing';
+            if (statusText.includes('failure')) return 'failing';
+            return 'pending';
+        }
+
+        // Function to check if a test matches current filters
+        function matchesFilters(card, searchTerm, statusFilter, platformFilter) {
+            const title = card.querySelector('.test-name').textContent.toLowerCase();
+            const status = getTestStatus(card.querySelector('.test-status img'));
+            
+            // Search filter
+            if (searchTerm && !title.includes(searchTerm.toLowerCase())) {
+                return false;
+            }
+            
+            // Status filter
+            if (statusFilter !== 'all' && status !== statusFilter) {
+                return false;
+            }
+            
+            // Platform filter
+            if (platformFilter !== 'all') {
+                const platformName = platformFilter.toLowerCase();
+                const workflowName = title.toLowerCase();
+                
+                // Special handling for ownCloud and Nextcloud
+                if (platformName === 'owncloud') {
+                    // Match "owncloud" but not "nextcloud"
+                    if (!workflowName.includes('owncloud') && !workflowName.includes('oc')) {
+                        return false;
+                    }
+                } else if (platformName === 'nextcloud') {
+                    // Match "nextcloud" but not "owncloud"
+                    if (!workflowName.includes('nextcloud') && !workflowName.includes('nc')) {
+                        return false;
+                    }
+                } else if (platformName === 'ocis') {
+                    // Match "ocis" specifically
+                    if (!workflowName.includes('ocis')) {
+                        return false;
+                    }
+                } else if (platformName === 'seafile') {
+                    // Match "seafile" or "sf"
+                    if (!workflowName.includes('seafile') && !workflowName.includes('sf')) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        // Function to animate element visibility
+        function animateVisibility(element, show) {
+            if (show) {
+                element.classList.remove('hidden');
+                // Force a reflow to ensure the animation plays
+                element.offsetHeight;
+                element.style.display = '';
+            } else {
+                element.classList.add('hidden');
+                // Wait for animation to complete before hiding
+                setTimeout(() => {
+                    if (element.classList.contains('hidden')) {
+                        element.style.display = 'none';
+                    }
+                }, 300); // Match the CSS transition duration
+            }
+        }
+
+        // Function to apply filters with animation
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value;
+            const statusFilter = document.getElementById('status-filter').value;
+            const platformFilter = document.getElementById('platform-filter').value;
+            
+            // Track if category has visible cards
+            const categoryVisibility = {
+                'auth-tests': false,
+                'share-link-tests': false,
+                'share-with-tests': false,
+                'sciencemesh-tests': false
+            };
+            
+            document.querySelectorAll('.test-card').forEach(card => {
+                const isVisible = matchesFilters(card, searchTerm, statusFilter, platformFilter);
+                animateVisibility(card, isVisible);
+                
+                if (isVisible) {
+                    const category = card.closest('.category');
+                    if (category) {
+                        categoryVisibility[category.id] = true;
+                    }
+                }
+            });
+            
+            // Show/hide categories based on whether they have visible cards
+            Object.entries(categoryVisibility).forEach(([categoryId, hasVisibleCards]) => {
+                const category = document.getElementById(categoryId);
+                if (category) {
+                    animateVisibility(category, hasVisibleCards);
+                }
+            });
+        }
+
+        // Function to create a test card with animation
         function createTestCard(videoData) {
             const template = document.getElementById('test-card-template');
             const card = template.content.cloneNode(true);
+            const cardElement = card.querySelector('.test-card');
             
-            const video = card.querySelector('video');
+            // Add hidden class initially
+            cardElement.classList.add('hidden');
+            
+            const video = cardElement.querySelector('video');
             const source = video.querySelector('source');
             
             // Strip 'site/static/' from paths since Zola copies everything from site/static to root
@@ -85,18 +265,166 @@
             source.src = `${baseUrl}/${videoPath}`;
             video.poster = `${baseUrl}/${thumbnailPath}`;
             
-            const title = card.querySelector('.test-name');
+            const title = cardElement.querySelector('.test-name');
             title.textContent = formatWorkflowName(videoData.workflow);
             
-            const status = card.querySelector('.test-status');
+            const status = cardElement.querySelector('.test-status');
             status.innerHTML = `<img src="https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/${videoData.workflow}.yml?branch=main&style=flat-square" alt="Test Status">`;
             
-            return card;
+            // Add keyboard shortcuts for video control
+            video.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    video.paused ? video.play() : video.pause();
+                } else if (e.code === 'ArrowLeft') {
+                    video.currentTime = Math.max(0, video.currentTime - 10);
+                } else if (e.code === 'ArrowRight') {
+                    video.currentTime = Math.min(video.duration, video.currentTime + 10);
+                }
+            });
+            
+            return cardElement;
         }
 
-        // Load videos and organize them into categories
+        // Function to create skeleton loading cards
+        function createSkeletons(container, count) {
+            const template = document.getElementById('skeleton-template');
+            for (let i = 0; i < count; i++) {
+                const skeleton = template.content.cloneNode(true);
+                container.appendChild(skeleton);
+            }
+        }
+
+        // Function to remove skeleton loading cards
+        function removeSkeletons(container) {
+            container.querySelectorAll('.test-card-skeleton').forEach(skeleton => {
+                skeleton.remove();
+            });
+        }
+
+        // Function to update compatibility matrix
+        function updateCompatibilityMatrix(data) {
+            const platforms = ['nc-v27', 'nc-v28', 'oc-v10', 'ocis-v5', 'sf-v11'];
+            const tbody = document.querySelector('.compatibility-matrix tbody');
+            tbody.innerHTML = '';
+
+            const features = [
+                { id: 'auth', name: 'Authentication' },
+                { id: 'share-link', name: 'Public Link Sharing' },
+                { id: 'share-with', name: 'Direct User Sharing' },
+                { id: 'invite-link', name: 'ScienceMesh Federation' }
+            ];
+
+            features.forEach(feature => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td class="platform-cell">${feature.name}</td>`;
+
+                platforms.forEach(platform => {
+                    const status = getFeatureStatus(data, feature.id, platform);
+                    row.innerHTML += `
+                        <td class="compatibility-cell" data-feature="${feature.id}" data-platform="${platform}">
+                            <div class="status-indicator">
+                                <span class="dot ${status.class}"></span>
+                                ${status.label}
+                            </div>
+                        </td>
+                    `;
+                });
+
+                tbody.appendChild(row);
+            });
+
+            // Add click handlers for matrix cells
+            document.querySelectorAll('.compatibility-cell').forEach(cell => {
+                cell.addEventListener('click', () => {
+                    const feature = cell.dataset.feature;
+                    const platform = cell.dataset.platform;
+                    showArtifacts(data, feature, platform);
+                });
+            });
+        }
+
+        // Function to get feature status
+        function getFeatureStatus(data, feature, platform) {
+            const relevantTests = data.videos.filter(video => {
+                const workflow = video.workflow.toLowerCase();
+                return workflow.includes(feature) && workflow.includes(platform);
+            });
+
+            if (relevantTests.length === 0) {
+                return { class: 'unsupported', label: 'Unsupported' };
+            }
+
+            const statuses = relevantTests.map(test => {
+                const statusImg = document.createElement('img');
+                statusImg.alt = test.status || '';
+                return getTestStatus(statusImg);
+            });
+
+            if (statuses.includes('failing')) {
+                return { class: 'failure', label: 'Failing' };
+            }
+            if (statuses.includes('pending')) {
+                return { class: 'pending', label: 'Pending' };
+            }
+            return { class: 'success', label: 'Passing' };
+        }
+
+        // Function to show artifacts panel
+        function showArtifacts(data, feature, platform) {
+            const panel = document.querySelector('.artifacts-panel');
+            const list = panel.querySelector('.artifacts-list');
+            list.innerHTML = '';
+
+            const relevantTests = data.videos.filter(video => {
+                const workflow = video.workflow.toLowerCase();
+                return workflow.includes(feature) && workflow.includes(platform);
+            });
+
+            relevantTests.forEach(test => {
+                const artifacts = test.artifacts || [];
+                artifacts.forEach(artifact => {
+                    const item = document.createElement('div');
+                    item.className = 'artifact-item';
+                    item.innerHTML = `
+                        <svg class="artifact-icon" viewBox="0 0 16 16">
+                            <path d="M8 1.5l4 4v9H4v-9l4-4z"/>
+                        </svg>
+                        <div class="artifact-info">
+                            <div class="artifact-name">${artifact.name}</div>
+                            <div class="artifact-size">${formatSize(artifact.size)}</div>
+                        </div>
+                        <button class="download-button" data-url="${artifact.url}">
+                            Download
+                        </button>
+                    `;
+                    list.appendChild(item);
+                });
+            });
+
+            panel.classList.add('open');
+        }
+
+        // Function to format file size
+        function formatSize(bytes) {
+            const units = ['B', 'KB', 'MB', 'GB'];
+            let size = bytes;
+            let unitIndex = 0;
+            while (size >= 1024 && unitIndex < units.length - 1) {
+                size /= 1024;
+                unitIndex++;
+            }
+            return `${size.toFixed(1)} ${units[unitIndex]}`;
+        }
+
+        // Load videos and organize them into categories with animation
         async function loadVideos() {
             try {
+                // Add skeleton loading
+                document.querySelectorAll('.test-grid').forEach(grid => {
+                    createSkeletons(grid, 3);
+                });
+
                 const baseUrl = '{{ get_url(path="/") | safe }}'.replace(/\/+$/, '');
                 const manifestUrl = `${baseUrl}/artifacts/manifest.json`;
                 
@@ -109,7 +437,22 @@
                 if (!data.videos || !Array.isArray(data.videos)) {
                     throw new Error('Invalid manifest format - missing videos array');
                 }
+
+                // Remove skeletons
+                document.querySelectorAll('.test-grid').forEach(grid => {
+                    removeSkeletons(grid);
+                });
+
+                // Update compatibility matrix
+                updateCompatibilityMatrix(data);
                 
+                // Add animation to categories
+                document.querySelectorAll('.category').forEach(category => {
+                    category.classList.add('hidden');
+                });
+                
+                // Stagger the loading of videos
+                let delay = 0;
                 data.videos.forEach(videoData => {
                     const category = getCategory(videoData.workflow);
                     if (category) {
@@ -117,9 +460,36 @@
                         if (container) {
                             const card = createTestCard(videoData);
                             container.appendChild(card);
+                            
+                            // Stagger the animation of cards
+                            setTimeout(() => {
+                                // Show the category if it's the first card
+                                const categoryElement = container.closest('.category');
+                                if (categoryElement.classList.contains('hidden')) {
+                                    animateVisibility(categoryElement, true);
+                                }
+                                // Show the card
+                                animateVisibility(card, true);
+                            }, delay);
+                            delay += 100; // Stagger each card by 100ms
                         }
                     }
                 });
+
+                // Set up event listeners for filters
+                document.getElementById('search-input').addEventListener('input', applyFilters);
+                document.getElementById('status-filter').addEventListener('change', applyFilters);
+                document.getElementById('platform-filter').addEventListener('change', applyFilters);
+                
+                // Add animation to clear search
+                const clearSearch = document.getElementById('clear-search');
+                clearSearch.addEventListener('click', () => {
+                    const searchInput = document.getElementById('search-input');
+                    searchInput.value = '';
+                    searchInput.focus();
+                    applyFilters();
+                });
+                
             } catch (error) {
                 console.error('Error loading videos:', error);
                 const errorDiv = document.createElement('div');
@@ -131,7 +501,25 @@
         }
 
         // Initialize the gallery
-        document.addEventListener('DOMContentLoaded', loadVideos);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadVideos();
+
+            // Set up artifacts panel close button
+            document.querySelector('.close-panel').addEventListener('click', () => {
+                document.querySelector('.artifacts-panel').classList.remove('open');
+            });
+
+            // Close artifacts panel when clicking outside
+            document.addEventListener('click', (e) => {
+                const panel = document.querySelector('.artifacts-panel');
+                const isClickInside = panel.contains(e.target);
+                const isClickOnMatrix = e.target.closest('.compatibility-cell');
+                
+                if (!isClickInside && !isClickOnMatrix && panel.classList.contains('open')) {
+                    panel.classList.remove('open');
+                }
+            });
+        });
     </script>
 </div>
-{% endblock content %} 
+{% endblock content %}

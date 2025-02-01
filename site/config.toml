@@ -1,19 +1,65 @@
 base_url = "https://pondersource.github.io/dev-stock"
-title = "OCM Compatibility Matrix"
+title = "OCM Test Suite"
 description = "Compatibility status of various file sharing and collaboration features across different platforms"
+default_language = "en"
+
+# Theme settings
 theme = "ocm"
-
-# Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
+build_search_index = true
+generate_feeds = true
+feed_filenames = ["rss.xml", "atom.xml"]
 
-# Whether to build a search index to be used later on by a JavaScript library
-build_search_index = false
-
+# Markdown settings
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
 highlight_code = true
-highlight_theme = "dracula"
+highlight_theme = "visual-studio-dark"
+external_links_target_blank = true
+external_links_no_follow = true
+external_links_no_referrer = true
 
 [extra]
-# Put all your custom variables here 
+# Theme color for browser
+theme_color = "#0078d4"
+
+# Dark mode support
+dark_mode = true
+
+# Navigation menu
+menu = [
+    { name = "Authentication", url = "#auth-tests" },
+    { name = "Public Links", url = "#link-tests" },
+    { name = "User Sharing", url = "#user-tests" },
+    { name = "Federation", url = "#federation-tests" }
+]
+
+# Social links
+social = [
+    { name = "GitHub", url = "https://github.com/pondersource/dev-stock", icon = "github" },
+    { name = "OCM Spec", url = "https://cs3org.github.io/OCM-API/", icon = "docs" },
+    { name = "Ponder Source", url = "https://www.pondersource.com", icon = "home" }
+]
+
+# Footer links
+footer_links = [
+    { name = "GitHub", url = "https://github.com/pondersource/dev-stock" },
+    { name = "OCM Spec", url = "https://cs3org.github.io/OCM-API/" },
+    { name = "Ponder Source", url = "https://www.pondersource.com" }
+]
+
+# SEO settings
+[extra.seo]
+image = "/images/og-image.png"
+twitter_card = "summary_large_image"
+twitter_site = "@pondersource"
+
+# Analytics (optional)
+[extra.analytics]
+google_analytics = "" # Add your Google Analytics ID here if needed
+
+# Search settings
+[extra.search]
+include_title = true
+include_description = true
+include_path = true
+include_content = true

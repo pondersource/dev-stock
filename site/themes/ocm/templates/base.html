@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,6 +13,12 @@
     <header>
         <nav>
             <a href="{{ config.base_url }}">Home</a>
+            <div class="nav-right">
+                <button id="theme-toggle" aria-label="Toggle dark mode">
+                    <svg class="theme-icon sun" viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zm0 2a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11zm0-15.5V5M12 19v2M4.22 6.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M6.34 17.66l-1.42 1.42M19.78 6.22l-1.42 1.42"/></svg>
+                    <svg class="theme-icon moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
+                </button>
+            </div>
         </nav>
     </header>
     <main>
@@ -21,5 +27,36 @@
     <footer>
         <p>© {{ now() | date(format="%Y") }} PonderSource. All rights reserved.</p>
     </footer>
+    
+    <button id="back-to-top" aria-label="Back to top">↑</button>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Back to top functionality
+        const backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
 </body>
 </html> 
