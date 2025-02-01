@@ -3,7 +3,7 @@
 set -e  # Exit on error
 
 # Default version if not specified
-ZOLA_VERSION=${ZOLA_VERSION:-"0.17.2"}
+ZOLA_VERSION=${ZOLA_VERSION:-"0.19.2"}
 
 echo "Installing Zola version ${ZOLA_VERSION}..."
 

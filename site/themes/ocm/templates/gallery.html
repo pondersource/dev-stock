@@ -3,6 +3,8 @@
 {% block content %}
 <div class="gallery-container">
     <h1>{{ section.title }}</h1>
+    {{ section.content | safe }}
+    
     <div class="test-categories">
         <div class="category" id="auth-tests">
             <h2>Authentication Tests 🔐</h2>
@@ -36,7 +38,7 @@
     <template id="test-card-template">
         <div class="test-card">
             <div class="video-container">
-                <video controls preload="none" poster="{{ get_url(path="images/video-placeholder.png") | safe }}">
+                <video controls preload="none">
                     <source src="" type="video/webm">
                     Your browser does not support the video tag.
                 </video>
@@ -53,7 +55,6 @@
         // Function to format workflow name into a readable title
         function formatWorkflowName(name) {
             return name
-                .replace(/\.(yml|yaml)$/, '')
                 .split('-')
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                 .join(' ');
@@ -61,26 +62,28 @@
 
         // Function to determine the category from workflow name
         function getCategory(workflowName) {
-            if (workflowName.includes('login-')) return 'auth-tests';
-            if (workflowName.includes('share-link-')) return 'share-link-tests';
-            if (workflowName.includes('share-with-')) return 'share-with-tests';
-            if (workflowName.includes('invite-link-')) return 'sciencemesh-tests';
+            if (workflowName.startsWith('login')) return 'auth-tests';
+            if (workflowName.startsWith('share-link')) return 'share-link-tests';
+            if (workflowName.startsWith('share-with')) return 'share-with-tests';
+            if (workflowName.startsWith('invite-link')) return 'sciencemesh-tests';
             return null;
         }
 
         // Function to create a test card
-        function createTestCard(workflowName, videoUrl) {
+        function createTestCard(videoData) {
             const template = document.getElementById('test-card-template');
             const card = template.content.cloneNode(true);
             
-            const video = card.querySelector('video source');
-            video.src = videoUrl;
+            const video = card.querySelector('video');
+            const source = video.querySelector('source');
+            source.src = '{{ get_url(path="") | safe }}' + videoData.video;
+            video.poster = '{{ get_url(path="") | safe }}' + videoData.thumbnail;
             
             const title = card.querySelector('.test-name');
-            title.textContent = formatWorkflowName(workflowName);
+            title.textContent = formatWorkflowName(videoData.workflow);
             
             const status = card.querySelector('.test-status');
-            status.innerHTML = `<img src="https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/${workflowName}?branch=main&style=flat-square" alt="Test Status">`;
+            status.innerHTML = `<img src="https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/${videoData.workflow}.yml?branch=main&style=flat-square" alt="Test Status">`;
             
             return card;
         }
@@ -89,18 +92,14 @@
         async function loadVideos() {
             try {
                 const response = await fetch('{{ get_url(path="artifacts/manifest.json") | safe }}');
-                const videos = await response.json();
+                const data = await response.json();
                 
-                videos.forEach(videoPath => {
-                    const match = videoPath.match(/artifacts\/([^/]+)/);
-                    if (match) {
-                        const workflowName = match[1];
-                        const category = getCategory(workflowName);
-                        if (category) {
-                            const container = document.querySelector(`#${category} .test-grid`);
-                            const card = createTestCard(workflowName, videoPath);
-                            container.appendChild(card);
-                        }
+                data.videos.forEach(videoData => {
+                    const category = getCategory(videoData.workflow);
+                    if (category) {
+                        const container = document.querySelector(`#${category} .test-grid`);
+                        const card = createTestCard(videoData);
+                        container.appendChild(card);
                     }
                 });
             } catch (error) {

@@ -1,0 +1,113 @@
+name: Deploy Zola site to Pages
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the specified branch and files.
+  push:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "scripts/github/**"
+      - ".github/workflows/github-pages.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "scripts/github/**"
+      - ".github/workflows/github-pages.yml"
+  # Allows you to run this workflow manually from the Actions tab.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  fetch-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg jq
+
+      - name: Download Artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x scripts/github/download-artifacts.sh
+          ./scripts/github/download-artifacts.sh
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-artifacts
+          path: site/static/artifacts/
+
+  build:
+    needs: fetch-artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install Zola
+        env:
+          ZOLA_VERSION: "0.19.2"
+        run: |
+          chmod +x scripts/github/install-zola.sh
+          ./scripts/github/install-zola.sh
+      
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: site-artifacts
+          path: site/static/artifacts
+
+      - name: Prepare theme
+        run: |
+          # Ensure theme directories exist
+          mkdir -p site/themes/ocm/{templates,sass,static}
+          
+          # Copy templates to theme directory
+          cp -r site/templates/* site/themes/ocm/templates/
+          
+          # Copy sass files to theme directory
+          cp -r site/sass/* site/themes/ocm/sass/
+          
+          # Copy static files to theme directory
+          cp -r site/static/* site/themes/ocm/static/ || true
+      
+      - name: Build site
+        run: |
+          chmod +x scripts/github/build-site.sh
+          ./scripts/github/build-site.sh
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 
