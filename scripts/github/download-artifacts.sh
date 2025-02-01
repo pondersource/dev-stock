@@ -195,11 +195,11 @@ download_artifacts() {
             continue
         fi
         
-        # Process videos
-        find "$target_dir" -name "*.mp4" -exec sh -c '
-            source "$0"
+        # Process videos - explicitly use bash and export functions
+        export -f process_video convert_to_webm generate_thumbnail log error info debug
+        find "$target_dir" -name "*.mp4" -exec bash -c '
             process_video "$1"
-        ' "$SCRIPT_DIR/$(basename "$0")" {} \;
+        ' _ {} \;
         
         # Clean up the temporary directory after successful processing
         rm -rf "$tmp_dir"
