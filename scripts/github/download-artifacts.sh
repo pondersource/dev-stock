@@ -77,31 +77,26 @@ sanitize_name() {
 generate_thumbnail() {
     local video="$1"
     local thumbnail="${video%.*}.jpg"
-    info "Generating thumbnail for $video"
     
     if ! ffmpeg -hide_banner -loglevel error -i "$video" \
-        -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail"; then
-        error "Failed to generate thumbnail for $video"
+        -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail" 2>/dev/null; then
         return 1
     fi
     
-    debug "Thumbnail generated at $thumbnail"
+    printf "%s" "$thumbnail"
 }
 
 # Function to convert video to WebM
 convert_to_webm() {
     local input="$1"
     local output="${input%.mp4}.webm"
-    info "Converting $input to WebM format"
     
     if ! ffmpeg -hide_banner -loglevel error -i "$input" \
-        -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y; then
-        error "Failed to convert $input to WebM"
+        -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y 2>/dev/null; then
         return 1
     fi
     
-    debug "Conversion complete: $output"
-    printf "%s" "$output"  # Use printf instead of echo for cleaner output
+    printf "%s" "$output"
 }
 
 # Function to process video file
@@ -120,17 +115,22 @@ process_video() {
     fi
     
     # Convert to WebM
+    info "Converting $new_name to WebM format"
     local webm_file
-    webm_file=$(convert_to_webm "$new_name") || {
+    if ! webm_file=$(convert_to_webm "$new_name"); then
         error "Failed to convert video to WebM"
         return 1
-    }
+    fi
+    info "Successfully converted to $webm_file"
     
     # Generate thumbnail
-    if ! generate_thumbnail "$webm_file"; then
+    info "Generating thumbnail for $webm_file"
+    local thumbnail_file
+    if ! thumbnail_file=$(generate_thumbnail "$webm_file"); then
         error "Failed to generate thumbnail"
         return 1
     fi
+    info "Successfully generated thumbnail at $thumbnail_file"
     
     # Cleanup original MP4
     rm -f "$new_name"
