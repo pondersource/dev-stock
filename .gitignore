@@ -12,6 +12,7 @@ server
 rd-sram
 ./owncloud
 ./nextcloud
+./site/public
 owncloud-sciencemesh
 nextcloud-sciencemesh
 open-id-connect
