@@ -50,11 +50,6 @@ For detailed setup instructions, see our [Getting Started Guide](docs/guides/get
 - [OCM Test Suite](docs/testing/test-suite.md)
 - [Platform Compatibility Matrix](docs/compatibility-matrix.md)
 
-### Platform Integration
-- [Nextcloud Integration](docs/guides/nextcloud.md)
-- [ownCloud Integration](docs/guides/owncloud.md)
-- [OCM Stub Usage](docs/guides/ocmstub.md)
-
 ### Other Topics
 - [ScienceMesh Integration](docs/scienecemesh.md)
 - [SOLID RemoteStorage](docs/solid-remotestorage.md)
