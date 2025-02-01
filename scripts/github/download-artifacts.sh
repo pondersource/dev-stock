@@ -21,8 +21,8 @@ set -euo pipefail
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ARTIFACTS_DIR="site/static/artifacts"
 readonly IMAGES_DIR="site/static/images"
-readonly TEMP_DIRS=()
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
+declare -a TEMP_DIRS
 
 # Logging functions
 log() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
@@ -182,6 +182,7 @@ download_artifacts() {
         if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
             -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"; then
             error "Failed to download artifact $id"
+            rm -rf "$tmp_dir"  # Clean up immediately on failure
             continue
         fi
         
@@ -190,6 +191,7 @@ download_artifacts() {
         mkdir -p "$target_dir"
         if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"; then
             error "Failed to extract artifact $id"
+            rm -rf "$tmp_dir"  # Clean up immediately on failure
             continue
         fi
         
@@ -198,6 +200,16 @@ download_artifacts() {
             source "$0"
             process_video "$1"
         ' "$SCRIPT_DIR/$(basename "$0")" {} \;
+        
+        # Clean up the temporary directory after successful processing
+        rm -rf "$tmp_dir"
+        # Remove the directory from our tracking array
+        for i in "${!TEMP_DIRS[@]}"; do
+            if [[ ${TEMP_DIRS[i]} = "$tmp_dir" ]]; then
+                unset 'TEMP_DIRS[i]'
+                break
+            fi
+        done
     done
 }
 
