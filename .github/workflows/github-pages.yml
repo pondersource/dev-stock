@@ -1,19 +1,30 @@
 name: Deploy Zola site to Pages
 
+# Controls when the action will run.
 on:
+  # Triggers the workflow on push or pull request events but only for the specified branch and files.
   push:
-    branches: ["main"]
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "scripts/github/**"
+      - ".github/workflows/github-pages.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "site/**"
+      - "scripts/github/**"
+      - ".github/workflows/github-pages.yml"
+  # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
-  schedule:
-    - cron: '0 */6 * * *'  # Run every 6 hours to fetch new artifacts
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -27,8 +38,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg jq
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y ffmpeg jq
 
       - name: Download Artifacts
         env:
@@ -52,7 +63,7 @@ jobs:
       
       - name: Install Zola
         env:
-          ZOLA_VERSION: "0.17.2"
+          ZOLA_VERSION: "0.19.2"
         run: |
           chmod +x scripts/github/install-zola.sh
           ./scripts/github/install-zola.sh
@@ -62,11 +73,25 @@ jobs:
         with:
           name: site-artifacts
           path: site/static/artifacts
-      
-      - name: Build
+
+      - name: Prepare theme
         run: |
-          cd site
-          zola build
+          # Ensure theme directories exist
+          mkdir -p site/themes/ocm/{templates,sass,static}
+          
+          # Copy templates to theme directory
+          cp -r site/templates/* site/themes/ocm/templates/
+          
+          # Copy sass files to theme directory
+          cp -r site/sass/* site/themes/ocm/sass/
+          
+          # Copy static files to theme directory
+          cp -r site/static/* site/themes/ocm/static/ || true
+      
+      - name: Build site
+        run: |
+          chmod +x scripts/github/build-site.sh
+          ./scripts/github/build-site.sh
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
