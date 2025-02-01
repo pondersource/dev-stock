@@ -25,47 +25,77 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup directories
+        run: mkdir -p site/static/artifacts
+
       - name: Download Artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p site/static/artifacts
           # Function to download artifacts from a workflow
           download_artifacts() {
             local workflow=$1
-            local latest_run=$(gh api repos/pondersource/dev-stock/actions/workflows/$workflow/runs --jq '.workflow_runs[0].id')
-            if [ ! -z "$latest_run" ]; then
-              # Get artifacts from the run
-              artifacts=$(gh api repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts --jq '.artifacts[]')
-              if [ ! -z "$artifacts" ]; then
-                echo "$artifacts" | while read -r artifact; do
-                  id=$(echo "$artifact" | jq -r '.id')
-                  name=$(echo "$artifact" | jq -r '.name')
-                  # Download and extract the artifact
-                  gh api repos/pondersource/dev-stock/actions/artifacts/$id/zip -H "Accept: application/vnd.github+json" --output temp.zip
-                  unzip -o temp.zip -d "site/static/artifacts/$workflow-$name"
-                  rm temp.zip
-                  # Convert any videos to web-friendly format
-                  find "site/static/artifacts/$workflow-$name" -name "*.mp4" -exec sh -c '
-                    input="$1"
-                    output="${input%.mp4}.webm"
-                    ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y
-                  ' sh {} \;
-                done
-              fi
+            echo "Processing workflow: $workflow"
+            
+            # Get the latest workflow run ID
+            latest_run=$(gh api repos/pondersource/dev-stock/actions/workflows/$workflow/runs --jq '.workflow_runs[0].id')
+            if [ -n "$latest_run" ]; then
+              echo "Latest run ID: $latest_run"
+              
+              # Get artifacts for this run
+              artifacts_json=$(gh api repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts)
+              
+              # Process each artifact
+              echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name)"' | while read -r id name; do
+                echo "Downloading artifact $name (ID: $id)"
+                
+                # Create a temporary directory for this artifact
+                tmp_dir=$(mktemp -d)
+                
+                # Download the artifact
+                gh api repos/pondersource/dev-stock/actions/artifacts/$id/zip -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"
+                
+                # Extract to the appropriate directory
+                workflow_name=$(basename $workflow)
+                target_dir="site/static/artifacts/${workflow_name%.*}-$name"
+                mkdir -p "$target_dir"
+                unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"
+                
+                # Convert videos to web format
+                find "$target_dir" -name "*.mp4" -exec sh -c '
+                  input="$1"
+                  output="${input%.mp4}.webm"
+                  echo "Converting $input to $output"
+                  ffmpeg -i "$input" -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y
+                ' sh {} \;
+                
+                # Cleanup
+                rm -rf "$tmp_dir"
+              done
             fi
           }
 
-          # Download artifacts from all test workflows
-          for workflow in $(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | grep -E 'share-|login-|invite-'); do
-            workflow_name=$(basename $workflow)
-            echo "Downloading artifacts from $workflow_name"
-            download_artifacts $workflow_name
+          # Get all workflow files and process them
+          gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | while read -r workflow; do
+            if echo "$workflow" | grep -qE 'share-|login-|invite-'; then
+              echo "Found test workflow: $workflow"
+              download_artifacts $(basename "$workflow")
+            fi
           done
 
           # Generate artifact manifest
           echo "Generating artifact manifest..."
-          find site/static/artifacts -type f -name "*.webm" -o -name "*.mp4" | jq -R -s 'split("\n")[:-1]' > site/static/artifacts/manifest.json
+          find site/static/artifacts -type f \( -name "*.webm" -o -name "*.mp4" \) | jq -R -s 'split("\n")[:-1]' > site/static/artifacts/manifest.json
+          
+          # Debug output
+          echo "Contents of artifacts directory:"
+          ls -R site/static/artifacts
+
+      - name: Upload artifact manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-manifest
+          path: site/static/artifacts/manifest.json
 
   build:
     needs: fetch-artifacts
@@ -84,7 +114,7 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       
-      - name: Download artifact manifest
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: artifact-manifest
