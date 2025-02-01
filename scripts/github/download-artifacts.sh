@@ -1,110 +1,258 @@
 #!/bin/bash
 
-set -e  # Exit on error
+# download-artifacts.sh
+#
+# Description: Downloads and processes video artifacts from GitHub Actions workflows,
+# converting them to web-friendly formats and generating thumbnails.
+#
+# Usage: ./download-artifacts.sh
+# Requirements:
+#   - GitHub CLI (gh)
+#   - jq
+#   - ffmpeg
+#   - unzip
+#
+# Author: PonderSource
+# License: MIT
+
+set -euo pipefail
+
+# Global variables
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly ARTIFACTS_DIR="site/static/artifacts"
+readonly IMAGES_DIR="site/static/images"
+readonly TEMP_DIRS=()
+readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
+
+# Logging functions
+log() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
+error() { log "ERROR: $*" >&2; }
+info() { log "INFO: $*"; }
+debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG: $*"; }
+
+# Cleanup function
+cleanup() {
+    local exit_code=$?
+    info "Cleaning up temporary directories..."
+    for dir in "${TEMP_DIRS[@]}"; do
+        if [[ -d "$dir" ]]; then
+            rm -rf "$dir"
+            debug "Removed temporary directory: $dir"
+        fi
+    done
+    if [[ $exit_code -ne 0 ]]; then
+        error "Script failed with exit code $exit_code"
+    fi
+    exit "$exit_code"
+}
+
+# Check required tools
+check_dependencies() {
+    local missing_deps=()
+    for cmd in gh jq ffmpeg unzip; do
+        if ! command -v "$cmd" &> /dev/null; then
+            missing_deps+=("$cmd")
+        fi
+    done
+    
+    if [[ ${#missing_deps[@]} -gt 0 ]]; then
+        error "Missing required dependencies: ${missing_deps[*]}"
+        error "Please install these tools before running this script."
+        exit 1
+    fi
+}
 
 # Function to sanitize workflow name for consistent file naming
 sanitize_name() {
-    echo "$1" | sed -E 's/\.(yml|yaml)$//' | tr '[:upper:]' '[:lower:]'
+    local name="$1"
+    echo "$name" | sed -E 's/\.(yml|yaml)$//' | tr '[:upper:]' '[:lower:]'
 }
 
 # Function to generate video thumbnail
 generate_thumbnail() {
     local video="$1"
     local thumbnail="${video%.*}.jpg"
-    echo "Generating thumbnail for $video"
-    ffmpeg -hide_banner -loglevel error -i "$video" -vf "select=eq(n\,0)" -vframes 1 "$thumbnail"
+    info "Generating thumbnail for $video"
+    
+    if ! ffmpeg -hide_banner -loglevel error -i "$video" \
+        -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail"; then
+        error "Failed to generate thumbnail for $video"
+        return 1
+    fi
+    
+    debug "Thumbnail generated at $thumbnail"
 }
 
-# Function to download artifacts from a workflow
+# Function to convert video to WebM
+convert_to_webm() {
+    local input="$1"
+    local output="${input%.mp4}.webm"
+    info "Converting $input to WebM format"
+    
+    if ! ffmpeg -hide_banner -loglevel error -i "$input" \
+        -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y; then
+        error "Failed to convert $input to WebM"
+        return 1
+    fi
+    
+    debug "Conversion complete: $output"
+    echo "$output"
+}
+
+# Function to process video file
+process_video() {
+    local input="$1"
+    local dir
+    dir="$(dirname "$input")"
+    local new_name="$dir/recording.mp4"
+    
+    info "Processing video: $input"
+    
+    # Rename to consistent filename
+    if ! mv "$input" "$new_name"; then
+        error "Failed to rename $input to $new_name"
+        return 1
+    fi
+    
+    # Convert to WebM
+    local webm_file
+    if ! webm_file=$(convert_to_webm "$new_name"); then
+        error "Failed to convert video to WebM"
+        return 1
+    fi
+    
+    # Generate thumbnail
+    if ! generate_thumbnail "$webm_file"; then
+        error "Failed to generate thumbnail"
+        return 1
+    fi
+    
+    # Cleanup original MP4
+    rm -f "$new_name"
+}
+
+# Function to fetch workflow artifacts
+fetch_workflow_artifacts() {
+    local workflow="$1"
+    local latest_run
+    
+    latest_run=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs" \
+        --jq '.workflow_runs[0].id') || {
+        error "Failed to fetch latest run for workflow $workflow"
+        return 1
+    }
+    
+    if [[ -z "$latest_run" ]]; then
+        error "No runs found for workflow $workflow"
+        return 1
+    fi
+    
+    echo "$latest_run"
+}
+
+# Function to download and process artifacts
 download_artifacts() {
-    local workflow=$1
-    local workflow_name=$(sanitize_name "$workflow")
-    echo "Processing workflow: $workflow_name"
+    local workflow="$1"
+    local workflow_name
+    workflow_name=$(sanitize_name "$workflow")
+    info "Processing workflow: $workflow_name"
     
     # Get the latest workflow run ID
-    latest_run=$(gh api repos/pondersource/dev-stock/actions/workflows/$workflow/runs --jq '.workflow_runs[0].id')
-    if [ -n "$latest_run" ]; then
-        echo "Latest run ID: $latest_run"
+    local latest_run
+    latest_run=$(fetch_workflow_artifacts "$workflow") || return 1
+    info "Latest run ID: $latest_run"
+    
+    # Get artifacts for this run
+    local artifacts_json
+    artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts") || {
+        error "Failed to fetch artifacts for run $latest_run"
+        return 1
+    }
+    
+    # Process each artifact
+    echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name)"' | while read -r id name; do
+        info "Downloading artifact $name (ID: $id)"
         
-        # Get artifacts for this run
-        artifacts_json=$(gh api repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts)
+        # Create a temporary directory for this artifact
+        local tmp_dir
+        tmp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$tmp_dir")
         
-        # Process each artifact
-        echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name)"' | while read -r id name; do
-            echo "Downloading artifact $name (ID: $id)"
-            
-            # Create a temporary directory for this artifact
-            tmp_dir=$(mktemp -d)
-            
-            # Download the artifact
-            gh api repos/pondersource/dev-stock/actions/artifacts/$id/zip -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"
-            
-            # Extract to the appropriate directory
-            target_dir="site/static/artifacts/$workflow_name"
-            mkdir -p "$target_dir"
-            unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"
-            
-            # Process videos
-            find "$target_dir" -name "*.mp4" -exec sh -c '
-                input="$1"
-                # Create a simpler filename
-                new_name="$(dirname "$input")/recording.mp4"
-                mv "$input" "$new_name"
-                
-                # Convert to WebM
-                output="${new_name%.mp4}.webm"
-                echo "Converting $new_name to $output"
-                ffmpeg -hide_banner -loglevel error -i "$new_name" \
-                    -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y
-                
-                # Generate thumbnail
-                thumbnail="${new_name%.mp4}.jpg"
-                echo "Generating thumbnail for $output"
-                ffmpeg -hide_banner -loglevel error -i "$output" \
-                    -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail"
-                
-                # Remove original MP4
-                rm "$new_name"
-            ' sh {} \;
-            
-            # Cleanup
-            rm -rf "$tmp_dir"
-        done
-    fi
+        # Download the artifact
+        if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
+            -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"; then
+            error "Failed to download artifact $id"
+            continue
+        fi
+        
+        # Extract to the appropriate directory
+        local target_dir="$ARTIFACTS_DIR/$workflow_name"
+        mkdir -p "$target_dir"
+        if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"; then
+            error "Failed to extract artifact $id"
+            continue
+        fi
+        
+        # Process videos
+        find "$target_dir" -name "*.mp4" -exec sh -c '
+            source "$0"
+            process_video "$1"
+        ' "$SCRIPT_DIR/$(basename "$0")" {} \;
+    done
 }
 
-# Create artifacts directory and placeholder image directory
-mkdir -p site/static/artifacts
-mkdir -p site/static/images
-
-# Get all workflow files and process them
-gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | while read -r workflow; do
-    if echo "$workflow" | grep -qE 'share-|login-|invite-'; then
-        echo "Found test workflow: $workflow"
-        download_artifacts $(basename "$workflow")
+# Function to generate manifest
+generate_manifest() {
+    info "Generating artifact manifest..."
+    local manifest="$ARTIFACTS_DIR/manifest.json"
+    
+    # Use jq to build the manifest
+    find "$ARTIFACTS_DIR" -type f -name "*.webm" -print0 | sort -z | jq -R -s -c 'split("\u0000")[:-1] | 
+        map(select(length > 0) | {
+            workflow: capture("artifacts/(?<wf>[^/]+)").wf,
+            video: .,
+            thumbnail: sub("\\.webm$"; ".jpg")
+        }) | { videos: . }' > "$manifest"
+    
+    if [[ ! -f "$manifest" ]]; then
+        error "Failed to generate manifest"
+        return 1
     fi
-done
+    
+    info "Manifest generated at $manifest"
+}
 
-# Generate artifact manifest with proper paths
-echo "Generating artifact manifest..."
-echo "{" > site/static/artifacts/manifest.json
-echo "  \"videos\": [" >> site/static/artifacts/manifest.json
-find site/static/artifacts -type f -name "*.webm" | sort | while read -r file; do
-    rel_path="${file#site/static/}"
-    thumb_path="${file%.webm}.jpg"
-    rel_thumb="${thumb_path#site/static/}"
-    workflow_name=$(echo "$file" | grep -oP 'artifacts/\K[^/]+')
-    echo "    {" >> site/static/artifacts/manifest.json
-    echo "      \"workflow\": \"$workflow_name\"," >> site/static/artifacts/manifest.json
-    echo "      \"video\": \"$rel_path\"," >> site/static/artifacts/manifest.json
-    echo "      \"thumbnail\": \"$rel_thumb\"" >> site/static/artifacts/manifest.json
-    echo "    }," >> site/static/artifacts/manifest.json
-done
-# Remove last comma and close JSON
-sed -i '$ s/,$//' site/static/artifacts/manifest.json
-echo "  ]" >> site/static/artifacts/manifest.json
-echo "}" >> site/static/artifacts/manifest.json
+main() {
+    # Set up error handling
+    trap cleanup EXIT
+    
+    # Check dependencies
+    check_dependencies
+    
+    # Create required directories
+    mkdir -p "$ARTIFACTS_DIR" "$IMAGES_DIR"
+    
+    # Process workflows
+    gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | \
+    while read -r workflow; do
+        if echo "$workflow" | grep -qE 'share-|login-|invite-'; then
+            info "Found test workflow: $workflow"
+            if ! download_artifacts "$(basename "$workflow")"; then
+                error "Failed to process workflow: $workflow"
+                continue
+            fi
+        fi
+    done
+    
+    # Generate manifest
+    generate_manifest
+    
+    # Debug output
+    info "Contents of artifacts directory:"
+    ls -R "$ARTIFACTS_DIR"
+    
+    info "Script completed successfully"
+}
 
-# Debug output
-echo "Contents of artifacts directory:"
-ls -R site/static/artifacts 
+# Execute main function
+main "$@" 
