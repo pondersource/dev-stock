@@ -25,7 +25,12 @@ readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
 declare -a TEMP_DIRS
 
 # Logging functions
-log() { echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
+log() { 
+    local timestamp
+    timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $*" >> "$LOG_FILE"
+    echo "[$timestamp] $*"
+}
 error() { log "ERROR: $*" >&2; }
 info() { log "INFO: $*"; }
 debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG: $*"; }
@@ -96,7 +101,7 @@ convert_to_webm() {
     fi
     
     debug "Conversion complete: $output"
-    echo "$output"
+    printf "%s" "$output"  # Use printf instead of echo for cleaner output
 }
 
 # Function to process video file
@@ -116,10 +121,10 @@ process_video() {
     
     # Convert to WebM
     local webm_file
-    if ! webm_file=$(convert_to_webm "$new_name"); then
+    webm_file=$(convert_to_webm "$new_name") || {
         error "Failed to convert video to WebM"
         return 1
-    fi
+    }
     
     # Generate thumbnail
     if ! generate_thumbnail "$webm_file"; then
@@ -196,6 +201,7 @@ download_artifacts() {
         fi
         
         # Process videos - explicitly use bash and export functions
+        export LOG_FILE  # Export log file path
         export -f process_video convert_to_webm generate_thumbnail log error info debug
         find "$target_dir" -name "*.mp4" -exec bash -c '
             process_video "$1"

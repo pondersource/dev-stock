@@ -73,20 +73,6 @@ jobs:
         with:
           name: site-artifacts
           path: site/static/artifacts
-
-      - name: Prepare theme
-        run: |
-          # Ensure theme directories exist
-          mkdir -p site/themes/ocm/{templates,sass,static}
-          
-          # Copy templates to theme directory
-          cp -r site/templates/* site/themes/ocm/templates/
-          
-          # Copy sass files to theme directory
-          cp -r site/sass/* site/themes/ocm/sass/
-          
-          # Copy static files to theme directory
-          cp -r site/static/* site/themes/ocm/static/ || true
       
       - name: Build site
         run: |
