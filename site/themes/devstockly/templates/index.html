@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+  <div class="hero__content">
+    <h1 class="hero__title" data-parallax="0.1">Open Cloud Mesh Test Suite</h1>
+    <p class="hero__subtitle" data-parallax="0.2">
+        Validating cross-cloud interoperability with OCM API
+    </p>
+    <button class="hero__cta" id="exploreBtn">View Test Results</button>
+  </div>
+  <div class="scroll-down" id="scrollDown">
+    <div class="scroll-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+</div>
+
+<main id="mainContent">
+  <div class="gallery-container">
+    {{ section.content | safe }}
+  </div>
+</main>
+
+<section class="test-matrix" id="testMatrix">
+  <div class="container">
+    <h2 class="matrix-title">Live Test Results</h2>
+    <div id="compatibilityMatrix"></div>
+  </div>
+</section>
+{% endblock content %} 

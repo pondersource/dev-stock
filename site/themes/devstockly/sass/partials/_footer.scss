@@ -1,0 +1,26 @@
+footer {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    margin-top: var(--spacing-3xl);
+    @include transition(background-color, border-color);
+    
+    p {
+        margin: 0;
+        color: var(--color-text);
+        opacity: 0.8;
+        @include transition(color);
+    }
+    
+    a {
+        color: var(--color-primary);
+        text-decoration: none;
+        font-weight: var(--font-weight-medium);
+        @include transition(color);
+        
+        &:hover {
+            color: var(--color-primary-hover);
+        }
+    }
+}

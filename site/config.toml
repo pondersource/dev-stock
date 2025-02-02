@@ -1,19 +1,16 @@
 base_url = "https://pondersource.github.io/dev-stock"
-title = "OCM Compatibility Matrix"
+title = "OCM Test Suite"
 description = "Compatibility status of various file sharing and collaboration features across different platforms"
-theme = "ocm"
+default_language = "en"
 
-# Whether to automatically compile all Sass files in the sass directory
+# Theme settings
+theme = "devstockly"
 compile_sass = true
 
-# Whether to build a search index to be used later on by a JavaScript library
-build_search_index = false
-
+# Markdown settings
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
 highlight_code = true
-highlight_theme = "dracula"
-
-[extra]
-# Put all your custom variables here 
+highlight_theme = "visual-studio-dark"
+external_links_target_blank = true
+external_links_no_follow = true
+external_links_no_referrer = true

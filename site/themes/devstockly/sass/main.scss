@@ -1,0 +1,27 @@
+// Import base styles and variables first
+@import 'partials/variables';
+@import 'partials/mixins';
+@import 'partials/reset';
+@import 'partials/hero';
+
+// Import layout components
+@import 'partials/header';
+@import 'partials/footer';
+@import 'partials/sidebar';
+
+// Import UI components
+@import 'partials/theme-toggle';
+@import 'partials/back-to-top';
+@import 'partials/controls';
+@import 'partials/loading';
+@import 'partials/artifacts';
+@import 'partials/tabs';
+@import 'partials/status-panel';
+@import 'partials/icons';
+
+// Import feature-specific styles
+@import 'partials/matrix';
+@import 'partials/gallery';
+@import 'partials/overlay';
+@import 'partials/responsive';
+@import 'partials/typography';

@@ -1,6 +1,8 @@
 # Jetbrains IDE config files.
 .idea/
 .DS_Store
+node_modules
+.parcel-cache
 
 bin/
 ./ocm
@@ -12,7 +14,6 @@ server
 rd-sram
 ./owncloud
 ./nextcloud
-./site/public
 owncloud-sciencemesh
 nextcloud-sciencemesh
 open-id-connect
@@ -27,10 +28,14 @@ surf-trashbin-app
 oc-sciencemesh-release
 nc-sciencemesh-release
 surf-token-based-access
-cypress/ocm-test-suite/cypress/videos/*
-cypress/ocm-test-suite/cypress/screenshots/*
+
+# site ignored files
+site/public
+site/static/artifacts
 
 # cypress temporary files.
+cypress/ocm-test-suite/cypress/videos/*
+cypress/ocm-test-suite/cypress/screenshots/*
 cypress/ocm-test-suite/share-link-url.txt
 cypress/ocm-test-suite/invite-link-nc-nc.txt
 cypress/ocm-test-suite/invite-link-nc-oc.txt

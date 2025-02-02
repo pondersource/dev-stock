@@ -1,0 +1,45 @@
+// Create new file for typography utilities
+@mixin text-gradient($gradient) {
+    background: $gradient;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.heading {
+    &-xl {
+        font-size: var(--font-size-4xl);
+        line-height: var(--line-height-tight);
+        letter-spacing: var(--letter-spacing-tight);
+    }
+
+    &-gradient {
+        @include text-gradient(linear-gradient(45deg, var(--color-primary), var(--color-secondary)));
+    }
+}
+
+.prose {
+    max-width: 65ch;
+    
+    p {
+        margin-bottom: var(--spacing-md);
+        line-height: var(--line-height-relaxed);
+    }
+
+    a {
+        color: var(--color-primary);
+        text-decoration: underline;
+        text-underline-offset: 0.25em;
+        @include transition(color);
+
+        &:hover {
+            color: var(--color-primary-hover);
+        }
+    }
+}
+
+code, pre {
+    font-family: var(--font-mono);
+    font-feature-settings: 'liga' 1, 'calt' 1;
+    font-variant-ligatures: common-ligatures contextual;
+} 
