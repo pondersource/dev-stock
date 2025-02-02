@@ -3,13 +3,6 @@ name: Deploy Zola site to Pages
 # Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the specified branch and files.
-  push:
-    branches:
-      - main
-    paths:
-      - "site/**"
-      - "scripts/github/**"
-      - ".github/workflows/github-pages.yml"
   pull_request:
     branches:
       - main
