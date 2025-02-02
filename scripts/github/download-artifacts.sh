@@ -12,8 +12,8 @@
 #   - ffmpeg
 #   - unzip
 #
-# Author: PonderSource
-# License: MIT
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+#
 
 set -euo pipefail
 

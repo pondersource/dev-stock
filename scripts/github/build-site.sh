@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+
 set -e  # Exit on error
 
 echo "Starting Zola build process..."
