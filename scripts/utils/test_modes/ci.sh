@@ -36,7 +36,25 @@ run_ci() {
     if [ "${TEST_SCENARIO}" = "login" ]; then
         # For login tests, we only need one platform version
         local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
-        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}-${p1_ver}.cy.js"
+        local platform_abbr
+        case "${EFSS_PLATFORM_1}" in
+            nextcloud)
+                platform_abbr="nc"
+                ;;
+            owncloud)
+                platform_abbr="oc"
+                ;;
+            ocmstub)
+                platform_abbr="os"
+                ;;
+            seafile)
+                platform_abbr="sf"
+                ;;
+            *)
+                platform_abbr="${EFSS_PLATFORM_1}"
+                ;;
+        esac
+        spec_path="cypress/e2e/${TEST_SCENARIO}/${platform_abbr}-${p1_ver}.cy.js"
     else
         # For share tests, we need both platform versions
         local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
