@@ -155,6 +155,24 @@ fetch_workflow_artifacts() {
     echo "$latest_run"
 }
 
+# Function to fetch workflow status
+fetch_workflow_status() {
+    local workflow="$1"
+    local status_json
+    
+    status_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?branch=main&per_page=1" \
+        --jq '{
+            name: .workflow_runs[0].name,
+            status: .workflow_runs[0].status,
+            conclusion: .workflow_runs[0].conclusion
+        }') || {
+        error "Failed to fetch status for workflow $workflow"
+        return 1
+    }
+    
+    echo "$status_json"
+}
+
 # Function to download and process artifacts
 download_artifacts() {
     local workflow="$1"
@@ -223,6 +241,19 @@ download_artifacts() {
 generate_manifest() {
     info "Generating artifact manifest..."
     local manifest="$ARTIFACTS_DIR/manifest.json"
+    local status_file="$ARTIFACTS_DIR/workflow-status.json"
+    local statuses="{}"
+    
+    # Collect all workflow statuses
+    gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[] | select(.path | test("share-|login-|invite-"))' | \
+    while read -r workflow; do
+        workflow_name=$(basename "$workflow")
+        status=$(fetch_workflow_status "$workflow_name")
+        statuses=$(echo "$statuses" | jq --arg name "$workflow_name" --argjson status "$status" '. + {($name): $status}')
+    done
+    
+    echo "$statuses" > "$status_file"
+    info "Workflow statuses written to $status_file"
     
     # Use jq to build the manifest with correct relative paths
     # Remove 'site/static/' prefix from paths as it's not needed in the final URL

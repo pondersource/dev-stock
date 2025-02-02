@@ -34,7 +34,13 @@
  body {
      min-height: 100vh;
      text-rendering: optimizeSpeed;
-     line-height: 1.5;
+     line-height: var(--line-height-normal);
+     font-family: var(--font-sans);
+     color: var(--color-text);
+     font-feature-settings: 'liga' 1, 'calt' 1;
+     font-variant-ligatures: common-ligatures contextual;
+     -webkit-font-smoothing: antialiased;
+     text-rendering: optimizeLegibility;
  }
 
  /* Remove list styles on ul, ol elements */

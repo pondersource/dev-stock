@@ -15,8 +15,8 @@ feed_filenames = ["rss.xml", "atom.xml"]
 # MIME types for JavaScript modules
 [extra.serve]
 [[extra.serve.headers]]
-paths = ["*.js"]
-headers = { "Content-Type" = "text/javascript" }
+path = "*.js"
+headers = { "Content-Type" = "text/javascript", "Access-Control-Allow-Origin" = "*" }
 
 # Markdown settings
 [markdown]
@@ -71,3 +71,9 @@ include_title = true
 include_description = true
 include_path = true
 include_content = true
+
+# Status mapping
+[extra.status]
+pass = { icon = "check-circle", color = "#2ea44f" }
+fail = { icon = "times-circle", color = "#cb2431" } 
+wip = { icon = "sync-alt", color = "#dbab09" }

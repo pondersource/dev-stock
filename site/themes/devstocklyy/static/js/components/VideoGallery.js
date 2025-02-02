@@ -17,9 +17,18 @@ export class VideoGallery {
 
     showLoading() {
         const template = document.getElementById('loading-spinner-template');
+        if (!template) {
+            console.error('Loading spinner template not found');
+            return;
+        }
+        
         const spinnerContent = document.importNode(template.content, true);
         this.loadingSpinner = spinnerContent.querySelector('.loading-spinner');
-        document.querySelector('.gallery-container').appendChild(this.loadingSpinner);
+        const container = document.querySelector('.gallery-container');
+        
+        if (container) {
+            container.appendChild(this.loadingSpinner);
+        }
     }
 
     hideLoading() {
@@ -126,5 +135,23 @@ export class VideoGallery {
         container.querySelectorAll('.test-card-skeleton').forEach(skeleton => {
             skeleton.remove();
         });
+    }
+
+    showError(message) {
+        const container = document.querySelector('.gallery-container');
+        const template = document.getElementById('error-message-template');
+        
+        if (!container || !template) {
+            console.error('Error container or template not found');
+            return;
+        }
+
+        const errorElement = document.importNode(template.content, true);
+        errorElement.querySelector('.error-text').textContent = `Error: ${message}`;
+        errorElement.querySelector('.retry-button').addEventListener('click', () => {
+            location.reload();
+        });
+
+        container.appendChild(errorElement);
     }
 }

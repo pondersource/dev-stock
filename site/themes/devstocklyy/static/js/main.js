@@ -1,12 +1,12 @@
 // Main application entry point
-import { VideoGallery } from '/js/components/VideoGallery.js';
+import { VideoGallery } from './components/VideoGallery.js';
 import { CompatibilityMatrix } from '/js/components/CompatibilityMatrix.js';
 import { config } from '/js/config.js';
 
 class App {
     constructor() {
         this.gallery = null;
-        this.matrix = null;
+        this.matrix = new CompatibilityMatrix();
     }
 
     async init() {
@@ -22,11 +22,35 @@ class App {
 
             // Initialize components
             this.gallery = new VideoGallery(data.videos);
-            this.matrix = new CompatibilityMatrix(data.videos);
 
             // Render components
             await this.gallery.render();
-            this.matrix.render();
+            await this.matrix.render();
+
+            // Updated scroll handlers
+            document.getElementById('exploreBtn')?.addEventListener('click', () => {
+                document.getElementById('mainContent')?.scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            });
+
+            document.getElementById('scrollDown')?.addEventListener('click', () => {
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Parallax effect on scroll
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('[data-parallax]');
+                
+                parallaxElements.forEach(element => {
+                    const speed = parseFloat(element.dataset.parallax);
+                    element.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
 
         } catch (error) {
             console.error('Application initialization failed:', error);

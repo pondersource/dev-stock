@@ -1,137 +1,261 @@
 import { config } from '/js/config.js';
 
 export class CompatibilityMatrix {
-    constructor(videos) {
-        this.videos = videos;
-        this.authMatrix = document.querySelector('.auth-matrix tbody');
-        this.publicLinkMatrix = document.querySelector('.public-link-matrix tbody');
-        this.directShareMatrix = document.querySelector('.direct-share-matrix tbody');
-        this.scienceMeshMatrix = document.querySelector('.sciencemesh-matrix tbody');
+    constructor() {
+        this.matrixContainer = document.getElementById('compatibilityMatrix');
+        this.workflowStatuses = null;
+        this.testCategories = [
+            {
+                id: 'auth-tests',
+                title: 'Authentication Tests',
+                icon: 'fingerprint',
+                platforms: [
+                    'Nextcloud v27.1.11',
+                    'Nextcloud v28.0.14',
+                    'oCIS v5.0.9',
+                    'OcmStub v1.0.0',
+                    'ownCloud v10.15.0',
+                    'Seafile v11.0.5'
+                ],
+                workflowPrefix: 'login-'
+            },
+            {
+                id: 'link-tests',
+                title: 'Public Link Sharing',
+                icon: 'link',
+                sources: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.15.0'],
+                targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.0.0'],
+                workflowPrefix: 'share-link-'
+            },
+            {
+                id: 'user-tests',
+                title: 'Direct User Sharing',
+                icon: 'user-friends',
+                sources: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'OcmStub v1.0.0', 'ownCloud v10.15.0', 'Seafile v11.0.5'],
+                targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'OcmStub v1.0.0', 'ownCloud v10.15.0', 'Seafile v11.0.5'],
+                workflowPrefix: 'share-with-'
+            },
+            {
+                id: 'federation-tests',
+                title: 'ScienceMesh Federation',
+                icon: 'network-wired',
+                sources: ['Nextcloud v27.1.11 (ScienceMesh)', 'oCIS v5.0.9', 'ownCloud v10.15.0 (ScienceMesh)'],
+                targets: ['Nextcloud v27.1.11 (ScienceMesh)', 'oCIS v5.0.9', 'ownCloud v10.15.0 (ScienceMesh)'],
+                workflowPrefix: 'invite-link-'
+            }
+        ];
+    }
+
+    async init() {
+        try {
+            const response = await fetch('/artifacts/workflow-status.json');
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.error('Workflow status file not found');
+                    this.workflowStatuses = null;
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            this.workflowStatuses = await response.json();
+        } catch (error) {
+            console.error('Failed to load workflow statuses:', error);
+            this.workflowStatuses = null;
+        }
     }
 
     async render() {
-        await Promise.all([
-            this.renderAuthenticationTests(),
-            this.renderPublicLinkTests(),
-            this.renderDirectUserTests(),
-            this.renderScienceMeshTests()
-        ]);
+        await this.init();  // Load statuses first
+        this.addStatusLegend();
+        this.testCategories.forEach(category => {
+            const section = this.createSectionElement(category);
+            this.matrixContainer.appendChild(section);
+        });
     }
 
-    createCell(workflowName, label, isUnsupported = false) {
-        const cell = document.createElement('td');
+    createSectionElement(category) {
+        const section = document.createElement('div');
+        section.className = 'matrix-section';
+        section.id = category.id;
         
-        if (isUnsupported) {
-            const badge = document.createElement('img');
-            badge.src = 'https://img.shields.io/badge/Unsupported-red?style=flat-square';
-            badge.alt = 'Unsupported';
-            cell.appendChild(badge);
-            return cell;
+        section.innerHTML = `
+            <h3 class="matrix-subtitle">
+                <i class="fas fa-${category.icon}"></i> ${category.title}
+            </h3>
+            <div class="matrix-scroll"></div>
+        `;
+
+        const table = this.createTable(category);
+        section.querySelector('.matrix-scroll').appendChild(table);
+        return section;
+    }
+
+    createTable(category) {
+        const table = document.createElement('table');
+        table.className = 'compatibility-table';
+        
+        table.appendChild(this.createTableHead(category));
+        table.appendChild(this.createTableBody(category));
+        
+        return table;
+    }
+
+    createTableHead(category) {
+        const thead = document.createElement('thead');
+        const tr = document.createElement('tr');
+        
+        if (category.platforms) {
+            // Header row for Authentication Tests: one header for the label then one for each platform
+            tr.innerHTML = '<th>Platform</th>';
+            category.platforms.forEach(platform => {
+                tr.innerHTML += `<th>${platform}</th>`;
+            });
+        } else {
+            tr.innerHTML = '<th>Source ➜ Target</th>';
+            category.targets.forEach(target => {
+                tr.innerHTML += `<th>${target}</th>`;
+            });
         }
+
+        thead.appendChild(tr);
+        return thead;
+    }
+
+    createTableBody(category) {
+        const tbody = document.createElement('tbody');
         
+        if (category.platforms) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>Status</td>';
+            
+            category.platforms.forEach(platform => {
+                const workflowName = this.generateWorkflowName(category.workflowPrefix, platform);
+                tr.appendChild(this.createStatusCell(workflowName));
+            });
+            
+            tbody.appendChild(tr);
+        } else {
+            category.sources.forEach(source => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${source}</td>`;
+                
+                category.targets.forEach(target => {
+                    const workflowName = this.generateWorkflowName(category.workflowPrefix, source, target);
+                    tr.appendChild(this.createStatusCell(workflowName));
+                });
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        return tbody;
+    }
+
+    generateWorkflowName(prefix, source, target) {
+        const platformMap = {
+            'Nextcloud v27.1.11': 'nc-v27',
+            'Nextcloud v28.0.14': 'nc-v28',
+            'ownCloud v10.15.0': 'oc-v10',
+            'OcmStub v1.0.0': 'os-v1',
+            'Seafile v11.0.5': 'sf-v11',
+            'Nextcloud v27.1.11 (ScienceMesh)': 'nc-sm-v27',
+            'ownCloud v10.15.0 (ScienceMesh)': 'oc-sm-v10',
+            'oCIS v5.0.9': 'ocis-v5'
+        };
+
+        if (!target) {
+            return `${prefix}${platformMap[source] || source}`;
+        }
+
+        const sourceKey = platformMap[source] || source;
+        const targetKey = platformMap[target] || target;
+        return `${prefix}${sourceKey}-${targetKey}`;
+    }
+
+    createStatusCell(workflowName) {
+        const td = document.createElement('td');
         const link = document.createElement('a');
         link.href = `https://github.com/pondersource/dev-stock/actions/workflows/${workflowName}.yml`;
         link.target = '_blank';
         
-        const badge = document.createElement('img');
-        badge.src = `https://img.shields.io/github/actions/workflow/status/pondersource/dev-stock/${workflowName}.yml?branch=main&style=flat-square&label=${label}`;
-        badge.alt = label;
+        // Placeholder spinner icon (no hover transform)
+        const iconEl = document.createElement('i');
+        iconEl.className = 'fas fa-spinner fa-spin';
+        link.appendChild(iconEl);
+        td.appendChild(link);
         
-        link.appendChild(badge);
-        cell.appendChild(link);
-        return cell;
-    }
-
-    renderAuthenticationTests() {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td><strong>Status</strong></td>';
-        
-        const platforms = [
-            { id: 'nc-v27', workflow: 'login-nextcloud-v27' },
-            { id: 'nc-v28', workflow: 'login-nextcloud-v28' },
-            { id: 'ocis-v5', workflow: 'login-ocis-v5' },
-            { id: 'os-v1', workflow: 'login-ocmstub-v1' },
-            { id: 'oc-v10', workflow: 'login-owncloud-v10' },
-            { id: 'sf-v11', workflow: 'login-seafile-v11' }
-        ];
-        
-        for (const platform of platforms) {
-            row.appendChild(this.createCell(platform.workflow, 'Auth'));
-        }
-        
-        this.authMatrix.appendChild(row);
-    }
-
-    renderPublicLinkTests() {
-        const sourcePlatforms = ['nc-v27', 'nc-v28', 'oc-v10'];
-        
-        for (const source of sourcePlatforms) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td><strong>${this.getPlatformLabel(source)}</strong></td>`;
-            
-            for (const target of sourcePlatforms) {
-                const workflowName = `share-link-${source}-${target}`;
-                row.appendChild(this.createCell(workflowName, 'Link'));
-            }
-            
-            this.publicLinkMatrix.appendChild(row);
-        }
-    }
-
-    renderDirectUserTests() {
-        const sourcePlatforms = ['nc-v27', 'nc-v28', 'os-v1', 'oc-v10', 'sf-v11'];
-        const targetPlatforms = ['nc-v27', 'nc-v28', 'os-v1', 'oc-v10', 'sf-v11'];
-        
-        for (const source of sourcePlatforms) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td><strong>${this.getPlatformLabel(source)}</strong></td>`;
-            
-            for (const target of targetPlatforms) {
-                if (this.isUnsupportedCombination(source, target)) {
-                    row.appendChild(this.createCell('', '', true));
-                } else {
-                    const workflowName = `share-with-${source}-${target}`;
-                    row.appendChild(this.createCell(workflowName, 'Share'));
-                }
-            }
-            
-            this.directShareMatrix.appendChild(row);
-        }
-    }
-
-    renderScienceMeshTests() {
-        const platforms = ['nc-sm-v27', 'ocis-v5', 'oc-sm-v10'];
-        
-        for (const source of platforms) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td><strong>${this.getPlatformLabel(source)}</strong></td>`;
-            
-            for (const target of platforms) {
-                const workflowName = `invite-link-${source}-${target}`;
-                row.appendChild(this.createCell(workflowName, 'ScienceMesh'));
-            }
-            
-            this.scienceMeshMatrix.appendChild(row);
-        }
-    }
-
-    getPlatformLabel(platform) {
-        const labels = {
-            'nc-v27': 'Nextcloud v27.1.11',
-            'nc-v28': 'Nextcloud v28.0.14',
-            'os-v1': 'OcmStub v1.0.0',
-            'oc-v10': 'ownCloud v10.15.0',
-            'sf-v11': 'Seafile v11.0.5',
-            'nc-sm-v27': 'Nextcloud v27.1.11 with ScienceMesh',
-            'ocis-v5': 'oCIS v5.0.9',
-            'oc-sm-v10': 'ownCloud v10.15.0 with ScienceMesh'
+        // Fetch the workflow status and update the icon with color
+        const iconName = this.getWorkflowStatus(workflowName);
+        const statusColors = {
+            'check-circle': '#2ea44f',             // success (green)
+            'times-circle': '#cb2431',             // failure (red)
+            'sync-alt': '#dbab09',                 // in progress (yellow)
+            'file-excel': '#d73a49',               // workflow errored (red)
+            'ban': '#6a737d',                      // workflow cancelled (gray)
+            'question-circle': '#6a737d'            // unknown (gray)
         };
-        return labels[platform] || platform;
+        iconEl.className = `fas fa-${iconName}`;
+        iconEl.style.color = statusColors[iconName] || '#6a737d';
+        iconEl.setAttribute('title', `Workflow ${workflowName}`);
+        
+        return td;
     }
 
-    isUnsupportedCombination(source, target) {
-        if (source === 'sf-v11' && target !== 'sf-v11') return true;
-        if (target === 'sf-v11' && source !== 'sf-v11') return true;
-        return false;
+    getWorkflowStatus(workflowName) {
+        const workflow = `${workflowName}.yml`;
+        
+        // Check if we have status data at all
+        if (!this.workflowStatuses) {
+            return 'question-circle';  // Status file not found or error loading
+        }
+
+        const status = this.workflowStatuses[workflow];
+        
+        if (!status) {
+            return 'question-circle';
+        }
+        
+        if (status.status !== 'completed') {
+            return 'sync-alt';
+        }
+        
+        switch (status.conclusion) {
+            case 'success': return 'check-circle';
+            case 'failure':
+            case 'timed_out': return 'times-circle';
+            case 'action_required':
+            case 'failure': return 'file-excel';
+            case 'cancelled': return 'ban';
+            default: return 'question-circle';
+        }
+    }
+
+    addStatusLegend() {
+        const legend = document.createElement('div');
+        legend.className = 'status-legend';
+        
+        legend.innerHTML = `
+            <div class="legend-item">
+                <i class="fas fa-check-circle" style="color: #2ea44f;"></i> Tests passing
+            </div>
+            <div class="legend-item">
+                <i class="fas fa-times-circle" style="color: #cb2431;"></i> Tests failing
+            </div>
+            <div class="legend-item">
+                <i class="fas fa-sync-alt" style="color: #dbab09;"></i> Tests in progress
+            </div>
+            <div class="legend-item">
+                <i class="fas fa-file-excel" style="color: #d73a49;"></i> Workflow errored
+            </div>
+            <div class="legend-item">
+                <i class="fas fa-ban" style="color: #6a737d;"></i> Workflow cancelled
+            </div>
+            <div class="legend-item">
+                <i class="fas fa-question-circle" style="color: #6a737d;"></i> Status unknown
+            </div>
+        `;
+
+        // Insert the legend at the top of the matrix container
+        this.matrixContainer.insertBefore(legend, this.matrixContainer.firstChild);
     }
 }
