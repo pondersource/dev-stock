@@ -5,6 +5,3 @@ homepage = "https://github.com/pondersource/dev-stock"
 
 [author]
 name = "Mahdi Baghbani"
-
-[extra]
-current_year = "2025"

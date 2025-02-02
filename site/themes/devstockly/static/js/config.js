@@ -1,38 +1,55 @@
 export const config = {
     manifestUrl: '/artifacts/manifest.json',
-    categories: {
-        'auth-tests': {
+    workflowStatusUrl: '/artifacts/workflow-status.json',
+    thumbnailExtension: 'webp',
+    categories: [
+        {
             id: 'auth-tests',
-            title: 'Authentication Tests 🔐',
-            description: 'Tests for user authentication across different platforms'
+            title: 'Authentication Tests',
+            icon: 'fingerprint',
+            platforms: [
+                'Nextcloud v27.1.11',
+                'Nextcloud v28.0.14',
+                'oCIS v5.0.9',
+                'OcmStub v1.0.0',
+                'ownCloud v10.15.0',
+                'Seafile v11.0.5'
+            ],
+            workflowPrefix: 'login-'
         },
-        'share-link-tests': {
+        {
             id: 'share-link-tests',
-            title: 'Public Link Sharing Tests 🔗',
-            description: 'Tests for public link sharing functionality'
+            title: 'Public Link Sharing Tests',
+            icon: 'link',
+            sources: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.15.0'],
+            targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.0.0'],
+            workflowPrefix: 'share-link-'
         },
-        'share-with-tests': {
+        {
             id: 'share-with-tests',
-            title: 'Direct User Sharing Tests 🤝',
-            description: 'Tests for direct user-to-user sharing capabilities'
+            title: 'Direct User Sharing Tests',
+            icon: 'user-friends',
+            sources: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'OcmStub v1.0.0', 'ownCloud v10.15.0', 'Seafile v11.0.5'],
+            targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'OcmStub v1.0.0', 'ownCloud v10.15.0', 'Seafile v11.0.5'],
+            workflowPrefix: 'share-with-'
         },
-        'sciencemesh-tests': {
+        {
             id: 'sciencemesh-tests',
-            title: 'ScienceMesh Federation Tests 🌐',
-            description: 'Tests for ScienceMesh federation features'
+            title: 'ScienceMesh Federation Tests',
+            icon: 'network-wired',
+            sources: ['Nextcloud v27.1.11 (ScienceMesh)', 'oCIS v5.0.9', 'ownCloud v10.15.0 (ScienceMesh)'],
+            targets: ['Nextcloud v27.1.11 (ScienceMesh)', 'oCIS v5.0.9', 'ownCloud v10.15.0 (ScienceMesh)'],
+            workflowPrefix: 'invite-link-'
         }
-    },
-    platforms: [
-        { id: 'nc-v27', name: 'Nextcloud v27' },
-        { id: 'nc-v28', name: 'Nextcloud v28' },
-        { id: 'oc-v10', name: 'ownCloud v10' },
-        { id: 'ocis-v5', name: 'oCIS v5' },
-        { id: 'sf-v11', name: 'Seafile v11' }
     ],
-    features: [
-        { id: 'auth', name: 'Authentication' },
-        { id: 'share-link', name: 'Public Link Sharing' },
-        { id: 'share-with', name: 'Direct User Sharing' },
-        { id: 'invite-link', name: 'ScienceMesh Federation' }
-    ]
+    platformMap: {
+        'Nextcloud v27.1.11': 'nc-v27',
+        'Nextcloud v28.0.14': 'nc-v28',
+        'oCIS v5.0.9': 'ocis-v5',
+        'OcmStub v1.0.0': 'os-v1',
+        'ownCloud v10.15.0': 'oc-v10',
+        'Seafile v11.0.5': 'sf-v11',
+        'Nextcloud v27.1.11 (ScienceMesh)': 'nc-sm-v27',
+        'ownCloud v10.15.0 (ScienceMesh)': 'oc-sm-v10'
+    }
 };
