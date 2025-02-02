@@ -1,0 +1,103 @@
+// Loading Spinner
+.loading-spinner {
+    @include flex-center;
+    flex-direction: column;
+    padding: var(--spacing-xl);
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid var(--color-border);
+        border-top-color: var(--color-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    p {
+        margin-top: var(--spacing-md);
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+    }
+}
+
+// Skeleton Loading Animation
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeleton {
+    @include skeleton-loading;
+}
+
+// Skeleton Card
+.test-card-skeleton {
+    @include card-base;
+    height: 300px;
+    overflow: hidden;
+    
+    .video-placeholder {
+        height: 56.25%;
+        @extend .skeleton;
+    }
+    
+    .content-placeholder {
+        padding: var(--spacing-md);
+        
+        .title-placeholder {
+            height: 24px;
+            width: 80%;
+            margin-bottom: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            @extend .skeleton;
+        }
+        
+        .status-placeholder {
+            height: 20px;
+            width: 40%;
+            margin-bottom: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            @extend .skeleton;
+        }
+    }
+}
+
+// Loading States
+[aria-busy="true"] {
+    position: relative;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: var(--z-elevate);
+        border-radius: inherit;
+    }
+    
+    &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--color-border);
+        border-top-color: var(--color-primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: var(--z-tooltip);
+    }
+}
+
+// Loading Animation
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+} 

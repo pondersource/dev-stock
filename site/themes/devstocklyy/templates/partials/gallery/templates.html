@@ -1,0 +1,55 @@
+<!-- Skeleton Loading Template -->
+<template id="skeleton-template">
+    <div class="test-card test-card-skeleton" role="presentation">
+        <div class="video-placeholder shimmer"></div>
+        <div class="content-placeholder">
+            <div class="title-placeholder shimmer"></div>
+            <div class="status-placeholder shimmer"></div>
+        </div>
+    </div>
+</template>
+
+<!-- Test Card Template -->
+<template id="test-card-template">
+    <div class="test-card" role="listitem">
+        <div class="video-container">
+            <video controls preload="none" tabindex="0">
+                <source src="" type="video/webm">
+                Your browser does not support the video tag.
+            </video>
+            <!-- Video controls overlay will be added by JavaScript -->
+        </div>
+        <div class="test-info">
+            <h3 class="test-name"></h3>
+            <div class="test-status" aria-live="polite"></div>
+            <div class="test-metadata">
+                <span class="duration"></span>
+                <span class="resolution"></span>
+            </div>
+            <p class="test-description"></p>
+        </div>
+    </div>
+</template>
+
+<!-- Loading Spinner Template -->
+<template id="loading-spinner-template">
+    <div class="loading-spinner" role="status" aria-live="polite">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+    </div>
+</template>
+
+<!-- Error Message Template -->
+<template id="error-message-template">
+    <div class="error-message" role="alert">
+        <div class="error-content">
+            <svg class="error-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+            </svg>
+            <p></p>
+            <button class="retry-button">Retry</button>
+        </div>
+    </div>
+</template>
+

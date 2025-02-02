@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path="favicon-32x32.png") | safe }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ get_url(path="favicon-16x16.png") | safe }}">
+    <link rel="shortcut icon" href="{{ get_url(path="favicon.ico") | safe }}">
+    <link rel="stylesheet" href="{{ get_url(path="main.css") | safe }}">
+    {% block head %}{% endblock head %}
+</head>
+
+<body>
+    {% include "partials/header.html" %}
+    <main>
+        {% block content %}{% endblock content %}
+    </main>
+    {% include "partials/footer.html" %}
+    <!-- Main common JS (theme toggle, back-to-top, etc.) -->
+    <script src="{{ get_url(path="js/main.js") | safe }}"></script>
+    {% block scripts %}{% endblock scripts %}
+</body>
+
+</html>
