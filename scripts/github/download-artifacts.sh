@@ -76,7 +76,7 @@ sanitize_name() {
 # Function to generate video thumbnail
 generate_thumbnail() {
     local video="$1"
-    local thumbnail="${video%.*}.jpg"
+    local thumbnail="${video%.*}.webp"
     
     if ! ffmpeg -hide_banner -loglevel error -i "$video" \
         -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail" 2>/dev/null; then
@@ -242,17 +242,22 @@ generate_manifest() {
     info "Generating artifact manifest..."
     local manifest="$ARTIFACTS_DIR/manifest.json"
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
-    local statuses="{}"
+    local temp_status_file="/tmp/temp_status_$$.json"
+    
+    # Initialize empty JSON in temp file
+    echo "{}" > "$temp_status_file"
     
     # Collect all workflow statuses
-    gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[] | select(.path | test("share-|login-|invite-"))' | \
     while read -r workflow; do
         workflow_name=$(basename "$workflow")
         status=$(fetch_workflow_status "$workflow_name")
-        statuses=$(echo "$statuses" | jq --arg name "$workflow_name" --argjson status "$status" '. + {($name): $status}')
-    done
+        if [[ -n "$status" ]]; then
+            jq --arg name "$workflow_name" --argjson status "$status" '. + {($name): $status}' "$temp_status_file" > "${temp_status_file}.tmp" && mv "${temp_status_file}.tmp" "$temp_status_file"
+        fi
+    done < <(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[] | select(.path | test("share-|login-|invite-")) | .path')
     
-    echo "$statuses" > "$status_file"
+    # Move the final status file to its destination
+    mv "$temp_status_file" "$status_file"
     info "Workflow statuses written to $status_file"
     
     # Use jq to build the manifest with correct relative paths
@@ -261,7 +266,7 @@ generate_manifest() {
         map(select(length > 0) | {
             workflow: capture("artifacts/(?<wf>[^/]+)").wf,
             video: (. | sub("^site/static/"; "")),
-            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".jpg"))
+            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".webp"))
         }) | { videos: . }' > "$manifest"
     
     if [[ ! -f "$manifest" ]]; then

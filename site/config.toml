@@ -4,19 +4,8 @@ description = "Compatibility status of various file sharing and collaboration fe
 default_language = "en"
 
 # Theme settings
-# theme = "ocm"
-theme = "devstocklyy"
-# theme = "bolt"
+theme = "devstockly"
 compile_sass = true
-build_search_index = true
-generate_feeds = true
-feed_filenames = ["rss.xml", "atom.xml"]
-
-# MIME types for JavaScript modules
-[extra.serve]
-[[extra.serve.headers]]
-path = "*.js"
-headers = { "Content-Type" = "text/javascript", "Access-Control-Allow-Origin" = "*" }
 
 # Markdown settings
 [markdown]
@@ -25,55 +14,3 @@ highlight_theme = "visual-studio-dark"
 external_links_target_blank = true
 external_links_no_follow = true
 external_links_no_referrer = true
-
-[extra]
-# Theme color for browser
-theme_color = "#0078d4"
-
-# Dark mode support
-dark_mode = true
-
-# Navigation menu
-menu = [
-    { name = "Authentication", url = "#auth-tests" },
-    { name = "Public Links", url = "#link-tests" },
-    { name = "User Sharing", url = "#user-tests" },
-    { name = "Federation", url = "#federation-tests" }
-]
-
-# Social links
-social = [
-    { name = "GitHub", url = "https://github.com/pondersource/dev-stock", icon = "github" },
-    { name = "OCM Spec", url = "https://cs3org.github.io/OCM-API/", icon = "docs" },
-    { name = "Ponder Source", url = "https://www.pondersource.com", icon = "home" }
-]
-
-# Footer links
-footer_links = [
-    { name = "GitHub", url = "https://github.com/pondersource/dev-stock" },
-    { name = "OCM Spec", url = "https://cs3org.github.io/OCM-API/" },
-    { name = "Ponder Source", url = "https://www.pondersource.com" }
-]
-
-# SEO settings
-[extra.seo]
-image = "/images/og-image.png"
-twitter_card = "summary_large_image"
-twitter_site = "@pondersource"
-
-# Analytics (optional)
-[extra.analytics]
-google_analytics = "" # Add your Google Analytics ID here if needed
-
-# Search settings
-[extra.search]
-include_title = true
-include_description = true
-include_path = true
-include_content = true
-
-# Status mapping
-[extra.status]
-pass = { icon = "check-circle", color = "#2ea44f" }
-fail = { icon = "times-circle", color = "#cb2431" } 
-wip = { icon = "sync-alt", color = "#dbab09" }
