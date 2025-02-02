@@ -23,6 +23,9 @@
 @import 'partials/matrix';
 @import 'partials/gallery';
 
+// **NEW: Import overlay styles so that the overlay covers the entire screen**
+@import 'partials/overlay';
+
 // Import responsive styles last
 @import 'partials/responsive';
 

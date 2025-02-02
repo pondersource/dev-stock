@@ -1,9 +1,11 @@
 import { config } from '/js/config.js';
+import { TestOverlay } from './TestOverlay.js';
 
 export class CompatibilityMatrix {
     constructor() {
         this.matrixContainer = document.getElementById('compatibilityMatrix');
         this.workflowStatuses = null;
+        this.overlay = new TestOverlay();
         this.testCategories = [
             {
                 id: 'auth-tests',
@@ -174,17 +176,14 @@ export class CompatibilityMatrix {
 
     createStatusCell(workflowName) {
         const td = document.createElement('td');
-        const link = document.createElement('a');
-        link.href = `https://github.com/pondersource/dev-stock/actions/workflows/${workflowName}.yml`;
-        link.target = '_blank';
+        const link = document.createElement('button');
+        link.className = 'status-button';
         
-        // Placeholder spinner icon (no hover transform)
         const iconEl = document.createElement('i');
         iconEl.className = 'fas fa-spinner fa-spin';
         link.appendChild(iconEl);
         td.appendChild(link);
         
-        // Fetch the workflow status and update the icon with color
         const iconName = this.getWorkflowStatus(workflowName);
         const statusColors = {
             'check-circle': '#2ea44f',             // success (green)
@@ -194,9 +193,21 @@ export class CompatibilityMatrix {
             'ban': '#6a737d',                      // workflow cancelled (gray)
             'question-circle': '#6a737d'            // unknown (gray)
         };
+        
         iconEl.className = `fas fa-${iconName}`;
         iconEl.style.color = statusColors[iconName] || '#6a737d';
-        iconEl.setAttribute('title', `Workflow ${workflowName}`);
+        
+        // Add click handler to show overlay
+        link.addEventListener('click', () => {
+            const status = {
+                icon: iconName,
+                color: statusColors[iconName],
+                text: this.getStatusText(iconName)
+            };
+            // Get video URL from artifacts if available
+            const videoUrl = `/artifacts/${workflowName}/recording.webm`;
+            this.overlay.show(workflowName, status, videoUrl);
+        });
         
         return td;
     }
@@ -227,6 +238,17 @@ export class CompatibilityMatrix {
             case 'failure': return 'file-excel';
             case 'cancelled': return 'ban';
             default: return 'question-circle';
+        }
+    }
+
+    getStatusText(iconName) {
+        switch (iconName) {
+            case 'check-circle': return 'Tests Passing';
+            case 'times-circle': return 'Tests Failing';
+            case 'sync-alt': return 'Tests in Progress';
+            case 'file-excel': return 'Workflow Errored';
+            case 'ban': return 'Workflow Cancelled';
+            default: return 'Status Unknown';
         }
     }
 

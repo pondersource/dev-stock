@@ -320,6 +320,18 @@ td {
         pointer-events: auto;
     }
   }
+
+  .status-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: inherit;
+    
+    &:hover {
+        opacity: 0.8;
+    }
+  }
 }
 
 // Also ensure no hover effects in dark mode

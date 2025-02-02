@@ -1,0 +1,139 @@
+.test-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+    z-index: 9999;
+    overflow: hidden;
+
+    &.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    &__content {
+        background: var(--color-bg);
+        border-radius: var(--radius-lg);
+        width: 95%;
+        max-width: 1000px;
+        max-height: 90vh;
+        position: relative;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+        overflow-y: auto;
+        padding: 3rem;
+        transform: translateY(0);
+        animation: overlayIn 0.3s ease-out;
+    }
+
+    @keyframes overlayIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    &__close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 2.5rem;
+        cursor: pointer;
+        color: var(--color-text);
+        opacity: 0.7;
+        transition: opacity 0.2s, transform 0.2s;
+        padding: 0.5rem;
+        line-height: 1;
+        z-index: 10000;
+
+        &:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: var(--font-size-xl);
+    }
+
+    &__ci-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary);
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    &__video-container {
+        margin-bottom: 1.5rem;
+        
+        video {
+            width: 100%;
+            border-radius: var(--radius-md);
+            max-height: 60vh;
+            object-fit: contain;
+            background: #000;
+            display: block;
+        }
+        
+        p {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-muted);
+        }
+    }
+
+    &__info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: var(--font-weight-medium);
+    }
+
+    &__download {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-primary);
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+// Prevent body scroll when overlay is active
+body.overlay-active {
+    overflow: hidden;
+} 
