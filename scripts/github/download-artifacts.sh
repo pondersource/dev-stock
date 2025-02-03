@@ -358,11 +358,11 @@ main() {
     # Create required directories
     mkdir -p "$ARTIFACTS_DIR" "$IMAGES_DIR"
     
-    # Get all workflow files first
+    # Get workflow files from the local .github/workflows directory
     local workflow_files=()
-    while IFS= read -r workflow; do
-        workflow_files+=("$workflow")
-    done < <(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path')
+    while IFS= read -r -d '' workflow; do
+        workflow_files+=("$(basename "$workflow")")
+    done < <(find ".github/workflows" -maxdepth 1 -type f -name "*.yml" -print0)
     
     # Count of expected workflow types
     local login_count=0
@@ -374,32 +374,30 @@ main() {
     
     # Process and categorize workflows
     for workflow in "${workflow_files[@]}"; do
-        local basename
-        basename=$(basename "$workflow")
-        
         # Skip the orchestrator and pages workflows
-        if [[ "$basename" == "github-pages.yml" || "$basename" == "github-pages-orchestrator.yml" ]]; then
+        if [[ "$workflow" == "github-pages.yml" || "$workflow" == "tests-orchestrator.yml" ]]; then
+            debug "Skipping workflow: $workflow"
             continue
         fi
         
         # Categorize the workflow
-        if [[ "$basename" == login-* ]]; then
+        if [[ "$workflow" == login-* ]]; then
             ((login_count++))
-            info "Processing login workflow: $basename"
-        elif [[ "$basename" == share-* ]]; then
+            info "Processing login workflow: $workflow"
+        elif [[ "$workflow" == share-* ]]; then
             ((share_count++))
-            info "Processing share workflow: $basename"
-        elif [[ "$basename" == invite-* ]]; then
+            info "Processing share workflow: $workflow"
+        elif [[ "$workflow" == invite-* ]]; then
             ((invite_count++))
-            info "Processing invite workflow: $basename"
+            info "Processing invite workflow: $workflow"
         else
             ((other_count++))
-            info "Found unexpected workflow: $basename"
+            warn "Found unexpected workflow: $workflow"
             continue
         fi
         
-        if ! fetch_workflow_artifacts "$basename"; then
-            error "Failed to process workflow: $basename"
+        if ! fetch_workflow_artifacts "$workflow"; then
+            error "Failed to process workflow: $workflow"
             continue
         fi
     done
@@ -419,6 +417,7 @@ main() {
     if ((total != 43)); then
         error "Processed $total workflows but expected 43"
         error "Some workflows might be missing or miscategorized"
+        exit 1
     fi
     
     # Generate manifest
