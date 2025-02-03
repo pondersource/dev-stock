@@ -10,6 +10,7 @@ on:
       - "cypress/ocm-test-suite/**"
       - "dev/ocm-test-suite.sh"
       - "dev/ocm-test-suite/**"
+      - ".github/workflows/**"
   pull_request:
     branches:
       - main
@@ -17,6 +18,7 @@ on:
       - "cypress/ocm-test-suite/**"
       - "dev/ocm-test-suite.sh"
       - "dev/ocm-test-suite/**"
+      - ".github/workflows/**"
   # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
