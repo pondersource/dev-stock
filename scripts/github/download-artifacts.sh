@@ -446,4 +446,4 @@ main() {
     success "Script completed successfully"
 }
 
-main "$@" 
+main "$@"
