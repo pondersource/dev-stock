@@ -50,7 +50,7 @@ end_timer() {
 
 # Get human readable file size
 human_size() {
-    local size=$1
+    local size="${1:-0}"  # Default to 0 if no argument provided
     if ((size < 1024)); then
         echo "${size}B"
     elif ((size < 1048576)); then
@@ -217,9 +217,9 @@ fetch_workflow_artifacts() {
     
     # Process each artifact with size information
     local processed_count=0
-    echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes)"' | while read -r id name size; do
+    echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes // 0)"' | while read -r id name size; do
         ((processed_count++))
-        info "Downloading artifact $name (ID: $id, Size: $(human_size $size)) [$processed_count/$artifact_count]"
+        info "Downloading artifact $name (ID: $id, Size: $(human_size ${size:-0})) [$processed_count/$artifact_count]"
         
         # Create a temporary directory for this artifact
         local tmp_dir
@@ -234,6 +234,11 @@ fetch_workflow_artifacts() {
             rm -rf "$tmp_dir"
             continue
         fi
+        
+        # Get actual downloaded size
+        local downloaded_size
+        downloaded_size=$(stat -f%z "$tmp_dir/artifact.zip" 2>/dev/null || stat -c%s "$tmp_dir/artifact.zip" 2>/dev/null || echo 0)
+        debug "Downloaded size: $(human_size ${downloaded_size:-0})"
         
         # Extract with size information
         local target_dir="$ARTIFACTS_DIR/$workflow_name"
