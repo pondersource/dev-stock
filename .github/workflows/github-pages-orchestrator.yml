@@ -99,7 +99,7 @@ jobs:
               'share-link-oc-v10-oc-v10.yml',
               'share-with-nc-v27-nc-v27.yml',
               'share-with-nc-v27-nc-v28.yml',
-              'share-with-nc-v27-oc-v10.yml'
+              'share-with-nc-v27-oc-v10.yml',
               'share-with-nc-v27-os-v1.yml',
               'share-with-nc-v28-nc-v27.yml',
               'share-with-nc-v28-nc-v28.yml',
