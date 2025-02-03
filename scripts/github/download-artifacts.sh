@@ -23,12 +23,13 @@ declare -a TEMP_DIRS=()
 
 # Enhanced logging functions
 log() { 
-    local timestamp
-    local level="$1"
+    local timestamp level msg
+    level="$1"
     shift
+    msg="$*"
     timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$*" >> "$LOG_FILE"
-    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$*"
+    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$msg" >> "$LOG_FILE"
+    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$msg"
 }
 error() { log "ERROR" "$*" >&2; }
 info() { log "INFO" "$*"; }
@@ -113,14 +114,60 @@ generate_thumbnail() {
 }
 
 # Converts MP4 to WebM using AV1 codec
-# Uses multi-threading and speed optimization (cpu-used=4)
+# Uses multi-threading and optimizes for size while maintaining quality
 convert_to_webm() {
     local input="$1"
     local output="${input%.mp4}.webm"
     
+    # Enhanced AV1 encoding settings for better compression:
+    # - crf=35: Higher CRF means more compression (range 0-63, default 30)
+    # - cpu-used=4: Speed setting (0-8, higher = faster but less efficient)
+    # - tile-columns=2: Parallel processing optimization
+    # - auto-alt-ref=1: Enables alternative reference frames
+    # - lag-in-frames=25: Longer look-ahead for better compression
+    # - row-mt=1: Row-based multi-threading
     if ! ffmpeg -hide_banner -loglevel error -i "$input" \
-        -c:v libaom-av1 -crf 30 -b:v 0 -b:a 128k -c:a libopus -row-mt 1 -cpu-used 4 "$output" -y 2>/dev/null; then
+        -c:v libaom-av1 \
+        -crf 35 \
+        -b:v 0 \
+        -tile-columns 2 \
+        -auto-alt-ref 1 \
+        -lag-in-frames 25 \
+        -row-mt 1 \
+        -cpu-used 4 \
+        -c:a libopus \
+        -b:a 96k \
+        "$output" -y 2>/dev/null; then
         return 1
+    fi
+    
+    # Verify the conversion resulted in smaller file
+    local input_size output_size
+    input_size=$(stat -f%z "$input" 2>/dev/null || stat -c%s "$input")
+    output_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output")
+    
+    info "Conversion sizes - Original: $(human_size $input_size), WebM: $(human_size $output_size)"
+    
+    # If WebM is larger, try with more aggressive compression
+    if ((output_size > input_size)); then
+        warn "WebM file is larger than original, trying more aggressive compression"
+        if ! ffmpeg -hide_banner -loglevel error -i "$input" \
+            -c:v libaom-av1 \
+            -crf 40 \
+            -b:v 0 \
+            -tile-columns 2 \
+            -auto-alt-ref 1 \
+            -lag-in-frames 25 \
+            -row-mt 1 \
+            -cpu-used 4 \
+            -c:a libopus \
+            -b:a 64k \
+            "$output" -y 2>/dev/null; then
+            return 1
+        fi
+        
+        output_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output")
+        info "After aggressive compression: $(human_size $output_size)"
     fi
     
     printf "%s" "$output"
