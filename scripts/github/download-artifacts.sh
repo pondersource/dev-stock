@@ -21,12 +21,44 @@ readonly IMAGES_DIR="site/static/images"
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
 declare -a TEMP_DIRS
 
-# Basic logging functions
-log() { local timestamp; timestamp=$(date +'%Y-%m-%d %H:%M:%S'); echo "[$timestamp] $*" >> "$LOG_FILE"; echo "[$timestamp] $*"; }
-error() { log "ERROR: $*" >&2; }
-info() { log "INFO: $*"; }
-debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG: $*"; }
-warn() { log "WARNING: $*" >&2; }
+# Enhanced logging functions
+log() { 
+    local timestamp
+    local level="$1"
+    shift
+    timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$*" >> "$LOG_FILE"
+    printf "[%s] %-7s %s\n" "$timestamp" "$level" "$*"
+}
+error() { log "ERROR" "$*" >&2; }
+info() { log "INFO" "$*"; }
+debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG" "$*"; }
+warn() { log "WARN" "$*" >&2; }
+success() { log "SUCCESS" "$*"; }
+
+# Timer functions for operation timing
+start_timer() {
+    timer_start=$(date +%s)
+}
+
+end_timer() {
+    local end_time=$(date +%s)
+    local duration=$((end_time - timer_start))
+    local operation="$1"
+    info "Operation '$operation' completed in ${duration}s"
+}
+
+# Get human readable file size
+human_size() {
+    local size=$1
+    if ((size < 1024)); then
+        echo "${size}B"
+    elif ((size < 1048576)); then
+        echo "$((size/1024))KB"
+    else
+        echo "$((size/1048576))MB"
+    fi
+}
 
 # Cleanup function
 cleanup() {
@@ -94,20 +126,24 @@ convert_to_webm() {
     printf "%s" "$output"
 }
 
-# Processes a video file
+# Enhanced process_video with progress logging
 process_video() {
     local input="$1"
     local dir
     dir="$(dirname "$input")"
     local new_name="$dir/recording.mp4"
+    local original_size
     
-    info "Processing video: $input"
+    start_timer
+    original_size=$(stat -f%z "$input" 2>/dev/null || stat -c%s "$input")
+    info "Processing video: $input ($(human_size $original_size))"
     
     # Rename to consistent filename
     if ! mv "$input" "$new_name"; then
         error "Failed to rename $input to $new_name"
         return 1
     fi
+    debug "Renamed $input to $new_name"
     
     # Convert to WebM
     info "Converting $new_name to WebM format"
@@ -116,7 +152,9 @@ process_video() {
         error "Failed to convert video to WebM"
         return 1
     fi
-    info "Successfully converted to $webm_file"
+    local webm_size
+    webm_size=$(stat -f%z "$webm_file" 2>/dev/null || stat -c%s "$webm_file")
+    success "Converted to $webm_file ($(human_size $webm_size))"
     
     # Generate thumbnail
     info "Generating thumbnail for $webm_file"
@@ -125,22 +163,26 @@ process_video() {
         error "Failed to generate thumbnail"
         return 1
     fi
-    info "Successfully generated thumbnail at $thumbnail_file"
+    local thumb_size
+    thumb_size=$(stat -f%z "$thumbnail_file" 2>/dev/null || stat -c%s "$thumbnail_file")
+    success "Generated thumbnail at $thumbnail_file ($(human_size $thumb_size))"
     
     # Cleanup original MP4
     rm -f "$new_name"
+    end_timer "Video processing"
 }
 
-# Fetches artifacts for a specific workflow run matching COMMIT_SHA
-# Important: Only downloads artifacts from the exact commit that triggered the workflow
+# Enhanced fetch_workflow_artifacts with more detailed logging
 fetch_workflow_artifacts() {
     local workflow="$1"
     local workflow_name
     workflow_name=$(sanitize_name "$workflow")
     info "Processing workflow: $workflow_name"
+    start_timer
     
-    # Get the latest run for this workflow, regardless of commit SHA
+    # Get the latest run for this workflow
     local runs_json
+    debug "Fetching workflow runs for $workflow_name"
     runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?per_page=20" \
         --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\" or .head_sha == \"${COMMIT_SHA:0:7}\")" | head -n 1) || {
         error "Failed to fetch runs for workflow $workflow"
@@ -156,54 +198,63 @@ fetch_workflow_artifacts() {
         }
     fi
     
-    # Get run ID from the JSON
-    local run_id
+    # Get run ID and additional information
+    local run_id run_status run_conclusion
     run_id=$(echo "$runs_json" | jq -r '.id')
-    info "Found run ID: $run_id for commit ${COMMIT_SHA}"
+    run_status=$(echo "$runs_json" | jq -r '.status')
+    run_conclusion=$(echo "$runs_json" | jq -r '.conclusion')
+    info "Found run ID: $run_id (Status: $run_status, Conclusion: $run_conclusion) for commit ${COMMIT_SHA}"
     
-    # Get artifacts for this run
-    local artifacts_json
+    # Get artifacts with count information
+    local artifacts_json artifact_count
+    debug "Fetching artifacts for run $run_id"
     artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$run_id/artifacts") || {
         error "Failed to fetch artifacts for run $run_id"
         return 1
     }
+    artifact_count=$(echo "$artifacts_json" | jq '.total_count')
+    info "Found $artifact_count artifacts for run $run_id"
     
-    # Process each artifact
-    echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name)"' | while read -r id name; do
-        info "Downloading artifact $name (ID: $id)"
+    # Process each artifact with size information
+    local processed_count=0
+    echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes)"' | while read -r id name size; do
+        ((processed_count++))
+        info "Downloading artifact $name (ID: $id, Size: $(human_size $size)) [$processed_count/$artifact_count]"
         
         # Create a temporary directory for this artifact
         local tmp_dir
         tmp_dir=$(mktemp -d)
         TEMP_DIRS+=("$tmp_dir")
         
-        # Download the artifact
+        # Download with progress indication
+        debug "Downloading to temporary directory: $tmp_dir"
         if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
             -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"; then
             error "Failed to download artifact $id"
-            rm -rf "$tmp_dir"  # Clean up immediately on failure
+            rm -rf "$tmp_dir"
             continue
         fi
         
-        # Extract to the appropriate directory
+        # Extract with size information
         local target_dir="$ARTIFACTS_DIR/$workflow_name"
         mkdir -p "$target_dir"
+        debug "Extracting to $target_dir"
         if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"; then
             error "Failed to extract artifact $id"
-            rm -rf "$tmp_dir"  # Clean up immediately on failure
+            rm -rf "$tmp_dir"
             continue
         fi
         
-        # Process videos
-        export LOG_FILE  # Export log file path
-        export -f process_video convert_to_webm generate_thumbnail log error info debug
-        find "$target_dir" -name "*.mp4" -exec bash -c '
-            process_video "$1"
-        ' _ {} \;
+        # Process videos with enhanced logging
+        local video_count=0
+        while IFS= read -r -d '' video; do
+            ((video_count++))
+            process_video "$video"
+        done < <(find "$target_dir" -name "*.mp4" -print0)
+        info "Processed $video_count videos from artifact $name"
         
-        # Clean up the temporary directory after successful processing
+        # Cleanup
         rm -rf "$tmp_dir"
-        # Remove the directory from our tracking array
         for i in "${!TEMP_DIRS[@]}"; do
             if [[ ${TEMP_DIRS[i]} = "$tmp_dir" ]]; then
                 unset 'TEMP_DIRS[i]'
@@ -211,6 +262,9 @@ fetch_workflow_artifacts() {
             fi
         done
     done
+    
+    end_timer "Workflow artifact processing"
+    return 0
 }
 
 # Fetches workflow status
@@ -273,11 +327,7 @@ generate_manifest() {
     info "Manifest generated at $manifest"
 }
 
-# Main execution flow:
-# 1. Verifies COMMIT_SHA is set
-# 2. Discovers and categorizes all test workflows
-# 3. Downloads and processes artifacts from matching commit
-# 4. Generates manifest files for website consumption
+# Enhanced main function with summary statistics
 main() {
     # Set up error handling
     trap cleanup EXIT
@@ -378,7 +428,23 @@ main() {
     info "Contents of artifacts directory:"
     ls -R "$ARTIFACTS_DIR"
     
-    info "Script completed successfully"
+    # Add summary at the end
+    info "=== Final Summary ==="
+    info "Total workflows processed: $total / 43"
+    info "- Login workflows: $login_count / 6"
+    info "- Share workflows: $share_count / 28"
+    info "- Invite workflows: $invite_count / 9"
+    if ((other_count > 0)); then
+        warn "- Unexpected workflows: $other_count"
+    fi
+    
+    # Add disk usage information
+    local artifacts_size
+    artifacts_size=$(du -sh "$ARTIFACTS_DIR" 2>/dev/null | cut -f1)
+    info "Total artifacts size: $artifacts_size"
+    
+    info "Log file location: $LOG_FILE"
+    success "Script completed successfully"
 }
 
 main "$@" 
