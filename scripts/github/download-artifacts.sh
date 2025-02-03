@@ -329,17 +329,26 @@ generate_manifest() {
 
 # Enhanced main function with summary statistics
 main() {
-    # Set up error handling
+    # Set up error handling with line numbers
+    set -E
+    trap 'error "Error on line $LINENO. Command: $BASH_COMMAND"' ERR
     trap cleanup EXIT
     
-    # Check dependencies
+    info "Starting script in directory: $(pwd)"
+    info "Script directory: $SCRIPT_DIR"
+    
+    # Check dependencies with more detailed logging
+    info "Checking dependencies..."
     check_dependencies
+    success "All dependencies found"
     
     # Ensure COMMIT_SHA is set
     if [[ -z "${COMMIT_SHA:-}" ]]; then
+        info "COMMIT_SHA not set, attempting to determine it"
         COMMIT_SHA=$(git rev-parse HEAD 2>/dev/null || true)
         
         if [[ -z "${COMMIT_SHA}" ]]; then
+            info "Git rev-parse failed, trying GitHub API"
             COMMIT_SHA=$(gh api repos/pondersource/dev-stock/commits/main --jq '.sha' 2>/dev/null || true)
             
             if [[ -z "${COMMIT_SHA}" ]]; then
@@ -353,10 +362,28 @@ main() {
     
     info "Downloading artifacts for commit: ${COMMIT_SHA}"
     
-    # Create required directories
-    mkdir -p "$ARTIFACTS_DIR" "$IMAGES_DIR"
+    # Create required directories with error checking
+    info "Creating required directories..."
+    if ! mkdir -p "$ARTIFACTS_DIR" 2>/dev/null; then
+        error "Failed to create artifacts directory: $ARTIFACTS_DIR"
+        error "Current permissions: $(ls -ld "$(dirname "$ARTIFACTS_DIR")" 2>/dev/null || echo 'Cannot read parent directory')"
+        exit 1
+    fi
+    if ! mkdir -p "$IMAGES_DIR" 2>/dev/null; then
+        error "Failed to create images directory: $IMAGES_DIR"
+        error "Current permissions: $(ls -ld "$(dirname "$IMAGES_DIR")" 2>/dev/null || echo 'Cannot read parent directory')"
+        exit 1
+    fi
+    success "Directories created successfully"
     
     # Get workflow files from the local .github/workflows directory
+    info "Looking for workflow files in .github/workflows..."
+    if [[ ! -d ".github/workflows" ]]; then
+        error "Workflows directory not found: .github/workflows"
+        error "Current directory contents: $(ls -la)"
+        exit 1
+    fi
+    
     local workflow_files=()
     while IFS= read -r -d '' workflow; do
         local basename
@@ -364,25 +391,38 @@ main() {
         # Only include relevant workflow files
         if [[ "$basename" =~ ^(login|invite|share)- ]]; then
             workflow_files+=("$basename")
+            debug "Added workflow: $basename"
         else
             debug "Skipping irrelevant workflow: $basename"
         fi
-    done < <(find ".github/workflows" -maxdepth 1 -type f -name "*.yml" -print0)
+    done < <(find ".github/workflows" -maxdepth 1 -type f -name "*.yml" -print0 || { error "Find command failed"; exit 1; })
     
-    # Log all found workflows by type
+    if [[ ${#workflow_files[@]} -eq 0 ]]; then
+        error "No workflow files found!"
+        error "Contents of .github/workflows: $(ls -la .github/workflows)"
+        exit 1
+    fi
+    
+    info "Found ${#workflow_files[@]} workflow files"
+    
+    # Log all found workflows by type with counts
     info "=== Found Workflows ==="
-    info "Login workflows:"
-    printf '%s\n' "${workflow_files[@]}" | grep '^login-' | while read -r wf; do
+    local login_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^login-' || true))
+    local share_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^share-' || true))
+    local invite_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^invite-' || true))
+    
+    info "Login workflows (${#login_files[@]}):"
+    printf '%s\n' "${login_files[@]}" | while read -r wf; do
         info "  - $wf"
     done
     
-    info "Share workflows:"
-    printf '%s\n' "${workflow_files[@]}" | grep '^share-' | while read -r wf; do
+    info "Share workflows (${#share_files[@]}):"
+    printf '%s\n' "${share_files[@]}" | while read -r wf; do
         info "  - $wf"
     done
     
-    info "Invite workflows:"
-    printf '%s\n' "${workflow_files[@]}" | grep '^invite-' | while read -r wf; do
+    info "Invite workflows (${#invite_files[@]}):"
+    printf '%s\n' "${invite_files[@]}" | while read -r wf; do
         info "  - $wf"
     done
     
