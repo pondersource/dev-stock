@@ -437,28 +437,35 @@ main() {
     done
     
     # Count of expected workflow types
-    declare -i login_count=0
-    declare -i share_count=0
-    declare -i invite_count=0
+    login_count=0
+    share_count=0
+    invite_count=0
     
     info "Found ${#workflow_files[@]} relevant workflows"
     
     # Process and categorize workflows
     for workflow in "${workflow_files[@]}"; do
-        if [[ "$workflow" == login-* ]]; then
-            login_count+=1
-            info "Processing login workflow: $workflow"
-        elif [[ "$workflow" == share-* ]]; then
-            share_count+=1
-            info "Processing share workflow: $workflow"
-        elif [[ "$workflow" == invite-* ]]; then
-            invite_count+=1
-            info "Processing invite workflow: $workflow"
-        else
-            warn "Unexpected workflow pattern found: $workflow"
-            continue
-        fi
-        
+        # First increment the counters
+        case "$workflow" in
+            login-*)
+                login_count=$((login_count + 1))
+                info "Processing login workflow: $workflow"
+                ;;
+            share-*)
+                share_count=$((share_count + 1))
+                info "Processing share workflow: $workflow"
+                ;;
+            invite-*)
+                invite_count=$((invite_count + 1))
+                info "Processing invite workflow: $workflow"
+                ;;
+            *)
+                warn "Unexpected workflow pattern found: $workflow"
+                continue
+                ;;
+        esac
+
+        # Then process the artifacts
         if ! fetch_workflow_artifacts "$workflow"; then
             error "Failed to process workflow: $workflow"
             continue
@@ -472,10 +479,10 @@ main() {
     info "Invite workflows: $invite_count (expected: 9)"
     
     # Verify we processed the expected number of workflows
-    declare -i total
     total=$((login_count + share_count + invite_count))
     info "Total test workflows processed: $total (expected: 42)"
-    if ((total != 42)); then
+    
+    if [ "$total" -ne 42 ]; then
         error "Processed $total workflows but expected 42"
         error "=== Workflow Count Mismatch ==="
         error "Found $login_count login workflows (expected 6)"
