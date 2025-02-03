@@ -7,7 +7,7 @@
 #
 # Key features:
 # - Ensures artifacts are from the same commit (COMMIT_SHA)
-# - Processes 43 test workflows (6 login, 28 share, 9 invite)
+# - Processes 42 test workflows (6 login, 27 share, 9 invite)
 # - Generates manifest.json for website consumption
 #
 # Requirements: gh, jq, ffmpeg, unzip
@@ -337,11 +337,9 @@ main() {
     
     # Ensure COMMIT_SHA is set
     if [[ -z "${COMMIT_SHA:-}" ]]; then
-        # Try to get the latest commit SHA from git
         COMMIT_SHA=$(git rev-parse HEAD 2>/dev/null || true)
         
         if [[ -z "${COMMIT_SHA}" ]]; then
-            # If git command fails, try to get it from GitHub API
             COMMIT_SHA=$(gh api repos/pondersource/dev-stock/commits/main --jq '.sha' 2>/dev/null || true)
             
             if [[ -z "${COMMIT_SHA}" ]]; then
@@ -361,26 +359,42 @@ main() {
     # Get workflow files from the local .github/workflows directory
     local workflow_files=()
     while IFS= read -r -d '' workflow; do
-        workflow_files+=("$(basename "$workflow")")
+        local basename
+        basename=$(basename "$workflow")
+        # Only include relevant workflow files
+        if [[ "$basename" =~ ^(login|invite|share)- ]]; then
+            workflow_files+=("$basename")
+        else
+            debug "Skipping irrelevant workflow: $basename"
+        fi
     done < <(find ".github/workflows" -maxdepth 1 -type f -name "*.yml" -print0)
+    
+    # Log all found workflows by type
+    info "=== Found Workflows ==="
+    info "Login workflows:"
+    printf '%s\n' "${workflow_files[@]}" | grep '^login-' | while read -r wf; do
+        info "  - $wf"
+    done
+    
+    info "Share workflows:"
+    printf '%s\n' "${workflow_files[@]}" | grep '^share-' | while read -r wf; do
+        info "  - $wf"
+    done
+    
+    info "Invite workflows:"
+    printf '%s\n' "${workflow_files[@]}" | grep '^invite-' | while read -r wf; do
+        info "  - $wf"
+    done
     
     # Count of expected workflow types
     local login_count=0
     local share_count=0
     local invite_count=0
-    local other_count=0
     
-    info "Found ${#workflow_files[@]} total workflows"
+    info "Found ${#workflow_files[@]} relevant workflows"
     
     # Process and categorize workflows
     for workflow in "${workflow_files[@]}"; do
-        # Skip the orchestrator and pages workflows
-        if [[ "$workflow" == "github-pages.yml" || "$workflow" == "tests-orchestrator.yml" ]]; then
-            debug "Skipping workflow: $workflow"
-            continue
-        fi
-        
-        # Categorize the workflow
         if [[ "$workflow" == login-* ]]; then
             ((login_count++))
             info "Processing login workflow: $workflow"
@@ -391,8 +405,7 @@ main() {
             ((invite_count++))
             info "Processing invite workflow: $workflow"
         else
-            ((other_count++))
-            warn "Found unexpected workflow: $workflow"
+            warn "Unexpected workflow pattern found: $workflow"
             continue
         fi
         
@@ -403,20 +416,20 @@ main() {
     done
     
     # Report workflow counts
-    info "Workflow processing summary:"
-    info "- Login workflows: $login_count (expected: 6)"
-    info "- Share workflows: $share_count (expected: 28)"
-    info "- Invite workflows: $invite_count (expected: 9)"
-    if ((other_count > 0)); then
-        warn "Found $other_count unexpected workflow types"
-    fi
+    info "=== Workflow Count Summary ==="
+    info "Login workflows: $login_count (expected: 6)"
+    info "Share workflows: $share_count (expected: 27)"
+    info "Invite workflows: $invite_count (expected: 9)"
     
     # Verify we processed the expected number of workflows
     local total=$((login_count + share_count + invite_count))
-    info "Total test workflows processed: $total (expected: 43)"
-    if ((total != 43)); then
-        error "Processed $total workflows but expected 43"
-        error "Some workflows might be missing or miscategorized"
+    info "Total test workflows processed: $total (expected: 42)"
+    if ((total != 42)); then
+        error "Processed $total workflows but expected 42"
+        error "=== Workflow Count Mismatch ==="
+        error "Found $login_count login workflows (expected 6)"
+        error "Found $share_count share workflows (expected 27)"
+        error "Found $invite_count invite workflows (expected 9)"
         exit 1
     fi
     
@@ -429,13 +442,10 @@ main() {
     
     # Add summary at the end
     info "=== Final Summary ==="
-    info "Total workflows processed: $total / 43"
+    info "Total workflows processed: $total / 42"
     info "- Login workflows: $login_count / 6"
-    info "- Share workflows: $share_count / 28"
+    info "- Share workflows: $share_count / 27"
     info "- Invite workflows: $invite_count / 9"
-    if ((other_count > 0)); then
-        warn "- Unexpected workflows: $other_count"
-    fi
     
     # Add disk usage information
     local artifacts_size
