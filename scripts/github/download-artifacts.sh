@@ -437,22 +437,22 @@ main() {
     done
     
     # Count of expected workflow types
-    local login_count=0
-    local share_count=0
-    local invite_count=0
+    declare -i login_count=0
+    declare -i share_count=0
+    declare -i invite_count=0
     
     info "Found ${#workflow_files[@]} relevant workflows"
     
     # Process and categorize workflows
     for workflow in "${workflow_files[@]}"; do
         if [[ "$workflow" == login-* ]]; then
-            ((login_count++))
+            login_count+=1
             info "Processing login workflow: $workflow"
         elif [[ "$workflow" == share-* ]]; then
-            ((share_count++))
+            share_count+=1
             info "Processing share workflow: $workflow"
         elif [[ "$workflow" == invite-* ]]; then
-            ((invite_count++))
+            invite_count+=1
             info "Processing invite workflow: $workflow"
         else
             warn "Unexpected workflow pattern found: $workflow"
@@ -472,7 +472,8 @@ main() {
     info "Invite workflows: $invite_count (expected: 9)"
     
     # Verify we processed the expected number of workflows
-    local total=$((login_count + share_count + invite_count))
+    declare -i total
+    total=$((login_count + share_count + invite_count))
     info "Total test workflows processed: $total (expected: 42)"
     if ((total != 42)); then
         error "Processed $total workflows but expected 42"
