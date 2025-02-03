@@ -139,17 +139,21 @@ fetch_workflow_artifacts() {
     workflow_name=$(sanitize_name "$workflow")
     info "Processing workflow: $workflow_name"
     
-    # Filter runs by commit SHA to ensure we get the right artifacts
+    # Get the latest run for this workflow, regardless of commit SHA
     local runs_json
-    runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs" \
-        --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\")" | head -n 1) || {
+    runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?per_page=20" \
+        --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\" or .head_sha == \"${COMMIT_SHA:0:7}\")" | head -n 1) || {
         error "Failed to fetch runs for workflow $workflow"
         return 1
     }
     
     if [[ -z "$runs_json" ]]; then
-        error "No runs found for workflow $workflow with commit ${COMMIT_SHA}"
-        return 1
+        warn "No runs found for workflow $workflow with commit ${COMMIT_SHA}, trying latest run instead"
+        runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?per_page=1" \
+            --jq ".workflow_runs[0]") || {
+            error "Failed to fetch latest run for workflow $workflow"
+            return 1
+        }
     fi
     
     # Get run ID from the JSON
@@ -282,9 +286,21 @@ main() {
     check_dependencies
     
     # Ensure COMMIT_SHA is set
-    if [[ -z "${COMMIT_SHA}" ]]; then
-        error "COMMIT_SHA environment variable is not set"
-        exit 1
+    if [[ -z "${COMMIT_SHA:-}" ]]; then
+        # Try to get the latest commit SHA from git
+        COMMIT_SHA=$(git rev-parse HEAD 2>/dev/null || true)
+        
+        if [[ -z "${COMMIT_SHA}" ]]; then
+            # If git command fails, try to get it from GitHub API
+            COMMIT_SHA=$(gh api repos/pondersource/dev-stock/commits/main --jq '.sha' 2>/dev/null || true)
+            
+            if [[ -z "${COMMIT_SHA}" ]]; then
+                error "Could not determine COMMIT_SHA. Please set it manually or ensure you're in a git repository."
+                exit 1
+            fi
+        fi
+        export COMMIT_SHA
+        info "Using commit SHA: ${COMMIT_SHA}"
     fi
     
     info "Downloading artifacts for commit: ${COMMIT_SHA}"
