@@ -2,6 +2,7 @@ export const config = {
     manifestUrl: './artifacts/manifest.json',
     workflowStatusUrl: './artifacts/workflow-status.json',
     thumbnailExtension: 'avif',
+    videoExtension: 'mp4',
     categories: [
         {
             id: 'auth-tests',

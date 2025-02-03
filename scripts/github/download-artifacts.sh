@@ -61,20 +61,13 @@ human_size() {
     fi
 }
 
-# Cleanup function
+# Cleanup function with simpler temp directory handling
 cleanup() {
-    local exit_code=$?
     info "Cleaning up temporary directories..."
-    for dir in "${TEMP_DIRS[@]}"; do
-        if [[ -d "$dir" ]]; then
-            rm -rf "$dir"
-            debug "Removed temporary directory: $dir"
-        fi
-    done
-    if [[ $exit_code -ne 0 ]]; then
-        error "Script failed with exit code $exit_code"
+    if [[ -n "${TEMP_DIR:-}" && -d "$TEMP_DIR" ]]; then
+        rm -rf "$TEMP_DIR"
+        debug "Removed temporary directory: $TEMP_DIR"
     fi
-    exit "$exit_code"
 }
 
 # Check required tools
@@ -113,100 +106,21 @@ generate_thumbnail() {
     printf "%s" "$thumbnail"
 }
 
-# Converts MP4 to WebM using AV1 codec
-# Uses multi-threading and optimizes for size while maintaining quality
-convert_to_webm() {
-    local input="$1"
-    local output="${input%.mp4}.webm"
-    
-    # Enhanced AV1 encoding settings for better compression:
-    # - crf=35: Higher CRF means more compression (range 0-63, default 30)
-    # - cpu-used=4: Speed setting (0-8, higher = faster but less efficient)
-    # - tile-columns=2: Parallel processing optimization
-    # - auto-alt-ref=1: Enables alternative reference frames
-    # - lag-in-frames=25: Longer look-ahead for better compression
-    # - row-mt=1: Row-based multi-threading
-    if ! ffmpeg -hide_banner -loglevel error -i "$input" \
-        -c:v libaom-av1 \
-        -crf 35 \
-        -b:v 0 \
-        -tile-columns 2 \
-        -auto-alt-ref 1 \
-        -lag-in-frames 25 \
-        -row-mt 1 \
-        -cpu-used 4 \
-        -c:a libopus \
-        -b:a 96k \
-        "$output" -y 2>/dev/null; then
-        return 1
-    fi
-    
-    # Verify the conversion resulted in smaller file
-    local input_size output_size
-    input_size=$(stat -f%z "$input" 2>/dev/null || stat -c%s "$input")
-    output_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output")
-    
-    info "Conversion sizes - Original: $(human_size $input_size), WebM: $(human_size $output_size)"
-    
-    # If WebM is larger, try with more aggressive compression
-    if ((output_size > input_size)); then
-        warn "WebM file is larger than original, trying more aggressive compression"
-        if ! ffmpeg -hide_banner -loglevel error -i "$input" \
-            -c:v libaom-av1 \
-            -crf 40 \
-            -b:v 0 \
-            -tile-columns 2 \
-            -auto-alt-ref 1 \
-            -lag-in-frames 25 \
-            -row-mt 1 \
-            -cpu-used 4 \
-            -c:a libopus \
-            -b:a 64k \
-            "$output" -y 2>/dev/null; then
-            return 1
-        fi
-        
-        output_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output")
-        info "After aggressive compression: $(human_size $output_size)"
-    fi
-    
-    printf "%s" "$output"
-}
-
-# Enhanced process_video with progress logging
+# Process video file (now just generates thumbnail)
 process_video() {
     local input="$1"
     local dir
     dir="$(dirname "$input")"
-    local new_name="$dir/recording.mp4"
     local original_size
     
     start_timer
     original_size=$(stat -f%z "$input" 2>/dev/null || stat -c%s "$input")
     info "Processing video: $input ($(human_size $original_size))"
     
-    # Rename to consistent filename
-    if ! mv "$input" "$new_name"; then
-        error "Failed to rename $input to $new_name"
-        return 1
-    fi
-    debug "Renamed $input to $new_name"
-    
-    # Convert to WebM
-    info "Converting $new_name to WebM format"
-    local webm_file
-    if ! webm_file=$(convert_to_webm "$new_name"); then
-        error "Failed to convert video to WebM"
-        return 1
-    fi
-    local webm_size
-    webm_size=$(stat -f%z "$webm_file" 2>/dev/null || stat -c%s "$webm_file")
-    success "Converted to $webm_file ($(human_size $webm_size))"
-    
     # Generate thumbnail
-    info "Generating thumbnail for $webm_file"
+    info "Generating thumbnail for $input"
     local thumbnail_file
-    if ! thumbnail_file=$(generate_thumbnail "$webm_file"); then
+    if ! thumbnail_file=$(generate_thumbnail "$input"); then
         error "Failed to generate thumbnail"
         return 1
     fi
@@ -214,18 +128,15 @@ process_video() {
     thumb_size=$(stat -f%z "$thumbnail_file" 2>/dev/null || stat -c%s "$thumbnail_file")
     success "Generated thumbnail at $thumbnail_file ($(human_size $thumb_size))"
     
-    # Cleanup original MP4
-    rm -f "$new_name"
     end_timer "Video processing"
 }
 
-# Enhanced fetch_workflow_artifacts with more detailed logging
+# Process artifacts for a workflow
 fetch_workflow_artifacts() {
     local workflow="$1"
     local workflow_name
     workflow_name=$(sanitize_name "$workflow")
     info "Processing workflow: $workflow_name"
-    start_timer
     
     # Get the latest run for this workflow
     local runs_json
@@ -245,77 +156,71 @@ fetch_workflow_artifacts() {
         }
     fi
     
-    # Get run ID and additional information
-    local run_id run_status run_conclusion
-    run_id=$(echo "$runs_json" | jq -r '.id')
-    run_status=$(echo "$runs_json" | jq -r '.status')
-    run_conclusion=$(echo "$runs_json" | jq -r '.conclusion')
-    info "Found run ID: $run_id (Status: $run_status, Conclusion: $run_conclusion) for commit ${COMMIT_SHA}"
+    # Store workflow status for later use
+    echo "$runs_json" | jq --arg name "$workflow" '{
+        ($name): {
+            name: .name,
+            status: .status,
+            conclusion: .conclusion
+        }
+    }' >> "$STATUS_FILE"
     
-    # Get artifacts with count information
-    local artifacts_json artifact_count
-    debug "Fetching artifacts for run $run_id"
+    # Get run ID
+    local run_id
+    run_id=$(echo "$runs_json" | jq -r '.id')
+    info "Processing run ID: $run_id"
+    
+    # Get artifacts
+    local artifacts_json
     artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$run_id/artifacts") || {
         error "Failed to fetch artifacts for run $run_id"
         return 1
     }
-    artifact_count=$(echo "$artifacts_json" | jq '.total_count')
-    info "Found $artifact_count artifacts for run $run_id"
     
-    # Process each artifact with size information
-    local processed_count=0
+    # Create workflow directory
+    local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+    mkdir -p "$workflow_dir"
+    
+    # Process each artifact
     echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes // 0)"' | while read -r id name size; do
-        ((processed_count++))
-        info "Downloading artifact $name (ID: $id, Size: $(human_size ${size:-0})) [$processed_count/$artifact_count]"
+        info "Downloading artifact $name (ID: $id, Size: $(human_size ${size:-0}))"
         
-        # Create a temporary directory for this artifact
-        local tmp_dir
-        tmp_dir=$(mktemp -d)
-        TEMP_DIRS+=("$tmp_dir")
+        # Create temporary directory if needed
+        TEMP_DIR="$(mktemp -d)"
         
-        # Download with progress indication
-        debug "Downloading to temporary directory: $tmp_dir"
-        if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
-            -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"; then
-            error "Failed to download artifact $id"
-            rm -rf "$tmp_dir"
-            continue
-        fi
-        
-        # Get actual downloaded size
-        local downloaded_size
-        downloaded_size=$(stat -f%z "$tmp_dir/artifact.zip" 2>/dev/null || stat -c%s "$tmp_dir/artifact.zip" 2>/dev/null || echo 0)
-        debug "Downloaded size: $(human_size ${downloaded_size:-0})"
-        
-        # Extract with size information
-        local target_dir="$ARTIFACTS_DIR/$workflow_name"
-        mkdir -p "$target_dir"
-        debug "Extracting to $target_dir"
-        if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"; then
-            error "Failed to extract artifact $id"
-            rm -rf "$tmp_dir"
-            continue
-        fi
-        
-        # Process videos with enhanced logging
-        local video_count=0
-        while IFS= read -r -d '' video; do
-            ((video_count++))
-            process_video "$video"
-        done < <(find "$target_dir" -name "*.mp4" -print0)
-        info "Processed $video_count videos from artifact $name"
-        
-        # Cleanup
-        rm -rf "$tmp_dir"
-        for i in "${!TEMP_DIRS[@]}"; do
-            if [[ ${TEMP_DIRS[i]} = "$tmp_dir" ]]; then
-                unset 'TEMP_DIRS[i]'
-                break
+        # Download and extract artifact
+        if gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
+            -H "Accept: application/vnd.github+json" > "$TEMP_DIR/artifact.zip"; then
+            
+            if unzip -q -o "$TEMP_DIR/artifact.zip" -d "$workflow_dir"; then
+                # Process videos
+                find "$workflow_dir" -name "*.mp4" -print0 | while IFS= read -r -d '' video; do
+                    process_video "$video"
+                    
+                    # Add to manifest if thumbnail was generated
+                    local thumbnail="${video%.mp4}.avif"
+                    if [[ -f "$thumbnail" ]]; then
+                        local rel_video="${video#site/static/}"
+                        local rel_thumbnail="${thumbnail#site/static/}"
+                        jq --arg wf "$workflow_name" \
+                           --arg video "$rel_video" \
+                           --arg thumb "$rel_thumbnail" \
+                           '.videos += [{"workflow": $wf, "video": $video, "thumbnail": $thumb}]' \
+                           "$MANIFEST_FILE" > "${MANIFEST_FILE}.tmp" && \
+                           mv "${MANIFEST_FILE}.tmp" "$MANIFEST_FILE"
+                    fi
+                done
+            else
+                error "Failed to extract artifact $id"
             fi
-        done
+        else
+            error "Failed to download artifact $id"
+        fi
+        
+        # Cleanup temp directory
+        rm -rf "$TEMP_DIR"
     done
     
-    end_timer "Workflow artifact processing"
     return 0
 }
 
@@ -369,10 +274,10 @@ generate_manifest() {
         
         if [[ -d "$workflow_dir" ]]; then
             debug "Processing artifacts for $workflow_name"
-            # Find all WebM videos and their thumbnails
+            # Find all MP4 videos and their thumbnails
             while IFS= read -r -d '' video; do
                 local rel_video="${video#site/static/}"
-                local thumbnail="${video%.webm}.avif"
+                local thumbnail="${video%.mp4}.avif"
                 local rel_thumbnail="${thumbnail#site/static/}"
                 
                 if [[ -f "$video" && -f "$thumbnail" ]]; then
@@ -387,7 +292,7 @@ generate_manifest() {
                 else
                     warn "Missing video or thumbnail for $workflow_name"
                 fi
-            done < <(find "$workflow_dir" -type f -name "*.webm" -print0)
+            done < <(find "$workflow_dir" -type f -name "*.mp4" -print0)
         else
             warn "No artifacts directory found for $workflow_name"
         fi
@@ -420,12 +325,18 @@ generate_manifest() {
     fi
 }
 
-# Enhanced main function with summary statistics
+# Main execution
 main() {
-    # Set up error handling with line numbers
-    set -E
-    trap 'error "Error on line $LINENO. Command: $BASH_COMMAND"' ERR
+    # Set up error handling
+    set -Eeo pipefail
     trap cleanup EXIT
+    trap 'error "Error on line $LINENO: $BASH_COMMAND"' ERR
+    
+    # Initialize files
+    MANIFEST_FILE="$ARTIFACTS_DIR/manifest.json"
+    STATUS_FILE="$ARTIFACTS_DIR/workflow-status.json"
+    echo '{"videos": []}' > "$MANIFEST_FILE"
+    echo '{}' > "$STATUS_FILE"
     
     info "Starting script in directory: $(pwd)"
     info "Script directory: $SCRIPT_DIR"

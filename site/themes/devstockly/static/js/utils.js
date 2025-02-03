@@ -52,7 +52,7 @@ export function createStatusIcon(iconName, color) {
 
 export function generateMediaUrls(workflowName) {
     return {
-        video: `./artifacts/${workflowName}/recording.webm`,
+        video: `./artifacts/${workflowName}/recording.${config.videoExtension}`,
         thumbnail: `./artifacts/${workflowName}/recording.${config.thumbnailExtension}`
     };
 } 
