@@ -51,7 +51,14 @@ end_timer() {
 
 # Get human readable file size
 human_size() {
-    local size="${1:-0}"  # Default to 0 if no argument provided
+    # If no argument is provided or if it's not a number, return '0B'
+    local size
+    size="${1:-0}"
+    if ! [[ "$size" =~ ^[0-9]+$ ]]; then
+        echo "0B"
+        return
+    fi
+    
     if ((size < 1024)); then
         echo "${size}B"
     elif ((size < 1048576)); then

@@ -23,7 +23,7 @@ export const config = {
             title: 'Public Link Sharing Tests',
             icon: 'link',
             sources: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.15.0'],
-            targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.0.0'],
+            targets: ['Nextcloud v27.1.11', 'Nextcloud v28.0.14', 'ownCloud v10.15.0'],
             workflowPrefix: 'share-link-'
         },
         {
