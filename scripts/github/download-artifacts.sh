@@ -76,10 +76,10 @@ sanitize_name() {
 # Function to generate video thumbnail
 generate_thumbnail() {
     local video="$1"
-    local thumbnail="${video%.*}.webp"
+    local thumbnail="${video%.*}.avif"
     
     if ! ffmpeg -hide_banner -loglevel error -i "$video" \
-        -vf "select=eq(n\,0),scale=640:-1" -vframes 1 "$thumbnail" 2>/dev/null; then
+        -vf "select=eq(n\,0),scale=640:-1" -vframes 1 -c:v libaom-av1 -still-picture 1 "$thumbnail" 2>/dev/null; then
         return 1
     fi
     
@@ -92,7 +92,7 @@ convert_to_webm() {
     local output="${input%.mp4}.webm"
     
     if ! ffmpeg -hide_banner -loglevel error -i "$input" \
-        -c:v libvpx-vp9 -crf 30 -b:v 0 -b:a 128k -c:a libopus "$output" -y 2>/dev/null; then
+        -c:v libaom-av1 -crf 30 -b:v 0 -b:a 128k -c:a libopus -row-mt 1 -cpu-used 4 "$output" -y 2>/dev/null; then
         return 1
     fi
     
@@ -139,56 +139,32 @@ process_video() {
 # Function to fetch workflow artifacts
 fetch_workflow_artifacts() {
     local workflow="$1"
-    local latest_run
-    
-    latest_run=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs" \
-        --jq '.workflow_runs[0].id') || {
-        error "Failed to fetch latest run for workflow $workflow"
-        return 1
-    }
-    
-    if [[ -z "$latest_run" ]]; then
-        error "No runs found for workflow $workflow"
-        return 1
-    fi
-    
-    echo "$latest_run"
-}
-
-# Function to fetch workflow status
-fetch_workflow_status() {
-    local workflow="$1"
-    local status_json
-    
-    status_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?branch=main&per_page=1" \
-        --jq '{
-            name: .workflow_runs[0].name,
-            status: .workflow_runs[0].status,
-            conclusion: .workflow_runs[0].conclusion
-        }') || {
-        error "Failed to fetch status for workflow $workflow"
-        return 1
-    }
-    
-    echo "$status_json"
-}
-
-# Function to download and process artifacts
-download_artifacts() {
-    local workflow="$1"
     local workflow_name
     workflow_name=$(sanitize_name "$workflow")
     info "Processing workflow: $workflow_name"
     
-    # Get the latest workflow run ID
-    local latest_run
-    latest_run=$(fetch_workflow_artifacts "$workflow") || return 1
-    info "Latest run ID: $latest_run"
+    # Get the latest workflow run for this specific commit
+    local runs_json
+    runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs" \
+        --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\")" | head -n 1) || {
+        error "Failed to fetch runs for workflow $workflow"
+        return 1
+    }
+    
+    if [[ -z "$runs_json" ]]; then
+        error "No runs found for workflow $workflow with commit ${COMMIT_SHA}"
+        return 1
+    }
+    
+    # Get run ID from the JSON
+    local run_id
+    run_id=$(echo "$runs_json" | jq -r '.id')
+    info "Found run ID: $run_id for commit ${COMMIT_SHA}"
     
     # Get artifacts for this run
     local artifacts_json
-    artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$latest_run/artifacts") || {
-        error "Failed to fetch artifacts for run $latest_run"
+    artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$run_id/artifacts") || {
+        error "Failed to fetch artifacts for run $run_id"
         return 1
     }
     
@@ -218,7 +194,7 @@ download_artifacts() {
             continue
         fi
         
-        # Process videos - explicitly use bash and export functions
+        # Process videos
         export LOG_FILE  # Export log file path
         export -f process_video convert_to_webm generate_thumbnail log error info debug
         find "$target_dir" -name "*.mp4" -exec bash -c '
@@ -235,6 +211,24 @@ download_artifacts() {
             fi
         done
     done
+}
+
+# Function to fetch workflow status
+fetch_workflow_status() {
+    local workflow="$1"
+    local status_json
+    
+    status_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?branch=main&per_page=1" \
+        --jq '{
+            name: .workflow_runs[0].name,
+            status: .workflow_runs[0].status,
+            conclusion: .workflow_runs[0].conclusion
+        }') || {
+        error "Failed to fetch status for workflow $workflow"
+        return 1
+    }
+    
+    echo "$status_json"
 }
 
 # Function to generate manifest
@@ -266,7 +260,7 @@ generate_manifest() {
         map(select(length > 0) | {
             workflow: capture("artifacts/(?<wf>[^/]+)").wf,
             video: (. | sub("^site/static/"; "")),
-            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".webp"))
+            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".avif"))
         }) | { videos: . }' > "$manifest"
     
     if [[ ! -f "$manifest" ]]; then
@@ -283,6 +277,14 @@ main() {
     
     # Check dependencies
     check_dependencies
+    
+    # Ensure COMMIT_SHA is set
+    if [[ -z "${COMMIT_SHA}" ]]; then
+        error "COMMIT_SHA environment variable is not set"
+        exit 1
+    }
+    
+    info "Downloading artifacts for commit: ${COMMIT_SHA}"
     
     # Create required directories
     mkdir -p "$ARTIFACTS_DIR" "$IMAGES_DIR"

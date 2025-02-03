@@ -2,15 +2,14 @@ name: Deploy Zola site to Pages
 
 # Controls when the action will run.
 on:
-  # Triggers the workflow on push or pull request events but only for the specified branch and files.
-  pull_request:
-    branches:
-      - main
-    paths:
-      - "site/**"
-      - "scripts/github/**"
-      - ".github/workflows/github-pages.yml"
-  # Allows you to run this workflow manually from the Actions tab.
+  # Make this workflow callable by other workflows
+  workflow_call:
+    inputs:
+      sha:
+        required: true
+        type: string
+        description: "The commit SHA to download artifacts for"
+  # Keep manual trigger for convenience
   workflow_dispatch:
 
 permissions:
@@ -37,6 +36,7 @@ jobs:
       - name: Download Artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_SHA: ${{ inputs.sha || github.sha }}
         run: |
           chmod +x scripts/github/download-artifacts.sh
           ./scripts/github/download-artifacts.sh
