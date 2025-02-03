@@ -150,7 +150,7 @@ fetch_workflow_artifacts() {
     if [[ -z "$runs_json" ]]; then
         error "No runs found for workflow $workflow with commit ${COMMIT_SHA}"
         return 1
-    }
+    fi
     
     # Get run ID from the JSON
     local run_id
@@ -285,7 +285,7 @@ main() {
     if [[ -z "${COMMIT_SHA}" ]]; then
         error "COMMIT_SHA environment variable is not set"
         exit 1
-    }
+    fi
     
     info "Downloading artifacts for commit: ${COMMIT_SHA}"
     
