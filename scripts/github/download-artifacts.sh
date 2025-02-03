@@ -19,7 +19,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ARTIFACTS_DIR="site/static/artifacts"
 readonly IMAGES_DIR="site/static/images"
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
-declare -a TEMP_DIRS
+declare -a TEMP_DIRS=()
 
 # Enhanced logging functions
 log() { 
@@ -32,7 +32,7 @@ log() {
 }
 error() { log "ERROR" "$*" >&2; }
 info() { log "INFO" "$*"; }
-debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG" "$*"; }
+debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG" "$*" || true; }
 warn() { log "WARN" "$*" >&2; }
 success() { log "SUCCESS" "$*"; }
 
@@ -384,7 +384,7 @@ main() {
         exit 1
     fi
     
-    local workflow_files=()
+    declare -a workflow_files=()
     while IFS= read -r -d '' workflow; do
         local basename
         basename=$(basename "$workflow")
@@ -407,22 +407,32 @@ main() {
     
     # Log all found workflows by type with counts
     info "=== Found Workflows ==="
-    local login_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^login-' || true))
-    local share_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^share-' || true))
-    local invite_files=($(printf '%s\n' "${workflow_files[@]}" | grep '^invite-' || true))
+    declare -a login_files=()
+    declare -a share_files=()
+    declare -a invite_files=()
+    
+    for wf in "${workflow_files[@]}"; do
+        if [[ "$wf" =~ ^login- ]]; then
+            login_files+=("$wf")
+        elif [[ "$wf" =~ ^share- ]]; then
+            share_files+=("$wf")
+        elif [[ "$wf" =~ ^invite- ]]; then
+            invite_files+=("$wf")
+        fi
+    done
     
     info "Login workflows (${#login_files[@]}):"
-    printf '%s\n' "${login_files[@]}" | while read -r wf; do
+    for wf in "${login_files[@]}"; do
         info "  - $wf"
     done
     
     info "Share workflows (${#share_files[@]}):"
-    printf '%s\n' "${share_files[@]}" | while read -r wf; do
+    for wf in "${share_files[@]}"; do
         info "  - $wf"
     done
     
     info "Invite workflows (${#invite_files[@]}):"
-    printf '%s\n' "${invite_files[@]}" | while read -r wf; do
+    for wf in "${invite_files[@]}"; do
         info "  - $wf"
     done
     
