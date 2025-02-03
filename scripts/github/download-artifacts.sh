@@ -10,7 +10,7 @@
 # - Processes 42 test workflows (6 login, 27 share, 9 invite)
 # - Generates manifest.json for website consumption
 #
-# Requirements: gh, jq, ffmpeg, unzip
+# Requirements: gh, jq, ffmpeg, unzip, zip
 
 set -euo pipefail
 
@@ -87,7 +87,7 @@ cleanup() {
 # Check required tools
 check_dependencies() {
     local missing_deps=()
-    for cmd in gh jq ffmpeg unzip; do
+    for cmd in gh jq ffmpeg unzip zip; do
         if ! command -v "$cmd" &> /dev/null; then
             missing_deps+=("$cmd")
         fi
@@ -354,6 +354,187 @@ generate_manifest() {
     fi
 }
 
+# Create a combined zip file of all test artifacts
+create_combined_zip() {
+    info "Creating combined zip file of all test artifacts..."
+    local zip_file="$ARTIFACTS_DIR/ocm-tests-all.zip"
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    TEMP_DIRS+=("$temp_dir")
+
+    # Copy all workflow artifacts to temp directory
+    for workflow in "${workflow_files[@]}"; do
+        local workflow_name
+        workflow_name=$(sanitize_name "$workflow")
+        local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+        
+        if [[ -d "$workflow_dir" ]]; then
+            # Create workflow directory in temp
+            mkdir -p "$temp_dir/$workflow_name"
+            
+            # Copy original MP4 files
+            find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+        fi
+    done
+
+    # Create zip file
+    (cd "$temp_dir" && zip -r "$zip_file" .)
+    
+    if [[ -f "$zip_file" ]]; then
+        local zip_size
+        zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+        success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
+    else
+        error "Failed to create combined zip file"
+        return 1
+    fi
+}
+
+# Create platform-specific zip bundles
+create_platform_bundles() {
+    info "Creating platform-specific zip bundles..."
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    mkdir -p "$base_dir"
+    
+    # Define platform combinations
+    declare -A platforms=(
+        ["nextcloud"]="nc"
+        ["owncloud"]="oc"
+        ["sciencemesh"]="sm"
+        ["solidserver"]="sf"
+    )
+    
+    # Create temp directory for each platform combination
+    for platform in "${!platforms[@]}"; do
+        local temp_dir
+        temp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$temp_dir")
+        local platform_code="${platforms[$platform]}"
+        
+        info "Processing $platform tests..."
+        
+        # Find workflows containing the platform code
+        for workflow in "${workflow_files[@]}"; do
+            if [[ "$workflow" =~ $platform_code ]]; then
+                local workflow_name
+                workflow_name=$(sanitize_name "$workflow")
+                local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+                
+                if [[ -d "$workflow_dir" ]]; then
+                    mkdir -p "$temp_dir/$workflow_name"
+                    find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+                fi
+            fi
+        done
+        
+        # Create zip file for this platform
+        local zip_file="$base_dir/ocm-tests-$platform.zip"
+        (cd "$temp_dir" && zip -r "$zip_file" .)
+        
+        if [[ -f "$zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+            success "Created $platform bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        fi
+    done
+}
+
+# Create test-type specific bundles
+create_test_type_bundles() {
+    info "Creating test-type specific bundles..."
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    mkdir -p "$base_dir"
+    
+    # Define test types
+    declare -a types=("login" "share" "invite")
+    
+    for type in "${types[@]}"; do
+        local temp_dir
+        temp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$temp_dir")
+        
+        info "Processing $type tests..."
+        
+        # Find workflows of this type
+        for workflow in "${workflow_files[@]}"; do
+            if [[ "$workflow" =~ ^$type- ]]; then
+                local workflow_name
+                workflow_name=$(sanitize_name "$workflow")
+                local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+                
+                if [[ -d "$workflow_dir" ]]; then
+                    mkdir -p "$temp_dir/$workflow_name"
+                    find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+                fi
+            fi
+        done
+        
+        # Create zip file for this test type
+        local zip_file="$base_dir/ocm-tests-$type.zip"
+        (cd "$temp_dir" && zip -r "$zip_file" .)
+        
+        if [[ -f "$zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+            success "Created $type tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        fi
+    done
+}
+
+# Create result-specific bundles based on workflow status
+create_result_bundles() {
+    info "Creating result-specific bundles..."
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    mkdir -p "$base_dir"
+    local status_file="$ARTIFACTS_DIR/workflow-status.json"
+    
+    # Create temp directories for success/failure
+    local success_dir
+    success_dir=$(mktemp -d)
+    TEMP_DIRS+=("$success_dir")
+    local failed_dir
+    failed_dir=$(mktemp -d)
+    TEMP_DIRS+=("$failed_dir")
+    
+    # Process each workflow based on its status
+    jq -r 'to_entries[] | "\(.key) \(.value.conclusion)"' "$status_file" | while read -r workflow status; do
+        local workflow_name
+        workflow_name=$(sanitize_name "$workflow")
+        local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+        
+        if [[ -d "$workflow_dir" ]]; then
+            local target_dir
+            if [[ "$status" == "success" ]]; then
+                target_dir="$success_dir/$workflow_name"
+            else
+                target_dir="$failed_dir/$workflow_name"
+            fi
+            
+            mkdir -p "$target_dir"
+            find "$workflow_dir" -name "recording.mp4" -exec cp {} "$target_dir/" \;
+        fi
+    done
+    
+    # Create success/failure zip files
+    for result in "success" "failed"; do
+        local source_dir
+        if [[ "$result" == "success" ]]; then
+            source_dir="$success_dir"
+        else
+            source_dir="$failed_dir"
+        fi
+        
+        local zip_file="$base_dir/ocm-tests-$result.zip"
+        (cd "$source_dir" && zip -r "$zip_file" .)
+        
+        if [[ -f "$zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+            success "Created $result tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        fi
+    done
+}
+
 # Enhanced main function with summary statistics
 main() {
     # Set up error handling with line numbers
@@ -520,6 +701,12 @@ main() {
     
     # Generate manifest
     generate_manifest
+    
+    # Create all zip bundles
+    create_combined_zip
+    create_platform_bundles
+    create_test_type_bundles
+    create_result_bundles
     
     # Debug output
     info "Contents of artifacts directory:"

@@ -5,9 +5,9 @@
   <div class="hero__content">
     <h1 class="hero__title" data-parallax="0.1">Open Cloud Mesh Test Suite</h1>
     <p class="hero__subtitle" data-parallax="0.2">
-        Validating cross-cloud interoperability with OCM API
+        Validating cross EFSS interoperability with OCM API
     </p>
-    <button class="hero__cta" id="exploreBtn">View Test Results</button>
+    <button class="hero__cta" id="exploreBtn">View Tests</button>
   </div>
   <div class="scroll-down" id="scrollDown">
     <div class="scroll-dots">
@@ -27,7 +27,36 @@
 
 <section class="test-matrix" id="testMatrix">
   <div class="container">
-    <h2 class="matrix-title">Live Test Results</h2>
+    <div class="matrix-header">
+      <h2 class="matrix-title">OCM Test Results</h2>
+      <div class="download-options">
+        <button class="download-all-btn" id="downloadBtn">Download Tests</button>
+        <div class="download-menu" id="downloadMenu">
+          <div class="download-section">
+            <h3>All Tests</h3>
+            <a href="/artifacts/ocm-tests-all.zip" download>Download All Tests</a>
+          </div>
+          <div class="download-section">
+            <h3>By Platform</h3>
+            <a href="/artifacts/bundles/ocm-tests-nextcloud.zip" download>Nextcloud Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-owncloud.zip" download>ownCloud Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-sciencemesh.zip" download>ScienceMesh Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-solidserver.zip" download>Solid Tests</a>
+          </div>
+          <div class="download-section">
+            <h3>By Test Type</h3>
+            <a href="/artifacts/bundles/ocm-tests-login.zip" download>Login Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-share.zip" download>Share Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-invite.zip" download>Invite Tests</a>
+          </div>
+          <div class="download-section">
+            <h3>By Result</h3>
+            <a href="/artifacts/bundles/ocm-tests-success.zip" download>Successful Tests</a>
+            <a href="/artifacts/bundles/ocm-tests-failed.zip" download>Failed Tests</a>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="compatibilityMatrix"></div>
   </div>
 </section>

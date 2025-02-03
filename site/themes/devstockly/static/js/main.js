@@ -207,3 +207,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Failed to start application:', error);
     }
 });
+
+// Download menu functionality
+document.addEventListener('DOMContentLoaded', () => {
+    const downloadBtn = document.getElementById('downloadBtn');
+    const downloadMenu = document.getElementById('downloadMenu');
+    
+    if (downloadBtn && downloadMenu) {
+        // Toggle menu on button click
+        downloadBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            downloadMenu.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!downloadMenu.contains(e.target) && !downloadBtn.contains(e.target)) {
+                downloadMenu.classList.remove('active');
+            }
+        });
+        
+        // Prevent menu from closing when clicking inside
+        downloadMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+});
