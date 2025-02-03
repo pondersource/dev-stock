@@ -298,38 +298,79 @@ generate_manifest() {
     local manifest="$ARTIFACTS_DIR/manifest.json"
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
     local temp_status_file="/tmp/temp_status_$$.json"
+    local temp_manifest_file="/tmp/temp_manifest_$$.json"
     
-    # Initialize empty JSON in temp file
+    # Initialize empty JSON files
     echo "{}" > "$temp_status_file"
+    echo '{"videos": []}' > "$temp_manifest_file"
     
-    # Collect all workflow statuses
-    while read -r workflow; do
-        workflow_name=$(basename "$workflow")
-        status=$(fetch_workflow_status "$workflow_name")
+    # Process each workflow type
+    for workflow in "${workflow_files[@]}"; do
+        # Get workflow status
+        local status
+        status=$(fetch_workflow_status "$workflow")
         if [[ -n "$status" ]]; then
-            jq --arg name "$workflow_name" --argjson status "$status" '. + {($name): $status}' "$temp_status_file" > "${temp_status_file}.tmp" && mv "${temp_status_file}.tmp" "$temp_status_file"
+            jq --arg name "$workflow" --argjson status "$status" \
+               '. + {($name): $status}' "$temp_status_file" > "${temp_status_file}.tmp" \
+               && mv "${temp_status_file}.tmp" "$temp_status_file"
         fi
-    done < <(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[] | select(.path | test("share-|login-|invite-")) | .path')
+        
+        # Get workflow artifacts
+        local workflow_name
+        workflow_name=$(sanitize_name "$workflow")
+        local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+        
+        if [[ -d "$workflow_dir" ]]; then
+            debug "Processing artifacts for $workflow_name"
+            # Find all WebM videos and their thumbnails
+            while IFS= read -r -d '' video; do
+                local rel_video="${video#site/static/}"
+                local thumbnail="${video%.webm}.avif"
+                local rel_thumbnail="${thumbnail#site/static/}"
+                
+                if [[ -f "$video" && -f "$thumbnail" ]]; then
+                    debug "Found video/thumbnail pair: $rel_video, $rel_thumbnail"
+                    # Add to manifest
+                    jq --arg wf "$workflow_name" \
+                       --arg video "$rel_video" \
+                       --arg thumb "$rel_thumbnail" \
+                       '.videos += [{"workflow": $wf, "video": $video, "thumbnail": $thumb}]' \
+                       "$temp_manifest_file" > "${temp_manifest_file}.tmp" \
+                       && mv "${temp_manifest_file}.tmp" "$temp_manifest_file"
+                else
+                    warn "Missing video or thumbnail for $workflow_name"
+                fi
+            done < <(find "$workflow_dir" -type f -name "*.webm" -print0)
+        else
+            warn "No artifacts directory found for $workflow_name"
+        fi
+    done
     
-    # Move the final status file to its destination
+    # Move the final files to their destinations
     mv "$temp_status_file" "$status_file"
-    info "Workflow statuses written to $status_file"
+    mv "$temp_manifest_file" "$manifest"
     
-    # Use jq to build the manifest with correct relative paths
-    # Remove 'site/static/' prefix from paths as it's not needed in the final URL
-    find "$ARTIFACTS_DIR" -type f -name "*.webm" -print0 | sort -z | jq -R -s -c 'split("\u0000")[:-1] | 
-        map(select(length > 0) | {
-            workflow: capture("artifacts/(?<wf>[^/]+)").wf,
-            video: (. | sub("^site/static/"; "")),
-            thumbnail: (. | sub("^site/static/"; "") | sub("\\.webm$"; ".avif"))
-        }) | { videos: . }' > "$manifest"
+    # Verify manifest contents
+    local video_count
+    video_count=$(jq '.videos | length' "$manifest")
+    info "Generated manifest with $video_count video entries"
     
-    if [[ ! -f "$manifest" ]]; then
-        error "Failed to generate manifest"
+    if [[ ! -f "$manifest" || ! -f "$status_file" ]]; then
+        error "Failed to generate manifest files"
         return 1
     fi
     
-    info "Manifest generated at $manifest"
+    info "Manifest files generated:"
+    info "- Status file: $status_file"
+    info "- Manifest file: $manifest"
+    
+    # Debug output of manifest contents
+    if [[ "${DEBUG:-0}" == "1" ]]; then
+        debug "Manifest contents:"
+        jq '.' "$manifest"
+        debug "Status file contents:"
+        jq '.' "$status_file"
+    fi
 }
 
 # Enhanced main function with summary statistics
