@@ -2,18 +2,15 @@
 
 # download-artifacts.sh
 #
-# Description: Downloads and processes video artifacts from GitHub Actions workflows,
-# converting them to web-friendly formats and generating thumbnails.
+# Downloads and processes video artifacts from GitHub Actions test workflows.
+# Converts videos to AV1/WebM format and generates AVIF thumbnails.
 #
-# Usage: ./download-artifacts.sh
-# Requirements:
-#   - GitHub CLI (gh)
-#   - jq
-#   - ffmpeg
-#   - unzip
+# Key features:
+# - Ensures artifacts are from the same commit (COMMIT_SHA)
+# - Processes 43 test workflows (6 login, 28 share, 9 invite)
+# - Generates manifest.json for website consumption
 #
-# Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
-#
+# Requirements: gh, jq, ffmpeg, unzip
 
 set -euo pipefail
 
@@ -24,16 +21,12 @@ readonly IMAGES_DIR="site/static/images"
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
 declare -a TEMP_DIRS
 
-# Logging functions
-log() { 
-    local timestamp
-    timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] $*" >> "$LOG_FILE"
-    echo "[$timestamp] $*"
-}
+# Basic logging functions
+log() { local timestamp; timestamp=$(date +'%Y-%m-%d %H:%M:%S'); echo "[$timestamp] $*" >> "$LOG_FILE"; echo "[$timestamp] $*"; }
 error() { log "ERROR: $*" >&2; }
 info() { log "INFO: $*"; }
 debug() { [[ "${DEBUG:-0}" == "1" ]] && log "DEBUG: $*"; }
+warn() { log "WARNING: $*" >&2; }
 
 # Cleanup function
 cleanup() {
@@ -67,13 +60,14 @@ check_dependencies() {
     fi
 }
 
-# Function to sanitize workflow name for consistent file naming
+# Sanitizes workflow names for filesystem usage
 sanitize_name() {
     local name="$1"
     echo "$name" | sed -E 's/\.(yml|yaml)$//' | tr '[:upper:]' '[:lower:]'
 }
 
-# Function to generate video thumbnail
+# Generates AVIF thumbnail from first frame
+# Uses AV1 codec with still-picture optimization
 generate_thumbnail() {
     local video="$1"
     local thumbnail="${video%.*}.avif"
@@ -86,7 +80,8 @@ generate_thumbnail() {
     printf "%s" "$thumbnail"
 }
 
-# Function to convert video to WebM
+# Converts MP4 to WebM using AV1 codec
+# Uses multi-threading and speed optimization (cpu-used=4)
 convert_to_webm() {
     local input="$1"
     local output="${input%.mp4}.webm"
@@ -99,7 +94,7 @@ convert_to_webm() {
     printf "%s" "$output"
 }
 
-# Function to process video file
+# Processes a video file
 process_video() {
     local input="$1"
     local dir
@@ -136,14 +131,15 @@ process_video() {
     rm -f "$new_name"
 }
 
-# Function to fetch workflow artifacts
+# Fetches artifacts for a specific workflow run matching COMMIT_SHA
+# Important: Only downloads artifacts from the exact commit that triggered the workflow
 fetch_workflow_artifacts() {
     local workflow="$1"
     local workflow_name
     workflow_name=$(sanitize_name "$workflow")
     info "Processing workflow: $workflow_name"
     
-    # Get the latest workflow run for this specific commit
+    # Filter runs by commit SHA to ensure we get the right artifacts
     local runs_json
     runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs" \
         --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\")" | head -n 1) || {
@@ -213,7 +209,7 @@ fetch_workflow_artifacts() {
     done
 }
 
-# Function to fetch workflow status
+# Fetches workflow status
 fetch_workflow_status() {
     local workflow="$1"
     local status_json
@@ -231,7 +227,9 @@ fetch_workflow_status() {
     echo "$status_json"
 }
 
-# Function to generate manifest
+# Generates two key files:
+# 1. manifest.json: Maps workflows to their video/thumbnail files
+# 2. workflow-status.json: Current status of all test workflows
 generate_manifest() {
     info "Generating artifact manifest..."
     local manifest="$ARTIFACTS_DIR/manifest.json"
@@ -271,6 +269,11 @@ generate_manifest() {
     info "Manifest generated at $manifest"
 }
 
+# Main execution flow:
+# 1. Verifies COMMIT_SHA is set
+# 2. Discovers and categorizes all test workflows
+# 3. Downloads and processes artifacts from matching commit
+# 4. Generates manifest files for website consumption
 main() {
     # Set up error handling
     trap cleanup EXIT
@@ -289,17 +292,68 @@ main() {
     # Create required directories
     mkdir -p "$ARTIFACTS_DIR" "$IMAGES_DIR"
     
-    # Process workflows
-    gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path' | \
-    while read -r workflow; do
-        if echo "$workflow" | grep -qE 'share-|login-|invite-'; then
-            info "Found test workflow: $workflow"
-            if ! download_artifacts "$(basename "$workflow")"; then
-                error "Failed to process workflow: $workflow"
-                continue
-            fi
+    # Get all workflow files first
+    local workflow_files=()
+    while IFS= read -r workflow; do
+        workflow_files+=("$workflow")
+    done < <(gh api repos/pondersource/dev-stock/actions/workflows --jq '.workflows[].path')
+    
+    # Count of expected workflow types
+    local login_count=0
+    local share_count=0
+    local invite_count=0
+    local other_count=0
+    
+    info "Found ${#workflow_files[@]} total workflows"
+    
+    # Process and categorize workflows
+    for workflow in "${workflow_files[@]}"; do
+        local basename
+        basename=$(basename "$workflow")
+        
+        # Skip the orchestrator and pages workflows
+        if [[ "$basename" == "github-pages.yml" || "$basename" == "github-pages-orchestrator.yml" ]]; then
+            continue
+        fi
+        
+        # Categorize the workflow
+        if [[ "$basename" == login-* ]]; then
+            ((login_count++))
+            info "Processing login workflow: $basename"
+        elif [[ "$basename" == share-* ]]; then
+            ((share_count++))
+            info "Processing share workflow: $basename"
+        elif [[ "$basename" == invite-* ]]; then
+            ((invite_count++))
+            info "Processing invite workflow: $basename"
+        else
+            ((other_count++))
+            info "Found unexpected workflow: $basename"
+            continue
+        fi
+        
+        if ! fetch_workflow_artifacts "$basename"; then
+            error "Failed to process workflow: $basename"
+            continue
         fi
     done
+    
+    # Report workflow counts
+    info "Workflow processing summary:"
+    info "- Login workflows: $login_count (expected: 6)"
+    info "- Share workflows: $share_count (expected: 28)"
+    info "- Invite workflows: $invite_count (expected: 9)"
+    if ((other_count > 0)); then
+        warn "Found $other_count unexpected workflow types"
+    fi
+    
+    # Verify we processed the expected number of workflows
+    local total=$((login_count + share_count + invite_count))
+    info "Total test workflows processed: $total (expected: 43)"
+    if ((total != 43)); then
+        error "Processed $total workflows but expected 43"
+        error "Some workflows might be missing or miscategorized"
+    fi
     
     # Generate manifest
     generate_manifest
@@ -311,5 +365,4 @@ main() {
     info "Script completed successfully"
 }
 
-# Execute main function
 main "$@" 
