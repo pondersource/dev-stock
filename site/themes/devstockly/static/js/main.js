@@ -1,9 +1,9 @@
 // Main application entry point
-import { CompatibilityMatrix } from '/js/components/CompatibilityMatrix.js';
-import { config } from '/js/config.js';
-import { ErrorHandler } from '/js/utils/ErrorHandler.js';
-import { StateManager } from '/js/utils/StateManager.js';
-import { EventManager, DOMManager, throttle } from '/js/utils/Performance.js';
+import { CompatibilityMatrix } from './components/CompatibilityMatrix.js';
+import { config } from './config.js';
+import { ErrorHandler } from './utils/ErrorHandler.js';
+import { StateManager } from './utils/StateManager.js';
+import { EventManager, DOMManager, throttle } from './utils/Performance.js';
 
 class App {
     constructor() {

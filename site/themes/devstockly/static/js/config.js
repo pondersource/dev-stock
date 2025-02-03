@@ -1,7 +1,7 @@
 export const config = {
-    manifestUrl: '/artifacts/manifest.json',
-    workflowStatusUrl: '/artifacts/workflow-status.json',
-    thumbnailExtension: 'webp',
+    manifestUrl: './artifacts/manifest.json',
+    workflowStatusUrl: './artifacts/workflow-status.json',
+    thumbnailExtension: 'avif',
     categories: [
         {
             id: 'auth-tests',
