@@ -7,7 +7,7 @@
     <p class="hero__subtitle" data-parallax="0.2">
         Validating cross EFSS interoperability with OCM API
     </p>
-    <button class="hero__cta" id="exploreBtn">View Tests</button>
+    <button class="hero__cta" id="exploreBtn">Let's Get Started</button>
   </div>
   <div class="scroll-down" id="scrollDown">
     <div class="scroll-dots">
@@ -19,40 +19,311 @@
   </div>
 </div>
 
-<main id="mainContent">
-  <div class="gallery-container">
-    {{ section.content | safe }}
+<section class="collaborators-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Collaborators & Developers</h2>
+      <p>Organizations contributing to the development and maintenance of OCM API and Test Suite</p>
+    </div>
+    <div class="collaborators-grid">
+      <div class="collaborator-item" data-collaborator="pondersource">
+        <div class="collaborator-logo">
+          <img src="./images/collaborators/pondersource.jpeg" alt="PonderSource Logo">
+        </div>
+        <div class="collaborator-info">
+          <h3>Ponder Source</h3>
+          <p>A small non-profit foundation that supports a handful of engineers focusing on Federated Sharing, Federated Bookkeeping, and Bring-your-own-Data architectures</p>
+          <div class="collaborator-tags">
+            <span class="tag">API Specification</span>
+            <span class="tag">Development</span>
+            <span class="tag">Test Suite</span>
+          </div>
+        </div>
+      </div>
+      <div class="collaborator-item" data-collaborator="cern">
+        <div class="collaborator-logo">
+          <img src="./images/collaborators/cern.svg" alt="CERN Logo">
+        </div>
+        <div class="collaborator-info">
+          <h3>CERN</h3>
+          <p>Providing infrastructure and expertise in large-scale data sharing solutions</p>
+          <div class="collaborator-tags">
+            <span class="tag">API Specification</span>
+            <span class="tag">Development</span>
+            <span class="tag">Infrastructure</span>
+          </div>
+        </div>
+      </div>
+      <div class="collaborator-item" data-collaborator="sunet">
+        <div class="collaborator-logo">
+          <img src="./images/collaborators/sunet.png" alt="SUNET Logo">
+        </div>
+        <div class="collaborator-info">
+          <h3>SUNET</h3>
+          <p>Supporting OCM development and integration in educational networks</p>
+          <div class="collaborator-tags">
+            <span class="tag">API Specification</span>
+            <span class="tag">Development</span>
+            <span class="tag">Education</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</main>
+</section>
+
+<section class="info-section" id="infoSection">
+  <div class="container">
+    <div class="section-header">
+      <h2>Test Suite Overview</h2>
+      <p>Comprehensive test suite for OCM protocol implementation</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>About the Test Suite</h3>
+          <p>Automated testing to catch implementation issues in OCM protocol across different EFSS platforms. We run
+            checks to verify if platforms can actually talk to each other without breaking the spec.</p>
+          <a href="#testMatrix" class="learn-more">View Test Results <span>→</span></a>
+        </div>
+      </div>
+
+      <div class="info-card featured">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M20 7h-7M20 11h-7M20 15h-7M8 7H4M8 11H4M8 15H4M12 19H4" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Test Categories</h3>
+          <div class="category-list">
+            <div class="category-item">
+              <div class="category-badge login">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                </svg>
+              </div>
+              <div>
+                <h4>Login Tests</h4>
+                <p>Basic authentication and session handling between platforms</p>
+                <div class="test-meta">
+                  <span class="test-count">6 Tests</span>
+                  <span class="test-type">Platform</span>
+                </div>
+              </div>
+            </div>
+            <div class="category-item">
+              <div class="category-badge share">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13" />
+                </svg>
+              </div>
+              <div>
+                <h4>Share Tests</h4>
+                <p>File and folder sharing between different platforms</p>
+                <div class="test-meta">
+                  <span class="test-count">27 Tests</span>
+                  <span class="test-type">Platform 1 → Platform 2</span>
+                </div>
+              </div>
+            </div>
+            <div class="category-item">
+              <div class="category-badge invite">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path
+                    d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 8v6M23 11h-6" />
+                </svg>
+              </div>
+              <div>
+                <h4>Invite Tests</h4>
+                <p>Remote user invitation and acceptance flows</p>
+                <div class="test-meta">
+                  <span class="test-count">9 Tests</span>
+                  <span class="test-type">Platform 1 ⇄ Platform 2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path
+              d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c-4.97 0-9-4.03-9-9m9 9a9 9 0 0 0 9-9m-9 9c4.97 0 9-4.03 9-9" />
+          </svg>
+        </div>
+        <div class="card-content">
+          <h3>Supported Platforms</h3>
+          <div class="platform-grid">
+            <div class="platform-item">
+              <div class="platform-logo">
+                <img src="./images/platforms/nextcloud.svg" alt="Nextcloud Logo">
+              </div>
+              <span>Nextcloud</span>
+            </div>
+            <div class="platform-item">
+              <div class="platform-logo">
+                <img src="./images/platforms/owncloud.svg" alt="ownCloud Logo">
+              </div>
+              <span>ownCloud</span>
+            </div>
+            <div class="platform-item">
+              <div class="platform-logo">
+                <img src="./images/platforms/ocis.png" alt="oCIS Logo">
+              </div>
+              <span>oCIS</span>
+            </div>
+            <div class="platform-item">
+              <div class="platform-logo" data-platform="cernbox">
+                <img src="./images/platforms/cernbox.png" alt="CERNBox Logo">
+              </div>
+              <span>CERNBox</span>
+            </div>
+            <div class="platform-item">
+              <div class="platform-logo">
+                <img src="./images/platforms/seafile.svg" alt="Seafile Logo">
+              </div>
+              <span>Seafile</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sponsors-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Our Sponsors</h2>
+      <p>Organizations that have funded the development of OCM API and Test Suite</p>
+    </div>
+    <div class="sponsors-grid">
+      <div class="sponsor-item" data-sponsor="geant">
+        <div class="sponsor-logo">
+          <img src="./images/sponsors/geant.svg" alt="GEANT Logo">
+        </div>
+        <div class="sponsor-info">
+          <h3>GÉANT</h3>
+          <p>Europe's leading collaboration on network and related infrastructure and services for research and
+            education</p>
+        </div>
+      </div>
+      <div class="sponsor-item" data-sponsor="sciencemesh">
+        <div class="sponsor-logo">
+          <img src="./images/sponsors/sciencemesh.svg" alt="ScienceMesh Logo">
+        </div>
+        <div class="sponsor-info">
+          <h3>ScienceMesh</h3>
+          <p>ScienceMesh is the Federated Science Cloud Mesh that connects existing and heterogeneous sites in a
+            transparent way</p>
+        </div>
+      </div>
+      <div class="sponsor-item" data-sponsor="nlnet">
+        <div class="sponsor-logo">
+          <img src="./images/sponsors/nlnet.svg" alt="NLnet Logo">
+        </div>
+        <div class="sponsor-info">
+          <h3>NLnet</h3>
+          <p>Supporting organizations and people that contribute to an open information society</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="test-matrix" id="testMatrix">
   <div class="container">
+    <div class="matrix-instructions">
+      <div class="instruction-content">
+        <div class="instruction-header">
+          <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+          </div>
+          <div>
+            <h3>How to View Test Results</h3>
+            <p>Interactive guide to exploring test outcomes</p>
+          </div>
+        </div>
+
+        <div class="instruction-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Test Status</h4>
+              <p>See the test status of a flow by EFSS combination</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Watch Test Recordings</h4>
+              <p>View detailed video recordings showing the exact test execution flow</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4>Review Test Steps</h4>
+              <p>Examine each step and its expected outcome in detail</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="instruction-tip">
+          <div class="tip-icon">💡</div>
+          <div class="tip-content">
+            <strong>Tip:</strong> Use the download menu below to get test recordings filtered by platform or test type
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="matrix-header">
-      <h2 class="matrix-title">OCM Test Results</h2>
+      <div class="matrix-title-group">
+    <h2 class="matrix-title">OCM Test Results</h2>
+        <p class="matrix-subtitle">Click on any cell to view test recordings and detailed results</p>
+      </div>
       <div class="download-options">
         <button class="download-all-btn" id="downloadBtn">Download Tests</button>
         <div class="download-menu" id="downloadMenu">
           <div class="download-section">
             <h3>All Tests</h3>
-            <a href="/artifacts/ocm-tests-all.zip" download>Download All Tests</a>
+            <a href="./artifacts/ocm-tests-all.zip" download>Download All Tests</a>
           </div>
           <div class="download-section">
             <h3>By Platform</h3>
-            <a href="/artifacts/bundles/ocm-tests-nextcloud.zip" download>Nextcloud Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-owncloud.zip" download>ownCloud Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-sciencemesh.zip" download>ScienceMesh Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-solidserver.zip" download>Solid Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-nextcloud.zip" download>Nextcloud Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-owncloud.zip" download>ownCloud Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-ocis.zip" download>oCIS Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-cernbox.zip" download>CERNBox Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-seafile.zip" download>Seafile Tests</a>
           </div>
           <div class="download-section">
             <h3>By Test Type</h3>
-            <a href="/artifacts/bundles/ocm-tests-login.zip" download>Login Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-share.zip" download>Share Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-invite.zip" download>Invite Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-login.zip" download>Login Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-share.zip" download>Share Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-invite.zip" download>Invite Tests</a>
           </div>
           <div class="download-section">
             <h3>By Result</h3>
-            <a href="/artifacts/bundles/ocm-tests-success.zip" download>Successful Tests</a>
-            <a href="/artifacts/bundles/ocm-tests-failed.zip" download>Failed Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-success.zip" download>Successful Tests</a>
+            <a href="./artifacts/bundles/ocm-tests-failed.zip" download>Failed Tests</a>
           </div>
         </div>
       </div>

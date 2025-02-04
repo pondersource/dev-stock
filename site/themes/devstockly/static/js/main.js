@@ -68,7 +68,7 @@ class App {
         const exploreBtn = DOMManager.getElement('exploreBtn');
         if (exploreBtn) {
             this.eventManager.addEvent(exploreBtn, 'click', () => {
-                const mainContent = DOMManager.getElement('mainContent');
+                const mainContent = DOMManager.getElement('infoSection');
                 mainContent?.scrollIntoView({ behavior: 'smooth' });
             });
         }
