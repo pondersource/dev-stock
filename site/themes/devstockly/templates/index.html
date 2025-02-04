@@ -1,23 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="hero">
-  <div class="hero__content">
-    <h1 class="hero__title" data-parallax="0.1">Open Cloud Mesh Test Suite</h1>
-    <p class="hero__subtitle" data-parallax="0.2">
-        Validating cross EFSS interoperability with OCM API
-    </p>
-    <button class="hero__cta" id="exploreBtn">Let's Get Started</button>
-  </div>
-  <div class="scroll-down" id="scrollDown">
-    <div class="scroll-dots">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-  </div>
-</div>
+{% include "sections/hero.html" %}
 
 <section class="collaborators-section">
   <div class="container">

@@ -2,7 +2,6 @@
 @import 'partials/variables';
 @import 'partials/mixins';
 @import 'partials/reset';
-@import 'partials/hero';
 
 // Import layout components
 @import 'partials/header';
@@ -25,3 +24,6 @@
 @import 'partials/overlay';
 @import 'partials/responsive';
 @import 'partials/typography';
+
+// Import sections
+@import "sections/hero";
