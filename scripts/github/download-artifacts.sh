@@ -401,7 +401,9 @@ create_platform_bundles() {
         ["nextcloud"]="nc"
         ["owncloud"]="oc"
         ["sciencemesh"]="sm"
-        ["solidserver"]="sf"
+        ["seafile"]="sf"
+        ["ocis"]="ocis"
+        ["cernbox"]="cb"
     )
     
     # Create temp directory for each platform combination
