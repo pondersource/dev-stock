@@ -312,28 +312,6 @@
     }
 }
 
-.info-section {
-    padding: var(--spacing-3xl) 0;
-    background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(to right, 
-            transparent, 
-            rgba(var(--accent-rgb), 0.2), 
-            transparent
-        );
-    }
-}
-
 .section-header {
     text-align: center;
     margin-bottom: var(--spacing-2xl);
@@ -353,55 +331,6 @@
         color: var(--text-secondary-color);
         max-width: 600px;
         margin: 0 auto;
-    }
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--spacing-xl);
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-xl);
-}
-
-.info-card {
-    background: var(--bg-alt);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-    }
-    
-    &.featured {
-        background: linear-gradient(135deg, 
-            rgba(var(--primary-rgb), 0.15), 
-            rgba(var(--accent-rgb), 0.15)
-        );
-        border: 1px solid rgba(var(--accent-rgb), 0.2);
-    }
-
-    .card-icon {
-        width: 48px;
-        height: 48px;
-        margin-bottom: var(--spacing-lg);
-        padding: 8px;
-        background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-        border-radius: var(--radius-md);
-        box-shadow: 0 2px 8px rgba(var(--accent-rgb), 0.2);
-        
-        svg {
-            width: 100%;
-            height: 100%;
-            stroke: #0c5df3;
-        }
     }
 }
 

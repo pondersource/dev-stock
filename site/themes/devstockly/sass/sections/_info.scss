@@ -1,0 +1,185 @@
+.info-section {
+    padding: 6rem 0;
+    background: var(--bg-secondary);
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+
+        h2 {
+            font-size: 2.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: var(--spacing-xl);
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 var(--spacing-xl);
+    }
+
+    .feature-card {
+        background: var(--bg-primary);
+        border-radius: 1rem;
+        padding: 2rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+
+            svg {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+    }
+
+    .test-categories {
+        margin-top: 2rem;
+
+        .category {
+            display: flex;
+            align-items: flex-start;
+            padding: 1.25rem;
+            background: var(--bg-tertiary);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .category-icon {
+                width: 40px;
+                height: 40px;
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                margin-right: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.login {
+                    background: rgba(var(--primary-rgb), 0.1);
+                }
+
+                &.share {
+                    background: rgba(var(--success-rgb), 0.1);
+                }
+
+                &.invite {
+                    background: rgba(var(--warning-rgb), 0.1);
+                }
+
+                svg {
+                    width: 24px;
+                    height: 24px;
+                }
+            }
+
+            .category-content {
+                flex: 1;
+
+                h4 {
+                    font-size: 1.1rem;
+                    margin-bottom: 0.5rem;
+                    color: var(--text-primary);
+                }
+
+                p {
+                    font-size: 0.9rem;
+                    color: var(--text-secondary);
+                    margin-bottom: 0.75rem;
+                }
+
+                .meta {
+                    display: flex;
+                    gap: 1rem;
+                    font-size: 0.875rem;
+
+                    span {
+                        display: flex;
+                        align-items: center;
+                        color: var(--text-tertiary);
+
+                        &::before {
+                            content: '';
+                            display: inline-block;
+                            width: 6px;
+                            height: 6px;
+                            border-radius: 50%;
+                            margin-right: 0.5rem;
+                            background: var(--primary-color);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .platforms-showcase {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+
+        .platform {
+            text-align: center;
+
+            .platform-logo {
+                width: 64px;
+                height: 64px;
+                margin: 0 auto 1rem;
+                padding: 0.75rem;
+                background: var(--bg-tertiary);
+                border-radius: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+            }
+
+            span {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+            }
+        }
+    }
+}
