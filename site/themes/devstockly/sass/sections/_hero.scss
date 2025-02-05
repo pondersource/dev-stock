@@ -79,7 +79,7 @@ $desktop: 1200px;
 
     // Main Content
     .hero-content {
-        max-width: 800px;
+        max-width: 1400px;
         margin: 0 auto;
         text-align: center;
         display: flex;
@@ -186,30 +186,31 @@ $desktop: 1200px;
     // Resource Cards
     .resource-cards {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(300px, 1fr));
         gap: 1.25rem;
         width: 100%;
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 2rem auto 6rem;
-        padding: 0 1rem;
+        padding: 0 1.5rem;
 
         @media (max-width: $desktop) {
-            grid-template-columns: repeat(2, 1fr);
-            max-width: 800px;
+            grid-template-columns: repeat(2, minmax(300px, 1fr));
+            max-width: 1000px;
         }
 
         @media (max-width: $tablet) {
-            grid-template-columns: 1fr;
-            max-width: 400px;
+            grid-template-columns: minmax(280px, 1fr);
+            max-width: 500px;
             margin: 1.5rem auto 5rem;
             gap: 1rem;
+            padding: 0 1rem;
         }
     }
 
     .resource-card {
         display: flex;
         align-items: center;
-        padding: 1.25rem;
+        padding: 1.5rem;
         background: white;
         border-radius: 1rem;
         border: 1px solid #dadce0;
@@ -219,7 +220,7 @@ $desktop: 1200px;
         overflow: hidden;
 
         @media (max-width: $mobile) {
-            padding: 1rem;
+            padding: 1.25rem;
         }
 
         &::before {
@@ -284,13 +285,18 @@ $desktop: 1200px;
         &__content {
             flex: 1;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
 
             h3 {
                 font-size: clamp(0.875rem, 1.5vw, 1rem);
                 color: #202124;
-                margin-bottom: 0.25rem;
                 font-weight: 500;
                 transition: color 0.2s ease;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             p {
@@ -298,9 +304,13 @@ $desktop: 1200px;
                 color: #5f6368;
                 margin: 0;
                 line-height: 1.4;
-                white-space: nowrap;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                max-height: 2.8em;
+                word-wrap: break-word;
             }
         }
     }
