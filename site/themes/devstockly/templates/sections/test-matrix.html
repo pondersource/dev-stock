@@ -19,7 +19,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="downloads-grid">
         <a href="./artifacts/bundles/ocm-tests-nextcloud.zip" class="platform-card" download>
           <div class="platform-icon">
@@ -33,7 +33,7 @@
             <i class="fas fa-download"></i>
           </div>
         </a>
-        
+
         <a href="./artifacts/bundles/ocm-tests-owncloud.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/owncloud.svg" alt="ownCloud Logo">
@@ -46,7 +46,7 @@
             <i class="fas fa-download"></i>
           </div>
         </a>
-        
+
         <a href="./artifacts/bundles/ocm-tests-ocis.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/ocis.png" alt="oCIS Logo">
@@ -59,7 +59,7 @@
             <i class="fas fa-download"></i>
           </div>
         </a>
-        
+
         <a href="./artifacts/bundles/ocm-tests-cernbox.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/cernbox.svg" alt="CERNBox Logo">
@@ -72,7 +72,7 @@
             <i class="fas fa-download"></i>
           </div>
         </a>
-        
+
         <a href="./artifacts/bundles/ocm-tests-seafile.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/seafile.svg" alt="Seafile Logo">
@@ -129,13 +129,27 @@
 
     <!-- Matrix Container -->
     <div id="compatibilityMatrix" class="matrix-container">
-      <div class="matrix-toolbar">
-        <div class="toolbar-right">
+      <div class="matrix-header-bar">
+        <div class="matrix-search-section">
+          <div class="matrix-search">
+            <div class="search-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <input type="text" placeholder="Filter platforms..." class="matrix-filter">
+            <button class="search-clear" type="button" aria-label="Clear search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="matrix-divider"></div>
+        <div class="matrix-actions">
           <div class="status-legend"></div>
         </div>
       </div>
-      
-      <div class="matrix-content"></div>
+
+      <div class="matrix-content">
+        <!-- Dynamic content will be inserted here -->
+      </div>
     </div>
   </div>
 </section>

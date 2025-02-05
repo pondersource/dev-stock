@@ -15,7 +15,91 @@ export class CompatibilityMatrix {
         this.workflowStatuses = null;
         this.overlay = new TestOverlay();
         this.testCategories = config.categories;
+
+        // Initialize search functionality
+        this.initializeSearch();
+
         console.log('CompatibilityMatrix: Constructor completed');
+    }
+
+    initializeSearch() {
+        const searchInput = this.matrixContainer.querySelector('.matrix-filter');
+        const clearButton = this.matrixContainer.querySelector('.search-clear');
+
+        if (!searchInput) {
+            console.warn('CompatibilityMatrix: Search input not found');
+            return;
+        }
+
+        // Handle input changes
+        searchInput.addEventListener('input', (e) => {
+            this.handleSearch(e.target.value);
+            this.toggleClearButton(e.target.value);
+        });
+
+        // Handle clear button
+        if (clearButton) {
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                this.handleSearch('');
+                this.toggleClearButton('');
+                searchInput.focus();
+            });
+        }
+
+        console.log('CompatibilityMatrix: Search initialized');
+    }
+
+    toggleClearButton(value) {
+        const clearButton = this.matrixContainer.querySelector('.search-clear');
+        if (clearButton) {
+            clearButton.classList.toggle('visible', value.length > 0);
+        }
+    }
+
+    handleSearch(query) {
+        const searchTerm = query.toLowerCase().trim();
+        console.log('CompatibilityMatrix: Searching for:', searchTerm);
+
+        const sections = this.matrixContainer.querySelectorAll('.matrix-section');
+        sections.forEach(section => {
+            let hasVisibleContent = false;
+            const isAuthSection = section.id === 'auth-tests';
+
+            if (isAuthSection) {
+                // For auth-tests section, search in column headers
+                const headers = Array.from(section.querySelectorAll('th'));
+                headers.forEach((header, index) => {
+                    if (index === 0) return; // Skip corner header
+                    const headerText = header.querySelector('.platform-header-content span')?.textContent.toLowerCase() || '';
+                    const headerMatches = headerText.includes(searchTerm);
+
+                    // Show/hide column header and corresponding cells
+                    header.style.display = headerMatches || !searchTerm ? '' : 'none';
+                    const cells = section.querySelectorAll(`tbody tr td:nth-child(${index + 1})`);
+                    cells.forEach(cell => {
+                        cell.style.display = headerMatches || !searchTerm ? '' : 'none';
+                    });
+
+                    if (headerMatches) hasVisibleContent = true;
+                });
+            } else {
+                // For other sections, search in row headers
+                const rows = Array.from(section.querySelectorAll('tbody tr'));
+                rows.forEach(row => {
+                    const rowHeader = row.querySelector('td:first-child .platform-header-content span');
+                    const rowHeaderText = rowHeader?.textContent.toLowerCase() || '';
+                    const rowMatches = rowHeaderText.includes(searchTerm);
+
+                    // Show/hide row based on match
+                    row.style.display = rowMatches || !searchTerm ? '' : 'none';
+                    if (rowMatches) hasVisibleContent = true;
+                });
+            }
+
+            // Show/hide entire section based on matches
+            section.style.display = hasVisibleContent || !searchTerm ? '' : 'none';
+        });
     }
 
     async init() {
