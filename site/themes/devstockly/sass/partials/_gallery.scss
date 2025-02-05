@@ -479,35 +479,6 @@
     }
 }
 
-.platform-logo {
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-md);
-    background: var(--bg-alt);
-    transition: all 0.3s ease;
-    
-    img {
-        max-width: 80%;
-        max-height: 80%;
-        transition: transform 0.3s ease;
-        
-        &[alt="CERNBox Logo"] {
-            background: black;
-            padding: 8px;
-            border-radius: var(--radius-md);
-        }
-    }
-    
-    &:hover {
-        img {
-            transform: scale(1.2);
-        }
-    }
-}
-
 // Smooth scroll behavior
 html {
     scroll-behavior: smooth;
