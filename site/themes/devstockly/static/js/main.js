@@ -3,8 +3,9 @@ import { CompatibilityMatrix } from './components/CompatibilityMatrix.js';
 import { config } from './config.js';
 import { ErrorHandler } from './utils/ErrorHandler.js';
 import { StateManager } from './utils/StateManager.js';
-import { EventManager, DOMManager, throttle } from './utils/Performance.js';
+import { EventManager, DOMManager } from './utils/Performance.js';
 import { initPartnersTabSwitching } from './sections/partners.js';
+import { initHeroSection } from './sections/hero.js';
 
 class App {
     constructor() {
@@ -16,10 +17,11 @@ class App {
         });
         this.errorHandler = new ErrorHandler();
         this.eventManager = new EventManager();
-        
+
         // Components
+        this.heroSection = null;
         this.matrix = null;
-        
+
         // Initialize error handling
         this.setupErrorHandling();
     }
@@ -60,53 +62,12 @@ class App {
     }
 
     async initComponents() {
+        // Initialize hero section
+        this.heroSection = initHeroSection();
+        this.heroSection.init();
+
         this.matrix = new CompatibilityMatrix();
         await this.matrix.init();
-    }
-
-    setupEventListeners() {
-        // Explore button scroll handler
-        const exploreBtn = DOMManager.getElement('exploreBtn');
-        if (exploreBtn) {
-            this.eventManager.addEvent(exploreBtn, 'click', () => {
-                const mainContent = DOMManager.getElement('infoSection');
-                mainContent?.scrollIntoView({ behavior: 'smooth' });
-            });
-        }
-
-        // Scroll down button handler
-        const scrollDown = DOMManager.getElement('scrollDown');
-        if (scrollDown) {
-            this.eventManager.addEvent(scrollDown, 'click', () => {
-                window.scrollTo({
-                    top: document.documentElement.scrollHeight,
-                    behavior: 'smooth'
-                });
-            });
-        }
-
-        // Parallax effect
-        this.setupParallax();
-    }
-
-    setupParallax() {
-        const handleParallax = throttle(() => {
-            const scrolled = window.pageYOffset;
-            const parallaxElements = document.querySelectorAll('[data-parallax]');
-            
-            DOMManager.batchUpdate(
-                Array.from(parallaxElements).map(element => ({
-                    id: element.id,
-                    updates: {
-                        style: {
-                            transform: `translateY(${scrolled * parseFloat(element.dataset.parallax)}px)`
-                        }
-                    }
-                }))
-            );
-        }, 16); // ~60fps
-
-        this.eventManager.addEvent(window, 'scroll', handleParallax, { passive: true });
     }
 
     async init() {
@@ -123,7 +84,7 @@ class App {
             if (!response.ok) {
                 throw new Error(`Failed to load manifest: ${response.status}`);
             }
-            
+
             const data = await response.json();
             if (!data.videos || !Array.isArray(data.videos)) {
                 throw new Error('Invalid manifest format');
@@ -132,24 +93,21 @@ class App {
             // Initialize components
             await this.initComponents();
 
-            // Setup event listeners
-            this.setupEventListeners();
-
             // Render matrix
             await this.matrix.render();
 
-            this.state.setState({ 
-                initialized: true, 
-                loading: false 
+            this.state.setState({
+                initialized: true,
+                loading: false
             }, { persist: true });
 
             console.log('Application initialized successfully');
 
         } catch (error) {
             const strategy = this.errorHandler.handleError(error, ErrorHandler.ERROR_TYPES.INITIALIZATION);
-            this.state.setState({ 
-                error: error.message, 
-                loading: false 
+            this.state.setState({
+                error: error.message,
+                loading: false
             });
             this.handleErrorStrategy(strategy);
         }
@@ -191,7 +149,12 @@ class App {
         this.eventManager.removeAll();
         DOMManager.clearCache();
         this.state.reset();
-        
+
+        if (this.heroSection) {
+            this.heroSection.dispose();
+            this.heroSection = null;
+        }
+
         if (this.matrix) {
             this.matrix.dispose?.();
             this.matrix = null;
@@ -213,21 +176,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.addEventListener('DOMContentLoaded', () => {
     const downloadBtn = document.getElementById('downloadBtn');
     const downloadMenu = document.getElementById('downloadMenu');
-    
+
     if (downloadBtn && downloadMenu) {
         // Toggle menu on button click
         downloadBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             downloadMenu.classList.toggle('active');
         });
-        
+
         // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!downloadMenu.contains(e.target) && !downloadBtn.contains(e.target)) {
                 downloadMenu.classList.remove('active');
             }
         });
-        
+
         // Prevent menu from closing when clicking inside
         downloadMenu.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -235,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Initialize partners tab switching
     initPartnersTabSwitching();
 });

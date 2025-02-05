@@ -58,10 +58,10 @@ export class EventManager {
     }
 
     addEvent(element, event, handler, options = {}) {
-        const optimizedHandler = options.debounce ? 
-            debounce(handler, options.debounce) : 
-            options.throttle ? 
-                throttle(handler, options.throttle) : 
+        const optimizedHandler = options.debounce ?
+            debounce(handler, options.debounce) :
+            options.throttle ?
+                throttle(handler, options.throttle) :
                 handler;
 
         element.addEventListener(event, optimizedHandler, {
@@ -90,4 +90,4 @@ export class EventManager {
         });
         this.handlers.clear();
     }
-} 
+}
