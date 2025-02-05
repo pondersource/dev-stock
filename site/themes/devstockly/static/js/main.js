@@ -4,6 +4,7 @@ import { config } from './config.js';
 import { ErrorHandler } from './utils/ErrorHandler.js';
 import { StateManager } from './utils/StateManager.js';
 import { EventManager, DOMManager, throttle } from './utils/Performance.js';
+import { initPartnersTabSwitching } from './sections/partners.js';
 
 class App {
     constructor() {
@@ -232,4 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
         });
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize partners tab switching
+    initPartnersTabSwitching();
 });
