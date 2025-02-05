@@ -308,12 +308,12 @@
                     transition: transform 0.3s ease;
                     filter: grayscale(100%);
                     opacity: 0.7;
+                }
 
-                    &[alt="CERNBox Logo"] {
-                        background: #202124;
-                        padding: 12px;
-                        border-radius: 8px;
-                    }
+                img[src*="cernbox"] {
+                    background: #202124;
+                    padding: 12px;
+                    border-radius: 8px;
                 }
 
                 &:hover {

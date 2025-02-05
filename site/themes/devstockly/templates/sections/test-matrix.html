@@ -1,96 +1,141 @@
 <section class="test-matrix-section" id="testMatrix">
   <div class="container">
     <div class="matrix-header">
+      <span class="section-badge">Test Results</span>
       <h2>OCM Compatibility Matrix</h2>
       <p>Explore cross-platform compatibility test results and detailed recordings</p>
     </div>
 
     <!-- Quick Downloads -->
-    <div class="quick-downloads">
+    <div class="downloads-section">
       <div class="downloads-header">
-        <h3>Quick Downloads</h3>
-        <p>Download test results filtered by platform or type</p>
+        <div class="downloads-header-content">
+          <div class="icon-wrapper">
+            <i class="fas fa-cloud-download-alt"></i>
+          </div>
+          <div class="text-content">
+            <h3>Quick Downloads</h3>
+            <p>Access platform-specific test results and documentation</p>
+          </div>
+        </div>
       </div>
+      
       <div class="downloads-grid">
-        <a href="./artifacts/bundles/ocm-tests-nextcloud.zip" class="download-card" download>
+        <a href="./artifacts/bundles/ocm-tests-nextcloud.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/nextcloud.svg" alt="Nextcloud Logo">
           </div>
-          <span>Nextcloud</span>
+          <div class="platform-info">
+            <span class="platform-name">Nextcloud</span>
+            <span class="download-size">Download Bundle</span>
+          </div>
+          <div class="download-icon">
+            <i class="fas fa-download"></i>
+          </div>
         </a>
-        <a href="./artifacts/bundles/ocm-tests-owncloud.zip" class="download-card" download>
+        
+        <a href="./artifacts/bundles/ocm-tests-owncloud.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/owncloud.svg" alt="ownCloud Logo">
           </div>
-          <span>ownCloud</span>
+          <div class="platform-info">
+            <span class="platform-name">ownCloud</span>
+            <span class="download-size">Download Bundle</span>
+          </div>
+          <div class="download-icon">
+            <i class="fas fa-download"></i>
+          </div>
         </a>
-        <a href="./artifacts/bundles/ocm-tests-ocis.zip" class="download-card" download>
+        
+        <a href="./artifacts/bundles/ocm-tests-ocis.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/ocis.png" alt="oCIS Logo">
           </div>
-          <span>oCIS</span>
-        </a>
-        <a href="./artifacts/bundles/ocm-tests-cernbox.zip" class="download-card" download>
-          <div class="platform-icon">
-            <img src="./images/platforms/cernbox.png" alt="CERNBox Logo">
+          <div class="platform-info">
+            <span class="platform-name">oCIS</span>
+            <span class="download-size">Download Bundle</span>
           </div>
-          <span>CERNBox</span>
+          <div class="download-icon">
+            <i class="fas fa-download"></i>
+          </div>
         </a>
-        <a href="./artifacts/bundles/ocm-tests-seafile.zip" class="download-card" download>
+        
+        <a href="./artifacts/bundles/ocm-tests-cernbox.zip" class="platform-card" download>
+          <div class="platform-icon">
+            <img src="./images/platforms/cernbox.svg" alt="CERNBox Logo">
+          </div>
+          <div class="platform-info">
+            <span class="platform-name">CERNBox</span>
+            <span class="download-size">Download Bundle</span>
+          </div>
+          <div class="download-icon">
+            <i class="fas fa-download"></i>
+          </div>
+        </a>
+        
+        <a href="./artifacts/bundles/ocm-tests-seafile.zip" class="platform-card" download>
           <div class="platform-icon">
             <img src="./images/platforms/seafile.svg" alt="Seafile Logo">
           </div>
-          <span>Seafile</span>
+          <div class="platform-info">
+            <span class="platform-name">Seafile</span>
+            <span class="download-size">Download Bundle</span>
+          </div>
+          <div class="download-icon">
+            <i class="fas fa-download"></i>
+          </div>
         </a>
       </div>
     </div>
 
-    <!-- Matrix Instructions -->
-    <div class="matrix-instructions">
-      <div class="instruction-content">
-        <div class="instruction-header">
-          <div class="header-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-          </div>
-          <div>
-            <span class="instruction-badge">Guide</span>
-            <h3>Understanding Test Results</h3>
-            <p>Follow these steps to explore the compatibility matrix</p>
+    <!-- Matrix Guide -->
+    <div class="matrix-guide">
+      <div class="guide-header">
+        <div class="guide-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="guide-title">
+          <span class="guide-badge">Interactive Guide</span>
+          <h3>How to Use the Matrix</h3>
+        </div>
+      </div>
+
+      <div class="guide-steps">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h4>Select Platforms</h4>
+            <p>Choose source and target platforms from the interactive matrix below</p>
           </div>
         </div>
 
-        <div class="instruction-steps">
-          <div class="step">
-            <div class="step-marker">1</div>
-            <div class="step-content">
-              <h4>Select Platform</h4>
-              <p>Choose source and target platforms from the matrix to view specific test results</p>
-            </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h4>View Results</h4>
+            <p>Click on any cell to see detailed test information and status</p>
           </div>
-          <div class="step">
-            <div class="step-marker">2</div>
-            <div class="step-content">
-              <h4>View Status</h4>
-              <p>Click on any status indicator to see detailed test information and recordings</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-marker">3</div>
-            <div class="step-content">
-              <h4>Analyze Results</h4>
-              <p>Review test steps, watch recordings, and download artifacts for deeper analysis</p>
-            </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h4>Analyze Data</h4>
+            <p>Access comprehensive test reports, logs, and video recordings</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Matrix Container -->
-    <div class="matrix-container">
-      <div id="compatibilityMatrix"></div>
+    <div id="compatibilityMatrix" class="matrix-container">
+      <div class="matrix-toolbar">
+        <div class="toolbar-right">
+          <div class="status-legend"></div>
+        </div>
+      </div>
+      
+      <div class="matrix-content"></div>
     </div>
   </div>
 </section>

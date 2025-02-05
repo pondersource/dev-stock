@@ -24,11 +24,24 @@
         padding: 0 2rem;
     }
 
-    // Section Header Styling
+    // Section Header
     .matrix-header {
         text-align: center;
         margin-bottom: 4rem;
         position: relative;
+
+        .section-badge {
+            display: inline-block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a73e8;
+            background: rgba(26, 115, 232, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         &::after {
             content: '';
@@ -63,72 +76,111 @@
         }
     }
 
-    // Quick Downloads Section
-    .quick-downloads {
+    // Downloads Section
+    .downloads-section {
         background: white;
         border-radius: 1.25rem;
-        padding: 2rem;
+        padding: 2.5rem;
         margin-bottom: 3rem;
-        border: 1px solid var(--color-border);
-        box-shadow: var(--shadow-md);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-        &:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
+        border: 1px solid #dadce0;
+        box-shadow: 0 4px 6px rgba(60, 64, 67, 0.05);
 
         .downloads-header {
-            text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
 
-            h3 {
-                font-size: 1.5rem;
-                color: var(--color-text);
-                margin-bottom: 0.75rem;
-                font-weight: 500;
-            }
+            &-content {
+                display: flex;
+                align-items: center;
+                gap: 1.5rem;
+                max-width: 800px;
+                margin: 0 auto;
 
-            p {
-                color: var(--color-text-muted);
-                font-size: 1rem;
+                .icon-wrapper {
+                    width: 48px;
+                    height: 48px;
+                    background: linear-gradient(45deg, #1a73e8, #34a853);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 1.5rem;
+                    flex-shrink: 0;
+                }
+
+                .text-content {
+                    h3 {
+                        font-size: 1.75rem;
+                        color: #202124;
+                        margin-bottom: 0.5rem;
+                        font-weight: 500;
+                    }
+
+                    p {
+                        color: #5f6368;
+                        font-size: 1.1rem;
+                        line-height: 1.5;
+                    }
+                }
             }
         }
 
         .downloads-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             padding: 1rem;
 
-            .download-card {
+            .platform-card {
                 display: flex;
-                flex-direction: column;
                 align-items: center;
-                padding: 1.5rem;
-                background: var(--color-surface);
+                padding: 1.25rem;
+                background: #f8f9fa;
                 border-radius: 1rem;
-                border: 1px solid var(--color-border);
+                border: 1px solid #dadce0;
                 transition: all 0.3s ease;
                 text-decoration: none;
-                color: var(--color-text);
+                color: #202124;
+                position: relative;
+                overflow: hidden;
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 3px;
+                    background: linear-gradient(90deg, #1a73e8, #34a853);
+                    opacity: 0;
+                    transition: opacity 0.3s ease;
+                }
 
                 &:hover {
                     background: white;
                     transform: translateY(-3px);
-                    box-shadow: var(--shadow-md);
-                    border-color: var(--color-primary);
+                    box-shadow: 0 12px 24px rgba(60, 64, 67, 0.15);
+                    border-color: #1a73e8;
+
+                    &::before {
+                        opacity: 1;
+                    }
 
                     .platform-icon img {
                         transform: scale(1.1);
                         filter: none;
                     }
+
+                    .download-icon {
+                        background: #1a73e8;
+                        color: white;
+                    }
                 }
 
                 .platform-icon {
-                    width: 48px;
-                    height: 48px;
-                    margin-bottom: 1rem;
+                    width: 40px;
+                    height: 40px;
+                    margin-right: 1rem;
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -139,101 +191,148 @@
                         transition: all 0.3s ease;
                         filter: grayscale(30%);
                     }
+
+                    img[src*="cernbox"] {
+                        background: #202124;
+                        padding: 6px;
+                        border-radius: 8px;
+                    }
                 }
 
-                span {
-                    font-size: 0.95rem;
-                    font-weight: 500;
+                .platform-info {
+                    flex: 1;
+
+                    .platform-name {
+                        display: block;
+                        font-weight: 500;
+                        font-size: 1rem;
+                        margin-bottom: 0.25rem;
+                    }
+
+                    .download-size {
+                        display: block;
+                        font-size: 0.875rem;
+                        color: #5f6368;
+                    }
+                }
+
+                .download-icon {
+                    width: 32px;
+                    height: 32px;
+                    background: #f1f3f4;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #5f6368;
+                    transition: all 0.3s ease;
                 }
             }
         }
     }
 
-    // Matrix Instructions
-    .matrix-instructions {
+    // Matrix Guide
+    .matrix-guide {
         background: white;
         border-radius: 1.25rem;
         padding: 2.5rem;
         margin-bottom: 3rem;
-        border: 1px solid var(--color-border);
-        box-shadow: var(--shadow-md);
+        border: 1px solid #dadce0;
+        box-shadow: 0 4px 6px rgba(60, 64, 67, 0.05);
 
-        .instruction-content {
-            max-width: 900px;
-            margin: 0 auto;
+        .guide-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
 
-            .instruction-header {
+            .guide-icon {
+                width: 48px;
+                height: 48px;
+                background: linear-gradient(45deg, #1a73e8, #34a853);
+                border-radius: 12px;
                 display: flex;
-                align-items: flex-start;
-                gap: 2rem;
-                margin-bottom: 3rem;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+            }
 
-                .header-icon {
-                    width: 48px;
-                    height: 48px;
-                    flex-shrink: 0;
-                    color: var(--color-primary);
-                }
-
-                .instruction-badge {
+            .guide-title {
+                .guide-badge {
                     display: inline-block;
                     font-size: 0.875rem;
                     font-weight: 500;
-                    color: var(--color-primary);
+                    color: #1a73e8;
                     background: rgba(26, 115, 232, 0.1);
                     padding: 0.25rem 0.75rem;
                     border-radius: 100px;
-                    margin-bottom: 0.75rem;
+                    margin-bottom: 0.5rem;
                 }
 
                 h3 {
                     font-size: 1.75rem;
-                    color: var(--color-text);
-                    margin-bottom: 0.75rem;
-                }
-
-                p {
-                    color: var(--color-text-muted);
-                    font-size: 1rem;
+                    color: #202124;
+                    font-weight: 500;
                 }
             }
+        }
 
-            .instruction-steps {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 2rem;
+        .guide-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
 
-                .step {
-                    display: flex;
-                    gap: 1rem;
-                    align-items: flex-start;
+            .step-card {
+                display: flex;
+                gap: 1rem;
+                align-items: flex-start;
+                padding: 1.5rem;
+                background: #f8f9fa;
+                border-radius: 1rem;
+                border: 1px solid #dadce0;
+                transition: all 0.3s ease;
 
-                    .step-marker {
-                        width: 32px;
-                        height: 32px;
-                        background: linear-gradient(45deg, #1a73e8, #34a853);
+                &:hover {
+                    background: white;
+                    transform: translateY(-3px);
+                    box-shadow: 0 12px 24px rgba(60, 64, 67, 0.15);
+                    border-color: #1a73e8;
+
+                    .step-number {
+                        background: #1a73e8;
                         color: white;
-                        border-radius: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        font-weight: 600;
-                        flex-shrink: 0;
+                    }
+                }
+
+                .step-number {
+                    width: 40px;
+                    height: 40px;
+                    background: #f1f3f4;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: 600;
+                    color: #1a73e8;
+                    font-size: 1.125rem;
+                    transition: all 0.3s ease;
+                }
+
+                .step-content {
+                    flex: 1;
+
+                    h4 {
+                        font-size: 1.125rem;
+                        color: #202124;
+                        margin-bottom: 0.5rem;
+                        font-weight: 500;
                     }
 
-                    .step-content {
-                        h4 {
-                            font-size: 1.1rem;
-                            color: var(--color-text);
-                            margin-bottom: 0.5rem;
-                            font-weight: 500;
-                        }
-
-                        p {
-                            color: var(--color-text-muted);
-                            font-size: 0.95rem;
-                            line-height: 1.6;
-                        }
+                    p {
+                        color: #5f6368;
+                        font-size: 0.95rem;
+                        line-height: 1.6;
                     }
                 }
             }
@@ -245,77 +344,157 @@
         background: white;
         border-radius: 1.25rem;
         padding: 2rem;
-        border: 1px solid var(--color-border);
-        box-shadow: var(--shadow-md);
+        border: 1px solid #dadce0;
+        box-shadow: 0 4px 6px rgba(60, 64, 67, 0.05);
 
-        #compatibilityMatrix {
+        .matrix-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dadce0;
+        }
+
+        .matrix-content {
+            min-height: 400px;
+
             .compatibility-table {
                 width: 100%;
                 border-collapse: separate;
                 border-spacing: 0;
-                margin: 1rem 0;
+                margin-top: 1rem;
 
                 th,
                 td {
                     padding: 1rem;
                     text-align: center;
-                    border: 1px solid var(--color-border);
+                    border: 1px solid #dadce0;
+                    background: white;
+                    position: relative;
+
+                    &:first-child {
+                        text-align: left;
+                        background: #f8f9fa;
+                    }
                 }
 
                 th {
-                    background: var(--color-surface);
+                    background: #f8f9fa;
                     font-weight: 500;
-                    color: var(--color-text);
+                    color: #202124;
                     position: sticky;
                     top: 0;
                     z-index: 10;
+                }
 
-                    &:first-child {
-                        text-align: left;
+                .corner-header {
+                    font-size: 0.875rem;
+                    color: #5f6368;
+                }
+
+                .platform-header {
+                    .platform-header-content {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.75rem;
+
+                        img {
+                            width: 24px;
+                            height: 24px;
+                            object-fit: contain;
+                        }
+
+                        span {
+                            font-weight: 500;
+                        }
                     }
                 }
 
-                td {
-                    &:first-child {
-                        text-align: left;
-                        font-weight: 500;
-                        background: var(--color-surface);
+                .row-header {
+                    .platform-header-content {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+
+                        img {
+                            width: 24px;
+                            height: 24px;
+                            object-fit: contain;
+                        }
+
+                        span {
+                            font-weight: 500;
+                        }
                     }
                 }
 
-                .status-button {
-                    background: none;
-                    border: none;
-                    padding: 0.5rem;
-                    cursor: pointer;
-                    transition: transform 0.2s ease;
+                .status-cell {
+                    .status-button {
+                        background: none;
+                        border: none;
+                        padding: 0.5rem;
+                        cursor: pointer;
+                        transition: transform 0.2s ease;
+                        margin: 0 auto;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
 
-                    &:hover {
-                        transform: scale(1.15);
-                    }
+                        i {
+                            font-size: 1.25rem;
+                        }
 
-                    i {
-                        font-size: 1.25rem;
+                        &:hover {
+                            transform: scale(1.15);
+                        }
                     }
                 }
             }
+        }
 
-            .matrix-section {
-                margin-bottom: 3rem;
+        // Matrix Error State
+        .matrix-error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
 
-                .matrix-subtitle {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
+            .error-content {
+                text-align: center;
+                color: #d93025;
+
+                i {
+                    font-size: 2.5rem;
+                    margin-bottom: 1rem;
+                }
+
+                p {
+                    font-size: 1.1rem;
                     margin-bottom: 1.5rem;
-                    padding-bottom: 1rem;
-                    border-bottom: 1px solid var(--color-border);
-                    color: var(--color-text);
-                    font-size: 1.25rem;
-                    font-weight: 500;
+                }
+
+                .retry-btn {
+                    background: none;
+                    border: 1px solid currentColor;
+                    color: #1a73e8;
+                    padding: 0.5rem 1rem;
+                    border-radius: 0.5rem;
+                    font-size: 0.875rem;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background: rgba(26, 115, 232, 0.1);
+                    }
 
                     i {
-                        color: var(--color-primary);
+                        font-size: 1rem;
+                        margin: 0;
                     }
                 }
             }
@@ -325,77 +504,42 @@
     // Status Legend
     .status-legend {
         display: flex;
+        gap: 1rem;
         flex-wrap: wrap;
-        gap: 1.5rem;
-        justify-content: center;
-        margin: 2rem 0;
-        padding: 1rem;
-        background: var(--color-surface);
-        border-radius: 0.75rem;
 
         .legend-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
-            color: var(--color-text-muted);
+            color: #5f6368;
 
             i {
                 font-size: 1rem;
             }
         }
     }
+}
 
-    // Responsive Design
-    @media (max-width: 768px) {
+// Responsive Design
+@media (max-width: 768px) {
+    .test-matrix-section {
         padding: 4rem 0;
 
         .matrix-header {
-            .matrix-title-group {
-                h2 {
-                    font-size: 2rem;
-                }
-
-                p {
-                    font-size: 1rem;
-                }
+            h2 {
+                font-size: 2.5rem;
             }
         }
 
-        .quick-downloads {
-            .downloads-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            }
-        }
-
-        .matrix-instructions {
-            padding: 1.5rem;
-
-            .instruction-steps {
-                grid-template-columns: 1fr;
-            }
-        }
-
+        .downloads-section,
+        .matrix-guide,
         .matrix-container {
-            padding: 1rem;
-            overflow-x: auto;
-
-            #compatibilityMatrix {
-                .compatibility-table {
-
-                    th,
-                    td {
-                        padding: 0.75rem;
-                        font-size: 0.875rem;
-                    }
-                }
-            }
+            padding: 1.5rem;
         }
 
-        .status-legend {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
+        .guide-steps {
+            grid-template-columns: 1fr;
         }
     }
 }
@@ -404,14 +548,14 @@
 [data-theme="dark"] .test-matrix-section {
     background: var(--color-bg);
 
-    .quick-downloads,
-    .matrix-instructions,
+    .downloads-section,
+    .matrix-guide,
     .matrix-container {
         background: var(--color-surface);
         border-color: var(--color-border);
     }
 
-    .download-card {
+    .platform-card {
         background: var(--color-bg) !important;
 
         &:hover {
@@ -419,19 +563,13 @@
         }
     }
 
-    .compatibility-table {
+    .guide-steps {
+        .step-card {
+            background: var(--color-bg) !important;
 
-        th,
-        td {
-            border-color: var(--color-border);
-        }
-
-        th {
-            background: var(--color-surface-hover);
-        }
-
-        td:first-child {
-            background: var(--color-surface-hover);
+            &:hover {
+                background: var(--color-surface-hover) !important;
+            }
         }
     }
 }
