@@ -1,0 +1,437 @@
+.test-matrix-section {
+    padding: 6rem 0;
+    background: #f8f9fa;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg,
+                transparent,
+                #e0e0e0 20%,
+                #e0e0e0 80%,
+                transparent);
+    }
+
+    .container {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    // Section Header Styling
+    .matrix-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #1a73e8, #34a853);
+            border-radius: 2px;
+        }
+
+        h2 {
+            font-size: 3rem;
+            color: #1f1f1f;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(45deg, #1a73e8, #34a853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #5f6368;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+    }
+
+    // Quick Downloads Section
+    .quick-downloads {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .downloads-header {
+            text-align: center;
+            margin-bottom: 2rem;
+
+            h3 {
+                font-size: 1.5rem;
+                color: var(--color-text);
+                margin-bottom: 0.75rem;
+                font-weight: 500;
+            }
+
+            p {
+                color: var(--color-text-muted);
+                font-size: 1rem;
+            }
+        }
+
+        .downloads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+
+            .download-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 1.5rem;
+                background: var(--color-surface);
+                border-radius: 1rem;
+                border: 1px solid var(--color-border);
+                transition: all 0.3s ease;
+                text-decoration: none;
+                color: var(--color-text);
+
+                &:hover {
+                    background: white;
+                    transform: translateY(-3px);
+                    box-shadow: var(--shadow-md);
+                    border-color: var(--color-primary);
+
+                    .platform-icon img {
+                        transform: scale(1.1);
+                        filter: none;
+                    }
+                }
+
+                .platform-icon {
+                    width: 48px;
+                    height: 48px;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    img {
+                        max-width: 100%;
+                        max-height: 100%;
+                        transition: all 0.3s ease;
+                        filter: grayscale(30%);
+                    }
+                }
+
+                span {
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+
+    // Matrix Instructions
+    .matrix-instructions {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 2.5rem;
+        margin-bottom: 3rem;
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+
+        .instruction-content {
+            max-width: 900px;
+            margin: 0 auto;
+
+            .instruction-header {
+                display: flex;
+                align-items: flex-start;
+                gap: 2rem;
+                margin-bottom: 3rem;
+
+                .header-icon {
+                    width: 48px;
+                    height: 48px;
+                    flex-shrink: 0;
+                    color: var(--color-primary);
+                }
+
+                .instruction-badge {
+                    display: inline-block;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: var(--color-primary);
+                    background: rgba(26, 115, 232, 0.1);
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 100px;
+                    margin-bottom: 0.75rem;
+                }
+
+                h3 {
+                    font-size: 1.75rem;
+                    color: var(--color-text);
+                    margin-bottom: 0.75rem;
+                }
+
+                p {
+                    color: var(--color-text-muted);
+                    font-size: 1rem;
+                }
+            }
+
+            .instruction-steps {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 2rem;
+
+                .step {
+                    display: flex;
+                    gap: 1rem;
+                    align-items: flex-start;
+
+                    .step-marker {
+                        width: 32px;
+                        height: 32px;
+                        background: linear-gradient(45deg, #1a73e8, #34a853);
+                        color: white;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: 600;
+                        flex-shrink: 0;
+                    }
+
+                    .step-content {
+                        h4 {
+                            font-size: 1.1rem;
+                            color: var(--color-text);
+                            margin-bottom: 0.5rem;
+                            font-weight: 500;
+                        }
+
+                        p {
+                            color: var(--color-text-muted);
+                            font-size: 0.95rem;
+                            line-height: 1.6;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Matrix Container
+    .matrix-container {
+        background: white;
+        border-radius: 1.25rem;
+        padding: 2rem;
+        border: 1px solid var(--color-border);
+        box-shadow: var(--shadow-md);
+
+        #compatibilityMatrix {
+            .compatibility-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 1rem 0;
+
+                th,
+                td {
+                    padding: 1rem;
+                    text-align: center;
+                    border: 1px solid var(--color-border);
+                }
+
+                th {
+                    background: var(--color-surface);
+                    font-weight: 500;
+                    color: var(--color-text);
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+
+                    &:first-child {
+                        text-align: left;
+                    }
+                }
+
+                td {
+                    &:first-child {
+                        text-align: left;
+                        font-weight: 500;
+                        background: var(--color-surface);
+                    }
+                }
+
+                .status-button {
+                    background: none;
+                    border: none;
+                    padding: 0.5rem;
+                    cursor: pointer;
+                    transition: transform 0.2s ease;
+
+                    &:hover {
+                        transform: scale(1.15);
+                    }
+
+                    i {
+                        font-size: 1.25rem;
+                    }
+                }
+            }
+
+            .matrix-section {
+                margin-bottom: 3rem;
+
+                .matrix-subtitle {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    margin-bottom: 1.5rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid var(--color-border);
+                    color: var(--color-text);
+                    font-size: 1.25rem;
+                    font-weight: 500;
+
+                    i {
+                        color: var(--color-primary);
+                    }
+                }
+            }
+        }
+    }
+
+    // Status Legend
+    .status-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: center;
+        margin: 2rem 0;
+        padding: 1rem;
+        background: var(--color-surface);
+        border-radius: 0.75rem;
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+
+            i {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    // Responsive Design
+    @media (max-width: 768px) {
+        padding: 4rem 0;
+
+        .matrix-header {
+            .matrix-title-group {
+                h2 {
+                    font-size: 2rem;
+                }
+
+                p {
+                    font-size: 1rem;
+                }
+            }
+        }
+
+        .quick-downloads {
+            .downloads-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+
+        .matrix-instructions {
+            padding: 1.5rem;
+
+            .instruction-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .matrix-container {
+            padding: 1rem;
+            overflow-x: auto;
+
+            #compatibilityMatrix {
+                .compatibility-table {
+
+                    th,
+                    td {
+                        padding: 0.75rem;
+                        font-size: 0.875rem;
+                    }
+                }
+            }
+        }
+
+        .status-legend {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+}
+
+// Dark Mode Styles
+[data-theme="dark"] .test-matrix-section {
+    background: var(--color-bg);
+
+    .quick-downloads,
+    .matrix-instructions,
+    .matrix-container {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+    }
+
+    .download-card {
+        background: var(--color-bg) !important;
+
+        &:hover {
+            background: var(--color-surface-hover) !important;
+        }
+    }
+
+    .compatibility-table {
+
+        th,
+        td {
+            border-color: var(--color-border);
+        }
+
+        th {
+            background: var(--color-surface-hover);
+        }
+
+        td:first-child {
+            background: var(--color-surface-hover);
+        }
+    }
+}
