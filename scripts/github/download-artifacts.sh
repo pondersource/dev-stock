@@ -204,12 +204,18 @@ fetch_workflow_artifacts() {
     artifact_count=$(echo "$artifacts_json" | jq '.total_count')
     info "Found $artifact_count artifacts for run $run_id"
     
-    # Process each artifact with size information
-    local processed_count=0
-    local downloaded_count=0
-    local video_count=0
+    # Use a temporary file to track counters across subshells
+    local counter_file
+    counter_file=$(mktemp)
+    echo "0 0 0" > "$counter_file"  # processed downloaded videos
+    
+    # Process each artifact
     echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes // 0)"' | while read -r id name size; do
-        ((processed_count++))
+        # Read current counters
+        read -r processed_count downloaded_count video_count < "$counter_file"
+        processed_count=$((processed_count + 1))
+        echo "$processed_count $downloaded_count $video_count" > "$counter_file"
+        
         info "Downloading artifact $name (ID: $id, Size: $(human_size ${size:-0})) [$processed_count/$artifact_count]"
         
         # Create a temporary directory for this artifact
@@ -225,7 +231,11 @@ fetch_workflow_artifacts() {
             rm -rf "$tmp_dir"
             continue
         fi
-        ((downloaded_count++))
+        
+        # Update downloaded counter
+        read -r processed_count downloaded_count video_count < "$counter_file"
+        downloaded_count=$((downloaded_count + 1))
+        echo "$processed_count $downloaded_count $video_count" > "$counter_file"
         
         # Get actual downloaded size and verify
         local downloaded_size
@@ -249,13 +259,16 @@ fetch_workflow_artifacts() {
         
         # Process videos with enhanced logging
         while IFS= read -r -d '' video; do
-            ((video_count++))
             if ! process_video "$video"; then
                 error "Failed to process video: $video"
                 continue
             fi
+            # Update video counter
+            read -r processed_count downloaded_count video_count < "$counter_file"
+            video_count=$((video_count + 1))
+            echo "$processed_count $downloaded_count $video_count" > "$counter_file"
             info "Successfully processed video $video_count from artifact $name"
-        done < <(find "$target_dir" -type f \( -name "*.mp4" -o -name "*.webm" \) -print0)
+        done < <(find "$target_dir" -type f -name "recording.mp4" -print0)
         
         # Cleanup
         rm -rf "$tmp_dir"
@@ -266,6 +279,10 @@ fetch_workflow_artifacts() {
             fi
         done
     done
+    
+    # Read final counter values
+    read -r processed_count downloaded_count video_count < "$counter_file"
+    rm -f "$counter_file"
     
     info "Artifact processing summary for $workflow_name:"
     info "- Processed artifacts: $processed_count"
@@ -309,6 +326,7 @@ generate_manifest() {
     echo '{"videos": []}' > "$temp_manifest_file"
     
     # Process each workflow type
+    local total_videos=0
     for workflow in "${workflow_files[@]}"; do
         # Get workflow status
         local status
@@ -326,13 +344,14 @@ generate_manifest() {
         
         if [[ -d "$workflow_dir" ]]; then
             debug "Processing artifacts for $workflow_name"
-            # Find all WebM videos and their thumbnails
+            # Find all MP4 videos and their thumbnails
             while IFS= read -r -d '' video; do
                 local rel_video="${video#site/static/}"
-                local thumbnail="${video%.webm}.avif"
+                local thumbnail="${video%.mp4}.avif"
                 local rel_thumbnail="${thumbnail#site/static/}"
                 
                 if [[ -f "$video" && -f "$thumbnail" ]]; then
+                    ((total_videos++))
                     debug "Found video/thumbnail pair: $rel_video, $rel_thumbnail"
                     # Add to manifest
                     jq --arg wf "$workflow_name" \
@@ -342,11 +361,11 @@ generate_manifest() {
                        "$temp_manifest_file" > "${temp_manifest_file}.tmp" \
                        && mv "${temp_manifest_file}.tmp" "$temp_manifest_file"
                 else
-                    warn "Missing video or thumbnail for $workflow_name"
+                    warn "Missing video or thumbnail for $workflow_name: $video"
                 fi
-            done < <(find "$workflow_dir" -type f -name "*.webm" -print0)
+            done < <(find "$workflow_dir" -type f -name "recording.mp4" -print0)
         else
-            warn "No artifacts directory found for $workflow_name"
+            debug "No artifacts directory found for $workflow_name"
         fi
     done
     
@@ -354,10 +373,7 @@ generate_manifest() {
     mv "$temp_status_file" "$status_file"
     mv "$temp_manifest_file" "$manifest"
     
-    # Verify manifest contents
-    local video_count
-    video_count=$(jq '.videos | length' "$manifest")
-    info "Generated manifest with $video_count video entries"
+    info "Generated manifest with $total_videos video entries"
     
     if [[ ! -f "$manifest" || ! -f "$status_file" ]]; then
         error "Failed to generate manifest files"
@@ -384,7 +400,10 @@ create_combined_zip() {
     local temp_dir
     temp_dir=$(mktemp -d)
     TEMP_DIRS+=("$temp_dir")
-
+    
+    # Track if we found any files to zip
+    local found_files=0
+    
     # Copy all workflow artifacts to temp directory
     for workflow in "${workflow_files[@]}"; do
         local workflow_name
@@ -395,20 +414,36 @@ create_combined_zip() {
             # Create workflow directory in temp
             mkdir -p "$temp_dir/$workflow_name"
             
-            # Copy original MP4 files
-            find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+            # Copy recording files
+            while IFS= read -r -d '' video; do
+                cp "$video" "$temp_dir/$workflow_name/"
+                ((found_files++))
+                debug "Copied $video to temp directory"
+            done < <(find "$workflow_dir" -name "recording.mp4" -print0)
         fi
     done
-
-    # Create zip file
-    (cd "$temp_dir" && zip -r "$zip_file" .)
     
-    if [[ -f "$zip_file" ]]; then
-        local zip_size
-        zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-        success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
+    if [[ $found_files -eq 0 ]]; then
+        warn "No files found to zip"
+        rm -rf "$temp_dir"
+        return 0
+    fi
+    
+    # Create parent directory if it doesn't exist
+    mkdir -p "$(dirname "$zip_file")"
+    
+    # Create zip file from temp directory
+    if (cd "$temp_dir" && zip -r "$zip_file" .); then
+        if [[ -f "$zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+            success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
+        else
+            error "Failed to create zip file"
+            return 1
+        fi
     else
-        error "Failed to create combined zip file"
+        error "Failed to create zip file"
         return 1
     fi
 }
