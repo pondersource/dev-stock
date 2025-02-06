@@ -8,7 +8,6 @@ bin/
 ./ocm
 ./reva
 ./seafile-data
-core
 temp
 server
 rd-sram

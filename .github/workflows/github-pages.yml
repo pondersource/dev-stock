@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get -qq update
-          sudo apt-get -qq install -y ffmpeg jq
+          sudo apt-get -qq install -y ffmpeg jq zip unzip
 
       - name: Download Artifacts
         env:
