@@ -411,16 +411,38 @@ generate_manifest() {
     fi
 }
 
+# Create required directories with error checking
+create_required_directories() {
+    info "Creating required directories..."
+    local -a required_dirs=(
+        "site"
+        "site/static"
+        "$ARTIFACTS_DIR"
+        "$IMAGES_DIR"
+        "$ARTIFACTS_DIR/bundles"
+    )
+    
+    for dir in "${required_dirs[@]}"; do
+        if ! mkdir -p "$dir" 2>/dev/null; then
+            error "Failed to create directory: $dir"
+            error "Current permissions: $(ls -ld "$(dirname "$dir")" 2>/dev/null || echo 'Cannot read parent directory')"
+            return 1
+        fi
+        debug "Created directory: $dir"
+    done
+    success "All required directories created successfully"
+}
+
 # Create a combined zip file of all test artifacts
 create_combined_zip() {
     info "Creating combined zip file of all test artifacts..."
     local zip_file="$ARTIFACTS_DIR/ocm-tests-all.zip"
     
     # Create parent directories first
-    mkdir -p "$(dirname "$zip_file")" || {
-        error "Failed to create directory: $(dirname "$zip_file")"
+    if ! create_required_directories; then
+        error "Failed to create required directories"
         return 1
-    }
+    fi
     
     local temp_dir
     temp_dir=$(mktemp -d)
@@ -849,17 +871,6 @@ main() {
     fi
     
     info "Downloading artifacts for commit: ${COMMIT_SHA}"
-    
-    # Create required directories with error checking
-    info "Creating required directories..."
-    for dir in "$ARTIFACTS_DIR" "$IMAGES_DIR" "$ARTIFACTS_DIR/bundles"; do
-        if ! mkdir -p "$dir" 2>/dev/null; then
-            error "Failed to create directory: $dir"
-            error "Current permissions: $(ls -ld "$(dirname "$dir")" 2>/dev/null || echo 'Cannot read parent directory')"
-            exit 1
-        fi
-    done
-    success "Directories created successfully"
     
     # Get workflow files from the local .github/workflows directory
     info "Looking for workflow files in .github/workflows..."
