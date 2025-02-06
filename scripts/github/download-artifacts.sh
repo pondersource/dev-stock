@@ -326,13 +326,15 @@ generate_manifest() {
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
     local temp_status_file="/tmp/temp_status_$$.json"
     local temp_manifest_file="/tmp/temp_manifest_$$.json"
+    local counter_file
+    counter_file=$(mktemp)
     
-    # Initialize empty JSON files
+    # Initialize empty JSON files and counter
     echo "{}" > "$temp_status_file"
     echo '{"videos": []}' > "$temp_manifest_file"
+    echo "0" > "$counter_file"  # Initialize video counter
     
     # Process each workflow type
-    local total_videos=0
     for workflow in "${workflow_files[@]}"; do
         # Get workflow status
         local status
@@ -357,7 +359,12 @@ generate_manifest() {
                 local rel_thumbnail="${thumbnail#site/static/}"
                 
                 if [[ -f "$video" && -f "$thumbnail" ]]; then
-                    ((total_videos++))
+                    # Update video counter
+                    local current_count
+                    read -r current_count < "$counter_file"
+                    current_count=$((current_count + 1))
+                    echo "$current_count" > "$counter_file"
+                    
                     debug "Found video/thumbnail pair: $rel_video, $rel_thumbnail"
                     # Add to manifest
                     jq --arg wf "$workflow_name" \
@@ -374,6 +381,11 @@ generate_manifest() {
             debug "No artifacts directory found for $workflow_name"
         fi
     done
+    
+    # Get final video count
+    local total_videos
+    read -r total_videos < "$counter_file"
+    rm -f "$counter_file"
     
     # Move the final files to their destinations
     mv "$temp_status_file" "$status_file"
@@ -544,6 +556,7 @@ create_test_type_bundles() {
         local temp_dir
         temp_dir=$(mktemp -d)
         TEMP_DIRS+=("$temp_dir")
+        local found_files=0
         
         info "Processing $type tests..."
         
@@ -556,20 +569,45 @@ create_test_type_bundles() {
                 
                 if [[ -d "$workflow_dir" ]]; then
                     mkdir -p "$temp_dir/$workflow_name"
-                    find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+                    # Copy recording files
+                    while IFS= read -r -d '' video; do
+                        cp "$video" "$temp_dir/$workflow_name/"
+                        ((found_files++))
+                        debug "Copied $video to temp directory for $type bundle"
+                    done < <(find "$workflow_dir" -name "recording.mp4" -print0)
                 fi
             fi
         done
         
+        if [[ $found_files -eq 0 ]]; then
+            warn "No files found for $type bundle"
+            rm -rf "$temp_dir"
+            continue
+        fi
+        
         # Create zip file for this test type
         local zip_file="$base_dir/ocm-tests-$type.zip"
-        (cd "$temp_dir" && zip -r "$zip_file" .)
+        mkdir -p "$(dirname "$zip_file")"
         
-        if [[ -f "$zip_file" ]]; then
-            local zip_size
-            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-            success "Created $type tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        if (cd "$temp_dir" && zip -r "$zip_file" .); then
+            if [[ -f "$zip_file" ]]; then
+                local zip_size
+                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                success "Created $type tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+            else
+                error "Failed to create zip file for $type"
+            fi
+        else
+            error "Failed to create zip file for $type"
         fi
+        
+        rm -rf "$temp_dir"
+        for i in "${!TEMP_DIRS[@]}"; do
+            if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
+                unset 'TEMP_DIRS[i]'
+                break
+            fi
+        done
     done
 }
 
@@ -588,6 +626,10 @@ create_result_bundles() {
     failed_dir=$(mktemp -d)
     TEMP_DIRS+=("$failed_dir")
     
+    # Track file counts
+    local success_count=0
+    local failed_count=0
+    
     # Process each workflow based on its status
     jq -r 'to_entries[] | "\(.key) \(.value.conclusion)"' "$status_file" | while read -r workflow status; do
         local workflow_name
@@ -603,27 +645,60 @@ create_result_bundles() {
             fi
             
             mkdir -p "$target_dir"
-            find "$workflow_dir" -name "recording.mp4" -exec cp {} "$target_dir/" \;
+            # Copy recording files
+            while IFS= read -r -d '' video; do
+                cp "$video" "$target_dir/"
+                if [[ "$status" == "success" ]]; then
+                    ((success_count++))
+                else
+                    ((failed_count++))
+                fi
+                debug "Copied $video to $(basename "$target_dir") bundle"
+            done < <(find "$workflow_dir" -name "recording.mp4" -print0)
         fi
     done
     
     # Create success/failure zip files
     for result in "success" "failed"; do
-        local source_dir
+        local source_dir count
         if [[ "$result" == "success" ]]; then
             source_dir="$success_dir"
+            count=$success_count
         else
             source_dir="$failed_dir"
+            count=$failed_count
+        fi
+        
+        if [[ $count -eq 0 ]]; then
+            warn "No files found for $result bundle"
+            continue
         fi
         
         local zip_file="$base_dir/ocm-tests-$result.zip"
-        (cd "$source_dir" && zip -r "$zip_file" .)
+        mkdir -p "$(dirname "$zip_file")"
         
-        if [[ -f "$zip_file" ]]; then
-            local zip_size
-            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-            success "Created $result tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        if (cd "$source_dir" && zip -r "$zip_file" .); then
+            if [[ -f "$zip_file" ]]; then
+                local zip_size
+                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                success "Created $result tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
+            else
+                error "Failed to create zip file for $result"
+            fi
+        else
+            error "Failed to create zip file for $result"
         fi
+    done
+    
+    # Cleanup temp directories
+    rm -rf "$success_dir" "$failed_dir"
+    for dir in "$success_dir" "$failed_dir"; do
+        for i in "${!TEMP_DIRS[@]}"; do
+            if [[ ${TEMP_DIRS[i]} = "$dir" ]]; then
+                unset 'TEMP_DIRS[i]'
+                break
+            fi
+        done
     done
 }
 
