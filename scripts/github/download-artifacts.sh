@@ -3,7 +3,7 @@
 # download-artifacts.sh
 #
 # Downloads and processes video artifacts from GitHub Actions test workflows.
-# Converts videos to AV1/WebM format and generates AVIF thumbnails.
+# Generates AVIF thumbnails.
 #
 # Key features:
 # - Ensures artifacts are from the same commit (COMMIT_SHA)
@@ -57,7 +57,7 @@ human_size() {
     if ! [[ "$size" =~ ^[0-9]+$ ]]; then
         echo "0 KiB"
         return
-    }
+    fi
     
     if ((size < 1024)); then
         echo "${size} B"
