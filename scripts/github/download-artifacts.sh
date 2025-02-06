@@ -448,6 +448,10 @@ create_combined_zip() {
     temp_dir=$(mktemp -d)
     TEMP_DIRS+=("$temp_dir")
     
+    # Create a subdirectory for the files to zip
+    local files_dir="$temp_dir/files"
+    mkdir -p "$files_dir"
+    
     # Create counter file
     local counter_file
     counter_file=$(mktemp)
@@ -461,16 +465,16 @@ create_combined_zip() {
         
         if [[ -d "$workflow_dir" ]]; then
             # Create workflow directory in temp
-            mkdir -p "$temp_dir/$workflow_name" || {
-                error "Failed to create directory: $temp_dir/$workflow_name"
+            mkdir -p "$files_dir/$workflow_name" || {
+                error "Failed to create directory: $files_dir/$workflow_name"
                 rm -f "$counter_file"
                 return 1
             }
             
             # Copy recording files
             while IFS= read -r -d '' video; do
-                if ! cp "$video" "$temp_dir/$workflow_name/"; then
-                    error "Failed to copy $video to $temp_dir/$workflow_name/"
+                if ! cp "$video" "$files_dir/$workflow_name/"; then
+                    error "Failed to copy $video to $files_dir/$workflow_name/"
                     continue
                 fi
                 local current_count
@@ -495,19 +499,26 @@ create_combined_zip() {
     
     info "Creating zip file with $found_files videos..."
     
-    # Create zip file from temp directory
-    if (cd "$temp_dir" && zip -r "$zip_file" .); then
-        if [[ -f "$zip_file" ]]; then
-            local zip_size
-            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-            success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
-            return 0
+    # Create temporary zip file first
+    local temp_zip="$temp_dir/temp.zip"
+    if (cd "$files_dir" && zip -r "$temp_zip" .); then
+        if [[ -f "$temp_zip" ]]; then
+            # Move the zip file to its final destination
+            if mv "$temp_zip" "$zip_file"; then
+                local zip_size
+                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
+                return 0
+            else
+                error "Failed to move zip file to final location"
+                return 1
+            fi
         else
-            error "Failed to create zip file: $zip_file does not exist after zip command"
+            error "Failed to create temporary zip file"
             return 1
         fi
     else
-        error "Failed to create zip file: zip command failed"
+        error "Failed to create zip file"
         return 1
     fi
 }
