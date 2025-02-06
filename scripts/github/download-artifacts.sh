@@ -274,7 +274,7 @@ fetch_workflow_artifacts() {
             video_count=$((video_count + 1))
             echo "$processed_count $downloaded_count $video_count" > "$counter_file"
             info "Successfully processed video $video_count from artifact $name"
-        done < <(find "$target_dir" -type f -name "recording.mp4" -print0)
+        done < <(find "$target_dir" -type f -name "*.mp4" ! -name "recording.mp4" -print0)
         
         # Cleanup
         rm -rf "$tmp_dir"
@@ -350,7 +350,7 @@ generate_manifest() {
         
         if [[ -d "$workflow_dir" ]]; then
             debug "Processing artifacts for $workflow_name"
-            # Find all MP4 videos and their thumbnails
+            # Find all processed MP4 videos and their thumbnails
             while IFS= read -r -d '' video; do
                 local rel_video="${video#site/static/}"
                 local thumbnail="${video%.mp4}.avif"
