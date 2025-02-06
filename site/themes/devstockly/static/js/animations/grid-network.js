@@ -1,7 +1,9 @@
 import { EventManager, throttle } from '../utils/Performance.js';
 
-// Grid Animation for hero-background that simulates OCM flows
 export function setupGridAnimation() {
+    // ----------------------------------------------------------------
+    // 1) CANVAS & CONFIG
+    // ----------------------------------------------------------------
     const canvas = document.getElementById('gridCanvas');
     if (!canvas) return;
 
@@ -9,30 +11,24 @@ export function setupGridAnimation() {
     let animationFrameId;
     const eventManager = new EventManager();
 
-    // ------------------------------------
-    // CONFIGURATION CONSTANTS
-    // ------------------------------------
-    const gridSize = 40;          // distance between grid lines
-    const nodeRadius = 5;         // radius for each permanent node
+    // -- Adjustable configuration constants --
+    const gridSize = 40;                 // distance between grid lines
+    const nodeRadius = 5;                // radius for each permanent node
+    const SIGNAL_SPEED = 0.05;           // speed in px/ms
+    const SEND_COOLDOWN = 10000;         // ms cooldown after sending
+    const TOTAL_NODES = 20;              // number of permanent nodes
 
-    // The user wants a comet-like effect:
-    //   - Head travels from 0..1 along the path
-    //   - Tail lags behind, then continues traveling until it catches up at 1
-    const tailLength = 0.5;       // fraction of path behind the head
-    const signalSpeed = 0.00005;  // smaller = slower
+    const MAX_CONCURRENT_RECEIVES = 3;   // each node can receive up to N signals at once
 
-    // We will allow the "progress" of a signal to go from [0..1 + tailLength].
-    //   headProgress = min(progress, 1)
-    //   tailProgress = max(progress - tailLength, 0)
-    //   once progress >= 1 + tailLength, we remove the signal.
-
-    const TOTAL_NODES = 20;       // number of permanent nodes
+    // The “tail only starts after head arrives” approach means each signal
+    // travels for 2 * totalLength along the path
+    // (Phase 1: head 0..totalLen, Phase 2: tail 0..totalLen)
 
     // Tail fade control: 0 = fully transparent, 1 = fully opaque
-    const TAIL_FADE_START = 0.01;  // alpha at tail
-    const TAIL_FADE_END = 1.0;    // alpha at head
+    const TAIL_FADE_START = 0.2;
+    const TAIL_FADE_END = 1.0;
 
-    // Predefined signals that get assigned randomly
+    // Predefined signals
     const signalsCatalog = [
         'GET: /.well-known/ocm (Discovery)',
         'POST: /shares (Create Share)',
@@ -42,7 +38,7 @@ export function setupGridAnimation() {
         'POST: /invite (Invite Flow)'
     ];
 
-    // Example universities/institutions across the EU
+    // Example EU institutions
     const EU_INSTITUTIONS = [
         'CERN',
         'SURF',
@@ -62,7 +58,6 @@ export function setupGridAnimation() {
         'INST Luxembourg',
         'Belnet',
     ];
-
     // Example platforms
     const PLATFORMS = ['Nextcloud', 'ownCloud', 'oCIS', 'Seafile', 'CERNBox'];
 
@@ -75,39 +70,29 @@ export function setupGridAnimation() {
         'X-ray', 'Yankee', 'Zulu'
     ];
 
-    // Store nodes and signals
+    // Data arrays
     let nodes = [];
     let signals = [];
 
-    // -----------------------------------------------------------
-    // 1) HELPER FUNCTIONS
-    // -----------------------------------------------------------
+    // ----------------------------------------------------------------
+    // 2) HELPER FUNCTIONS
+    // ----------------------------------------------------------------
     function randomColor() {
-        // e.g. random HSL color
         return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
     }
 
-    /**
-     * Return something like: "CERN - Nextcloud"
-     * or fallback: "Node Alpha"
-     */
     function getNodeName(idx) {
         if (idx < EU_INSTITUTIONS.length) {
             const institution = EU_INSTITUTIONS[idx];
             const plat = PLATFORMS[Math.floor(Math.random() * PLATFORMS.length)];
             return `${institution} - ${plat}`;
         } else {
-            const first =
-                FALLBACK_FIRST[Math.floor(Math.random() * FALLBACK_FIRST.length)];
-            const second =
-                NATO_ALPHABET[Math.floor(Math.random() * NATO_ALPHABET.length)];
+            const first = FALLBACK_FIRST[Math.floor(Math.random() * FALLBACK_FIRST.length)];
+            const second = NATO_ALPHABET[Math.floor(Math.random() * NATO_ALPHABET.length)];
             return `${first} ${second}`;
         }
     }
 
-    /**
-     * Resizing logic
-     */
     function resizeCanvas() {
         const rect = canvas.parentElement.getBoundingClientRect();
         canvas.width = rect.width * window.devicePixelRatio;
@@ -119,15 +104,19 @@ export function setupGridAnimation() {
     }
 
     /**
-     * Generate permanent nodes at random grid intersections
+     * Create permanent nodes at random grid intersections
+     * and track concurrency states:
+     *   - isSending (bool): can only send 1 at a time
+     *   - currentIncoming (count): up to MAX_CONCURRENT_RECEIVES
+     *   - nextSendAllowed (timestamp) for cooldown
+     *   - lastReceiver (track last node used as receiver)
      */
     function initNodes() {
         const cols = Math.floor(canvas.width / gridSize);
         const rows = Math.floor(canvas.height / gridSize);
-
         nodes = [];
-        const intersections = [];
 
+        const intersections = [];
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 intersections.push({ x: j * gridSize, y: i * gridSize });
@@ -138,7 +127,6 @@ export function setupGridAnimation() {
             const r = Math.floor(Math.random() * (i + 1));
             [intersections[i], intersections[r]] = [intersections[r], intersections[i]];
         }
-        // pick as many as TOTAL_NODES
         const selected = intersections.slice(0, TOTAL_NODES);
 
         selected.forEach((coords, idx) => {
@@ -148,25 +136,26 @@ export function setupGridAnimation() {
                 color: randomColor(),
                 name: getNodeName(idx),
                 isSending: false,
-                isReceiving: false,
+                currentIncoming: 0,
+                nextSendAllowed: 0,
+                lastReceiver: null
             });
         });
     }
 
     /**
-     * A path is an array of grid points (no diagonals).
+     * Build a path along the grid lines from src to dst
      */
     function findPath(src, dst) {
         const path = [{ x: src.x, y: src.y }];
         let current = { x: src.x, y: src.y };
-
         while (current.x !== dst.x || current.y !== dst.y) {
-            // Move horizontally first
+            // horizontally first
             if (current.x !== dst.x) {
                 current.x += gridSize * (current.x < dst.x ? 1 : -1);
                 path.push({ x: current.x, y: current.y });
             }
-            // Then vertically
+            // then vertically
             else if (current.y !== dst.y) {
                 current.y += gridSize * (current.y < dst.y ? 1 : -1);
                 path.push({ x: current.x, y: current.y });
@@ -176,71 +165,157 @@ export function setupGridAnimation() {
     }
 
     /**
-     * Creates a random signal from one node to another.
+     * Compute segment lengths + cumulative lengths
+     */
+    function precomputeDistances(path) {
+        const segmentLengths = [];
+        const cumulativeLengths = [0];
+        let totalLength = 0;
+
+        for (let i = 0; i < path.length - 1; i++) {
+            const dx = path[i + 1].x - path[i].x;
+            const dy = path[i + 1].y - path[i].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            segmentLengths.push(dist);
+            totalLength += dist;
+            cumulativeLengths.push(totalLength);
+        }
+        return { segmentLengths, cumulativeLengths, totalLength };
+    }
+
+    /**
+     * Find which segment 'dist' is on, plus fraction along that segment
+     */
+    function getSegmentIndexFrac(dist, cumulativeLengths) {
+        const lastIndex = cumulativeLengths.length - 1;
+        if (dist <= 0) return { index: 0, frac: 0 };
+
+        const totalLen = cumulativeLengths[lastIndex];
+        if (dist >= totalLen) return { index: lastIndex - 1, frac: 1 };
+
+        let seg = 0;
+        while (seg < lastIndex && cumulativeLengths[seg] <= dist) {
+            seg++;
+        }
+        const distBefore = cumulativeLengths[seg - 1] || 0;
+        const segmentDist = cumulativeLengths[seg] - distBefore;
+        const localDist = dist - distBefore;
+        const frac = localDist / segmentDist;
+        return { index: seg - 1, frac };
+    }
+
+    /**
+     * Interpolate x,y for path segment
+     */
+    function interpolate(path, indexFrac) {
+        const { index, frac } = indexFrac;
+        const p0 = path[index];
+        const p1 = path[index + 1] || p0;
+        return {
+            x: p0.x + (p1.x - p0.x) * frac,
+            y: p0.y + (p1.y - p0.y) * frac
+        };
+    }
+
+    /**
+     * Create a new signal from a random available sender to a random receiver
+     * applying:
+     *   - One-signal-at-a-time sending (isSending = false)
+     *   - up to N concurrent receives (currentIncoming < MAX_CONCURRENT_RECEIVES)
+     *   - optional cooldown
+     *   - skip lastReceiver if possible
      */
     function createSignal() {
-        if (nodes.length < 2) return;
+        const now = performance.now();
 
-        const availableSenders = nodes.filter(n => !n.isSending);
-        if (availableSenders.length < 1) return;
+        // 1) pick from nodes that are not sending & are past cooldown
+        const availableSenders = nodes.filter(n => {
+            return !n.isSending && now >= n.nextSendAllowed;
+        });
+        if (availableSenders.length < 1) return; // no senders available
 
+        // 2) pick random sender
         const sender = availableSenders[Math.floor(Math.random() * availableSenders.length)];
 
-        const availableReceivers = nodes.filter(n => n !== sender && !n.isReceiving);
-        if (availableReceivers.length < 1) return;
+        // 3) gather possible receivers
+        //    skip self, skip those at max concurrency
+        //    skip lastReceiver if possible
+        let possibleReceivers = nodes.filter(r => {
+            if (r === sender) return false;
+            if (r.currentIncoming >= MAX_CONCURRENT_RECEIVES) return false;
+            return r !== sender.lastReceiver; // skip last used if possible
+        });
+        if (possibleReceivers.length < 1) {
+            // fallback: allow lastReceiver if everything else fails
+            possibleReceivers = nodes.filter(r => {
+                if (r === sender) return false;
+                return r.currentIncoming < MAX_CONCURRENT_RECEIVES;
+            });
+            if (possibleReceivers.length < 1) return; // no receivers available
+        }
 
-        const receiver = availableReceivers[Math.floor(Math.random() * availableReceivers.length)];
+        // 4) pick random from possibleReceivers
+        const receiver = possibleReceivers[Math.floor(Math.random() * possibleReceivers.length)];
 
-        // Mark them as busy
+        // 5) Mark concurrency states
         sender.isSending = true;
-        receiver.isReceiving = true;
+        sender.nextSendAllowed = now + SEND_COOLDOWN; // cooldown
+        sender.lastReceiver = receiver;
 
-        // find path
+        receiver.currentIncoming += 1; // increment
+
+        // 6) find path & precompute distances
         const path = findPath(sender, receiver);
-        // pick random signal name
+        const { segmentLengths, cumulativeLengths, totalLength } = precomputeDistances(path);
+
+        // 7) pick random label
         const signalLabel = signalsCatalog[Math.floor(Math.random() * signalsCatalog.length)];
 
-        // push signal object
+        // 8) push the new signal
         signals.push({
             source: sender,
             target: receiver,
             path,
+            segmentLengths,
+            cumulativeLengths,
+            totalLength,
+            distanceTravelled: 0, // goes 0..2*totalLength
             label: signalLabel,
             color: sender.color,
-            // For the comet effect, we track overall 'progress' from 0..(1 + tailLength).
-            // The head is at min(progress, 1). The tail is at max(progress - tailLength, 0).
-            progress: 0,
             hasFreedNodes: false,
             onComplete: () => {
-                // once the head arrives, free up the nodes
+                // once head arrives, free up the sender
                 sender.isSending = false;
-                receiver.isReceiving = false;
             }
         });
     }
 
-    // -----------------------------------------------------------
-    // 2) DRAWING LOGIC
-    // -----------------------------------------------------------
+    // ----------------------------------------------------------------
+    // 3) DRAWING LOGIC
+    // ----------------------------------------------------------------
     function drawNodes() {
         nodes.forEach(node => {
-            // node circle
             ctx.beginPath();
             ctx.fillStyle = node.color;
             ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
             ctx.fill();
 
             // label
-            ctx.font = '12px sans-serif';
+            ctx.font = '12px "JetBrains Mono"';
             ctx.fillStyle = '#333';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'top';
             ctx.fillText(node.name, node.x, node.y + nodeRadius + 4);
+
+            // debug concurrency? (optional)
+            // ctx.font = '10px "JetBrains Mono"';
+            // ctx.fillStyle = '#999';
+            // ctx.fillText(`IN:${node.currentIncoming}`, node.x, node.y - 12);
         });
     }
 
     /**
-     * Draw faint grid lines (optional).
+     * Draw faint grid lines
      */
     function drawGrid() {
         ctx.save();
@@ -268,127 +343,122 @@ export function setupGridAnimation() {
     }
 
     /**
-     * Draw signals with a comet-like effect:
-     *   - We store overall signal.progress from 0..(1 + tailLength).
-     *   - Head is at min(progress, 1).
-     *   - Tail is at max(progress - tailLength, 0).
-     *   - Remove the signal once progress >= (1 + tailLength).
+     * Draw a partial stepped path from tailDist..headDist
+     */
+    function drawSteppedPath(path, cumulativeLengths, tailDist, headDist, color) {
+        const tailInfo = getSegmentIndexFrac(tailDist, cumulativeLengths);
+        const headInfo = getSegmentIndexFrac(headDist, cumulativeLengths);
+
+        const tailPt = interpolate(path, tailInfo);
+        const headPt = interpolate(path, headInfo);
+
+        const gradient = ctx.createLinearGradient(tailPt.x, tailPt.y, headPt.x, headPt.y);
+        gradient.addColorStop(0, `rgba(${hexToRgb(color)}, ${TAIL_FADE_START})`);
+        gradient.addColorStop(1, `rgba(${hexToRgb(color)}, ${TAIL_FADE_END})`);
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        ctx.moveTo(tailPt.x, tailPt.y);
+
+        // if in the same segment
+        if (tailInfo.index === headInfo.index) {
+            ctx.lineTo(headPt.x, headPt.y);
+            ctx.stroke();
+            return;
+        }
+
+        // finish the tail’s segment
+        const tailSegmentEnd = path[tailInfo.index + 1];
+        ctx.lineTo(tailSegmentEnd.x, tailSegmentEnd.y);
+
+        // draw intermediate full segments
+        for (let i = tailInfo.index + 1; i < headInfo.index; i++) {
+            ctx.lineTo(path[i + 1].x, path[i + 1].y);
+        }
+
+        // partial segment for the head
+        if (headInfo.index < path.length - 1) {
+            ctx.lineTo(headPt.x, headPt.y);
+        }
+        ctx.stroke();
+    }
+
+    /**
+     * Animate each signal in two phases:
+     *  Phase 1) 0..totalLen => line from 0..headDist
+     *  Phase 2) totalLen..(2*totalLen) => line from tailDist..totalLen
      */
     function drawSignals(deltaTime) {
         signals.forEach(signal => {
-            const path = signal.path;
-            const totalSegments = path.length - 1;
-            if (totalSegments < 1) return;
+            signal.distanceTravelled += SIGNAL_SPEED * deltaTime;
+            const dist = signal.distanceTravelled;
+            const totalLen = signal.totalLength;
 
-            // 1) Update progress
-            signal.progress += signalSpeed * deltaTime;
-            if (signal.progress > 1 + tailLength) {
-                signal.progress = 1 + tailLength;
+            let headDist, tailDist;
+            if (dist < totalLen) {
+                // Phase 1
+                headDist = dist;
+                tailDist = 0;
+            } else {
+                // Phase 2
+                headDist = totalLen;
+                tailDist = dist - totalLen; // 0..totalLen
             }
 
-            // 2) Determine head/tail progress in [0..1]
-            const headProgress = Math.min(signal.progress, 1);
-            const tailProgress = Math.max(signal.progress - tailLength, 0);
+            // clamp tailDist
+            if (tailDist < 0) tailDist = 0;
+            if (tailDist > totalLen) tailDist = totalLen;
 
-            const headDist = headProgress * totalSegments;
-            const tailDist = tailProgress * totalSegments;
-
-            const headIdx = Math.floor(headDist);
-            const headFrac = headDist - headIdx;
-            const tailIdx = Math.floor(tailDist);
-            const tailFrac = tailDist - tailIdx;
-
-            // 3) Find actual coordinates
-            const tailPoint = getPointOnPath(path, tailIdx, tailFrac);
-            const headPoint = getPointOnPath(path, headIdx, headFrac);
-
-            // 4) Gradient for the line (tail -> head)
-            ctx.save();
-            const gradient = ctx.createLinearGradient(
-                tailPoint.x, tailPoint.y,
-                headPoint.x, headPoint.y
+            // draw the stepped path
+            drawSteppedPath(
+                signal.path,
+                signal.cumulativeLengths,
+                tailDist,
+                headDist,
+                signal.color
             );
-            gradient.addColorStop(0, `rgba(${hexToRgb(signal.color)}, ${TAIL_FADE_START})`);
-            gradient.addColorStop(1, `rgba(${hexToRgb(signal.color)}, ${TAIL_FADE_END})`);
 
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = gradient;
-            ctx.beginPath();
-            // draw the path segments from tail to head
-            drawPathSegments(path, tailIdx, tailFrac, headIdx, headFrac);
-            ctx.stroke();
-            ctx.restore();
+            // draw the “head” circle
+            const headInfo = getSegmentIndexFrac(headDist, signal.cumulativeLengths);
+            const headPt = interpolate(signal.path, headInfo);
 
-            // 5) Draw the comet head circle (keep it visible until the entire signal is done)
             ctx.beginPath();
             ctx.fillStyle = signal.color;
-            ctx.arc(headPoint.x, headPoint.y, 4, 0, Math.PI * 2);
+            ctx.arc(headPt.x, headPt.y, 4, 0, 2 * Math.PI);
             ctx.fill();
 
             // traveling label
-            ctx.font = '10px sans-serif';
+            ctx.font = '10px "JetBrains Mono"';
             ctx.fillStyle = '#444';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'bottom';
-            ctx.fillText(signal.label, headPoint.x + 6, headPoint.y - 6);
+            ctx.fillText(signal.label, headPt.x + 6, headPt.y - 6);
 
-            // Once head arrives, free up the nodes (onComplete) but do NOT remove the signal yet.
-            if (headProgress >= 1 && !signal.hasFreedNodes) {
-                if (typeof signal.onComplete === 'function') {
-                    signal.onComplete();
-                }
+            // once head arrives, free up sender if not done
+            if (!signal.hasFreedNodes && dist >= totalLen) {
+                signal.onComplete?.();
                 signal.hasFreedNodes = true;
             }
         });
 
-        // Remove signals once the tail has fully arrived
-        signals = signals.filter(s => s.progress < 1 + tailLength);
+        // remove signals that fully finished
+        // (distanceTravelled >= 2*totalLength => tail has arrived)
+        // also free the receiver concurrency here
+        signals = signals.filter(s => {
+            const keep = s.distanceTravelled < 2 * s.totalLength;
+            if (!keep) {
+                // the tail has fully arrived => free concurrency on receiver
+                s.target.currentIncoming = Math.max(s.target.currentIncoming - 1, 0);
+            }
+            return keep;
+        });
     }
 
-    /**
-     * Helper to draw partial path from (startIdx + startFrac) to (endIdx + endFrac)
-     */
-    function drawPathSegments(path, startIdx, startFrac, endIdx, endFrac) {
-        // Starting point
-        let s1 = path[startIdx];
-        let s2 = path[startIdx + 1] || s1;
-        const sx = s1.x + (s2.x - s1.x) * startFrac;
-        const sy = s1.y + (s2.y - s1.y) * startFrac;
-
-        // Ending point
-        let e1 = path[endIdx];
-        let e2 = path[endIdx + 1] || e1;
-        const ex = e1.x + (e2.x - e1.x) * endFrac;
-        const ey = e1.y + (e2.y - e1.y) * endFrac;
-
-        ctx.moveTo(sx, sy);
-
-        // full segments in between
-        for (let i = startIdx + 1; i <= endIdx - 1; i++) {
-            ctx.lineTo(path[i].x, path[i].y);
-        }
-        // final partial
-        ctx.lineTo(ex, ey);
-    }
-
-    /**
-     * Return point at index + fraction along the path.
-     */
-    function getPointOnPath(path, idx, frac) {
-        if (idx >= path.length - 1) {
-            return { x: path[path.length - 1].x, y: path[path.length - 1].y };
-        }
-        const p0 = path[idx];
-        const p1 = path[idx + 1];
-        return {
-            x: p0.x + (p1.x - p0.x) * frac,
-            y: p0.y + (p1.y - p0.y) * frac,
-        };
-    }
-
-    /**
-     * Convert hex or HSL to "r,g,b"
-     */
+    // ----------------------------------------------------------------
+    // 4) COLOR UTILS
+    // ----------------------------------------------------------------
     function hexToRgb(color) {
         // If #hex
         if (color.startsWith('#')) {
@@ -413,9 +483,6 @@ export function setupGridAnimation() {
         return '255,255,255'; // fallback
     }
 
-    /**
-     * Minimal HSL->RGB converter
-     */
     function hslToRgb(h, s, l) {
         const c = (1 - Math.abs(2 * l - 1)) * s;
         const x = c * (1 - Math.abs((h / 60) % 2 - 1));
@@ -435,9 +502,9 @@ export function setupGridAnimation() {
         return { r, g, b };
     }
 
-    // -----------------------------------------------------------
-    // 3) MAIN ANIMATION LOOP
-    // -----------------------------------------------------------
+    // ----------------------------------------------------------------
+    // 5) MAIN ANIMATION LOOP
+    // ----------------------------------------------------------------
     let lastTimestamp = 0;
     function drawEverything(timestamp = 0) {
         const deltaTime = timestamp - lastTimestamp;
@@ -445,16 +512,11 @@ export function setupGridAnimation() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // optional background grid
         drawGrid();
-
-        // signals first
         drawSignals(deltaTime);
-
-        // nodes on top
         drawNodes();
 
-        // small chance each frame to create a new random signal
+        // small chance each frame to spawn a new signal
         if (Math.random() < 0.01) {
             createSignal();
         }
@@ -462,16 +524,16 @@ export function setupGridAnimation() {
         animationFrameId = requestAnimationFrame(drawEverything);
     }
 
-    // -----------------------------------------------------------
-    // 4) INITIALIZATION
-    // -----------------------------------------------------------
+    // ----------------------------------------------------------------
+    // 6) INITIALIZATION
+    // ----------------------------------------------------------------
     resizeCanvas();
     initNodes();
 
     // Attach a throttled resize
     eventManager.addEvent(window, 'resize', throttle(resizeCanvas, 250));
 
-    // Start loop
+    // Start the loop
     drawEverything();
 
     // Return a dispose method if needed
