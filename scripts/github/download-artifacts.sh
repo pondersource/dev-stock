@@ -415,6 +415,13 @@ generate_manifest() {
 create_combined_zip() {
     info "Creating combined zip file of all test artifacts..."
     local zip_file="$ARTIFACTS_DIR/ocm-tests-all.zip"
+    
+    # Create parent directories first
+    mkdir -p "$(dirname "$zip_file")" || {
+        error "Failed to create directory: $(dirname "$zip_file")"
+        return 1
+    }
+    
     local temp_dir
     temp_dir=$(mktemp -d)
     TEMP_DIRS+=("$temp_dir")
@@ -432,11 +439,18 @@ create_combined_zip() {
         
         if [[ -d "$workflow_dir" ]]; then
             # Create workflow directory in temp
-            mkdir -p "$temp_dir/$workflow_name"
+            mkdir -p "$temp_dir/$workflow_name" || {
+                error "Failed to create directory: $temp_dir/$workflow_name"
+                rm -f "$counter_file"
+                return 1
+            }
             
             # Copy recording files
             while IFS= read -r -d '' video; do
-                cp "$video" "$temp_dir/$workflow_name/"
+                if ! cp "$video" "$temp_dir/$workflow_name/"; then
+                    error "Failed to copy $video to $temp_dir/$workflow_name/"
+                    continue
+                fi
                 local current_count
                 read -r current_count < "$counter_file"
                 current_count=$((current_count + 1))
@@ -457,8 +471,7 @@ create_combined_zip() {
         return 0
     fi
     
-    # Create parent directory if it doesn't exist
-    mkdir -p "$(dirname "$zip_file")"
+    info "Creating zip file with $found_files videos..."
     
     # Create zip file from temp directory
     if (cd "$temp_dir" && zip -r "$zip_file" .); then
@@ -466,12 +479,13 @@ create_combined_zip() {
             local zip_size
             zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
             success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
+            return 0
         else
-            error "Failed to create zip file"
+            error "Failed to create zip file: $zip_file does not exist after zip command"
             return 1
         fi
     else
-        error "Failed to create zip file"
+        error "Failed to create zip file: zip command failed"
         return 1
     fi
 }
