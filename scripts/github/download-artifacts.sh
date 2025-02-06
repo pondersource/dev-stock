@@ -206,6 +206,8 @@ fetch_workflow_artifacts() {
     
     # Process each artifact with size information
     local processed_count=0
+    local downloaded_count=0
+    local video_count=0
     echo "$artifacts_json" | jq -r '.artifacts[] | "\(.id) \(.name) \(.size_in_bytes // 0)"' | while read -r id name size; do
         ((processed_count++))
         info "Downloading artifact $name (ID: $id, Size: $(human_size ${size:-0})) [$processed_count/$artifact_count]"
@@ -215,7 +217,7 @@ fetch_workflow_artifacts() {
         tmp_dir=$(mktemp -d)
         TEMP_DIRS+=("$tmp_dir")
         
-        # Download with progress indication
+        # Download with progress indication and error checking
         debug "Downloading to temporary directory: $tmp_dir"
         if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
             -H "Accept: application/vnd.github+json" > "$tmp_dir/artifact.zip"; then
@@ -223,29 +225,37 @@ fetch_workflow_artifacts() {
             rm -rf "$tmp_dir"
             continue
         fi
+        ((downloaded_count++))
         
-        # Get actual downloaded size
+        # Get actual downloaded size and verify
         local downloaded_size
         downloaded_size=$(stat -f%z "$tmp_dir/artifact.zip" 2>/dev/null || stat -c%s "$tmp_dir/artifact.zip" 2>/dev/null || echo 0)
+        if [[ $downloaded_size -eq 0 ]]; then
+            error "Downloaded artifact $id is empty"
+            rm -rf "$tmp_dir"
+            continue
+        fi
         debug "Downloaded size: $(human_size ${downloaded_size:-0})"
         
-        # Extract with size information
+        # Extract with size information and error checking
         local target_dir="$ARTIFACTS_DIR/$workflow_name"
         mkdir -p "$target_dir"
         debug "Extracting to $target_dir"
-        if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir"; then
+        if ! unzip -o "$tmp_dir/artifact.zip" -d "$target_dir" 2>/dev/null; then
             error "Failed to extract artifact $id"
             rm -rf "$tmp_dir"
             continue
         fi
         
         # Process videos with enhanced logging
-        local video_count=0
         while IFS= read -r -d '' video; do
             ((video_count++))
-            process_video "$video"
-        done < <(find "$target_dir" -name "*.mp4" -print0)
-        info "Processed $video_count videos from artifact $name"
+            if ! process_video "$video"; then
+                error "Failed to process video: $video"
+                continue
+            fi
+            info "Successfully processed video $video_count from artifact $name"
+        done < <(find "$target_dir" -type f \( -name "*.mp4" -o -name "*.webm" \) -print0)
         
         # Cleanup
         rm -rf "$tmp_dir"
@@ -256,6 +266,11 @@ fetch_workflow_artifacts() {
             fi
         done
     done
+    
+    info "Artifact processing summary for $workflow_name:"
+    info "- Processed artifacts: $processed_count"
+    info "- Successfully downloaded: $downloaded_count"
+    info "- Videos processed: $video_count"
     
     end_timer "Workflow artifact processing"
     return 0
@@ -671,16 +686,13 @@ main() {
     
     # Create required directories with error checking
     info "Creating required directories..."
-    if ! mkdir -p "$ARTIFACTS_DIR" 2>/dev/null; then
-        error "Failed to create artifacts directory: $ARTIFACTS_DIR"
-        error "Current permissions: $(ls -ld "$(dirname "$ARTIFACTS_DIR")" 2>/dev/null || echo 'Cannot read parent directory')"
-        exit 1
-    fi
-    if ! mkdir -p "$IMAGES_DIR" 2>/dev/null; then
-        error "Failed to create images directory: $IMAGES_DIR"
-        error "Current permissions: $(ls -ld "$(dirname "$IMAGES_DIR")" 2>/dev/null || echo 'Cannot read parent directory')"
-        exit 1
-    fi
+    for dir in "$ARTIFACTS_DIR" "$IMAGES_DIR" "$ARTIFACTS_DIR/bundles"; do
+        if ! mkdir -p "$dir" 2>/dev/null; then
+            error "Failed to create directory: $dir"
+            error "Current permissions: $(ls -ld "$(dirname "$dir")" 2>/dev/null || echo 'Cannot read parent directory')"
+            exit 1
+        fi
+    done
     success "Directories created successfully"
     
     # Get workflow files from the local .github/workflows directory
