@@ -257,6 +257,12 @@ fetch_workflow_artifacts() {
             continue
         fi
         
+        # List extracted files for debugging
+        debug "Extracted files in $target_dir:"
+        find "$target_dir" -type f -exec ls -l {} \; 2>/dev/null | while read -r line; do
+            debug "  $line"
+        done
+        
         # Process videos with enhanced logging
         while IFS= read -r -d '' video; do
             if ! process_video "$video"; then
@@ -470,6 +476,7 @@ create_platform_bundles() {
         temp_dir=$(mktemp -d)
         TEMP_DIRS+=("$temp_dir")
         local platform_code="${platforms[$platform]}"
+        local found_files=0
         
         info "Processing $platform tests..."
         
@@ -482,20 +489,45 @@ create_platform_bundles() {
                 
                 if [[ -d "$workflow_dir" ]]; then
                     mkdir -p "$temp_dir/$workflow_name"
-                    find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+                    # Copy recording files
+                    while IFS= read -r -d '' video; do
+                        cp "$video" "$temp_dir/$workflow_name/"
+                        ((found_files++))
+                        debug "Copied $video to temp directory for $platform bundle"
+                    done < <(find "$workflow_dir" -name "recording.mp4" -print0)
                 fi
             fi
         done
         
+        if [[ $found_files -eq 0 ]]; then
+            warn "No files found for $platform bundle"
+            rm -rf "$temp_dir"
+            continue
+        fi
+        
         # Create zip file for this platform
         local zip_file="$base_dir/ocm-tests-$platform.zip"
-        (cd "$temp_dir" && zip -r "$zip_file" .)
+        mkdir -p "$(dirname "$zip_file")"
         
-        if [[ -f "$zip_file" ]]; then
-            local zip_size
-            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-            success "Created $platform bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        if (cd "$temp_dir" && zip -r "$zip_file" .); then
+            if [[ -f "$zip_file" ]]; then
+                local zip_size
+                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                success "Created $platform bundle: $zip_file ($(human_size ${zip_size:-0}))"
+            else
+                error "Failed to create zip file for $platform"
+            fi
+        else
+            error "Failed to create zip file for $platform"
         fi
+        
+        rm -rf "$temp_dir"
+        for i in "${!TEMP_DIRS[@]}"; do
+            if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
+                unset 'TEMP_DIRS[i]'
+                break
+            fi
+        done
     done
 }
 
