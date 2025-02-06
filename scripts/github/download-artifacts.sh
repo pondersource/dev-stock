@@ -419,8 +419,10 @@ create_combined_zip() {
     temp_dir=$(mktemp -d)
     TEMP_DIRS+=("$temp_dir")
     
-    # Track if we found any files to zip
-    local found_files=0
+    # Create counter file
+    local counter_file
+    counter_file=$(mktemp)
+    echo "0" > "$counter_file"
     
     # Copy all workflow artifacts to temp directory
     for workflow in "${workflow_files[@]}"; do
@@ -435,11 +437,19 @@ create_combined_zip() {
             # Copy recording files
             while IFS= read -r -d '' video; do
                 cp "$video" "$temp_dir/$workflow_name/"
-                ((found_files++))
+                local current_count
+                read -r current_count < "$counter_file"
+                current_count=$((current_count + 1))
+                echo "$current_count" > "$counter_file"
                 debug "Copied $video to temp directory"
             done < <(find "$workflow_dir" -name "recording.mp4" -print0)
         fi
     done
+    
+    # Get final count
+    local found_files
+    read -r found_files < "$counter_file"
+    rm -f "$counter_file"
     
     if [[ $found_files -eq 0 ]]; then
         warn "No files found to zip"
