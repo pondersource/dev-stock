@@ -1002,14 +1002,14 @@ main() {
     generate_manifest
     
     # Create all zip bundles
-    create_combined_zip
-    create_platform_bundles
-    create_test_type_bundles
-    create_result_bundles
-    create_category_bundles
+    # create_combined_zip
+    # create_platform_bundles
+    # create_test_type_bundles
+    # create_result_bundles
+    # create_category_bundles
 
     # Generate bundle sizes JSON
-    generate_bundle_sizes
+    # generate_bundle_sizes
     
     # Debug output
     info "Contents of artifacts directory:"
