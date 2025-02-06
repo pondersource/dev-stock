@@ -235,6 +235,130 @@
                     color: #5f6368;
                     transition: all 0.3s ease;
                 }
+
+                // Status Cards Styling
+                &.status-card {
+                    background: white;
+                    border-width: 2px;
+
+                    .platform-icon {
+                        width: 40px;
+                        height: 40px;
+                        background: #f1f3f4;
+                        border-radius: 10px;
+                        i {
+                            font-size: 1.25rem;
+                        }
+                    }
+
+                    &.all-tests {
+                        border-color: #1a73e8;
+                        .platform-icon {
+                            background: rgba(26, 115, 232, 0.1);
+                            i { color: #1a73e8; }
+                        }
+                        &:hover {
+                            background: rgba(26, 115, 232, 0.02);
+                            .download-icon { background: #1a73e8; }
+                        }
+                    }
+
+                    &.failed-tests {
+                        border-color: #ea4335;
+                        .platform-icon {
+                            background: rgba(234, 67, 53, 0.1);
+                            i { color: #ea4335; }
+                        }
+                        &:hover {
+                            background: rgba(234, 67, 53, 0.02);
+                            .download-icon { background: #ea4335; }
+                        }
+                    }
+
+                    &.passed-tests {
+                        border-color: #34a853;
+                        .platform-icon {
+                            background: rgba(52, 168, 83, 0.1);
+                            i { color: #34a853; }
+                        }
+                        &:hover {
+                            background: rgba(52, 168, 83, 0.02);
+                            .download-icon { background: #34a853; }
+                        }
+                    }
+
+                    &:hover .download-icon {
+                        color: white;
+                    }
+                }
+
+                // Category Cards Styling
+                &.category-card {
+                    background: white;
+                    border-width: 2px;
+
+                    .platform-icon {
+                        width: 40px;
+                        height: 40px;
+                        background: #f1f3f4;
+                        border-radius: 10px;
+                        i {
+                            font-size: 1.25rem;
+                        }
+                    }
+
+                    &.auth-tests {
+                        border-color: #9334ea;
+                        .platform-icon {
+                            background: rgba(147, 52, 234, 0.1);
+                            i { color: #9334ea; }
+                        }
+                        &:hover {
+                            background: rgba(147, 52, 234, 0.02);
+                            .download-icon { background: #9334ea; }
+                        }
+                    }
+
+                    &.share-link-tests {
+                        border-color: #34a8ea;
+                        .platform-icon {
+                            background: rgba(52, 168, 234, 0.1);
+                            i { color: #34a8ea; }
+                        }
+                        &:hover {
+                            background: rgba(52, 168, 234, 0.02);
+                            .download-icon { background: #34a8ea; }
+                        }
+                    }
+
+                    &.share-with-tests {
+                        border-color: #ea8f34;
+                        .platform-icon {
+                            background: rgba(234, 143, 52, 0.1);
+                            i { color: #ea8f34; }
+                        }
+                        &:hover {
+                            background: rgba(234, 143, 52, 0.02);
+                            .download-icon { background: #ea8f34; }
+                        }
+                    }
+
+                    &.sciencemesh-tests {
+                        border-color: #34ea8f;
+                        .platform-icon {
+                            background: rgba(52, 234, 143, 0.1);
+                            i { color: #34ea8f; }
+                        }
+                        &:hover {
+                            background: rgba(52, 234, 143, 0.02);
+                            .download-icon { background: #34ea8f; }
+                        }
+                    }
+
+                    &:hover .download-icon {
+                        color: white;
+                    }
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 // Main application entry point
 import { CompatibilityMatrix } from './components/CompatibilityMatrix.js';
+import { BundleSizes } from './components/BundleSizes.js';
 import { config } from './config.js';
 import { ErrorHandler } from './utils/ErrorHandler.js';
 import { StateManager } from './utils/StateManager.js';
@@ -68,6 +69,9 @@ class App {
 
         this.matrix = new CompatibilityMatrix();
         await this.matrix.init();
+
+        // Initialize bundle sizes
+        new BundleSizes();
     }
 
     async init() {

@@ -49,22 +49,30 @@ end_timer() {
     info "Operation '$operation' completed in ${duration}s"
 }
 
-# Get human readable file size
+# Get human readable file size in KiB format
 human_size() {
-    # If no argument is provided or if it's not a number, return '0B'
+    # If no argument is provided or if it's not a number, return '0 KiB'
     local size
     size="${1:-0}"
     if ! [[ "$size" =~ ^[0-9]+$ ]]; then
-        echo "0B"
+        echo "0 KiB"
         return
-    fi
+    }
     
     if ((size < 1024)); then
-        echo "${size}B"
+        echo "${size} B"
     elif ((size < 1048576)); then
-        echo "$((size/1024))KB"
+        # Convert to KiB with one decimal place
+        local kib=$(echo "scale=1; $size/1024" | bc)
+        echo "${kib} KiB"
+    elif ((size < 1073741824)); then
+        # Convert to MiB with one decimal place
+        local mib=$(echo "scale=1; $size/1048576" | bc)
+        echo "${mib} MiB"
     else
-        echo "$((size/1048576))MB"
+        # Convert to GiB with one decimal place
+        local gib=$(echo "scale=1; $size/1073741824" | bc)
+        echo "${gib} GiB"
     fi
 }
 
@@ -537,6 +545,95 @@ create_result_bundles() {
     done
 }
 
+# Create category-specific bundles based on workflow types
+create_category_bundles() {
+    info "Creating category-specific bundles..."
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    mkdir -p "$base_dir"
+
+    # Define test categories and their workflow patterns
+    declare -A categories=(
+        ["auth"]="login-"
+        ["share-link"]="share-link-"
+        ["share-with"]="share-with-"
+        ["sciencemesh"]="invite-"
+    )
+
+    for category in "${!categories[@]}"; do
+        local pattern="${categories[$category]}"
+        local temp_dir
+        temp_dir=$(mktemp -d)
+        TEMP_DIRS+=("$temp_dir")
+
+        info "Processing $category category tests..."
+
+        # Find workflows matching this category's pattern
+        for workflow in "${workflow_files[@]}"; do
+            if [[ "$workflow" =~ ^$pattern ]]; then
+                local workflow_name
+                workflow_name=$(sanitize_name "$workflow")
+                local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
+
+                if [[ -d "$workflow_dir" ]]; then
+                    mkdir -p "$temp_dir/$workflow_name"
+                    find "$workflow_dir" -name "recording.mp4" -exec cp {} "$temp_dir/$workflow_name/" \;
+                fi
+            fi
+        done
+
+        # Create zip file for this category
+        local zip_file="$base_dir/ocm-tests-$category.zip"
+        (cd "$temp_dir" && zip -r "$zip_file" .)
+
+        if [[ -f "$zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+            success "Created $category category bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        fi
+    done
+}
+
+# Create bundle sizes JSON file
+generate_bundle_sizes() {
+    info "Generating bundle sizes JSON file..."
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    local sizes_file="$ARTIFACTS_DIR/bundle-sizes.json"
+    local temp_sizes_file="/tmp/temp_sizes_$$.json"
+    
+    echo "{}" > "$temp_sizes_file"
+    
+    # Process each bundle file
+    while IFS= read -r -d '' bundle; do
+        local bundle_name
+        bundle_name=$(basename "$bundle")
+        local bundle_size
+        bundle_size=$(stat -f%z "$bundle" 2>/dev/null || stat -c%s "$bundle")
+        local human_bundle_size
+        human_bundle_size=$(human_size "$bundle_size")
+        
+        # Add to JSON
+        jq --arg name "$bundle_name" \
+           --arg size "$human_bundle_size" \
+           --arg bytes "$bundle_size" \
+           '. + {($name): {"size": $size, "bytes": $bytes}}' "$temp_sizes_file" > "${temp_sizes_file}.tmp" \
+           && mv "${temp_sizes_file}.tmp" "$temp_sizes_file"
+        
+        debug "Added size for bundle: $bundle_name ($human_bundle_size)"
+    done < <(find "$base_dir" -type f -name "ocm-tests-*.zip" -print0)
+    
+    # Move the final file to its destination
+    mv "$temp_sizes_file" "$sizes_file"
+    
+    if [[ -f "$sizes_file" ]]; then
+        success "Generated bundle sizes file: $sizes_file"
+        debug "Bundle sizes file contents:"
+        debug "$(cat "$sizes_file")"
+    else
+        error "Failed to generate bundle sizes file"
+        return 1
+    fi
+}
+
 # Enhanced main function with summary statistics
 main() {
     # Set up error handling with line numbers
@@ -709,6 +806,10 @@ main() {
     create_platform_bundles
     create_test_type_bundles
     create_result_bundles
+    create_category_bundles
+
+    # Generate bundle sizes JSON
+    generate_bundle_sizes
     
     # Debug output
     info "Contents of artifacts directory:"
