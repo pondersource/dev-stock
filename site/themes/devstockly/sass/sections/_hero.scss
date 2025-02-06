@@ -14,7 +14,7 @@ $desktop: 1200px;
 .hero-section {
     position: relative;
     min-height: 100vh;
-    height: 100%;
+    height: 100vh;
     background: $hero-background;
     overflow: hidden;
     display: flex;
@@ -28,21 +28,15 @@ $desktop: 1200px;
     }
 
     .container {
-        max-width: 1440px;
-        margin: 0 auto;
-        padding: 0 2rem;
         position: relative;
-        z-index: 2;
-        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        gap: 2rem;
-
-        @media (max-width: $tablet) {
-            padding: 0 1rem;
-            gap: 1.5rem;
-        }
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        width: 100%;
     }
 
     // Badge
@@ -79,19 +73,15 @@ $desktop: 1200px;
 
     // Main Content
     .hero-content {
-        max-width: 1400px;
-        margin: 0 auto;
-        text-align: center;
+        position: relative;
+        flex: 1;
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
-        gap: 2rem;
         width: 100%;
         padding: 0 1rem;
-
-        @media (max-width: $tablet) {
-            gap: 1.5rem;
-        }
+        z-index: 2;
     }
 
     .hero-title {
@@ -317,15 +307,14 @@ $desktop: 1200px;
 
     // Scroll Indicator
     .scroll-indicator {
-        position: fixed;
-        bottom: 2rem;
+        position: absolute;
         left: 50%;
+        bottom: 2rem;
         transform: translateX(-50%);
-        z-index: 10;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
         cursor: pointer;
         transition: all 0.3s ease;
 

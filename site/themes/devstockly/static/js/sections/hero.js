@@ -8,9 +8,9 @@ export function initHeroSection() {
         const exploreBtn = DOMManager.getElement('exploreBtn');
         if (exploreBtn) {
             eventManager.addEvent(exploreBtn, 'click', () => {
-                const testMatrix = document.getElementById('testMatrix');
-                if (testMatrix) {
-                    testMatrix.scrollIntoView({ behavior: 'smooth' });
+                const partnersSection = document.getElementById('partnersSection');
+                if (partnersSection) {
+                    partnersSection.scrollIntoView({ behavior: 'smooth' });
                 }
             });
         }
@@ -18,14 +18,54 @@ export function initHeroSection() {
 
     function setupScrollDownButton() {
         const scrollDown = DOMManager.getElement('scrollDown');
-        if (scrollDown) {
-            eventManager.addEvent(scrollDown, 'click', () => {
-                const testMatrix = document.getElementById('testMatrix');
-                if (testMatrix) {
-                    testMatrix.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
+        if (!scrollDown) return;
+
+        // Initial state
+        let hasScrolled = false;
+        updateScrollIndicatorVisibility();
+
+        // Click handler
+        eventManager.addEvent(scrollDown, 'click', () => {
+            const testMatrix = document.getElementById('testMatrix');
+            if (testMatrix) {
+                testMatrix.scrollIntoView({ behavior: 'smooth' });
+                hasScrolled = true;
+                updateScrollIndicatorVisibility();
+            }
+        });
+
+        // Scroll handler with throttle
+        const handleScroll = throttle(() => {
+            const scrollTop = window.scrollY;
+            hasScrolled = scrollTop > 50;
+            updateScrollIndicatorVisibility();
+        }, 100);
+
+        // Update visibility based on scroll position
+        function updateScrollIndicatorVisibility() {
+            const scrollTop = window.scrollY;
+            const shouldShow = scrollTop < 50 && !hasScrolled;
+            
+            scrollDown.style.opacity = shouldShow ? '1' : '0';
+            scrollDown.style.pointerEvents = shouldShow ? 'auto' : 'none';
+            
+            // Only change visibility after opacity transition
+            if (!shouldShow) {
+                setTimeout(() => {
+                    if (window.scrollY > 50) {
+                        scrollDown.style.visibility = 'hidden';
+                    }
+                }, 300);
+            } else {
+                scrollDown.style.visibility = 'visible';
+            }
         }
+
+        // Add scroll event listener
+        eventManager.addEvent(window, 'scroll', handleScroll, { passive: true });
+        
+        // Update on resize
+        eventManager.addEvent(window, 'resize', updateScrollIndicatorVisibility);
     }
 
     function setupBackgroundParallax() {
