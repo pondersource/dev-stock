@@ -25,7 +25,7 @@ export function setupGridAnimation() {
     // (Phase 1: head 0..totalLen, Phase 2: tail 0..totalLen)
 
     // Tail fade control: 0 = fully transparent, 1 = fully opaque
-    const TAIL_FADE_START = 0.2;
+    const TAIL_FADE_START = 0.01;
     const TAIL_FADE_END = 1.0;
 
     // Predefined signals
