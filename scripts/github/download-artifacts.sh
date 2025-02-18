@@ -617,7 +617,7 @@ create_platform_bundles() {
         local abs_temp_dir
         abs_temp_dir=$(cd "$temp_dir" && pwd)
         local abs_zip_file
-        abs_zip_file=$(cd "$(dirname "$zip_file")" && pwd)/$(basename "$zip_file")
+        abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
         
         debug "Creating zip file from: $abs_temp_dir"
         debug "Creating zip file to: $abs_zip_file"
@@ -734,6 +734,12 @@ create_test_type_bundles() {
         # Create zip file for this test type using absolute paths
         local zip_file="$base_dir/ocm-tests-$type.zip"
         local zip_dir="$(dirname "$zip_file")"
+        
+        # Define absolute paths before using them
+        local abs_temp_dir
+        abs_temp_dir=$(cd "$temp_dir" && pwd)
+        local abs_zip_file
+        abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
         
         debug "Ensuring zip directory exists: $zip_dir"
         if ! mkdir -p "$zip_dir"; then
