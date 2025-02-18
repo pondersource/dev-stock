@@ -21,6 +21,9 @@ readonly IMAGES_DIR="site/static/images"
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
 declare -a TEMP_DIRS=()
 
+DEBUG=1
+export DEBUG
+
 # Enhanced logging functions
 log() { 
     local timestamp level msg
@@ -545,7 +548,11 @@ create_platform_bundles() {
         temp_dir=$(mktemp -d)
         TEMP_DIRS+=("$temp_dir")
         local platform_code="${platforms[$platform]}"
-        local found_files=0
+        
+        # Create counter file
+        local counter_file
+        counter_file=$(mktemp)
+        echo "0" > "$counter_file"
         
         info "Processing $platform tests..."
         
@@ -560,13 +567,24 @@ create_platform_bundles() {
                     mkdir -p "$temp_dir/$workflow_name"
                     # Copy recording files
                     while IFS= read -r -d '' video; do
-                        cp "$video" "$temp_dir/$workflow_name/"
-                        ((found_files++))
+                        if ! cp "$video" "$temp_dir/$workflow_name/"; then
+                            error "Failed to copy $video to $temp_dir/$workflow_name/"
+                            continue
+                        fi
+                        local current_count
+                        read -r current_count < "$counter_file"
+                        current_count=$((current_count + 1))
+                        echo "$current_count" > "$counter_file"
                         debug "Copied $video to temp directory for $platform bundle"
                     done < <(find "$workflow_dir" -name "recording.mp4" -print0)
                 fi
             fi
         done
+        
+        # Get final count
+        local found_files
+        read -r found_files < "$counter_file"
+        rm -f "$counter_file"
         
         if [[ $found_files -eq 0 ]]; then
             warn "No files found for $platform bundle"
@@ -610,6 +628,11 @@ create_test_type_bundles() {
     declare -a types=("login" "share" "invite")
     
     for type in "${types[@]}"; do
+        debug "=== Test Type Bundle Debug ==="
+        debug "Starting processing for type: $type"
+        debug "Current shell PID: $$"
+        debug "Parent shell PID: $PPID"
+        
         local temp_dir
         temp_dir=$(mktemp -d)
         TEMP_DIRS+=("$temp_dir")
@@ -620,6 +643,7 @@ create_test_type_bundles() {
         # Find workflows of this type
         for workflow in "${workflow_files[@]}"; do
             if [[ "$workflow" =~ ^$type- ]]; then
+                debug "Processing workflow: $workflow (Shell PID: $$)"
                 local workflow_name
                 workflow_name=$(sanitize_name "$workflow")
                 local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
@@ -628,13 +652,19 @@ create_test_type_bundles() {
                     mkdir -p "$temp_dir/$workflow_name"
                     # Copy recording files
                     while IFS= read -r -d '' video; do
+                        debug "Found video in subshell PID: $$"
+                        debug "Video path: $video"
+                        debug "Current found_files value: $found_files"
                         cp "$video" "$temp_dir/$workflow_name/"
                         ((found_files++))
-                        debug "Copied $video to temp directory for $type bundle"
+                        debug "Updated found_files value: $found_files"
                     done < <(find "$workflow_dir" -name "recording.mp4" -print0)
                 fi
             fi
         done
+        
+        debug "Final found_files value: $found_files"
+        debug "=== End Test Type Bundle Debug ==="
         
         if [[ $found_files -eq 0 ]]; then
             warn "No files found for $type bundle"
@@ -671,6 +701,9 @@ create_test_type_bundles() {
 # Create result-specific bundles based on workflow status
 create_result_bundles() {
     info "Creating result-specific bundles..."
+    debug "=== Result Bundle Debug ==="
+    debug "Starting result bundle processing"
+    debug "Current shell PID: $$"
     local base_dir="$ARTIFACTS_DIR/bundles"
     mkdir -p "$base_dir"
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
@@ -762,6 +795,9 @@ create_result_bundles() {
 # Create category-specific bundles based on workflow types
 create_category_bundles() {
     info "Creating category-specific bundles..."
+    debug "=== Category Bundle Debug ==="
+    debug "Starting category bundle processing"
+    debug "Current shell PID: $$"
     local base_dir="$ARTIFACTS_DIR/bundles"
     mkdir -p "$base_dir"
 
@@ -1002,14 +1038,14 @@ main() {
     generate_manifest
     
     # Create all zip bundles
-    # create_combined_zip
-    # create_platform_bundles
-    # create_test_type_bundles
-    # create_result_bundles
-    # create_category_bundles
+    create_combined_zip
+    create_platform_bundles
+    create_test_type_bundles
+    create_result_bundles
+    create_category_bundles
 
     # Generate bundle sizes JSON
-    # generate_bundle_sizes
+    generate_bundle_sizes
     
     # Debug output
     info "Contents of artifacts directory:"
