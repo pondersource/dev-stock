@@ -530,7 +530,15 @@ create_combined_zip() {
 create_platform_bundles() {
     info "Creating platform-specific zip bundles..."
     local base_dir="$ARTIFACTS_DIR/bundles"
-    mkdir -p "$base_dir"
+    
+    # Add explicit directory creation and validation
+    debug "Ensuring bundle directory exists: $base_dir"
+    if ! mkdir -p "$base_dir"; then
+        error "Failed to create bundle directory: $base_dir"
+        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
+        return 1
+    fi
+    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
     
     # Define platform combinations
     declare -A platforms=(
@@ -542,7 +550,6 @@ create_platform_bundles() {
         ["cernbox"]="cb"
     )
     
-    # Create temp directory for each platform combination
     for platform in "${!platforms[@]}"; do
         local temp_dir
         temp_dir=$(mktemp -d)
@@ -555,6 +562,20 @@ create_platform_bundles() {
         echo "0" > "$counter_file"
         
         info "Processing $platform tests..."
+        debug "Using temporary directory: $temp_dir"
+        debug "Temporary directory permissions: $(ls -ld "$temp_dir")"
+        
+        # Create zip file for this platform
+        local zip_file="$base_dir/ocm-tests-$platform.zip"
+        local zip_dir="$(dirname "$zip_file")"
+        
+        debug "Ensuring zip directory exists: $zip_dir"
+        if ! mkdir -p "$zip_dir"; then
+            error "Failed to create zip directory: $zip_dir"
+            error "Parent permissions: $(ls -ld "$(dirname "$zip_dir")")"
+            continue
+        fi
+        debug "Zip directory permissions: $(ls -ld "$zip_dir")"
         
         # Find workflows containing the platform code
         for workflow in "${workflow_files[@]}"; do
@@ -622,7 +643,15 @@ create_platform_bundles() {
 create_test_type_bundles() {
     info "Creating test-type specific bundles..."
     local base_dir="$ARTIFACTS_DIR/bundles"
-    mkdir -p "$base_dir"
+    
+    # Add explicit directory creation and validation
+    debug "Ensuring bundle directory exists: $base_dir"
+    if ! mkdir -p "$base_dir"; then
+        error "Failed to create bundle directory: $base_dir"
+        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
+        return 1
+    fi
+    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
     
     # Define test types
     declare -a types=("login" "share" "invite")
@@ -636,9 +665,15 @@ create_test_type_bundles() {
         local temp_dir
         temp_dir=$(mktemp -d)
         TEMP_DIRS+=("$temp_dir")
-        local found_files=0
+        
+        # Use a file to track the counter
+        local counter_file
+        counter_file=$(mktemp)
+        echo "0" > "$counter_file"
         
         info "Processing $type tests..."
+        debug "Using temporary directory: $temp_dir"
+        debug "Temporary directory permissions: $(ls -ld "$temp_dir")"
         
         # Find workflows of this type
         for workflow in "${workflow_files[@]}"; do
@@ -650,21 +685,31 @@ create_test_type_bundles() {
                 
                 if [[ -d "$workflow_dir" ]]; then
                     mkdir -p "$temp_dir/$workflow_name"
-                    # Copy recording files
+                    # Copy recording files and update counter using file
                     while IFS= read -r -d '' video; do
                         debug "Found video in subshell PID: $$"
                         debug "Video path: $video"
-                        debug "Current found_files value: $found_files"
-                        cp "$video" "$temp_dir/$workflow_name/"
-                        ((found_files++))
-                        debug "Updated found_files value: $found_files"
+                        local current_count
+                        read -r current_count < "$counter_file"
+                        debug "Current count from file: $current_count"
+                        
+                        if cp "$video" "$temp_dir/$workflow_name/"; then
+                            current_count=$((current_count + 1))
+                            echo "$current_count" > "$counter_file"
+                            debug "Updated count in file: $current_count"
+                        else
+                            error "Failed to copy video: $video"
+                        fi
                     done < <(find "$workflow_dir" -name "recording.mp4" -print0)
                 fi
             fi
         done
         
-        debug "Final found_files value: $found_files"
-        debug "=== End Test Type Bundle Debug ==="
+        # Read final count from file
+        local found_files
+        read -r found_files < "$counter_file"
+        rm -f "$counter_file"
+        debug "Final count from file: $found_files"
         
         if [[ $found_files -eq 0 ]]; then
             warn "No files found for $type bundle"
@@ -674,7 +719,16 @@ create_test_type_bundles() {
         
         # Create zip file for this test type
         local zip_file="$base_dir/ocm-tests-$type.zip"
-        mkdir -p "$(dirname "$zip_file")"
+        local zip_dir="$(dirname "$zip_file")"
+        
+        debug "Ensuring zip directory exists: $zip_dir"
+        if ! mkdir -p "$zip_dir"; then
+            error "Failed to create zip directory: $zip_dir"
+            error "Parent permissions: $(ls -ld "$(dirname "$zip_dir")")"
+            continue
+        fi
+        debug "Zip directory permissions: $(ls -ld "$zip_dir")"
+        debug "About to create zip file: $zip_file"
         
         if (cd "$temp_dir" && zip -r "$zip_file" .); then
             if [[ -f "$zip_file" ]]; then
@@ -686,6 +740,8 @@ create_test_type_bundles() {
             fi
         else
             error "Failed to create zip file for $type"
+            error "Current directory: $(pwd)"
+            error "Temp directory contents: $(ls -la "$temp_dir")"
         fi
         
         rm -rf "$temp_dir"
