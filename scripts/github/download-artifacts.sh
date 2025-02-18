@@ -763,6 +763,8 @@ create_test_type_bundles() {
             fi
         else
             error "Failed to create zip file for $type"
+            error "Absolute temp dir: $abs_temp_dir"
+            error "Absolute zip file: $abs_zip_file"
             error "Current directory: $(pwd)"
             error "Temp directory contents: $(ls -la "$temp_dir")"
         fi
