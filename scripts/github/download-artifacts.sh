@@ -21,9 +21,6 @@ readonly IMAGES_DIR="site/static/images"
 readonly LOG_FILE="/tmp/artifact-download-$(date +%Y%m%d-%H%M%S).log"
 declare -a TEMP_DIRS=()
 
-DEBUG=1
-export DEBUG
-
 # Enhanced logging functions
 log() { 
     local timestamp level msg
