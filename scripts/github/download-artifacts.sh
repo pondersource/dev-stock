@@ -613,20 +613,34 @@ create_platform_bundles() {
             continue
         fi
         
-        # Create zip file for this platform
-        local zip_file="$base_dir/ocm-tests-$platform.zip"
-        mkdir -p "$(dirname "$zip_file")"
+        # Create zip file for this platform using absolute paths
+        local abs_temp_dir
+        abs_temp_dir=$(cd "$temp_dir" && pwd)
+        local abs_zip_file
+        abs_zip_file=$(cd "$(dirname "$zip_file")" && pwd)/$(basename "$zip_file")
         
-        if (cd "$temp_dir" && zip -r "$zip_file" .); then
-            if [[ -f "$zip_file" ]]; then
+        debug "Creating zip file from: $abs_temp_dir"
+        debug "Creating zip file to: $abs_zip_file"
+        
+        # Create zip file using absolute paths
+        if (cd "$abs_temp_dir" && zip -r "$abs_zip_file" .); then
+            if [[ -f "$abs_zip_file" ]]; then
                 local zip_size
-                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
                 success "Created $platform bundle: $zip_file ($(human_size ${zip_size:-0}))"
             else
                 error "Failed to create zip file for $platform"
+                error "Absolute temp dir: $abs_temp_dir"
+                error "Absolute zip file: $abs_zip_file"
+                error "Current directory: $(pwd)"
+                error "Temp directory contents: $(ls -la "$temp_dir")"
             fi
         else
             error "Failed to create zip file for $platform"
+            error "Absolute temp dir: $abs_temp_dir"
+            error "Absolute zip file: $abs_zip_file"
+            error "Current directory: $(pwd)"
+            error "Temp directory contents: $(ls -la "$temp_dir")"
         fi
         
         rm -rf "$temp_dir"
@@ -717,7 +731,7 @@ create_test_type_bundles() {
             continue
         fi
         
-        # Create zip file for this test type
+        # Create zip file for this test type using absolute paths
         local zip_file="$base_dir/ocm-tests-$type.zip"
         local zip_dir="$(dirname "$zip_file")"
         
@@ -730,13 +744,22 @@ create_test_type_bundles() {
         debug "Zip directory permissions: $(ls -ld "$zip_dir")"
         debug "About to create zip file: $zip_file"
         
-        if (cd "$temp_dir" && zip -r "$zip_file" .); then
-            if [[ -f "$zip_file" ]]; then
+        debug "Creating zip file from: $abs_temp_dir"
+        debug "Creating zip file to: $abs_zip_file"
+        debug "Current working directory: $(pwd)"
+        
+        # Create zip file using absolute paths
+        if (cd "$abs_temp_dir" && zip -r "$abs_zip_file" .); then
+            if [[ -f "$abs_zip_file" ]]; then
                 local zip_size
-                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
                 success "Created $type tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
             else
                 error "Failed to create zip file for $type"
+                error "Absolute temp dir: $abs_temp_dir"
+                error "Absolute zip file: $abs_zip_file"
+                error "Current directory: $(pwd)"
+                error "Temp directory contents: $(ls -la "$temp_dir")"
             fi
         else
             error "Failed to create zip file for $type"
@@ -761,7 +784,16 @@ create_result_bundles() {
     debug "Starting result bundle processing"
     debug "Current shell PID: $$"
     local base_dir="$ARTIFACTS_DIR/bundles"
-    mkdir -p "$base_dir"
+    
+    # Add explicit directory creation and validation
+    debug "Ensuring bundle directory exists: $base_dir"
+    if ! mkdir -p "$base_dir"; then
+        error "Failed to create bundle directory: $base_dir"
+        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
+        return 1
+    fi
+    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
+    
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
     
     # Create temp directories for success/failure
@@ -772,9 +804,13 @@ create_result_bundles() {
     failed_dir=$(mktemp -d)
     TEMP_DIRS+=("$failed_dir")
     
-    # Track file counts
-    local success_count=0
-    local failed_count=0
+    # Track file counts using files
+    local success_counter
+    success_counter=$(mktemp)
+    echo "0" > "$success_counter"
+    local failed_counter
+    failed_counter=$(mktemp)
+    echo "0" > "$failed_counter"
     
     # Process each workflow based on its status
     jq -r 'to_entries[] | "\(.key) \(.value.conclusion)"' "$status_file" | while read -r workflow status; do
@@ -783,26 +819,36 @@ create_result_bundles() {
         local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
         
         if [[ -d "$workflow_dir" ]]; then
-            local target_dir
+            local target_dir counter_file
             if [[ "$status" == "success" ]]; then
                 target_dir="$success_dir/$workflow_name"
+                counter_file="$success_counter"
             else
                 target_dir="$failed_dir/$workflow_name"
+                counter_file="$failed_counter"
             fi
             
             mkdir -p "$target_dir"
             # Copy recording files
             while IFS= read -r -d '' video; do
-                cp "$video" "$target_dir/"
-                if [[ "$status" == "success" ]]; then
-                    ((success_count++))
+                if cp "$video" "$target_dir/"; then
+                    local current_count
+                    read -r current_count < "$counter_file"
+                    current_count=$((current_count + 1))
+                    echo "$current_count" > "$counter_file"
+                    debug "Copied $video to $(basename "$target_dir") bundle"
                 else
-                    ((failed_count++))
+                    error "Failed to copy $video to $target_dir/"
                 fi
-                debug "Copied $video to $(basename "$target_dir") bundle"
             done < <(find "$workflow_dir" -name "recording.mp4" -print0)
         fi
     done
+    
+    # Read final counts
+    local success_count failed_count
+    read -r success_count < "$success_counter"
+    read -r failed_count < "$failed_counter"
+    rm -f "$success_counter" "$failed_counter"
     
     # Create success/failure zip files
     for result in "success" "failed"; do
@@ -821,18 +867,33 @@ create_result_bundles() {
         fi
         
         local zip_file="$base_dir/ocm-tests-$result.zip"
-        mkdir -p "$(dirname "$zip_file")"
+        local abs_source_dir
+        abs_source_dir=$(cd "$source_dir" && pwd)
+        local abs_zip_file
+        abs_zip_file=$(cd "$(dirname "$zip_file")" && pwd)/$(basename "$zip_file")
         
-        if (cd "$source_dir" && zip -r "$zip_file" .); then
-            if [[ -f "$zip_file" ]]; then
+        debug "Creating zip file from: $abs_source_dir"
+        debug "Creating zip file to: $abs_zip_file"
+        debug "Current working directory: $(pwd)"
+        
+        if (cd "$abs_source_dir" && zip -r "$abs_zip_file" .); then
+            if [[ -f "$abs_zip_file" ]]; then
                 local zip_size
-                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
+                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
                 success "Created $result tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
             else
                 error "Failed to create zip file for $result"
+                error "Absolute source dir: $abs_source_dir"
+                error "Absolute zip file: $abs_zip_file"
+                error "Current directory: $(pwd)"
+                error "Source directory contents: $(ls -la "$source_dir")"
             fi
         else
             error "Failed to create zip file for $result"
+            error "Absolute source dir: $abs_source_dir"
+            error "Absolute zip file: $abs_zip_file"
+            error "Current directory: $(pwd)"
+            error "Source directory contents: $(ls -la "$source_dir")"
         fi
     done
     
