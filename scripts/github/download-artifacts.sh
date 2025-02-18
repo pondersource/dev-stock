@@ -924,7 +924,15 @@ create_category_bundles() {
     debug "Starting category bundle processing"
     debug "Current shell PID: $$"
     local base_dir="$ARTIFACTS_DIR/bundles"
-    mkdir -p "$base_dir"
+    
+    # Add explicit directory creation and validation
+    debug "Ensuring bundle directory exists: $base_dir"
+    if ! mkdir -p "$base_dir"; then
+        error "Failed to create bundle directory: $base_dir"
+        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
+        return 1
+    fi
+    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
 
     # Define test categories and their workflow patterns
     declare -A categories=(
@@ -941,6 +949,8 @@ create_category_bundles() {
         TEMP_DIRS+=("$temp_dir")
 
         info "Processing $category category tests..."
+        debug "Using temporary directory: $temp_dir"
+        debug "Temporary directory permissions: $(ls -ld "$temp_dir")"
 
         # Find workflows matching this category's pattern
         for workflow in "${workflow_files[@]}"; do
@@ -956,15 +966,47 @@ create_category_bundles() {
             fi
         done
 
-        # Create zip file for this category
+        # Create zip file for this category using absolute paths
         local zip_file="$base_dir/ocm-tests-$category.zip"
-        (cd "$temp_dir" && zip -r "$zip_file" .)
+        local zip_dir="$(dirname "$zip_file")"
+        
+        # Get absolute paths
+        local abs_temp_dir
+        abs_temp_dir=$(cd "$temp_dir" && pwd)
+        local abs_zip_file
+        abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
+        
+        debug "Creating zip file from: $abs_temp_dir"
+        debug "Creating zip file to: $abs_zip_file"
+        debug "Current working directory: $(pwd)"
 
-        if [[ -f "$zip_file" ]]; then
-            local zip_size
-            zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-            success "Created $category category bundle: $zip_file ($(human_size ${zip_size:-0}))"
+        if (cd "$abs_temp_dir" && zip -r "$abs_zip_file" .); then
+            if [[ -f "$abs_zip_file" ]]; then
+                local zip_size
+                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
+                success "Created $category category bundle: $zip_file ($(human_size ${zip_size:-0}))"
+            else
+                error "Failed to create zip file for $category"
+                error "Absolute temp dir: $abs_temp_dir"
+                error "Absolute zip file: $abs_zip_file"
+                error "Current directory: $(pwd)"
+                error "Temp directory contents: $(ls -la "$temp_dir")"
+            fi
+        else
+            error "Failed to create zip file for $category"
+            error "Absolute temp dir: $abs_temp_dir"
+            error "Absolute zip file: $abs_zip_file"
+            error "Current directory: $(pwd)"
+            error "Temp directory contents: $(ls -la "$temp_dir")"
         fi
+
+        rm -rf "$temp_dir"
+        for i in "${!TEMP_DIRS[@]}"; do
+            if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
+                unset 'TEMP_DIRS[i]'
+                break
+            fi
+        done
     done
 }
 
