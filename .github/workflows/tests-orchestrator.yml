@@ -56,18 +56,15 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const orchestrateTests = require('./scripts/github/orchestrate-tests.js');
-            const context = {
-              ...context,
-              ref: process.env.WORKFLOW_REF
-            };
+            context.ref = process.env.WORKFLOW_REF;
             try {
               const success = await orchestrateTests(github, context);
-              core.setOutput('success', success ? 'true' : 'false');
+              core.setOutput('tests_passed', success ? 'true' : 'false');
               if (!success) {
                 core.setFailed('One or more test workflows failed');
               }
             } catch (error) {
-              core.setOutput('success', 'false');
+              core.setOutput('tests_passed', 'false');
               core.setFailed(`Error orchestrating tests: ${error.message}`);
             }
 
