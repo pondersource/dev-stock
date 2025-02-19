@@ -175,6 +175,7 @@ module.exports = async function orchestrateTests(github, context) {
   const batchSize = DEFAULT_BATCH_SIZE;
   const totalWorkflows = WORKFLOWS.length;
   const totalBatches = Math.ceil(totalWorkflows / batchSize);
+  let allSucceeded = true;
 
   console.log(`Starting orchestration of ${totalWorkflows} workflows in ${totalBatches} batches...`);
 
@@ -192,6 +193,7 @@ module.exports = async function orchestrateTests(github, context) {
         triggeredWorkflows.push(wf);
       } catch (error) {
         console.error(`Error triggering workflow ${workflow}: ${error.message}`);
+        allSucceeded = false;
       }
     }
 
@@ -206,9 +208,13 @@ module.exports = async function orchestrateTests(github, context) {
           wf.runId
         );
         console.log(`Workflow ${wf.name} completed with conclusion: ${conclusion}`);
+        if (conclusion !== 'success') {
+          allSucceeded = false;
+        }
       })
     );
   }
 
   console.log('\nAll test workflows have completed.');
+  return allSucceeded;
 };

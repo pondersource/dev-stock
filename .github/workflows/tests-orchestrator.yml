@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
+      tests_passed: ${{ steps.run-tests.outputs.success }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,16 +38,39 @@ jobs:
         id: get-sha
         run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
+      - name: Set ref for workflow dispatch
+        id: set-ref
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "ref=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Trigger and monitor test workflows
+        id: run-tests
         uses: actions/github-script@v7
+        env:
+          WORKFLOW_REF: ${{ steps.set-ref.outputs.ref }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const orchestrateTests = require('./scripts/github/orchestrate-tests.js');
-            await orchestrateTests(github, context);
+            context.ref = process.env.WORKFLOW_REF;
+            try {
+              const success = await orchestrateTests(github, context);
+              core.setOutput('tests_passed', success ? 'true' : 'false');
+              if (!success) {
+                core.setFailed('One or more test workflows failed');
+              }
+            } catch (error) {
+              core.setOutput('tests_passed', 'false');
+              core.setFailed(`Error orchestrating tests: ${error.message}`);
+            }
 
   trigger-pages:
     needs: orchestrate-tests
+    if: needs.orchestrate-tests.outputs.tests_passed == 'true'
     uses: ./.github/workflows/github-pages.yml
     with:
       sha: ${{ needs.orchestrate-tests.outputs.commit_sha }} 

@@ -120,12 +120,14 @@ command_exists() {
 #   3. Tags (space-separated string of tags)
 #   4. Cache Bust to force rebuild.
 #   5. Additional build arguments (optional)
+#   6. Build context path (optional, defaults to '.')
 build_docker_image() {
     local dockerfile="${1}"
     local image_name="${2}"
     local tags="${3}"
     local cache_bust="${4}"
-    local build_args="${5}"
+    local build_args="${5:-}"
+    local context_path="${6:-.}"
 
     # Validate that the Dockerfile exists
     if [[ ! -f "./dockerfiles/${dockerfile}" ]]; then
@@ -138,7 +140,7 @@ build_docker_image() {
         --build-arg CACHEBUST="${cache_bust}" ${build_args} \
         --file "./dockerfiles/${dockerfile}" \
         $(for tag in ${tags}; do printf -- "--tag ${image_name}:%s " "${tag}"; done) \
-        .; then
+        "${context_path}"; then
         print_error "Failed to build image ${image_name}."
         return 1
     fi
@@ -287,6 +289,9 @@ main() {
     # -----------------------------------------------------------------------------------
     # Build Images
     # -----------------------------------------------------------------------------------
+    # Dev Stock (Base development environment)
+    build_docker_image dev-stock.Dockerfile         pondersource/dev-stock          "v1.0.0 latest"            DEFAULT "" ".."
+
     # OCM Stub
     build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"     DEFAULT
 

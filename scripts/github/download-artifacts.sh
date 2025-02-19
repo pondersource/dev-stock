@@ -436,91 +436,51 @@ create_required_directories() {
 # Create a combined zip file of all test artifacts
 create_combined_zip() {
     info "Creating combined zip file of all test artifacts..."
-    local zip_file="$ARTIFACTS_DIR/ocm-tests-all.zip"
+    local base_dir="$ARTIFACTS_DIR/bundles"
+    local zip_file="$base_dir/ocm-tests-all.zip"
     
-    # Create parent directories first
-    if ! create_required_directories; then
-        error "Failed to create required directories"
-        return 1
-    fi
+    # Create parent directories
+    ensure_directory "$base_dir" "bundle" || return 1
     
+    # Create temporary directory for files
     local temp_dir
-    temp_dir=$(mktemp -d)
-    TEMP_DIRS+=("$temp_dir")
-    
-    # Create a subdirectory for the files to zip
+    temp_dir=$(create_temp_dir)
     local files_dir="$temp_dir/files"
     mkdir -p "$files_dir"
+    debug "Created temporary directory for files: $files_dir"
     
-    # Create counter file
+    # Initialize counter
     local counter_file
-    counter_file=$(mktemp)
-    echo "0" > "$counter_file"
+    counter_file=$(create_counter_file)
     
     # Copy all workflow artifacts to temp directory
     for workflow in "${workflow_files[@]}"; do
         local workflow_name
         workflow_name=$(sanitize_name "$workflow")
         local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
-        
-        if [[ -d "$workflow_dir" ]]; then
-            # Create workflow directory in temp
-            mkdir -p "$files_dir/$workflow_name" || {
-                error "Failed to create directory: $files_dir/$workflow_name"
-                rm -f "$counter_file"
-                return 1
-            }
-            
-            # Copy recording files
-            while IFS= read -r -d '' video; do
-                if ! cp "$video" "$files_dir/$workflow_name/"; then
-                    error "Failed to copy $video to $files_dir/$workflow_name/"
-                    continue
-                fi
-                local current_count
-                read -r current_count < "$counter_file"
-                current_count=$((current_count + 1))
-                echo "$current_count" > "$counter_file"
-                debug "Copied $video to temp directory"
-            done < <(find "$workflow_dir" -name "recording.mp4" -print0)
-        fi
+        copy_workflow_videos "$workflow_dir" "$files_dir" "$counter_file" "$workflow_name"
     done
     
     # Get final count
     local found_files
     read -r found_files < "$counter_file"
-    rm -f "$counter_file"
     
     if [[ $found_files -eq 0 ]]; then
         warn "No files found to zip"
-        rm -rf "$temp_dir"
+        cleanup_temp_resources "$temp_dir" "$counter_file"
         return 0
     fi
     
     info "Creating zip file with $found_files videos..."
     
-    # Create temporary zip file first
-    local temp_zip="$temp_dir/temp.zip"
-    if (cd "$files_dir" && zip -r "$temp_zip" .); then
-        if [[ -f "$temp_zip" ]]; then
-            # Move the zip file to its final destination
-            if mv "$temp_zip" "$zip_file"; then
-                local zip_size
-                zip_size=$(stat -f%z "$zip_file" 2>/dev/null || stat -c%s "$zip_file")
-                success "Created combined zip file: $zip_file ($(human_size ${zip_size:-0}))"
-                return 0
-            else
-                error "Failed to move zip file to final location"
-                return 1
-            fi
-        else
-            error "Failed to create temporary zip file"
-            return 1
-        fi
-    else
-        error "Failed to create zip file"
+    # Create the zip bundle
+    create_zip_bundle "$files_dir" "$zip_file" "combined" || {
+        cleanup_temp_resources "$temp_dir" "$counter_file"
         return 1
-    fi
+    }
+    
+    cleanup_temp_resources "$temp_dir" "$counter_file"
+    return 0
 }
 
 # Create platform-specific zip bundles
@@ -528,14 +488,8 @@ create_platform_bundles() {
     info "Creating platform-specific zip bundles..."
     local base_dir="$ARTIFACTS_DIR/bundles"
     
-    # Add explicit directory creation and validation
-    debug "Ensuring bundle directory exists: $base_dir"
-    if ! mkdir -p "$base_dir"; then
-        error "Failed to create bundle directory: $base_dir"
-        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
-        return 1
-    fi
-    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
+    # Create parent directories
+    ensure_directory "$base_dir" "bundle" || return 1
     
     # Define platform combinations
     declare -A platforms=(
@@ -548,31 +502,16 @@ create_platform_bundles() {
     )
     
     for platform in "${!platforms[@]}"; do
-        local temp_dir
-        temp_dir=$(mktemp -d)
-        TEMP_DIRS+=("$temp_dir")
         local platform_code="${platforms[$platform]}"
-        
-        # Create counter file
-        local counter_file
-        counter_file=$(mktemp)
-        echo "0" > "$counter_file"
+        local temp_dir
+        temp_dir=$(create_temp_dir)
         
         info "Processing $platform tests..."
         debug "Using temporary directory: $temp_dir"
-        debug "Temporary directory permissions: $(ls -ld "$temp_dir")"
         
-        # Create zip file for this platform
-        local zip_file="$base_dir/ocm-tests-$platform.zip"
-        local zip_dir="$(dirname "$zip_file")"
-        
-        debug "Ensuring zip directory exists: $zip_dir"
-        if ! mkdir -p "$zip_dir"; then
-            error "Failed to create zip directory: $zip_dir"
-            error "Parent permissions: $(ls -ld "$(dirname "$zip_dir")")"
-            continue
-        fi
-        debug "Zip directory permissions: $(ls -ld "$zip_dir")"
+        # Initialize counter
+        local counter_file
+        counter_file=$(create_counter_file)
         
         # Find workflows containing the platform code
         for workflow in "${workflow_files[@]}"; do
@@ -580,73 +519,30 @@ create_platform_bundles() {
                 local workflow_name
                 workflow_name=$(sanitize_name "$workflow")
                 local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
-                
-                if [[ -d "$workflow_dir" ]]; then
-                    mkdir -p "$temp_dir/$workflow_name"
-                    # Copy recording files
-                    while IFS= read -r -d '' video; do
-                        if ! cp "$video" "$temp_dir/$workflow_name/"; then
-                            error "Failed to copy $video to $temp_dir/$workflow_name/"
-                            continue
-                        fi
-                        local current_count
-                        read -r current_count < "$counter_file"
-                        current_count=$((current_count + 1))
-                        echo "$current_count" > "$counter_file"
-                        debug "Copied $video to temp directory for $platform bundle"
-                    done < <(find "$workflow_dir" -name "recording.mp4" -print0)
-                fi
+                copy_workflow_videos "$workflow_dir" "$temp_dir" "$counter_file" "$workflow_name"
             fi
         done
         
         # Get final count
         local found_files
         read -r found_files < "$counter_file"
-        rm -f "$counter_file"
         
         if [[ $found_files -eq 0 ]]; then
             warn "No files found for $platform bundle"
-            rm -rf "$temp_dir"
+            cleanup_temp_resources "$temp_dir" "$counter_file"
             continue
         fi
         
-        # Create zip file for this platform using absolute paths
-        local abs_temp_dir
-        abs_temp_dir=$(cd "$temp_dir" && pwd)
-        local abs_zip_file
-        abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
+        # Create zip file for this platform
+        local zip_file="$base_dir/ocm-tests-$platform.zip"
         
-        debug "Creating zip file from: $abs_temp_dir"
-        debug "Creating zip file to: $abs_zip_file"
+        # Create the zip bundle
+        create_zip_bundle "$temp_dir" "$zip_file" "$platform" || {
+            cleanup_temp_resources "$temp_dir" "$counter_file"
+            continue
+        }
         
-        # Create zip file using absolute paths
-        if (cd "$abs_temp_dir" && zip -r "$abs_zip_file" .); then
-            if [[ -f "$abs_zip_file" ]]; then
-                local zip_size
-                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
-                success "Created $platform bundle: $zip_file ($(human_size ${zip_size:-0}))"
-            else
-                error "Failed to create zip file for $platform"
-                error "Absolute temp dir: $abs_temp_dir"
-                error "Absolute zip file: $abs_zip_file"
-                error "Current directory: $(pwd)"
-                error "Temp directory contents: $(ls -la "$temp_dir")"
-            fi
-        else
-            error "Failed to create zip file for $platform"
-            error "Absolute temp dir: $abs_temp_dir"
-            error "Absolute zip file: $abs_zip_file"
-            error "Current directory: $(pwd)"
-            error "Temp directory contents: $(ls -la "$temp_dir")"
-        fi
-        
-        rm -rf "$temp_dir"
-        for i in "${!TEMP_DIRS[@]}"; do
-            if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
-                unset 'TEMP_DIRS[i]'
-                break
-            fi
-        done
+        cleanup_temp_resources "$temp_dir" "$counter_file"
     done
 }
 
@@ -655,14 +551,8 @@ create_test_type_bundles() {
     info "Creating test-type specific bundles..."
     local base_dir="$ARTIFACTS_DIR/bundles"
     
-    # Add explicit directory creation and validation
-    debug "Ensuring bundle directory exists: $base_dir"
-    if ! mkdir -p "$base_dir"; then
-        error "Failed to create bundle directory: $base_dir"
-        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
-        return 1
-    fi
-    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
+    # Create parent directories
+    ensure_directory "$base_dir" "bundle" || return 1
     
     # Define test types
     declare -a types=("login" "share" "invite")
@@ -671,20 +561,16 @@ create_test_type_bundles() {
         debug "=== Test Type Bundle Debug ==="
         debug "Starting processing for type: $type"
         debug "Current shell PID: $$"
-        debug "Parent shell PID: $PPID"
         
         local temp_dir
-        temp_dir=$(mktemp -d)
-        TEMP_DIRS+=("$temp_dir")
-        
-        # Use a file to track the counter
-        local counter_file
-        counter_file=$(mktemp)
-        echo "0" > "$counter_file"
+        temp_dir=$(create_temp_dir)
         
         info "Processing $type tests..."
         debug "Using temporary directory: $temp_dir"
-        debug "Temporary directory permissions: $(ls -ld "$temp_dir")"
+        
+        # Initialize counter
+        local counter_file
+        counter_file=$(create_counter_file)
         
         # Find workflows of this type
         for workflow in "${workflow_files[@]}"; do
@@ -693,92 +579,31 @@ create_test_type_bundles() {
                 local workflow_name
                 workflow_name=$(sanitize_name "$workflow")
                 local workflow_dir="$ARTIFACTS_DIR/$workflow_name"
-                
-                if [[ -d "$workflow_dir" ]]; then
-                    mkdir -p "$temp_dir/$workflow_name"
-                    # Copy recording files and update counter using file
-                    while IFS= read -r -d '' video; do
-                        debug "Found video in subshell PID: $$"
-                        debug "Video path: $video"
-                        local current_count
-                        read -r current_count < "$counter_file"
-                        debug "Current count from file: $current_count"
-                        
-                        if cp "$video" "$temp_dir/$workflow_name/"; then
-                            current_count=$((current_count + 1))
-                            echo "$current_count" > "$counter_file"
-                            debug "Updated count in file: $current_count"
-                        else
-                            error "Failed to copy video: $video"
-                        fi
-                    done < <(find "$workflow_dir" -name "recording.mp4" -print0)
-                fi
+                copy_workflow_videos "$workflow_dir" "$temp_dir" "$counter_file" "$workflow_name"
             fi
         done
         
-        # Read final count from file
+        # Get final count
         local found_files
         read -r found_files < "$counter_file"
-        rm -f "$counter_file"
         debug "Final count from file: $found_files"
         
         if [[ $found_files -eq 0 ]]; then
             warn "No files found for $type bundle"
-            rm -rf "$temp_dir"
+            cleanup_temp_resources "$temp_dir" "$counter_file"
             continue
         fi
         
-        # Create zip file for this test type using absolute paths
+        # Create zip file for this test type
         local zip_file="$base_dir/ocm-tests-$type.zip"
-        local zip_dir="$(dirname "$zip_file")"
         
-        # Define absolute paths before using them
-        local abs_temp_dir
-        abs_temp_dir=$(cd "$temp_dir" && pwd)
-        local abs_zip_file
-        abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
-        
-        debug "Ensuring zip directory exists: $zip_dir"
-        if ! mkdir -p "$zip_dir"; then
-            error "Failed to create zip directory: $zip_dir"
-            error "Parent permissions: $(ls -ld "$(dirname "$zip_dir")")"
+        # Create the zip bundle
+        create_zip_bundle "$temp_dir" "$zip_file" "$type tests" || {
+            cleanup_temp_resources "$temp_dir" "$counter_file"
             continue
-        fi
-        debug "Zip directory permissions: $(ls -ld "$zip_dir")"
-        debug "About to create zip file: $zip_file"
+        }
         
-        debug "Creating zip file from: $abs_temp_dir"
-        debug "Creating zip file to: $abs_zip_file"
-        debug "Current working directory: $(pwd)"
-        
-        # Create zip file using absolute paths
-        if (cd "$abs_temp_dir" && zip -r "$abs_zip_file" .); then
-            if [[ -f "$abs_zip_file" ]]; then
-                local zip_size
-                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
-                success "Created $type tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
-            else
-                error "Failed to create zip file for $type"
-                error "Absolute temp dir: $abs_temp_dir"
-                error "Absolute zip file: $abs_zip_file"
-                error "Current directory: $(pwd)"
-                error "Temp directory contents: $(ls -la "$temp_dir")"
-            fi
-        else
-            error "Failed to create zip file for $type"
-            error "Absolute temp dir: $abs_temp_dir"
-            error "Absolute zip file: $abs_zip_file"
-            error "Current directory: $(pwd)"
-            error "Temp directory contents: $(ls -la "$temp_dir")"
-        fi
-        
-        rm -rf "$temp_dir"
-        for i in "${!TEMP_DIRS[@]}"; do
-            if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
-                unset 'TEMP_DIRS[i]'
-                break
-            fi
-        done
+        cleanup_temp_resources "$temp_dir" "$counter_file"
     done
 }
 
@@ -790,32 +615,22 @@ create_result_bundles() {
     debug "Current shell PID: $$"
     local base_dir="$ARTIFACTS_DIR/bundles"
     
-    # Add explicit directory creation and validation
-    debug "Ensuring bundle directory exists: $base_dir"
-    if ! mkdir -p "$base_dir"; then
-        error "Failed to create bundle directory: $base_dir"
-        error "Parent directory permissions: $(ls -ld "$(dirname "$base_dir")")"
-        return 1
-    fi
-    debug "Bundle directory permissions: $(ls -ld "$base_dir")"
+    # Create parent directories
+    ensure_directory "$base_dir" "bundle" || return 1
     
     local status_file="$ARTIFACTS_DIR/workflow-status.json"
     
     # Create temp directories for success/failure
     local success_dir
-    success_dir=$(mktemp -d)
-    TEMP_DIRS+=("$success_dir")
+    success_dir=$(create_temp_dir)
     local failed_dir
-    failed_dir=$(mktemp -d)
-    TEMP_DIRS+=("$failed_dir")
+    failed_dir=$(create_temp_dir)
     
-    # Track file counts using files
+    # Initialize counters
     local success_counter
-    success_counter=$(mktemp)
-    echo "0" > "$success_counter"
+    success_counter=$(create_counter_file)
     local failed_counter
-    failed_counter=$(mktemp)
-    echo "0" > "$failed_counter"
+    failed_counter=$(create_counter_file)
     
     # Process each workflow based on its status
     jq -r 'to_entries[] | "\(.key) \(.value.conclusion)"' "$status_file" | while read -r workflow status; do
@@ -826,44 +641,33 @@ create_result_bundles() {
         if [[ -d "$workflow_dir" ]]; then
             local target_dir counter_file
             if [[ "$status" == "success" ]]; then
-                target_dir="$success_dir/$workflow_name"
+                target_dir="$success_dir"
                 counter_file="$success_counter"
             else
-                target_dir="$failed_dir/$workflow_name"
+                target_dir="$failed_dir"
                 counter_file="$failed_counter"
             fi
             
-            mkdir -p "$target_dir"
-            # Copy recording files
-            while IFS= read -r -d '' video; do
-                if cp "$video" "$target_dir/"; then
-                    local current_count
-                    read -r current_count < "$counter_file"
-                    current_count=$((current_count + 1))
-                    echo "$current_count" > "$counter_file"
-                    debug "Copied $video to $(basename "$target_dir") bundle"
-                else
-                    error "Failed to copy $video to $target_dir/"
-                fi
-            done < <(find "$workflow_dir" -name "recording.mp4" -print0)
+            copy_workflow_videos "$workflow_dir" "$target_dir" "$counter_file" "$workflow_name"
         fi
     done
     
-    # Read final counts
+    # Get final counts
     local success_count failed_count
     read -r success_count < "$success_counter"
     read -r failed_count < "$failed_counter"
-    rm -f "$success_counter" "$failed_counter"
     
     # Create success/failure zip files
     for result in "success" "failed"; do
-        local source_dir count
+        local source_dir count counter_file
         if [[ "$result" == "success" ]]; then
             source_dir="$success_dir"
             count=$success_count
+            counter_file="$success_counter"
         else
             source_dir="$failed_dir"
             count=$failed_count
+            counter_file="$failed_counter"
         fi
         
         if [[ $count -eq 0 ]]; then
@@ -872,46 +676,14 @@ create_result_bundles() {
         fi
         
         local zip_file="$base_dir/ocm-tests-$result.zip"
-        local abs_source_dir
-        abs_source_dir=$(cd "$source_dir" && pwd)
-        local abs_zip_file
-        abs_zip_file=$(cd "$(dirname "$zip_file")" && pwd)/$(basename "$zip_file")
         
-        debug "Creating zip file from: $abs_source_dir"
-        debug "Creating zip file to: $abs_zip_file"
-        debug "Current working directory: $(pwd)"
-        
-        if (cd "$abs_source_dir" && zip -r "$abs_zip_file" .); then
-            if [[ -f "$abs_zip_file" ]]; then
-                local zip_size
-                zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
-                success "Created $result tests bundle: $zip_file ($(human_size ${zip_size:-0}))"
-            else
-                error "Failed to create zip file for $result"
-                error "Absolute source dir: $abs_source_dir"
-                error "Absolute zip file: $abs_zip_file"
-                error "Current directory: $(pwd)"
-                error "Source directory contents: $(ls -la "$source_dir")"
-            fi
-        else
-            error "Failed to create zip file for $result"
-            error "Absolute source dir: $abs_source_dir"
-            error "Absolute zip file: $abs_zip_file"
-            error "Current directory: $(pwd)"
-            error "Source directory contents: $(ls -la "$source_dir")"
-        fi
+        # Create the zip bundle
+        create_zip_bundle "$source_dir" "$zip_file" "$result tests" || continue
     done
     
-    # Cleanup temp directories
-    rm -rf "$success_dir" "$failed_dir"
-    for dir in "$success_dir" "$failed_dir"; do
-        for i in "${!TEMP_DIRS[@]}"; do
-            if [[ ${TEMP_DIRS[i]} = "$dir" ]]; then
-                unset 'TEMP_DIRS[i]'
-                break
-            fi
-        done
-    done
+    # Cleanup temp resources
+    cleanup_temp_resources "$success_dir" "$success_counter"
+    cleanup_temp_resources "$failed_dir" "$failed_counter"
 }
 
 # Create category-specific bundles based on workflow types
@@ -1046,6 +818,131 @@ generate_bundle_sizes() {
         error "Failed to generate bundle sizes file"
         return 1
     fi
+}
+
+# Common helper functions to reduce duplication
+
+# Ensures a directory exists and logs permissions
+ensure_directory() {
+    local dir="$1"
+    local dir_type="$2"
+    
+    debug "Ensuring $dir_type directory exists: $dir"
+    if ! mkdir -p "$dir"; then
+        error "Failed to create $dir_type directory: $dir"
+        error "Parent directory permissions: $(ls -ld "$(dirname "$dir")" 2>/dev/null || echo 'Cannot read parent directory')"
+        return 1
+    fi
+    debug "$dir_type directory permissions: $(ls -ld "$dir")"
+    return 0
+}
+
+# Creates a temporary directory and adds it to TEMP_DIRS array
+create_temp_dir() {
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    TEMP_DIRS+=("$temp_dir")
+    echo "$temp_dir"
+}
+
+# Creates and initializes a counter file
+create_counter_file() {
+    local initial_value="${1:-0}"
+    local counter_file
+    counter_file=$(mktemp)
+    echo "$initial_value" > "$counter_file"
+    echo "$counter_file"
+}
+
+# Increments a counter file and returns new value
+increment_counter() {
+    local counter_file="$1"
+    local current_count
+    read -r current_count < "$counter_file"
+    current_count=$((current_count + 1))
+    echo "$current_count" > "$counter_file"
+    echo "$current_count"
+}
+
+# Common function to create zip files
+create_zip_bundle() {
+    local source_dir="$1"
+    local zip_file="$2"
+    local bundle_type="$3"
+    
+    local zip_dir="$(dirname "$zip_file")"
+    
+    # Get absolute paths
+    local abs_source_dir
+    abs_source_dir=$(cd "$source_dir" && pwd)
+    local abs_zip_file
+    abs_zip_file=$(cd "$zip_dir" && pwd)/$(basename "$zip_file")
+    
+    debug "Creating zip file from: $abs_source_dir"
+    debug "Creating zip file to: $abs_zip_file"
+    debug "Current working directory: $(pwd)"
+    
+    if (cd "$abs_source_dir" && zip -r "$abs_zip_file" .); then
+        if [[ -f "$abs_zip_file" ]]; then
+            local zip_size
+            zip_size=$(stat -f%z "$abs_zip_file" 2>/dev/null || stat -c%s "$abs_zip_file")
+            success "Created $bundle_type bundle: $zip_file ($(human_size ${zip_size:-0}))"
+            return 0
+        else
+            error "Failed to create zip file for $bundle_type"
+            error "Absolute source dir: $abs_source_dir"
+            error "Absolute zip file: $abs_zip_file"
+            error "Current directory: $(pwd)"
+            error "Source directory contents: $(ls -la "$source_dir")"
+            return 1
+        fi
+    else
+        error "Failed to create zip file for $bundle_type"
+        error "Absolute source dir: $abs_source_dir"
+        error "Absolute zip file: $abs_zip_file"
+        error "Current directory: $(pwd)"
+        error "Source directory contents: $(ls -la "$source_dir")"
+        return 1
+    fi
+}
+
+# Common function to copy workflow videos
+copy_workflow_videos() {
+    local workflow_dir="$1"
+    local target_dir="$2"
+    local counter_file="$3"
+    local workflow_name="$4"
+    
+    if [[ ! -d "$workflow_dir" ]]; then
+        return 0
+    fi
+    
+    mkdir -p "$target_dir/$workflow_name"
+    
+    while IFS= read -r -d '' video; do
+        if cp "$video" "$target_dir/$workflow_name/"; then
+            increment_counter "$counter_file" > /dev/null
+            debug "Copied $video to $target_dir/$workflow_name"
+        else
+            error "Failed to copy $video to $target_dir/$workflow_name"
+        fi
+    done < <(find "$workflow_dir" -name "recording.mp4" -print0)
+}
+
+# Common function to cleanup temp resources
+cleanup_temp_resources() {
+    local temp_dir="$1"
+    local counter_file="$2"
+    
+    [[ -f "$counter_file" ]] && rm -f "$counter_file"
+    [[ -d "$temp_dir" ]] && rm -rf "$temp_dir"
+    
+    for i in "${!TEMP_DIRS[@]}"; do
+        if [[ ${TEMP_DIRS[i]} = "$temp_dir" ]]; then
+            unset 'TEMP_DIRS[i]'
+            break
+        fi
+    done
 }
 
 # Enhanced main function with summary statistics

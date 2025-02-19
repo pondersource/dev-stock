@@ -1,22 +1,23 @@
 /**
  * @fileoverview
- * Cypress test suite for testing federated sharing functionality via share-link flow in Nextcloud v27 and OcmStub v1.
+ * Cypress test suite for testing federated share link functionality between Nextcloud v27 and OcmStub v1.
+ * This suite verifies the ability to send and receive federated file shares via share links between
+ * Nextcloud v27 and OcmStub v1 instances.
  *
- * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
 import {
-  createShareLinkV27,
-  ensureFileExistsV27,
+  createAndSendShareLinkV27,
   renameFileV27,
+  ensureFileExistsV27,
 } from '../utils/nextcloud-v27';
 
 import {
   generateShareAssertions,
-} from '../utils/ocmstub-v1.js';
+} from '../utils/ocmstub-v1';
 
-describe('Share link federated sharing functionality for Nextcloud to OcmStub', () => {
+describe('Share Link Federated Sharing Functionality for Nextcloud to OcmStub', () => {
   // Shared variables to avoid repetition and improve maintainability
   const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
   const recipientUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -24,8 +25,7 @@ describe('Share link federated sharing functionality for Nextcloud to OcmStub', 
   const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const recipientUsername = Cypress.env('OCMSTUB1_USERNAME') || 'michiel';
   const originalFileName = 'welcome.txt';
-  const sharedFileName = 'nc1-to-os1-share.txt';
-  const sharedWith = 'michiel@ocmstub1.docker';
+  const sharedFileName = 'share-link-nc1-to-os1.txt';
 
   // Expected details of the federated share
   const expectedShareDetails = {
@@ -39,57 +39,45 @@ describe('Share link federated sharing functionality for Nextcloud to OcmStub', 
   };
 
   /**
-   * Test Case: Sending a federated share from one Nextcloud instance to OcmStub.
-   * Validates that a file can be successfully shared from Nextcloud to OcmStub.
+   * Test Case: Sending a federated share link from Nextcloud v27 to OcmStub v1.
+   * Validates that a file can be successfully shared via link from Nextcloud v27 to OcmStub v1.
    */
-  it('Send federated share <file> from Nextcloud v27 to OcmStub v1', () => {
+  it('Send federated share link of a file from Nextcloud v27 to OcmStub v1', () => {
     // Step 1: Log in to the sender's Nextcloud instance
-    cy.loginNextcloud(senderUrl, senderUsername, senderPassword)
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
     // Step 2: Ensure the original file exists before renaming
     ensureFileExistsV27(originalFileName);
 
     // Step 3: Rename the file to prepare it for sharing
     renameFileV27(originalFileName, sharedFileName);
-    
+
     // Step 4: Verify the file has been renamed
     ensureFileExistsV27(sharedFileName);
 
-    // Step 5: Create a federated share for the recipient
-    // TODO @MahdiBaghbani: We should hide any complexity in .cy.js files and move them to utils/*.js files
-    createShareLinkV27(sharedFileName).then(
-      (result) => {
-        cy.visit(result)
-
-        cy.get('button[id="header-actions-toggle"]').click()
-        cy.get('button[id="save-external-share"]').click()
-
-        cy.get('form[class="save-form"]').within(() => {
-          cy.get('input[id="remote_address"]').type(sharedWith)
-          cy.get('input[id="save-button-confirm"]').click()
-        })
-      }
-    )
-  })
+    // Step 5: Create and send the share link to the recipient
+    createAndSendShareLinkV27(
+      sharedFileName,
+      recipientUsername,
+      recipientUrl.replace(/^https?:\/\/|\/$/g, '')
+    );
+  });
 
   /**
-   * Test Case: Receiving a federated share on OcmStub from Nextcloud.
+   * Test Case: Receiving and verifying a federated share link on the recipient's OcmStub instance.
+   * Validates that the share metadata is correctly received and displayed in OcmStub.
    */
-  it('Receive federated share of a file from from Nextcloud v27 to OcmStub v1', () => {
-    // Step 1: Log in to OcmStub
+  it('Receive federated share link of a file from Nextcloud v27 to OcmStub v1', () => {
+    // Step 1: Log in to the recipient's OcmStub instance
     cy.loginOcmStub(recipientUrl);
 
-    // Step 2: Create an array of strings to verify. Each string is a snippet of text expected to be found on the page.
-    // These assertions represent lines or properties that should appear in the OcmStub's displayed share metadata.
-    // Adjust these strings if the page format changes.
+    // Step 2: Generate assertions for share metadata verification
     const shareAssertions = generateShareAssertions(expectedShareDetails, true);
 
-    // Step 3: Loop through all assertions and verify their presence on the page
-    // We use `cy.contains()` to search for the text anywhere on the page.
-    // The `should('be.visible')` ensures that the text is actually visible, not hidden or off-screen.
+    // Step 3: Verify all share metadata is correctly displayed
     shareAssertions.forEach((assertion) => {
       cy.contains(assertion, { timeout: 10000 })
         .should('be.visible');
     });
   });
-})
+});
