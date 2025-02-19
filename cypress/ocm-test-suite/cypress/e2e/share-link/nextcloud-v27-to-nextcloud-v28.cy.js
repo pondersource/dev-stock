@@ -1,39 +1,69 @@
-import { createShareLinkV27, renameFileV27 } from '../utils/nextcloud-v27'
+/**
+ * @fileoverview
+ * Cypress test suite for testing federated share link functionality between Nextcloud v27 and v28.
+ * This suite verifies the ability to send and receive federated file shares via share links between
+ * Nextcloud v27 and Nextcloud v28 instances.
+ *
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
 
-describe('Share link federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v27 to Nextcloud v28', () => {
-    // send share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+import {
+  createAndSendShareLinkV27,
+  renameFileV27,
+  ensureFileExistsV27,
+} from '../utils/nextcloud-v27';
 
-    renameFileV27('welcome.txt', 'nc1-to-nc2-share-link.txt')
-    createShareLinkV27('nc1-to-nc2-share-link.txt').then(
-      (result) => {
-        cy.visit(result)
+import {
+  handleShareAcceptanceV28,
+} from '../utils/nextcloud-v28';
 
-        cy.get('button[id="header-actions-toggle"]').click()
-        cy.get('button[id="save-external-share"]').click()
+describe('Share Link Federated Sharing Functionality for Nextcloud', () => {
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('NEXTCLOUD2_URL') || 'https://nextcloud2.docker';
+  const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
+  const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
+  const recipientUsername = Cypress.env('NEXTCLOUD2_USERNAME') || 'michiel';
+  const recipientPassword = Cypress.env('NEXTCLOUD2_PASSWORD') || 'dejong';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'share-link-nc1-to-nc2.txt';
 
-        cy.get('form[class="save-form"]').within(() => {
-          cy.get('input[id="remote_address"]').type('michiel@nextcloud2.docker')
-          cy.get('input[id="save-button-confirm"]').click()
-        })
-      }
-    )
-  })
+  /**
+   * Test Case: Sending a federated share link from Nextcloud v27 to Nextcloud v28.
+   * Validates that a file can be successfully shared via link from Nextcloud v27 to Nextcloud v28.
+   */
+  it('Send federated share link of a file from Nextcloud v27 to Nextcloud v28', () => {
+    // Step 1: Log in to the sender's Nextcloud instance
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
-  it('Receive federated share <file> from Nextcloud v27 to Nextcloud v28', () => {
-    // accept share from Nextcloud 2.
-    cy.loginNextcloud('https://nextcloud2.docker', 'michiel', 'dejong')
+    // Step 2: Ensure the original file exists before renaming
+    ensureFileExistsV27(originalFileName);
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+    // Step 3: Rename the file to prepare it for sharing
+    renameFileV27(originalFileName, sharedFileName);
 
-    // force reload the page for share to apear.
-    cy.reload(true)
+    // Step 4: Verify the file has been renamed
+    ensureFileExistsV27(sharedFileName);
 
-    cy.get('[data-cy-files-list-row-name="nc1-to-nc2-share-link.txt"]', { timeout: 10000 }).should('be.visible')
-  })
-})
+    // Step 5: Create and send the share link to the recipient
+    createAndSendShareLinkV27(
+      sharedFileName,
+      recipientUsername,
+      recipientUrl.replace(/^https?:\/\/|\/$/g, '')
+    );
+  });
+
+  /**
+   * Test Case: Receiving and accepting a federated share link on the recipient's Nextcloud instance.
+   * Validates that the recipient can successfully accept the share link and view the shared file.
+   */
+  it('Receive federated share link of a file from Nextcloud v27 to Nextcloud v28', () => {
+    // Step 1: Log in to the recipient's Nextcloud instance
+    cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
+
+    // Step 2: Handle any share acceptance pop-ups and verify the file exists
+    handleShareAcceptanceV28(sharedFileName);
+
+    // TODO @MahdiBaghbani: Download or open the file to verify content (if required)
+  });
+});

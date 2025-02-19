@@ -54,6 +54,57 @@ export function acceptShare() {
 }
 
 /**
+ * Handles multiple share acceptance pop-ups that may appear after reloads.
+ * This function recursively checks for and accepts share dialogs until none remain,
+ * then verifies the shared file exists.
+ * 
+ * @param {string} fileName - The name of the shared file to verify exists.
+ * @param {number} [timeout=10000] - Optional timeout for the final file existence check.
+ * @param {string} [appId='files'] - The app ID to navigate to after accepting shares.
+ * @param {number} [depth=0] - Current recursion depth.
+ * @param {number} [maxDepth=5] - Maximum allowed recursion depth to prevent infinite loops.
+ */
+export function handleShareAcceptanceOcV10(fileName, timeout = 10000, appId = 'files', depth = 0, maxDepth = 5) {
+  // Check if maximum recursion depth has been reached
+  if (depth >= maxDepth) {
+    throw new Error(`Maximum recursion depth (${maxDepth}) reached while handling share acceptance. 
+      This might indicate an issue with the sharing process.`);
+  }
+
+  // Wait for the page to be fully loaded
+  cy.wait(500);
+
+  // Try to find the share dialog with a reasonable timeout
+  cy.get('body', { timeout: 10000 }).then($body => {
+    // Check if dialog exists and is visible
+    const hasDialog = $body.find('div.oc-dialog:visible').length > 0;
+
+    if (hasDialog) {
+      // If dialog exists, accept it
+      acceptShare();
+      // Wait a bit for the acceptance to be processed
+      cy.wait(500);
+      // Reload and continue checking
+      cy.reload(true).then(() => {
+        // Wait for page load after reload
+        cy.wait(500);
+        // Recursively check for more pop-ups with incremented depth
+        handleShareAcceptanceOcV10(fileName, timeout, appId, depth + 1, maxDepth);
+      });
+    } else {
+      // No more pop-ups, wait for the file list to be loaded
+      cy.wait(1000);
+
+      // Step 3: Navigate to the correct section
+      selectAppFromLeftSide(appId);
+
+      // Verify the shared file exists with specified timeout
+      ensureFileExists(fileName, timeout);
+    }
+  });
+}
+
+/**
  * Creates a share for a specific file and user.
  * @param {string} fileName - The name of the file to be shared.
  * @param {string} username - The username of the recipient.
