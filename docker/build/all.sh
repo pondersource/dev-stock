@@ -301,6 +301,8 @@ main() {
     # Nextcloud Base
     build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"           DEFAULT
 
+    build_docker_image nextcloud-ci.Dockerfile      pondersource/nextcloud-ci       "latest"           DEFAULT
+
     # Nextcloud Versions
     # The first element in this array is considered the "latest".
     nextcloud_versions=("v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
