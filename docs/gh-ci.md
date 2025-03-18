@@ -78,4 +78,84 @@ export RECEIVER_ENV="-e NEXTCLOUD_REPO_URL=https://github.com/nextcloud/server -
 
 The OCM test suite is integrated with GitHub Actions to automatically test OCM functionality on pull requests and pushes to the master branch. The workflow uses the nextcloud-ci Docker image to test the current code against various stable Nextcloud versions.
 
-See `.github/workflows/integration-ocm.yml` for the full workflow configuration. 
+See `.github/workflows/integration-ocm.yml` for the full workflow configuration.
+
+# Nextcloud CI Docker Image
+
+This Docker image is designed for CI/CD pipelines to test Nextcloud with the exact commit that triggered the pipeline.
+
+## Overview
+
+The Nextcloud CI image extends the standard Nextcloud image by allowing you to specify a specific Git repository URL, branch, and commit hash at runtime. This is particularly useful for CI/CD pipelines where you want to test the exact code that triggered the pipeline.
+
+## Environment Variables
+
+The following environment variables are used to configure the CI-specific behavior:
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `NEXTCLOUD_REPO_URL` | The URL of the Nextcloud repository to clone | Yes | - |
+| `NEXTCLOUD_BRANCH` | The branch to clone | No | `main` |
+| `NEXTCLOUD_COMMIT_HASH` | The specific commit hash to checkout | Yes | - |
+
+In addition to these CI-specific variables, all the standard Nextcloud environment variables are also supported.
+
+## Usage
+
+### Basic Usage
+
+```bash
+docker run -d \
+  -e NEXTCLOUD_REPO_URL=https://github.com/nextcloud/server \
+  -e NEXTCLOUD_BRANCH=master \
+  -e NEXTCLOUD_COMMIT_HASH=abcdef1234567890 \
+  -e MYSQL_HOST=db \
+  -e MYSQL_DATABASE=nextcloud \
+  -e MYSQL_USER=nextcloud \
+  -e MYSQL_PASSWORD=nextcloud \
+  -e NEXTCLOUD_ADMIN_USER=admin \
+  -e NEXTCLOUD_ADMIN_PASSWORD=admin \
+  -p 8080:80 \
+  pondersource/nextcloud-ci:latest
+```
+
+### In CI/CD Pipelines
+
+In your CI/CD pipeline configuration, you can use the image like this:
+
+```yaml
+# Example GitHub Actions workflow
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      nextcloud:
+        image: pondersource/nextcloud-ci:latest
+        env:
+          NEXTCLOUD_REPO_URL: https://github.com/nextcloud/server
+          NEXTCLOUD_BRANCH: ${{ github.ref_name }}
+          NEXTCLOUD_COMMIT_HASH: ${{ github.sha }}
+          # Other Nextcloud environment variables
+        ports:
+          - 8080:80
+```
+
+## How It Works
+
+When the container starts:
+
+1. The entrypoint script checks if the CI environment variables are set
+2. If they are, it runs the `ci-clone.sh` script which:
+   - Installs Git temporarily
+   - Clones the specified repository and branch
+   - Checks out the specific commit
+   - Removes Git to keep the image size small
+3. The normal Nextcloud initialization process continues
+
+## Building the Image
+
+To build the image:
+
+```bash
+docker build -t pondersource/nextcloud-ci:latest -f docker/dockerfiles/nextcloud-ci.Dockerfile .
+```
