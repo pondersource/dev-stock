@@ -1,6 +1,13 @@
 #!/bin/sh
 set -eu
 
+# Check if we're in CI mode and need to clone a specific commit
+if [ -n "${NEXTCLOUD_REPO_URL:-}" ] && [ -n "${NEXTCLOUD_COMMIT_HASH:-}" ]; then
+    echo "CI environment detected. Cloning specific commit..."
+    /ci.sh
+    echo "CI clone completed. Proceeding with normal initialization..."
+fi
+
 # version_greater A B returns whether A > B
 version_greater() {
     [ "$(printf '%s\n' "$@" | sort -t '.' -n -k1,1 -k2,2 -k3,3 -k4,4 | head -n 1)" != "$1" ]

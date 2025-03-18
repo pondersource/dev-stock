@@ -53,6 +53,18 @@ set -euo pipefail
 # trap 'rm -rf /tls' EXIT
 
 # -----------------------------------------------------------------------------------
+# CI Environment Check
+# -----------------------------------------------------------------------------------
+
+# Log CI environment variables if they exist
+if [ -n "${NEXTCLOUD_REPO_URL:-}" ] && [ -n "${NEXTCLOUD_COMMIT_HASH:-}" ]; then
+    echo "CI environment detected:"
+    echo "NEXTCLOUD_REPO_URL: ${NEXTCLOUD_REPO_URL}"
+    echo "NEXTCLOUD_BRANCH: ${NEXTCLOUD_BRANCH:-main}"
+    echo "NEXTCLOUD_COMMIT_HASH: ${NEXTCLOUD_COMMIT_HASH}"
+fi
+
+# -----------------------------------------------------------------------------------
 # Directory and Certificate Setup
 # -----------------------------------------------------------------------------------
 

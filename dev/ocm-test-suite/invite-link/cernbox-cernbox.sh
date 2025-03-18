@@ -74,8 +74,8 @@ function createIdpKeycloak() {
     -e KC_HTTPS_PORT="443"                                                                    \
     -v "${ENV_ROOT}/temp/certificates:/certificates"                                          \
     -v "${ENV_ROOT}/temp/cernbox/keycloak.json:/opt/keycloak/data/import/keycloak.json"       \
-    quay.io/keycloak/keycloak:21.1.1                                                          \
-    -v start-dev --import-realm
+    quay.io/keycloak/keycloak:26.1.0                                                          \
+    -v start --import-realm --verbose --optimized
 }
 
 function createEfssCernBox() {

@@ -1,45 +1,67 @@
-import {
-  createShareLinkV28,
-  renameFileV28
-} from '../utils/nextcloud-v28'
+/**
+ * @fileoverview
+ * Cypress test suite for testing federated share link functionality between Nextcloud v28 and ownCloud v10.
+ * This suite verifies the ability to send and receive federated file shares via share links between
+ * Nextcloud v28 and ownCloud v10 instances.
+ *
+ * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
+ */
 
 import {
-  selectAppFromLeftSide
-} from '../utils/owncloud-v10'
+  createAndSendShareLinkV28,
+  renameFileV28,
+  ensureFileExistsV28,
+} from '../utils/nextcloud-v28';
 
-describe('Share link federated sharing functionality for Nextcloud', () => {
-  it('Send federated share <file> from Nextcloud v28 to ownCloud v10', () => {
-    // send share from Nextcloud 1.
-    cy.loginNextcloud('https://nextcloud1.docker', 'einstein', 'relativity')
+import {
+  handleShareAcceptanceOcV10,
+} from '../utils/owncloud-v10';
 
-    renameFileV28('welcome.txt', 'nc1-to-oc1-share-link.txt')
-    createShareLinkV28('nc1-to-oc1-share-link.txt').then(
-      (result) => {
-        cy.visit(result)
+describe('Share Link Federated Sharing Functionality for Nextcloud to ownCloud', () => {
+  // Shared variables to avoid repetition and improve maintainability
+  const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+  const recipientUrl = Cypress.env('OWNCLOUD1_URL') || 'https://owncloud1.docker';
+  const senderUsername = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
+  const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
+  const recipientUsername = Cypress.env('OWNCLOUD1_USERNAME') || 'marie';
+  const recipientPassword = Cypress.env('OWNCLOUD1_PASSWORD') || 'radioactivity';
+  const originalFileName = 'welcome.txt';
+  const sharedFileName = 'share-link-nc1-to-oc1.txt';
 
-        cy.get('button[id="header-actions-toggle"]').click()
-        cy.get('button[id="save-external-share"]').click()
+  /**
+   * Test Case: Sending a federated share link from Nextcloud v28 to ownCloud v10.
+   * Validates that a file can be successfully shared via link from Nextcloud v28 to ownCloud v10.
+   */
+  it('Send federated share link of a file from Nextcloud v28 to ownCloud v10', () => {
+    // Step 1: Log in to the sender's Nextcloud instance
+    cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
 
-        cy.get('form[class="save-form"]').within(() => {
-          cy.get('input[id="remote_address"]').type('marie@owncloud1.docker')
-          cy.get('input[id="save-button-confirm"]').click()
-        })
-      }
-    )
-  })
+    // Step 2: Ensure the original file exists before renaming
+    ensureFileExistsV28(originalFileName);
 
-  it('Receive federated share <file> from Nextcloud v28 to ownCloud v10', () => {
-    // accept share from Nextcloud 1.
-    cy.loginOwncloud('https://owncloud1.docker', 'marie', 'radioactivity')
+    // Step 3: Rename the file to prepare it for sharing
+    renameFileV28(originalFileName, sharedFileName);
 
-    cy.get('div[class="oc-dialog"]', { timeout: 10000 })
-      .should('be.visible')
-      .find('*[class^="oc-dialog-buttonrow"]')
-      .find('button[class="primary"]')
-      .click()
+    // Step 4: Verify the file has been renamed
+    ensureFileExistsV28(sharedFileName);
 
-    selectAppFromLeftSide('sharingin')
+    // Step 5: Create and send the share link to the recipient
+    createAndSendShareLinkV28(
+      sharedFileName,
+      recipientUsername,
+      recipientUrl.replace(/^https?:\/\/|\/$/g, '')
+    );
+  });
 
-    cy.get('[data-file="nc1-to-oc1-share-link.txt"]', { timeout: 10000 }).should('be.visible')
-  })
-})
+  /**
+   * Test Case: Receiving and accepting a federated share link on the recipient's ownCloud instance.
+   * Validates that the recipient can successfully accept the share link and view the shared file.
+   */
+  it('Receive federated share link of a file from Nextcloud v28 to ownCloud v10', () => {
+    // Step 1: Log in to the recipient's ownCloud instance
+    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
+
+    // Step 2: Accept the share dialog
+    handleShareAcceptanceOcV10();
+  });
+});
