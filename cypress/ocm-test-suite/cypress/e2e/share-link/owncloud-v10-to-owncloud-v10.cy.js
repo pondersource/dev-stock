@@ -73,7 +73,7 @@ describe('Share Link Federated Sharing Functionality for ownCloud', () => {
       cy.visit(federatedShareUrl);
 
       // Step 5: Accept the share dialog
-      handleShareAcceptanceOcV10();
+      handleShareAcceptanceOcV10(sharedFileName);
     });
   });
 });
