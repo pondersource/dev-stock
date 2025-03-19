@@ -59,10 +59,10 @@ jobs:
             context.ref = process.env.WORKFLOW_REF;
             try {
               const success = await orchestrateTests(github, context);
-              core.setOutput('tests_passed', success ? 'true' : 'false');
               if (!success) {
                 core.setFailed('One or more test workflows failed');
               }
+              core.setOutput('tests_passed', 'true');
             } catch (error) {
               core.setOutput('tests_passed', 'false');
               core.setFailed(`Error orchestrating tests: ${error.message}`);
@@ -73,4 +73,4 @@ jobs:
     if: needs.orchestrate-tests.outputs.tests_passed == 'true'
     uses: ./.github/workflows/github-pages.yml
     with:
-      sha: ${{ needs.orchestrate-tests.outputs.commit_sha }} 
+      sha: ${{ needs.orchestrate-tests.outputs.commit_sha }}

@@ -62,6 +62,6 @@ describe('Share Link Federated Sharing Functionality for Nextcloud to ownCloud',
     cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
 
     // Step 2: Accept the share dialog
-    handleShareAcceptanceOcV10();
+    handleShareAcceptanceOcV10(sharedFileName);
   });
 });
