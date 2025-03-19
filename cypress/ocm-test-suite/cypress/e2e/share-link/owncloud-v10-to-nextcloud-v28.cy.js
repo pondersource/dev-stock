@@ -10,7 +10,7 @@
 import {
   createShareLink,
   renameFile,
-  ensureFileExistsV10,
+  ensureFileExistsOcV10,
 } from '../utils/owncloud-v10';
 
 import {
@@ -41,13 +41,13 @@ describe('Share Link Federated Sharing Functionality for ownCloud to Nextcloud',
     cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
 
     // Step 2: Ensure the original file exists before renaming
-    ensureFileExistsV10(originalFileName);
+    ensureFileExistsOcV10(originalFileName);
 
     // Step 3: Rename the file to prepare it for sharing
     renameFile(originalFileName, sharedFileName);
 
     // Step 4: Verify the file has been renamed
-    ensureFileExistsV10(sharedFileName);
+    ensureFileExistsOcV10(sharedFileName);
 
     // Step 5: Create a share link for the file
     createShareLink(sharedFileName);

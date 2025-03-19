@@ -12,6 +12,12 @@ import {
   escapeCssSelector,
 } from './general';
 
+// TODO @MahdiBaghbani: we should migrate to this fucntion completely and remove the inner function.
+// for now its just a wrapper to the old function.
+export function ensureFileExistsOcV10(fileName, timeout = 10000) {
+  ensureFileExists(fileName, timeout);
+}
+
 /**
  * Ensures that a file with the specified name exists and is visible in the file list.
  *
