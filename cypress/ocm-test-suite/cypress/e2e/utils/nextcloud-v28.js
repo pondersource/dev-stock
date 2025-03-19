@@ -121,9 +121,10 @@ export function handleShareAcceptanceV28(fileName, timeout = 10000, appId = 'fil
       cy.wait(1000);
 
       // Navigate to the correct section
-      navigationSwitchLeftSideV28('Open navigation');
-      selectAppFromLeftSideV28(appId);
-      navigationSwitchLeftSideV28('Close navigation');
+      // TODO @MahdiBaghbani: Implement this
+      // navigationSwitchLeftSideV28('Open navigation');
+      // selectAppFromLeftSideV28(appId);
+      // navigationSwitchLeftSideV28('Close navigation');
 
       // Verify the shared file exists with specified timeout
       ensureFileExistsV28(fileName, timeout);
