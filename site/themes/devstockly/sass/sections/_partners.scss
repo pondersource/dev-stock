@@ -234,6 +234,28 @@
             }
         }
 
+        .partner-logo-cern {
+            margin-top: 4.5rem;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+
+            img {
+                max-width: 180px;
+                max-height: 90px;
+                object-fit: contain;
+            }
+
+            &:hover img {
+                opacity: 1;
+            }
+        }
+
         .partner-content {
             padding: 2rem;
             position: relative;
