@@ -7,47 +7,57 @@ set -euo pipefail
 
 # Environment variables that should be provided:
 # NEXTCLOUD_REPO_URL - The URL of the Nextcloud repository to clone
-# NEXTCLOUD_BRANCH - The branch to clone (optional, defaults to main)
 # NEXTCLOUD_COMMIT_HASH - The specific commit hash to checkout
-
+# NEXTCLOUD_TAG - the specific tag to checkout
 echo "Starting CI-specific Nextcloud clone..."
 
-if [ -z "${NEXTCLOUD_REPO_URL:-}" ]; then
-    echo "Error: NEXTCLOUD_REPO_URL environment variable is not set. Aborting."
-    exit 1
-fi
-if [ -z "${NEXTCLOUD_COMMIT_HASH:-}" ]; then
-    echo "Error: NEXTCLOUD_COMMIT_HASH environment variable is not set. Aborting."
-    exit 1
-fi
+# Clone Nextcloud by:
+#   repo + commit hash              (NEXTCLOUD_COMMIT_HASH)
+#   repo + tag                      (NEXTCLOUD_TAG)
+#
+# Exactly one of NEXTCLOUD_COMMIT_HASH or NEXTCLOUD_TAG must be provided.
+: "${NEXTCLOUD_REPO_URL:?NEXTCLOUD_REPO_URL is required}"
 
-NEXTCLOUD_BRANCH=${NEXTCLOUD_BRANCH:-main}
+# Validate mutually‑exclusive options
+if [[ -n "${NEXTCLOUD_COMMIT_HASH:-}" && -n "${NEXTCLOUD_TAG:-}" ]]; then
+    echo "Error: provide either NEXTCLOUD_COMMIT_HASH or NEXTCLOUD_TAG, not both." >&2
+    exit 1
+fi
+if [[ -z "${NEXTCLOUD_COMMIT_HASH:-}" && -z "${NEXTCLOUD_TAG:-}" ]]; then
+    echo "Error: you must set NEXTCLOUD_COMMIT_HASH or NEXTCLOUD_TAG." >&2
+    exit 1
+fi
 
 # @MahdiBaghbani: it is already installed in the base image, but we need to be sure.
-echo "Installing git for cloning..."
-apt-get update
-apt-get install -y git
-
-echo "Cloning Nextcloud repository..."
-echo "Repository: ${NEXTCLOUD_REPO_URL}"
-echo "Branch: ${NEXTCLOUD_BRANCH}"
-echo "Commit: ${NEXTCLOUD_COMMIT_HASH}"
-
-if [ -d "/usr/src/nextcloud" ]; then
-    echo "Removing existing Nextcloud directory..."
-    rm -rf /usr/src/nextcloud
+# Ensure git is present (base image may already have it)
+if ! command -v git &>/dev/null; then
+    echo "Installing git…"
+    apt-get update -qq && apt-get install -y --no-install-recommends git
 fi
-git clone --depth 1 --recursive --shallow-submodules --branch "${NEXTCLOUD_BRANCH}" "${NEXTCLOUD_REPO_URL}" /usr/src/nextcloud
 
-cd /usr/src/nextcloud
+DEST=/usr/src/nextcloud
+rm -rf "$DEST"
 
-git fetch --depth=1 origin "${NEXTCLOUD_COMMIT_HASH}"
-git checkout "${NEXTCLOUD_COMMIT_HASH}"
+# Clone by tag
+if [[ -n "${NEXTCLOUD_TAG:-}" ]]; then
+    echo "Cloning ${NEXTCLOUD_REPO_URL} (tag ${NEXTCLOUD_TAG})…"
+    git clone --depth 1 --branch "${NEXTCLOUD_TAG}" "${NEXTCLOUD_REPO_URL}" "$DEST"
+else
+    # Clone by commit hash
+    echo "Fetching commit ${NEXTCLOUD_COMMIT_HASH}…"
+    git init -q "$DEST"
+    cd "$DEST"
+    git remote add origin "${NEXTCLOUD_REPO_URL}"
 
-rm -rf /usr/src/nextcloud/.git
-mkdir -p /usr/src/nextcloud/data
-mkdir -p /usr/src/nextcloud/custom_apps
-chmod +x /usr/src/nextcloud/occ
+    # Fetch exactly that commit (no full history)
+    git fetch -q --depth 1 origin "${NEXTCLOUD_COMMIT_HASH}"
+    git checkout -q "${NEXTCLOUD_COMMIT_HASH}"
+fi
+
+# Clean‑up & prepare runtime dirs
+rm -rf "$DEST/.git"
+mkdir -p "$DEST/data" "$DEST/custom_apps"
+chmod +x "$DEST/occ"
 
 echo "Removing git..."
 apt-get purge -y git

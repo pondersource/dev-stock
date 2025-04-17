@@ -21,6 +21,7 @@
 #   $4: Docker image
 #   $5: Docker tag
 #   $6: Volume mount arguments (optional, format: "-v path:path")
+#   $7: Extra env values for the container (optional, format "-e env=value")
 #
 # Environment Variables Used:
 #   DOCKER_NETWORK: Network for container communication
@@ -35,6 +36,7 @@ _create_nextcloud_base() {
     local image="${4}"
     local tag="${5}"
     local volume_args="${6:-}"
+    local extra_env="${7:-}"
 
     run_quietly_if_ci echo "Creating Nextcloud instance ${number} with MariaDB backend"
 
@@ -68,6 +70,8 @@ _create_nextcloud_base() {
         -e MYSQL_DATABASE="efss" \
         -e MYSQL_USER="root" \
         -e MYSQL_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+        -e USE_CI_IMAGE="${USE_CI_IMAGE}" \
+        ${extra_env} \
         "${image}:${tag}" || error_exit "Failed to start Nextcloud container ${number}."
 
     # Ensure Nextcloud is ready to accept connections
@@ -84,12 +88,13 @@ _create_nextcloud_base() {
 #   $3: Admin password
 #   $4: Docker image
 #   $5: Docker tag
+#   $6: Extra env
 #
 # Example:
-#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.2"
+#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.2" "-e funny=true -e bugs=bunny"
 # ------------------------------------------------------------------------------
 create_nextcloud() {
-    _create_nextcloud_base "$1" "$2" "$3" "$4" "$5"
+    _create_nextcloud_base "$1" "$2" "$3" "$4" "$5" "" "$6"
 }
 
 # ------------------------------------------------------------------------------

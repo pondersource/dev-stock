@@ -131,10 +131,17 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
-    # Create EFSS containers
-    #                # id   # username    # password       # image                  # tag
-    create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
-    create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
+    if [ "${USE_CI_IMAGE:-}" = "true" ]; then
+        # Create EFSS containers
+        #                # id   # username    # password       # image                     # tag        # extra env
+        create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud-ci   "latest"     "${SENDER_ENV}"
+        create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud-ci   "latest"     "${RECEIVER_ENV}"
+    else
+        # Create EFSS containers
+        #                # id   # username    # password       # image                  # tag    
+        create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud   "${EFSS_PLATFORM_1_VERSION}"
+        create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud   "${EFSS_PLATFORM_2_VERSION}"
+    fi
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
