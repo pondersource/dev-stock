@@ -18,6 +18,7 @@ COPY cypress/ocm-test-suite/ ./cypress/ocm-test-suite/
 COPY scripts ./scripts/
 COPY docker/configs ./docker/configs/
 COPY docker/scripts ./docker/scripts/
+COPY docker/tls ./docker/tls/
 
 # Make all scripts executable
 RUN find ./dev -type f -name "*.sh" -exec chmod +x {} \; && \
