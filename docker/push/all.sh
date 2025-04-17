@@ -81,6 +81,8 @@ done
 
 # Nextcloud: push multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker push pondersource/nextcloud-base:latest
+run_quietly_if_ci docker push pondersource/nextcloud-ci:latest
+
 nextcloud_versions=("v30.0.2" "v29.0.10" "v28.0.14" "v27.1.11")
 
 for i in "${!nextcloud_versions[@]}"; do
