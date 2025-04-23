@@ -73,11 +73,16 @@ run_ci() {
         sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/' "${cypress_config}"
     fi
 
-    # Perform cleanup after CI tests
-    echo "Cleaning up test environment..."
-    if [[ -x "${ENV_ROOT}/scripts/clean.sh" ]]; then
-        "${ENV_ROOT}/scripts/clean.sh" "no"
+    # Skip cleanup when CI_ENVIRONMENT=true or NO_CLEANING=true
+    if [[ "${CI_ENVIRONMENT}" != "true" && "${NO_CLEANING}" != "true" ]]; then
+        # Perform cleanup after CI tests
+        echo "Cleaning up test environment..."
+        if [[ -x "${ENV_ROOT}/scripts/clean.sh" ]]; then
+            "${ENV_ROOT}/scripts/clean.sh" "no"
+        else
+            print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'."
+        fi
     else
-        print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'."
+        run_quietly_if_ci echo "Skipping cleanup because CI_ENVIRONMENT or NO_CLEANING is set to true."
     fi
 }

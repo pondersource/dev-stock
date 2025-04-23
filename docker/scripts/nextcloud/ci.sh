@@ -36,28 +36,35 @@ if ! command -v git &>/dev/null; then
 fi
 
 DEST=/usr/src/nextcloud
-rm -rf "$DEST"
+rm -rf "${DEST}"
 
-# Clone by tag
-if [[ -n "${NEXTCLOUD_TAG:-}" ]]; then
-    echo "Cloning ${NEXTCLOUD_REPO_URL} (tag ${NEXTCLOUD_TAG})…"
-    git clone --depth 1 --branch "${NEXTCLOUD_TAG}" "${NEXTCLOUD_REPO_URL}" "$DEST"
+# Clone Nextcloud source – tag or detached commit, always with sub-modules
+if [[ -n ${NEXTCLOUD_TAG:-} ]]; then
+    echo "Cloning ${NEXTCLOUD_REPO_URL} @ tag ${NEXTCLOUD_TAG} …"
+    git clone \
+      --branch  "${NEXTCLOUD_TAG}" \
+      --depth   1 \
+      --recurse-submodules --shallow-submodules \
+      "${NEXTCLOUD_REPO_URL}"  "${DEST}"
+
 else
-    # Clone by commit hash
-    echo "Fetching commit ${NEXTCLOUD_COMMIT_HASH}…"
-    git init -q "$DEST"
-    cd "$DEST"
-    git remote add origin "${NEXTCLOUD_REPO_URL}"
+    echo "Cloning ${NEXTCLOUD_REPO_URL} @ commit ${NEXTCLOUD_COMMIT_HASH} …"
+    git init -q "${DEST}"
+    cd       "${DEST}"
 
-    # Fetch exactly that commit (no full history)
+    git remote add origin "${NEXTCLOUD_REPO_URL}"
+    # Fetch exactly the one commit and whatever its sub-module SHAs point to
     git fetch -q --depth 1 origin "${NEXTCLOUD_COMMIT_HASH}"
-    git checkout -q "${NEXTCLOUD_COMMIT_HASH}"
+    git checkout -q        "${NEXTCLOUD_COMMIT_HASH}"
+
+    # Bring in sub-modules at the versions recorded in that commit, shallowly.
+    git submodule update --init --recursive --depth 1
 fi
 
 # Clean‑up & prepare runtime dirs
-rm -rf "$DEST/.git"
-mkdir -p "$DEST/data" "$DEST/custom_apps"
-chmod +x "$DEST/occ"
+rm -rf "${DEST}/.git"
+mkdir -p "${DEST}/data" "${DEST}/custom_apps"
+chmod +x "${DEST}/occ"
 
 echo "Removing git..."
 apt-get purge -y git

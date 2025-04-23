@@ -11,11 +11,21 @@ prepare_environment() {
     remove_directory "${TEMP_DIR}"
     mkdir -p "${TEMP_DIR}"
 
-    # Clean up previous resources (if the cleanup script is available)
-    if [ -x "${ENV_ROOT}/scripts/clean.sh" ]; then
-        "${ENV_ROOT}/scripts/clean.sh" "no"
+    # Skip cleanup when CI_ENVIRONMENT=true or NO_CLEANING=true
+    if [[ "${CI_ENVIRONMENT}" != "true" && "${NO_CLEANING}" != "true" ]]; then
+        # Clean up previous resources (if the cleanup script is available)
+        # WARNING: this is probably going to make real mess of your system and 
+        # cause tremendous pain on ci jobs based on docker, since it will NUKE
+        # everything related to docker and WIPE it clean.
+        # I (@MahdiBaghbani) should delete this, but the use of it is really needed on gitpod,
+        # or in isolated dev envs, so there are env variables to disable this functionality.
+        if [ -x "${ENV_ROOT}/scripts/clean.sh" ]; then
+            "${ENV_ROOT}/scripts/clean.sh" "no"
+        else
+            print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'. Continuing without cleanup."
+        fi
     else
-        print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'. Continuing without cleanup."
+        run_quietly_if_ci echo "Skipping cleanup because CI_ENVIRONMENT or NO_CLEANING is set to true."
     fi
 
     # Ensure Docker network exists

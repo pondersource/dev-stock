@@ -2,7 +2,7 @@
 set -eu
 
 # If we're running in the CI‑image context, run the CI script
-if [ "${USE_CI_IMAGE:-}" = "true" ]; then
+if [ "${IS_CI_IMAGE:-}" = "true" ]; then
     echo "CI image mode detected. Running CI script..."
     /ci.sh
     echo "CI script completed. Proceeding with normal initialization..."

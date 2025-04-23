@@ -131,11 +131,11 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
-    if [ "${USE_CI_IMAGE:-}" = "true" ]; then
+    if [ "${CI_ENVIRONMENT:-}" = "true" ]; then
         # Create EFSS containers
         #                # id   # username    # password       # image                     # tag        # extra env
-        create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud-ci   "latest"     "${SENDER_ENV}"
-        create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud-ci   "latest"     "${RECEIVER_ENV}"
+        create_nextcloud 1      "einstein"    "relativity"     pondersource/nextcloud-ci   "latest"     "${SENDER_ENV}"     "true"
+        create_nextcloud 2      "michiel"     "dejong"         pondersource/nextcloud-ci   "latest"     "${RECEIVER_ENV}"   "true"
     else
         # Create EFSS containers
         #                # id   # username    # password       # image                  # tag    

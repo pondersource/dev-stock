@@ -54,7 +54,23 @@ modify_cypress_config() {
 # Purpose: Stops and removes all Docker containers.
 # -----------------------------------------------------------------------------------
 stop_and_remove_docker_containers() {
-    docker ps -q | xargs -r docker stop && docker ps -q -a | xargs -r docker rm
+    # @MahdiBaghbani This is a safeguard agains the unfortunate event of running the CI Action with
+    # bahdotsh/wrkflw or nektos/act which are actually docker container runners themselves :)
+    # I don't expect it to be effective since it prevents nuking the dev-stock container, RIGHT!
+    # but the act/wrkflw master container gets nuked anyway and halts the ci run
+    # this is only very helpfull in the actuall GitHub CI when the master action runner isn't
+    # a container itself and is a (I suspect) an LXD container bor bare-metal host machine or VPS
+    # 1. Stop running containers whose *image* or *name* is NOT dev-stock
+    docker ps --format '{{.ID}} {{.Image}} {{.Names}}' |
+        grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' |
+        awk '{print $1}' |
+        xargs -r docker stop
+
+    # 2. Remove *all* exited/stopped containers except the dev-stock ones
+    docker ps -a --format '{{.ID}} {{.Image}} {{.Names}}' |
+        grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' |
+        awk '{print $1}' |
+        xargs -r docker rm
 }
 
 # -----------------------------------------------------------------------------------
@@ -137,4 +153,9 @@ main() {
 # -----------------------------------------------------------------------------------
 # Execute the main function with all script arguments
 # -----------------------------------------------------------------------------------
-main "$@"
+# Skip cleanup when NO_CLEANING=true
+if [[ "${NO_CLEANING}" != "true" ]]; then
+    main "$@"
+else
+    echo "Skipping cleanup because NO_CLEANING is set to true."
+fi

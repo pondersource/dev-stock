@@ -56,13 +56,21 @@ set -euo pipefail
 # CI Environment Check
 # -----------------------------------------------------------------------------------
 
-# Log CI environment variables if they exist
-if [ -n "${NEXTCLOUD_REPO_URL:-}" ] && [ -n "${NEXTCLOUD_COMMIT_HASH:-}" ]; then
+# Log CI-specific variables when we appear to be running in CI
+#   We consider it a CI context when we have a repo URL and either
+#   - a commit hash (current build)  OR
+#   - a tag        (stable build).
+# -----------------------------------------------------------------------------
+if [[ -n ${NEXTCLOUD_REPO_URL:-} && ( -n ${NEXTCLOUD_COMMIT_HASH:-} || -n ${NEXTCLOUD_TAG:-} ) ]]; then
     echo "CI environment detected:"
-    echo "NEXTCLOUD_REPO_URL: ${NEXTCLOUD_REPO_URL}"
-    echo "NEXTCLOUD_BRANCH: ${NEXTCLOUD_BRANCH:-main}"
-    echo "NEXTCLOUD_COMMIT_HASH: ${NEXTCLOUD_COMMIT_HASH}"
+    echo "  NEXTCLOUD_REPO_URL : ${NEXTCLOUD_REPO_URL}"
+
+    # Log whichever identifier is present
+    [[ -n ${NEXTCLOUD_BRANCH:-}      ]] && echo "  NEXTCLOUD_BRANCH    : ${NEXTCLOUD_BRANCH}"
+    [[ -n ${NEXTCLOUD_COMMIT_HASH:-} ]] && echo "  NEXTCLOUD_COMMIT_HASH: ${NEXTCLOUD_COMMIT_HASH}"
+    [[ -n ${NEXTCLOUD_TAG:-}         ]] && echo "  NEXTCLOUD_TAG       : ${NEXTCLOUD_TAG}"
 fi
+
 
 # -----------------------------------------------------------------------------------
 # Directory and Certificate Setup
