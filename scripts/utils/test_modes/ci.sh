@@ -73,11 +73,22 @@ run_ci() {
         sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/' "${cypress_config}"
     fi
 
-    # Perform cleanup after CI tests
-    echo "Cleaning up test environment..."
-    if [[ -x "${ENV_ROOT}/scripts/clean.sh" ]]; then
-        "${ENV_ROOT}/scripts/clean.sh" "no"
+    # Skip cleanup when NO_CLEANING=true
+    if [[ "${NO_CLEANING}" != "true" ]]; then
+        run_quietly_if_ci echo "Cleaning up test environment..."
+
+        # Build argument list for the new clean.sh
+        local clean_args=("no" "cypress" "meshdir" "firefox" "vnc" "${EFSS_PLATFORM_1}")
+        if [[ "${TEST_SCENARIO}" != "login" ]]; then
+            clean_args+=("reva${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}" reva"${EFSS_PLATFORM_2}")
+        fi
+
+        if [[ -x "${ENV_ROOT}/scripts/clean.sh" ]]; then
+            "${ENV_ROOT}/scripts/clean.sh" "${clean_args[@]}"
+        else
+            print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'."
+        fi
     else
-        print_error "Cleanup script not found or not executable at '${ENV_ROOT}/scripts/clean.sh'."
+        run_quietly_if_ci echo "Skipping cleanup because NO_CLEANING is set to true."
     fi
 }

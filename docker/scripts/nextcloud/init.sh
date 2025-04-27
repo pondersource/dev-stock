@@ -1,11 +1,11 @@
 #!/bin/sh
 set -eu
 
-# Check if we're in CI mode and need to clone a specific commit
-if [ -n "${NEXTCLOUD_REPO_URL:-}" ] && [ -n "${NEXTCLOUD_COMMIT_HASH:-}" ]; then
-    echo "CI environment detected. Cloning specific commit..."
+# If we're running in the CI‑image context, run the CI script
+if [ "${IS_CI_IMAGE:-}" = "true" ]; then
+    echo "CI image mode detected. Running CI script..."
     /ci.sh
-    echo "CI clone completed. Proceeding with normal initialization..."
+    echo "CI script completed. Proceeding with normal initialization..."
 fi
 
 # version_greater A B returns whether A > B

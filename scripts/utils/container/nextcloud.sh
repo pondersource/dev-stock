@@ -21,6 +21,8 @@
 #   $4: Docker image
 #   $5: Docker tag
 #   $6: Volume mount arguments (optional, format: "-v path:path")
+#   $7: Extra env values for the container (optional, format "-e env=value")
+#   $8: Indicate if this container is not prebuilt and is from ci pipeline
 #
 # Environment Variables Used:
 #   DOCKER_NETWORK: Network for container communication
@@ -35,6 +37,8 @@ _create_nextcloud_base() {
     local image="${4}"
     local tag="${5}"
     local volume_args="${6:-}"
+    local extra_env="${7:-}"
+    local is_ci_image="${8:-}"
 
     run_quietly_if_ci echo "Creating Nextcloud instance ${number} with MariaDB backend"
 
@@ -68,6 +72,8 @@ _create_nextcloud_base() {
         -e MYSQL_DATABASE="efss" \
         -e MYSQL_USER="root" \
         -e MYSQL_PASSWORD="${MARIADB_ROOT_PASSWORD}" \
+        -e IS_CI_IMAGE="${is_ci_image}" \
+        ${extra_env} \
         "${image}:${tag}" || error_exit "Failed to start Nextcloud container ${number}."
 
     # Ensure Nextcloud is ready to accept connections
@@ -84,12 +90,14 @@ _create_nextcloud_base() {
 #   $3: Admin password
 #   $4: Docker image
 #   $5: Docker tag
+#   $6: Extra env
+#   $7: Indicate if this container is not prebuilt and is from ci pipeline
 #
 # Example:
-#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.2"
+#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.2" "-e funny=true -e bugs=bunny"
 # ------------------------------------------------------------------------------
 create_nextcloud() {
-    _create_nextcloud_base "$1" "$2" "$3" "$4" "$5"
+    _create_nextcloud_base "${1}" "${2}" "${3}" "${4}" "${5}" "" "${6:-}" "${7:-}"
 }
 
 # ------------------------------------------------------------------------------
@@ -132,4 +140,50 @@ create_nextcloud_dev() {
     fi
 
     _create_nextcloud_base "${number}" "${user}" "${password}" "${image}" "${tag}" "${volume_args}"
+}
+
+# ------------------------------------------------------------------------------
+# Function: delete_nextcloud
+# Purpose : Stop and remove a Nextcloud + MariaDB pair (and their named volumes)
+#
+# Arguments:
+#   $1  Container number/
+#
+# Example:
+#   delete_nextcloud 1       # removes nextcloud1.docker & marianextcloud1.docker
+#
+# Notes:
+#   • Anonymous volumes are removed automatically with `docker rm -v`.
+#   • Named volumes are detected via `docker inspect` and removed explicitly.
+#   • Bind-mounts on the host are intentionally not touched.
+# ------------------------------------------------------------------------------
+delete_nextcloud() {
+    local number="${1}"
+    local nc="nextcloud${number}.docker"
+    local db="marianextcloud${number}.docker"
+
+    run_quietly_if_ci echo "Deleting Nextcloud instance ${number} …"
+
+    # Stop containers if they exist (ignore errors if already gone/stopped)
+    run_quietly_if_ci docker stop "${nc}" "${db}" || true
+
+    # Collect any **named** volumes attached to either container
+    local volumes
+    volumes="$(
+        {
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${nc}" 2>/dev/null || true
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${db}" 2>/dev/null || true
+        } | xargs -r echo
+    )"
+
+    # Remove containers (+ anonymous volumes with -v)
+    run_quietly_if_ci docker rm -fv "${nc}" "${db}" || true
+
+    # Remove any named volumes we discovered
+    if [[ -n "${volumes}" ]]; then
+        run_quietly_if_ci echo "Removing volumes: ${volumes}"
+        run_quietly_if_ci docker volume rm -f ${volumes} || true
+    fi
+
+    run_quietly_if_ci echo "Nextcloud instance ${number} removed."
 }

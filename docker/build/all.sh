@@ -292,6 +292,9 @@ main() {
     # Dev Stock (Base development environment)
     build_docker_image dev-stock.Dockerfile         pondersource/dev-stock          "v1.0.0 latest"            DEFAULT "" ".."
 
+    # Cypress + OCM test suite files
+    build_docker_image cypress.Dockerfile           pondersource/cypress            "v1.0.0 latest"            DEFAULT "" ".."
+
     # OCM Stub
     build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"     DEFAULT
 

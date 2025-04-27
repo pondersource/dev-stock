@@ -76,4 +76,4 @@ setup() {
 
     # Prepare the environment
     prepare_environment
-} 
+}

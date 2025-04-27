@@ -4,6 +4,11 @@
 DOCKER_NETWORK="testnet"
 export DOCKER_NETWORK
 
+# default to false if unset
+: "${DEVSTOCK_DEBUG:=false}"
+: "${NO_CLEANING:=false}"
+export DEVSTOCK_DEBUG NO_CLEANING
+
 # MariaDB root password
 MARIADB_ROOT_PASSWORD="eilohtho9oTahsuongeeTh7reedahPo1Ohwi3aek"
 export MARIADB_ROOT_PASSWORD
@@ -16,8 +21,8 @@ DOCKER_SCRIPTS_DIR="${ENV_ROOT}/docker/scripts"
 export TEMP_DIR TLS_CA_DIR TLS_CERT_DIR DOCKER_SCRIPTS_DIR
 
 # 3rd party containers
-CYPRESS_REPO=cypress/included
-CYPRESS_TAG=13.13.1
+CYPRESS_REPO=pondersource/cypress
+CYPRESS_TAG=latest
 FIREFOX_REPO=jlesage/firefox
 FIREFOX_TAG=v24.11.1
 MARIADB_REPO=mariadb
