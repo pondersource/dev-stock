@@ -61,7 +61,7 @@ jobs:
 
             try {
               // array of {name, conclusion}
-              const results = await orchestrateTests(github, context);
+              const results = await orchestrateTests(github, context, core);
               const allPassed = results.every(r => r.conclusion === 'success');
 
               // pass boolean on to downstream jobs

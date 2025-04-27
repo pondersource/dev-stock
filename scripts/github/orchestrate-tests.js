@@ -7,7 +7,6 @@
  * next batch until all workflows finish.
  **********************************************/
 
-const core = require('@actions/core');
 const WORKFLOWS = [
   'login-nc-v27.yml',
   'login-nc-v28.yml',
@@ -160,14 +159,15 @@ async function triggerWorkflow(github, context, workflow) {
 }
 
 /**
- * Main orchestration entry point. 
- * Batches workflows, triggers them in parallel, then waits for completion.
+ * Main orchestration entry point.
+* Batches workflows, triggers them in parallel, then waits for completion.
  * Moves on to the next batch until all workflows finish.
  *
  * @param {Object} github - GitHub API client.
  * @param {Object} context - GitHub Actions context.
+ * @param {Object} core - actions/core object injected by github-script.
  */
-module.exports = async function orchestrateTests(github, context) {
+module.exports = async function orchestrateTests(github, context, core) {
   const batchSize = DEFAULT_BATCH_SIZE;
   const totalWorkflows = WORKFLOWS.length;
   const totalBatches = Math.ceil(totalWorkflows / batchSize);
