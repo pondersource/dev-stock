@@ -7,7 +7,7 @@
  * next batch until all workflows finish.
  **********************************************/
 
-const WORKFLOWS = new Set([
+const WORKFLOWS_SET = new Set([
   'login-nc-v27.yml',
   'login-nc-v28.yml',
   'login-oc-v10.yml',
@@ -51,6 +51,10 @@ const WORKFLOWS = new Set([
   'invite-link-ocis-v5-oc-sm-v10.yml',
   'invite-link-ocis-v5-ocis-v5.yml'
 ]);
+
+// @MahdiBaghbani: Some kind of a safegaurd against accidentally 
+// duplicate values in the above list
+const WORKFLOWS = Array.from(WORKFLOWS_SET);
 
 // Workflows in this list may fail without marking the whole matrix red
 const EXPECTED_FAILURES = new Set([
