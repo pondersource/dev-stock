@@ -97,7 +97,7 @@ _create_nextcloud_base() {
 #   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.2" "-e funny=true -e bugs=bunny"
 # ------------------------------------------------------------------------------
 create_nextcloud() {
-    _create_nextcloud_base "$1" "$2" "$3" "$4" "$5" "" "$6" "$7"
+    _create_nextcloud_base "${1}" "${2}" "${3}" "${4}" "${5}" "" "${6:-}" "${7:-}"
 }
 
 # ------------------------------------------------------------------------------
@@ -140,4 +140,50 @@ create_nextcloud_dev() {
     fi
 
     _create_nextcloud_base "${number}" "${user}" "${password}" "${image}" "${tag}" "${volume_args}"
+}
+
+# ------------------------------------------------------------------------------
+# Function: delete_nextcloud
+# Purpose : Stop and remove a Nextcloud + MariaDB pair (and their named volumes)
+#
+# Arguments:
+#   $1  Container number/
+#
+# Example:
+#   delete_nextcloud 1       # removes nextcloud1.docker & marianextcloud1.docker
+#
+# Notes:
+#   • Anonymous volumes are removed automatically with `docker rm -v`.
+#   • Named volumes are detected via `docker inspect` and removed explicitly.
+#   • Bind-mounts on the host are intentionally not touched.
+# ------------------------------------------------------------------------------
+delete_nextcloud() {
+    local number="${1}"
+    local nc="nextcloud${number}.docker"
+    local db="marianextcloud${number}.docker"
+
+    run_quietly_if_ci echo "Deleting Nextcloud instance ${number} …"
+
+    # Stop containers if they exist (ignore errors if already gone/stopped)
+    run_quietly_if_ci docker stop "${nc}" "${db}" || true
+
+    # Collect any **named** volumes attached to either container
+    local volumes
+    volumes="$(
+        {
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${nc}" 2>/dev/null || true
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${db}" 2>/dev/null || true
+        } | xargs -r echo
+    )"
+
+    # Remove containers (+ anonymous volumes with -v)
+    run_quietly_if_ci docker rm -fv "${nc}" "${db}" || true
+
+    # Remove any named volumes we discovered
+    if [[ -n "${volumes}" ]]; then
+        run_quietly_if_ci echo "Removing volumes: ${volumes}"
+        run_quietly_if_ci docker volume rm -f ${volumes} || true
+    fi
+
+    run_quietly_if_ci echo "Nextcloud instance ${number} removed."
 }

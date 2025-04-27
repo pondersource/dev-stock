@@ -43,3 +43,34 @@ create_owncloud() {
     # Wait for EFSS port to open
     run_quietly_if_ci wait_for_port "owncloud${number}.docker" 443
 }
+
+delete_owncloud() {
+    local number="${1}"
+    local oc="owncloud${number}.docker"
+    local db="mariaowncloud${number}.docker"
+
+    run_quietly_if_ci echo "Deleting ownCloud instance ${number} …"
+
+    # Stop containers if they exist (ignore errors if already gone/stopped)
+    run_quietly_if_ci docker stop "${oc}" "${db}" || true
+
+    # Collect any **named** volumes attached to either container
+    local volumes
+    volumes="$(
+        {
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${oc}" 2>/dev/null || true
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${db}" 2>/dev/null || true
+        } | xargs -r echo
+    )"
+
+    # Remove containers (+ anonymous volumes with -v)
+    run_quietly_if_ci docker rm -fv "${oc}" "${db}" || true
+
+    # Remove any named volumes we discovered
+    if [[ -n "${volumes}" ]]; then
+        run_quietly_if_ci echo "Removing volumes: ${volumes}"
+        run_quietly_if_ci docker volume rm -f ${volumes} || true
+    fi
+
+    run_quietly_if_ci echo "ownCloud instance ${number} removed."
+}

@@ -70,3 +70,34 @@ create_seafile() {
     # TODO @MahdiBaghbani: we might need custom images with ss installed.
     # run_quietly_if_ci wait_for_port "seafile${number}.docker" 443
 }
+
+delete_seafile() {
+    local number="${1}"
+    local sf="seafile${number}.docker"
+    local db="mariaseafile${number}.docker"
+
+    run_quietly_if_ci echo "Deleting Seafile instance ${number} …"
+
+    # Stop containers if they exist (ignore errors if already gone/stopped)
+    run_quietly_if_ci docker stop "${sf}" "${db}" || true
+
+    # Collect any **named** volumes attached to either container
+    local volumes
+    volumes="$(
+        {
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${sf}" 2>/dev/null || true
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${db}" 2>/dev/null || true
+        } | xargs -r echo
+    )"
+
+    # Remove containers (+ anonymous volumes with -v)
+    run_quietly_if_ci docker rm -fv "${sf}" "${db}" || true
+
+    # Remove any named volumes we discovered
+    if [[ -n "${volumes}" ]]; then
+        run_quietly_if_ci echo "Removing volumes: ${volumes}"
+        run_quietly_if_ci docker volume rm -f ${volumes} || true
+    fi
+
+    run_quietly_if_ci echo "Seafile instance ${number} removed."
+}

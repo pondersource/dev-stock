@@ -18,21 +18,72 @@ set -euo pipefail
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
-# Purpose: Resolves the absolute path of the script's directory, handling symlinks.
-# Returns:
-#   The absolute path to the script's directory.
+# Purpose : Resolves the absolute path of the script's directory, handling symlinks.
+# Returns : 
+#   Exports SOURCE, SCRIPT_DIR
+# Note    : This function relies on BASH_SOURCE, so it must be used in a Bash shell.
 # -----------------------------------------------------------------------------------
 resolve_script_dir() {
     local source="${BASH_SOURCE[0]}"
-    local dir
+
+    # Follow symbolic links until we get the real file location
     while [ -L "${source}" ]; do
+        # Get the directory path where the symlink is located
         dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+        # Use readlink to get the target the symlink points to
         source="$(readlink "${source}")"
-        # Resolve relative symlink
+        # If the source was a relative symlink, convert it to an absolute path
         [[ "${source}" != /* ]] && source="${dir}/${source}"
     done
-    dir="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
-    printf "%s" "${dir}"
+
+    # After resolving symlinks, retrieve the directory of the final source
+    SCRIPT_DIR="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
+
+    # Exports
+    export SOURCE="${source}"
+    export SCRIPT_DIR="${SCRIPT_DIR}"
+}
+
+# -----------------------------------------------------------------------------------
+# Function: initialize_environment
+# Purpose :
+#   1) Resolve the script's directory.
+#   2) Change into that directory plus an optional subdirectory (if provided).
+#   3) Export ENV_ROOT as the new working directory.
+#   4) Source a utility script (`utils.sh`) with optional version parameters.
+#
+# Arguments:
+#   1) $1 - Relative or absolute path to a subdirectory (optional).
+#           If omitted or empty, defaults to '.' (the same directory as resolve_script_dir).
+#
+# Usage Example:
+#   initialize_environment        # Uses the script's directory
+#   initialize_environment "dev"  # Changes to script's directory + "/dev"
+# -----------------------------------------------------------------------------------
+initialize_environment() {
+    # Resolve script's directory
+    resolve_script_dir
+
+    # Local variables
+    local subdir
+    # Check if a subdirectory argument was passed; default to '.' if not
+    subdir="${1:-.}"
+
+    # Attempt to change into the resolved directory + the subdirectory
+    if cd "${SCRIPT_DIR}/${subdir}"; then
+        ENV_ROOT="$(pwd)"
+        export ENV_ROOT
+    else
+        printf "Error: %s\n" "Failed to change directory to '${SCRIPT_DIR}/${subdir}'." >&2 && exit 1
+    fi
+
+    # shellcheck source=/dev/null
+    # Source utility script (assuming it exists and is required for subsequent commands)
+    if [[ -f "${ENV_ROOT}/scripts/utils.sh" ]]; then
+        source "${ENV_ROOT}/scripts/utils.sh" "${DEFAULT_EFSS_1_VERSION:-}" "${DEFAULT_EFSS_2_VERSION:-}"
+    else
+        printf "Error: %s\n" "Could not source '${ENV_ROOT}/scripts/utils.sh' (file not found)." >&2 && exit 1
+    fi
 }
 
 # -----------------------------------------------------------------------------------
@@ -44,7 +95,7 @@ modify_cypress_config() {
     if [[ -f "${config_file}" ]]; then
         sed -i 's/.*modifyObstructiveCode: false,.*/  modifyObstructiveCode: true,/' "${config_file}"
     else
-        printf "Warning: Configuration file not found: %s\n" "${config_file}" >&2
+        run_quietly_if_ci printf "Warning: Configuration file not found: %s\n" "${config_file}" >&2
         exit 1
     fi
 }
@@ -62,13 +113,13 @@ stop_and_remove_docker_containers() {
     # a container itself and is a (I suspect) an LXD container bor bare-metal host machine or VPS
     # 1. Stop running containers whose *image* or *name* is NOT dev-stock
     docker ps --format '{{.ID}} {{.Image}} {{.Names}}' |
-        grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' |
+        { grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' || true; } |
         awk '{print $1}' |
         xargs -r docker stop
 
-    # 2. Remove *all* exited/stopped containers except the dev-stock ones
+    # 2. Remove all exited/stopped containers except the dev-stock ones
     docker ps -a --format '{{.ID}} {{.Image}} {{.Names}}' |
-        grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' |
+        { grep -vE '[[:space:]]dev-stock(:|$)|(^|[[:space:]])dev-stock($|[[:space:]])' || true; } |
         awk '{print $1}' |
         xargs -r docker rm
 }
@@ -79,9 +130,9 @@ stop_and_remove_docker_containers() {
 # -----------------------------------------------------------------------------------
 docker_cleanup() {
     # Prune unused Docker volumes without confirmation
-    docker volume prune -f >/dev/null 2>&1 || true
+    run_quietly_if_ci docker volume prune -f || true
     # Prune unused Docker system data without confirmation
-    docker system prune -f >/dev/null 2>&1 || true
+    run_quietly_if_ci docker system prune -f || true
 }
 
 # -----------------------------------------------------------------------------------
@@ -93,55 +144,98 @@ docker_cleanup() {
 recreate_docker_network() {
     local network_name="${1}"
     if [[ -z "${network_name}" ]]; then
-        printf "Error: Network name is required.\n" >&2
+        run_quietly_if_ci printf "Error: Network name is required.\n" >&2
         exit 1
     fi
 
     # Remove the Docker network if it exists
     if docker network inspect "${network_name}" >/dev/null 2>&1; then
         docker network rm "${network_name}" >/dev/null 2>&1 || {
-            printf "Warning: Failed to remove Docker network: %s\n" "${network_name}" >&2
+            run_quietly_if_ci printf "Warning: Failed to remove Docker network: %s\n" "${network_name}" >&2
         }
     fi
 
     # Create the Docker network
     docker network create "${network_name}" >/dev/null 2>&1 || {
-        printf "Error: Failed to create Docker network: %s\n" "${network_name}" >&2
+        run_quietly_if_ci printf "Error: Failed to create Docker network: %s\n" "${network_name}" >&2
         exit 1
     }
 }
 
 # -----------------------------------------------------------------------------------
 # Function: main
-# Purpose: Main function encapsulating the script logic.
+# Usage: clean.sh [yes|no] [platform1 [platform2 …]]
 # -----------------------------------------------------------------------------------
 main() {
-    # Resolve the script's directory and move to the parent directory
-    local script_dir
-    script_dir="$(resolve_script_dir)"
-    cd "${script_dir}/.." || {
-        printf "Error: Failed to change directory to script's parent.\n" >&2
-        exit 1
-    }
+    # Use existing value or default to "clean"
+    : "${SCRIPT_MODE:=clean}"
+    export SCRIPT_MODE
+    # Initialize environment and parse arguments
+    initialize_environment ".."
 
-    # Export the environment root directory
-    local env_root
-    env_root="$(pwd)"
-    export ENV_ROOT="${env_root}"
-
-    # Modify the Cypress configuration
     modify_cypress_config
 
-    # Determine whether to clear the terminal (default: yes)
-    local clear_terminal="${1:-yes}"
+    # Args: leading yes|no toggles terminal clear, rest are platform names
+    local clear_terminal="yes"
+    if [[ $# -gt 0 && ( $1 == "yes" || $1 == "no" ) ]]; then
+        clear_terminal="$1"
+        shift
+    fi
 
-    # Stop and remove all Docker containers
-    stop_and_remove_docker_containers >/dev/null 2>&1
+    local platforms=("$@")
 
-    # Clean up unused Docker volumes and system resources
-    docker_cleanup
+    # list of singleton tokens (no numeric suffix)
+    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1)
 
-    # Recreate the Docker network 'testnet'
+    # fine-grained cleanup
+    if [[ ${#platforms[@]} -gt 0 ]]; then
+        declare -A COUNTER=()           # per-token index
+        for token in "${platforms[@]}"; do
+            local idx=""
+            local cname=""
+
+            if [[ ${SINGLETON[$token]+yes} ]]; then
+                # singleton - no index, container name = token.docker
+                cname="${token}.docker"
+            else
+                # numbered token
+                COUNTER["$token"]=$(( COUNTER["$token"] + 1 ))
+                idx="${COUNTER[$token]}"
+                cname="${token}${idx}.docker"
+            fi
+
+            # skip if container absent
+            if ! docker ps -a --format '{{.Names}}' | grep -qx "${cname}"; then
+                run_quietly_if_ci echo "Container ${cname} not found - cleaning skipped."
+                continue
+            fi
+
+            # Reva wrapper
+            if [[ "${token}" =~ ^reva(.+)$ ]]; then
+                local inner_platform="${BASH_REMATCH[1]}"
+                if declare -f delete_reva >/dev/null; then
+                    delete_reva "${inner_platform}" "${idx:-1}"
+                else
+                    run_quietly_if_ci printf "Warning: delete_reva function not present - cleaning skipped.\n" >&2
+                fi
+            else
+                # plain or singleton platform
+                local fn="delete_${token}"
+                if declare -f "${fn}" >/dev/null; then
+                    # if idx is empty (singleton), call without it
+                    [[ -n "${idx}" ]] && "${fn}" "${idx}" || "${fn}"
+                else
+                    run_quietly_if_ci printf "Warning: no %s function found - cleaning skipped.\n" "${fn}" >&2
+                fi
+            fi
+        done
+    else
+        # Big Hammer for Nuking the system to the oblivion
+        stop_and_remove_docker_containers
+        docker_cleanup
+    fi
+
+    # @MahdiBaghbani: Couldn't decide if this is necessary or not
     recreate_docker_network "testnet"
 
     # Clear the terminal if requested
@@ -154,8 +248,8 @@ main() {
 # Execute the main function with all script arguments
 # -----------------------------------------------------------------------------------
 # Skip cleanup when NO_CLEANING=true
-if [[ "${NO_CLEANING}" != "true" ]]; then
+if [[ "${NO_CLEANING:-}" != "true" ]]; then
     main "$@"
 else
-    echo "Skipping cleanup because NO_CLEANING is set to true."
+    run_quietly_if_ci echo "Skipping cleanup because NO_CLEANING is set to true."
 fi
