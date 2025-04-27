@@ -14,9 +14,14 @@ error_exit() {
 
 # Run command quietly in CI mode
 run_quietly_if_ci() {
-    if [ "${SCRIPT_MODE}" = "ci" ]; then
+    if [[ "${DEVSTOCK_DEBUG}" == "true" ]]; then
+        # Debug flag forces full output
+        "$@"
+    elif [[ "${SCRIPT_MODE}" == "ci" ]]; then
+        # CI mode: suppress stdout & stderr
         "$@" >/dev/null 2>&1
     else
+        # Normal execution
         "$@"
     fi
 }
