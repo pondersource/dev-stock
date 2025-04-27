@@ -176,7 +176,7 @@ async function triggerWorkflow(github, context, workflow) {
 module.exports = async function orchestrateTests(github, context, core) {
   const total = WORKFLOWS.length;
   const batchSize = DEFAULT_BATCH_SIZE;
-  const totalBatches = Math.ceil(totalWorkflows / batchSize);
+  const totalBatches = Math.ceil(total / batchSize);
   // {name, runId, conclusion}
   const results = [];
   let processed = 0;
