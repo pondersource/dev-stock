@@ -56,7 +56,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const core = require('@actions/core');
             const orchestrateTests = require('./scripts/github/orchestrate-tests.js');
             context.ref = process.env.WORKFLOW_REF;
 
