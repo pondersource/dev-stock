@@ -189,28 +189,30 @@ main() {
 
     # fine-grained cleanup
     if [[ ${#platforms[@]} -gt 0 ]]; then
-        declare -A COUNTER=()           # per-token index
-        for token in "${platforms[@]}"; do
-            local idx=""
-            local cname=""
+        declare -A COUNTER=()                  # per-base-token index
+        for raw in "${platforms[@]}"; do
+            # 1. normalise token
+            # drop “-sm” plus trailing digits, e.g. owncloud-sm → owncloud
+            # revaowncloud-sm       → revaowncloud
+            local token="${raw%%-sm*}"
+
+            local idx="" cname=""
 
             if [[ ${SINGLETON[$token]+yes} ]]; then
-                # singleton - no index, container name = token.docker
-                cname="${token}.docker"
+                cname="${token}.docker"                # singleton
             else
-                # numbered token
                 COUNTER["$token"]=$(( COUNTER["$token"] + 1 ))
                 idx="${COUNTER[$token]}"
-                cname="${token}${idx}.docker"
+                cname="${token}${idx}.docker"          # numbered
             fi
 
-            # skip if container absent
+            # 2. skip if container absent
             if ! docker ps -a --format '{{.Names}}' | grep -qx "${cname}"; then
                 run_quietly_if_ci echo "Container ${cname} not found - cleaning skipped."
                 continue
             fi
 
-            # Reva wrapper
+            # 3. reva or plain delete
             if [[ "${token}" =~ ^reva(.+)$ ]]; then
                 local inner_platform="${BASH_REMATCH[1]}"
                 if declare -f delete_reva >/dev/null; then
@@ -219,10 +221,8 @@ main() {
                     run_quietly_if_ci printf "Warning: delete_reva function not present - cleaning skipped.\n" >&2
                 fi
             else
-                # plain or singleton platform
                 local fn="delete_${token}"
                 if declare -f "${fn}" >/dev/null; then
-                    # if idx is empty (singleton), call without it
                     [[ -n "${idx}" ]] && "${fn}" "${idx}" || "${fn}"
                 else
                     run_quietly_if_ci printf "Warning: no %s function found - cleaning skipped.\n" "${fn}" >&2
