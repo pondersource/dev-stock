@@ -7,6 +7,7 @@
  * next batch until all workflows finish.
  **********************************************/
 
+const core = require('@actions/core');
 const WORKFLOWS = [
   'login-nc-v27.yml',
   'login-nc-v28.yml',
