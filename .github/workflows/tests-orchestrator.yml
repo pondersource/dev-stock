@@ -29,22 +29,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
-      tests_passed: ${{ steps.run-tests.outputs.success }}
+      tests_passed: ${{ steps.run-tests.outputs.tests_passed }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Get commit SHA
         id: get-sha
-        run: echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+        run: echo "sha=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
 
       - name: Set ref for workflow dispatch
         id: set-ref
         run: |
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "ref=${{ github.head_ref }}" >> $GITHUB_OUTPUT
+            echo "ref=${{ github.head_ref }}" >> "${GITHUB_OUTPUT}"
           else
-            echo "ref=${{ github.ref }}" >> $GITHUB_OUTPUT
+            echo "ref=${{ github.ref }}" >> "${GITHUB_OUTPUT}"
           fi
 
       - name: Trigger and monitor test workflows
@@ -55,17 +56,21 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const core = require('@actions/core');
             const orchestrateTests = require('./scripts/github/orchestrate-tests.js');
             context.ref = process.env.WORKFLOW_REF;
+
             try {
-              const success = await orchestrateTests(github, context);
-              if (!success) {
-                core.setFailed('One or more test workflows failed');
-              }
-              core.setOutput('tests_passed', 'true');
-            } catch (error) {
-              core.setOutput('tests_passed', 'true');
-              core.setFailed(`Error orchestrating tests: ${error.message}`);
+              // array of {name, conclusion}
+              const results = await orchestrateTests(github, context);
+              const allPassed = results.every(r => r.conclusion === 'success');
+
+              // pass boolean on to downstream jobs
+              core.setOutput('tests_passed', allPassed.toString());
+            } catch (err) {
+              // Orchestrator itself failed - mark job red.
+              core.setOutput('tests_passed', 'false');
+              core.setFailed(`orchestrator error: ${err.message}`);
             }
 
   trigger-pages:

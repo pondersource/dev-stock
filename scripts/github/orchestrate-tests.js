@@ -7,7 +7,7 @@
  * next batch until all workflows finish.
  **********************************************/
 
-
+const core = require('@actions/core');        // NEW
 const WORKFLOWS = [
   'login-nc-v27.yml',
   'login-nc-v28.yml',
@@ -92,7 +92,6 @@ async function waitForWorkflowCompletion(github, owner, repo, runId) {
     } catch (error) {
       console.error(`Error fetching run ${runId}: ${error.message}`);
     }
-
     await sleep(POLL_INTERVAL_STATUS);
   }
 }
@@ -122,12 +121,10 @@ async function findNewRunId(github, params) {
     } catch (error) {
       console.error(`Error listing runs for workflow ${params.workflow_id}: ${error.message}`);
     }
-
     await sleep(POLL_INTERVAL_RUN_ID);
   }
-
   throw new Error(
-    `Timeout: No in-progress run found for workflow ${params.workflow_id} within ${RUN_ID_TIMEOUT}ms`
+    `Timeout: No in-progress run found for workflow ${params.workflow_id} within ${RUN_ID_TIMEOUT} ms`
   );
 }
 
@@ -171,50 +168,58 @@ async function triggerWorkflow(github, context, workflow) {
  * @param {Object} context - GitHub Actions context.
  */
 module.exports = async function orchestrateTests(github, context) {
-  // Optionally, this could come from inputs or environment
   const batchSize = DEFAULT_BATCH_SIZE;
   const totalWorkflows = WORKFLOWS.length;
   const totalBatches = Math.ceil(totalWorkflows / batchSize);
+  const results = [];       // collect individual outcomes
   let allSucceeded = true;
 
-  console.log(`Starting orchestration of ${totalWorkflows} workflows in ${totalBatches} batches...`);
+  console.log(`Starting orchestration of ${totalWorkflows} workflows in ${totalBatches} batches …`);
 
   for (let i = 0; i < totalWorkflows; i += batchSize) {
     const currentBatch = WORKFLOWS.slice(i, i + batchSize);
     const batchNumber = Math.floor(i / batchSize) + 1;
 
-    console.log(`\nProcessing batch ${batchNumber} of ${totalBatches}...`);
-    const triggeredWorkflows = [];
+    console.log(`\nProcessing batch ${batchNumber} of ${totalBatches}…`);
+    const triggered = [];
 
-    // Trigger workflows in the current batch
-    for (const workflow of currentBatch) {
+    for (const wf of currentBatch) {
       try {
-        const wf = await triggerWorkflow(github, context, workflow);
-        triggeredWorkflows.push(wf);
-      } catch (error) {
-        console.error(`Error triggering workflow ${workflow}: ${error.message}`);
+        triggered.push(await triggerWorkflow(github, context, wf));
+      } catch (err) {
+        console.error(`Error triggering workflow ${wf}: ${err.message}`);
+        results.push({ name: wf, conclusion: 'failure' });
         allSucceeded = false;
       }
     }
 
     // Wait for all triggered workflows in the batch to complete
     await Promise.all(
-      triggeredWorkflows.map(async (wf) => {
-        console.log(`Waiting for workflow: ${wf.name} (Run ID: ${wf.runId}) to complete...`);
+      triggered.map(async ({ name, runId }) => {
+        console.log(`Waiting for workflow: ${name} (Run ID: ${runId}) …`);
         const conclusion = await waitForWorkflowCompletion(
           github,
           context.repo.owner,
           context.repo.repo,
-          wf.runId
+          runId
         );
-        console.log(`Workflow ${wf.name} completed with conclusion: ${conclusion}`);
-        if (conclusion !== 'success') {
-          allSucceeded = false;
-        }
+        console.log(`Workflow ${name} completed with conclusion: ${conclusion}`);
+        results.push({ name, conclusion });
+        if (conclusion !== 'success') allSucceeded = false;
       })
     );
   }
 
+  // nice summary in the Actions UI
+  await core.summary
+    .addHeading('OCM Test-matrix result')
+    .addTable([
+      [{ header: true, data: 'Workflow' }, { header: true, data: 'Result' }],
+      ...results.map(r => [r.name, r.conclusion])
+    ])
+    .addRaw(`\n**Overall:** ${allSucceeded ? '✅ success' : '❌ failures present'}`)
+    .write();
+
   console.log('\nAll test workflows have completed.');
-  return allSucceeded;
+  return results;            // caller decides what counts as success
 };
