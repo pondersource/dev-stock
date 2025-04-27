@@ -71,6 +71,7 @@ run_quietly_if_ci echo "Pushing PonderSource-specific Docker images..."
 
 # Push the core PonderSource images.
 run_quietly_if_ci docker push pondersource/dev-stock:latest
+run_quietly_if_ci docker push pondersource/cypress:latest
 run_quietly_if_ci docker push pondersource/revad:latest
 
 # OcmStub: push multiple versions of the OcmStub Docker image.

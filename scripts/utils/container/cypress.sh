@@ -26,13 +26,60 @@ create_cypress_ci() {
 
     run_quietly_if_ci echo "Running Cypress tests using spec: $cypress_spec"
 
-    docker run --network="${DOCKER_NETWORK}" \
-        --name="cypress.docker" \
-        -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm" \
-        -w /ocm \
-        "${CYPRESS_REPO}:${CYPRESS_TAG}" \
-        cypress run \
-        --browser "${BROWSER_PLATFORM}" \
-        --spec "${cypress_spec}" ||
-        error_exit "Cypress tests failed."
+    if [ "${CI_ENVIRONMENT:-}" = "true" ]; then
+        # do not mount the ocm test suite files from the local filesystem, 
+        # use the internal one provided by the image itself
+        # only mount the videos and screenshots
+        run_quietly_if_ci echo "Running Cypress without mounting test files from host system"
+        docker run --network="${DOCKER_NETWORK}" \
+            --name="cypress.docker" \
+            -v "${ENV_ROOT}/cypress/screenshots:/ocm/cypress/screenshots" \
+            -v "${ENV_ROOT}/cypress/videos:/ocm/cypress/videos" \
+            -w /ocm \
+            "${CYPRESS_REPO}:${CYPRESS_TAG}" \
+            cypress run \
+            --browser "${BROWSER_PLATFORM}" \
+            --spec "${cypress_spec}" ||
+            error_exit "Cypress tests failed."
+    else
+        # mount from internal filesystem, for development
+        run_quietly_if_ci echo "Running Cypress with mounting test files from host system"
+        docker run --network="${DOCKER_NETWORK}" \
+            --name="cypress.docker" \
+            -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm" \
+            -w /ocm \
+            "${CYPRESS_REPO}:${CYPRESS_TAG}" \
+            cypress run \
+            --browser "${BROWSER_PLATFORM}" \
+            --spec "${cypress_spec}" ||
+            error_exit "Cypress tests failed."
+    fi
+}
+
+delete_cypress() {
+    local cp="cypress.docker"
+
+    run_quietly_if_ci echo "Deleting Cypress instance …"
+
+    # Stop containers if they exist (ignore errors if already gone/stopped)
+    run_quietly_if_ci docker stop "${cp}" || true
+
+    # Collect any **named** volumes attached to either container
+    local volumes
+    volumes="$(
+        {
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${cp}" 2>/dev/null || true
+        } | xargs -r echo
+    )"
+
+    # Remove containers (+ anonymous volumes with -v)
+    run_quietly_if_ci docker rm -fv "${cp}" || true
+
+    # Remove any named volumes we discovered
+    if [[ -n "${volumes}" ]]; then
+        run_quietly_if_ci echo "Removing volumes: ${volumes}"
+        run_quietly_if_ci docker volume rm -f ${volumes} || true
+    fi
+
+    run_quietly_if_ci echo "Cypress removed."
 }
