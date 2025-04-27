@@ -75,11 +75,12 @@ delete_seafile() {
     local number="${1}"
     local sf="seafile${number}.docker"
     local db="mariaseafile${number}.docker"
+    local mc="memcacheseafile${number}.docker"
 
     run_quietly_if_ci echo "Deleting Seafile instance ${number} …"
 
     # Stop containers if they exist (ignore errors if already gone/stopped)
-    run_quietly_if_ci docker stop "${sf}" "${db}" || true
+    run_quietly_if_ci docker stop "${sf}" "${db}" "${mc}" || true
 
     # Collect any **named** volumes attached to either container
     local volumes
@@ -87,11 +88,12 @@ delete_seafile() {
         {
             docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${sf}" 2>/dev/null || true
             docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${db}" 2>/dev/null || true
+            docker inspect -f '{{ range .Mounts }}{{ if eq .Type "volume" }}{{ .Name }} {{ end }}{{ end }}' "${mc}" 2>/dev/null || true
         } | xargs -r echo
     )"
 
     # Remove containers (+ anonymous volumes with -v)
-    run_quietly_if_ci docker rm -fv "${sf}" "${db}" || true
+    run_quietly_if_ci docker rm -fv "${sf}" "${db}" "${mc}" || true
 
     # Remove any named volumes we discovered
     if [[ -n "${volumes}" ]]; then
