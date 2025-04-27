@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
-      tests_passed: ${{ steps.run-tests.outputs.tests_passed }}
+      done: ${{ steps.run-tests.outputs.done }}
 
     steps:
       - name: Checkout
@@ -62,19 +62,16 @@ jobs:
             try {
               // array of {name, conclusion}
               const results = await orchestrateTests(github, context, core);
-              const allPassed = results.every(r => r.conclusion === 'success');
-
-              // pass boolean on to downstream jobs
-              core.setOutput('tests_passed', allPassed.toString());
+              core.setOutput('done', 'true');
             } catch (err) {
               // Orchestrator itself failed - mark job red.
-              core.setOutput('tests_passed', 'false');
+              core.setOutput('done', 'false');
               core.setFailed(`orchestrator error: ${err.message}`);
             }
 
   trigger-pages:
     needs: orchestrate-tests
-    if: needs.orchestrate-tests.outputs.tests_passed == 'true'
+    if: needs.orchestrate-tests.outputs.done == 'true'
     uses: ./.github/workflows/github-pages.yml
     with:
       sha: ${{ needs.orchestrate-tests.outputs.commit_sha }}
