@@ -7,7 +7,7 @@
  * next batch until all workflows finish.
  **********************************************/
 
-const WORKFLOWS = [
+const WORKFLOWS = new Set([
   'login-nc-v27.yml',
   'login-nc-v28.yml',
   'login-oc-v10.yml',
@@ -50,7 +50,13 @@ const WORKFLOWS = [
   'invite-link-ocis-v5-nc-sm-v27.yml',
   'invite-link-ocis-v5-oc-sm-v10.yml',
   'invite-link-ocis-v5-ocis-v5.yml'
-];
+]);
+
+// Workflows in this list may fail without marking the whole matrix red
+const EXPECTED_FAILURES = new Set([
+  'share-link-oc-v10-nc-v27.yml',
+  'share-link-oc-v10-nc-v28.yml',
+]);
 
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
@@ -168,58 +174,72 @@ async function triggerWorkflow(github, context, workflow) {
  * @param {Object} core - actions/core object injected by github-script.
  */
 module.exports = async function orchestrateTests(github, context, core) {
+  const total = WORKFLOWS.length;
   const batchSize = DEFAULT_BATCH_SIZE;
-  const totalWorkflows = WORKFLOWS.length;
   const totalBatches = Math.ceil(totalWorkflows / batchSize);
-  const results = [];       // collect individual outcomes
+  // {name, runId, conclusion}
+  const results = [];
+  let processed = 0;
   let allSucceeded = true;
 
-  console.log(`Starting orchestration of ${totalWorkflows} workflows in ${totalBatches} batches …`);
+  console.log(`Orchestrating ${total} workflows in batches of ${batchSize}, ${totalBatches} batches to go …`);
 
-  for (let i = 0; i < totalWorkflows; i += batchSize) {
-    const currentBatch = WORKFLOWS.slice(i, i + batchSize);
+  for (let i = 0; i < total; i += batchSize) {
     const batchNumber = Math.floor(i / batchSize) + 1;
+    console.log(`\nProcessing batch ${batchNumber} of ${totalBatches} …`);
+    const batch = WORKFLOWS.slice(i, i + batchSize);
 
-    console.log(`\nProcessing batch ${batchNumber} of ${totalBatches}…`);
-    const triggered = [];
-
-    for (const wf of currentBatch) {
+    await Promise.all(batch.map(async wf => {
       try {
-        triggered.push(await triggerWorkflow(github, context, wf));
-      } catch (err) {
-        console.error(`Error triggering workflow ${wf}: ${err.message}`);
-        results.push({ name: wf, conclusion: 'failure' });
+        const { name, runId } = await triggerWorkflow(github, context, wf);
+        const concl = await waitForWorkflowCompletion(
+          github, context.repo.owner, context.repo.repo, runId);
+        results.push({ name, runId, conclusion: concl });
+        if (concl !== 'success' && !EXPECTED_FAILURES.has(name)) {
+          allSucceeded = false;
+        }
+      } catch (e) {
+        results.push({ name: wf, runId: 0, conclusion: 'failure' });
         allSucceeded = false;
+        console.error(e.message);
       }
-    }
-
-    // Wait for all triggered workflows in the batch to complete
-    await Promise.all(
-      triggered.map(async ({ name, runId }) => {
-        console.log(`Waiting for workflow: ${name} (Run ID: ${runId}) …`);
-        const conclusion = await waitForWorkflowCompletion(
-          github,
-          context.repo.owner,
-          context.repo.repo,
-          runId
-        );
-        console.log(`Workflow ${name} completed with conclusion: ${conclusion}`);
-        results.push({ name, conclusion });
-        if (conclusion !== 'success') allSucceeded = false;
-      })
-    );
+      processed++;
+      console.log(`${processed}/${total} done`);
+    }));
   }
 
-  // nice summary in the Actions UI
+  // summary 
+  const passed = results.filter(r => r.conclusion === 'success' || EXPECTED_FAILURES.has(r.name)).length;
+  const failed = total - passed;
+  const pct = Math.round((passed / total) * 100);
+  const barUnits = Math.round((passed / total) * 20);
+  const bar = '▉'.repeat(barUnits) + '▏'.repeat(20 - barUnits);
+
   await core.summary
-    .addHeading('OCM Test-matrix result')
+    .addHeading('🚀 OCM Test Suite Report')
+    .addRaw(`**${passed}/${total} passed - ${pct}%**  \n`)
+    .addRaw(`\`${bar}\`  \n`)
     .addTable([
       [{ header: true, data: 'Workflow' }, { header: true, data: 'Result' }],
-      ...results.map(r => [r.name, r.conclusion])
+      ...results.map(r => {
+        const link = r.runId
+          ? `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${r.runId}`
+          : '';
+        const label =
+          r.conclusion === 'success' ? '✅ success' :
+            EXPECTED_FAILURES.has(r.name) ? '⚠️ allowed-failure' :
+              '❌ failure';
+        return [link ? `<a href="${link}">${r.name}</a>` : r.name, label];
+      })
     ])
-    .addRaw(`\n**Overall:** ${allSucceeded ? '✅ success' : '❌ failures present'}`)
+    .addBreak()
+    .addRaw(`<details><summary>🔍 Failing workflows (${failed})</summary>\n\n` +
+      results.filter(r => r.conclusion !== 'success')
+        .map(r => `* **${r.name}**`).join('\n') +
+      '\n\n</details>')
+    .addBreak()
+    .addRaw(allSucceeded ? '🎉 **Test Suite succeeded**' : '⚠️ **Failures present**')
     .write();
 
-  console.log('\nAll test workflows have completed.');
-  return results;            // caller decides what counts as success
+  return results;
 };
