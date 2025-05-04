@@ -20,7 +20,7 @@ The following diagram illustrates the high-level architecture of the Development
 
 ```mermaid
 flowchart TD
-    %% --- Core Components --------------------------------------------------
+    %% Core Components
     subgraph "Core Components"
         direction TB
         OCMTestSuite["OCM Test Suite<br/>(ocm-test-suite.sh)"]
@@ -33,12 +33,11 @@ flowchart TD
         Artifacts -->|Provides&nbsp;data&nbsp;for| Zola
     end
 
-    %% --- External test results -------------------------------------------
+    %% External test results
     TestResults["Test Results<br/>(videos, screenshots)"]
     OCMTestSuite -->|Generates| TestResults
     TestResults -->|Processed&nbsp;by| Artifacts
 
-    %% --- Testing categories ----------------------------------------------
     subgraph "Testing Categories"
         direction LR
         Login[Login&nbsp;Tests] --> ShareWith["Share‑With&nbsp;Tests"] --> ShareLink["Share‑Link&nbsp;Tests"] --> InviteLink["Invite‑Link&nbsp;Tests"]
@@ -50,13 +49,12 @@ flowchart TD
     OCMTestSuite -->|Executes| ShareLink
     OCMTestSuite -->|Executes| InviteLink
 
-    %% --- EFSS hub ---------------------------------------------------------
+    %% EFSS hub
     Login -->|Tests| EFSS[EFSS]
     ShareWith -->|Tests| EFSS
     ShareLink -->|Tests| EFSS
     InviteLink -->|Tests| EFSS
 
-    %% --- EFSS platforms ---------------------------------------------------
     subgraph "EFSS Platforms"
         direction LR
         Nextcloud[Nextcloud]
@@ -89,7 +87,6 @@ The Docker management system provides containerized environments for various EFS
 
 ```mermaid
 flowchart LR
-    %% ------------------- Docker Management -----------------------
     subgraph "Docker Management"
         direction TB
         DockerScripts["Docker Scripts<br/>(docker/**)"]
@@ -102,7 +99,6 @@ flowchart LR
         DockerScripts -->|Manage| EnvCleanup
     end
 
-    %% ------------------- EFSS Containers -------------------------
     subgraph "EFSS Containers"
         direction TB
         Nextcloud["Nextcloud Container"]
@@ -112,7 +108,6 @@ flowchart LR
         OCMStub["OCM Stub Container"]
     end
 
-    %% ------------------- Creation flows --------------------------
     DockerImages -->|Create| Nextcloud
     EnvSetup -->|Create| OwnCloud
     EnvSetup -->|Create| OCIS
@@ -125,7 +120,7 @@ The following diagram illustrates how tests are executed using the OCM Test Suit
 
 ```mermaid
 sequenceDiagram
-    %% ----------- Participants -----------
+    %% Participants
     participant User
     participant Suite as "ocm-test-suite.sh"
     participant Script as "Test Script (*.sh)"
@@ -133,7 +128,7 @@ sequenceDiagram
     participant Cypress as "Cypress Test Runner"
     participant EFSS as "EFSS Platform(s)"
 
-    %% ----------- Flow -------------------
+    %% Flow
     User  ->>  Suite   : Run test command
     Suite ->>  Suite   : Parse arguments
     Suite ->>  Script  : Invoke specific test script

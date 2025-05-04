@@ -9,7 +9,7 @@ The OCM Test Suite consists of several interconnected components that work toget
 
 ```mermaid
 flowchart TD
-    %% ----------  test_framework  ------------------------------------------------
+    %% test_framework
     subgraph "Test Framework"
         direction TB
         TS["Test Shell Scripts<br/>(*.sh)"]
@@ -22,7 +22,6 @@ flowchart TD
         CTR -->|Runs| CTC
     end
 
-    %% ----------  test_categories  ----------------------------------------------
     subgraph "Test Categories"
         direction LR
         Login[Login&nbsp;Tests]
@@ -36,8 +35,7 @@ flowchart TD
     CTC  --> Invite
     CTC  --> ShareL
     CTC  --> ShareW
-
-    %% ----------  docker_environment  -------------------------------------------
+ 
     subgraph "Docker Environment"
         direction TB
         SIS["Specific Initialization Script<br/>(*.sh)"]
@@ -60,7 +58,6 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    %% ---------------- Nodes ----------------
     Start([Start Test Suite])
     Init["Initialize Environment<br/>setup()"]
     CreateEFSS["Create EFSS Containers<br/>create_nextcloud()<br/>create_owncloud()<br/>create_ocmstub()"]
@@ -76,7 +73,6 @@ flowchart LR
     CleanEnv["Clean Environment"]
     EndTS([End Test Suite])
 
-    %% ------------- Flow & Branches ----------
     Start --> Init
     Init --> CreateEFSS
     CreateEFSS --> Mode
@@ -132,7 +128,7 @@ The OCM Test Suite heavily relies on Docker to create isolated, reproducible tes
 
 ```mermaid
 flowchart TD
-  %% ───── GROUPS ─────────────────────────
+  %% GROUPS
   subgraph host["Host System"]
     TS[Test Script *.sh]
     CR[Cypress Runner]
@@ -148,7 +144,7 @@ flowchart TD
     OC2[ownCloud 2 Container]
   end
 
-  %% ───── RELATIONSHIPS ──────────────────
+  %% RELATIONSHIPS
   TS -->|Executes| CR
 
   TS -->|Creates| REVA
