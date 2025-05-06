@@ -2,7 +2,7 @@
 ## Purpose and Scope
 This page documents the Docker management system used in the dev-stock repository. It covers the creation, configuration, and lifecycle management of Docker containers and images used for testing Enterprise File Synchronization and Sharing (EFSS) platforms for OCM compatibility.
 
-For specific information about running tests with these Docker containers, see OCM Test Suite Architecture. For environment setup instructions, see Environment Management.
+For specific information about running tests with these Docker containers, see [OCM Test Suite Architecture](./2-architecture.md). For environment setup instructions, see [Environment Management](./3.3-environment-management.md).
 
 ## Overview
 The Docker management system in dev-stock provides a containerized environment for testing OCM compatibility between various EFSS platforms. It manages:

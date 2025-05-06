@@ -1,6 +1,6 @@
 # OCM Test Suite Architecture
 
-This document describes the architecture of the OCM (Open Cloud Mesh) Test Suite, which is designed to test federated sharing functionality between different Enterprise File Synchronization and Sharing (EFSS) platforms like Nextcloud, ownCloud, and OCM Stub. For information about specific test categories, see Test Categories. For platform compatibility details, see Platform Compatibility.
+This document describes the architecture of the OCM (Open Cloud Mesh) Test Suite, which is designed to test federated sharing functionality between different Enterprise File Synchronization and Sharing (EFSS) platforms like Nextcloud, ownCloud, and OCM Stub. For information about specific test categories, see [Test Categories](./2.2-test-categories.md). For platform compatibility details, see [Platform Compatibility](./2.3-platform-compatibility.md).
 
 ## Core Components and Design
 The OCM Test Suite consists of several interconnected components that work together to create isolated test environments, execute tests, and report results.

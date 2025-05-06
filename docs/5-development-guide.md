@@ -1,10 +1,11 @@
 # Development Guide
 ## Purpose and Scope
-This guide provides comprehensive instructions for developers working with the Development Stockpile (dev-stock) repository. It covers setting up a local development environment, running OCM test suites, debugging, and contributing to the project. This document focuses on the developer experience rather than the technical architecture of the system. For information about the overall OCM Test Suite Architecture, see OCM Test Suite Architecture, and for details about Docker Management, see Docker Management.
+This guide provides comprehensive instructions for developers working with the Development Stockpile (dev-stock) repository. It covers setting up a local development environment, running OCM test suites, debugging, and contributing to the project. This document focuses on the developer experience rather than the technical architecture of the system. For information about the overall OCM Test Suite Architecture, see [OCM Test Suite Architecture](./2-architecture.md), and for details about Docker Management, see [Docker Management](./3-docker-management.md).
 
 ## Setting Up the Development Environment
 ### Local Environment Setup
 Setting up a local development environment involves cloning the repository and pulling the required Docker images.
+
 ```sh
 # Clone the repository
 git clone https://github.com/pondersource/dev-stock.git

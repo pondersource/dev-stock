@@ -174,13 +174,13 @@ cd dev-stock
 ./dev/ocm-test-suite.sh login nextcloud v30.0.2 dev chrome
 ```
 
-For more detailed information on setting up and using Development Stock, refer to the Development Guide.
+For more detailed information on setting up and using Development Stock, refer to the [Development Guide](./5-development-guide.md).
 
 # Related Topics
 For more detailed information about specific components and functionality, please refer to:
 
-- OCM Test Suite Architecture - Detailed description of the test suite architecture
-- Docker Management - More information about Docker management
-- CI/CD Pipeline - Details about the CI/CD integration
-- Result Visualization - Information about test result visualization
-- Development Guide - Guide for developers using and contributing to the toolkit
+- [OCM Test Suite Architecture](./2-architecture.md) - Detailed description of the test suite architecture
+- [Docker Management](./3-docker-management.md) - More information about Docker management
+- CI/CD Pipeline - Details about the CI/CD integration  (#TODO: create docs for this after merging Nextcloud GitHub Actions PR)
+- [Result Visualization](./4-result-visualization.md) - Information about test result visualization
+- [Development Guide](./5-development-guide.md) - Guide for developers using and contributing to the toolkit
