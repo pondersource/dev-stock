@@ -239,8 +239,8 @@ docker run --rm -v "$(pwd)/reva:/reva-build" --workdir /reva-build golang:1.22.1
 ### Test Execution
 Tests can be executed in two modes:
 
-1.**Development Mode**: Launches Cypress in interactive mode, allowing developers to view tests as they run and debug issues.
-2.**CI Mode**: Runs tests in headless mode, suitable for continuous integration environments.
+1. **Development Mode**: Launches Cypress in interactive mode, allowing developers to view tests as they run and debug issues.
+2. **CI Mode**: Runs tests in headless mode, suitable for continuous integration environments.
 
 ```sh
 if [ "${SCRIPT_MODE}" = "dev" ]; then
