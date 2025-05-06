@@ -8,7 +8,6 @@
 
 Your complete toolkit for Enterprise File Sync & Share (EFSS) development and testing 🚀
 
-[Getting Started](docs/guides/getting-started.md) •
 [Documentation](#documentation) •
 [Contributing](CONTRIBUTING.md)
 
@@ -40,21 +39,29 @@ cd dev-stock
 ./dev/ocm-test-suite.sh login nextcloud v30.0.2 dev chrome
 ```
 
-For detailed setup instructions, see our [Getting Started Guide](docs/guides/getting-started.md).
+For detailed setup instructions, see our [Development Guide](./docs/5-development-guide.md).
 
 ## 📚 Documentation
 
 ### Core Documentation
-- [Getting Started Guide](docs/guides/getting-started.md)
-- [Docker Images](docs/docker-images.md)
-- [OCM Test Suite](docs/testing/test-suite.md)
-- [Platform Compatibility Matrix](docs/compatibility-matrix.md)
+1. [Overview](./docs/1-overview.md)
+2. [OCM Test Suite Architecture](./docs/2-architecture.md)
+    - [Test Categories](./docs/2.2-test-categories.md)
+    - [Platform Compatibility](./docs/2.3-platform-compatibility.md)
+        - [OCM Test Suite Documentation](./docs/2.3.2-test-suite.md)
+3. [Docker Management](./docs/3-docker-management.md)
+    - [Docker Images](./docs/3.2-docker-images.md)
+        - [Detailed Docker Images Documentation](./docs/3.2.2-detailed-docker-images.md)
+    - [Environment Management](./docs/3.3-environment-management.md)
+4. [Result Visualization](./docs/4-result-visualization.md)
+    - [OCM Compatibility Matrix](./docs/4.2-compatibility-matrix.md)
+5. [Development Guide](./docs/5-development-guide.md)
+    - [Local Setup](./docs/5.2-local-setup.md)
+    - [Debugging PHP with Xdebug v3 inside Docker using VSCode](./docs/5.3-xdebug.md)
+    - [Local GitHub Actions with Act](./docs/5.4-act.md)
 
 ### Other Topics
-- [ScienceMesh Integration](docs/scienecemesh.md)
-- [SOLID RemoteStorage](docs/solid-remotestorage.md)
-- [Debugging with Xdebug](docs/xdebug.md)
-- [GitHub Actions Integration](docs/guides/act.md)
+- [SOLID RemoteStorage](./docs/99-appendix-solid-remotestorage.md)
 
 ## 🔧 Supported Platforms
 
