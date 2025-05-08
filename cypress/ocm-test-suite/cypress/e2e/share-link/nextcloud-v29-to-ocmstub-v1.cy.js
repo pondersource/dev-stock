@@ -31,8 +31,8 @@ describe('Share Link Federated Sharing Functionality for Nextcloud to OcmStub', 
   const expectedShareDetails = {
     shareWith: `${recipientUsername}@${recipientUrl}`,
     fileName: sharedFileName,
-    owner: `${senderUsername}@${senderUrl}/`,
-    sender: `${senderUsername}@${senderUrl}/`,
+    owner: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
+    sender: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
     shareType: 'user',
     resourceType: 'file',
     protocol: 'webdav'
