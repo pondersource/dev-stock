@@ -71,7 +71,8 @@ jobs:
 
   trigger-pages:
     needs: orchestrate-tests
-    if: needs.orchestrate-tests.outputs.done == 'true'
+    # only run if the tests passed AND we're on main
+    if: needs.orchestrate-tests.outputs.done == 'true' && github.ref == 'refs/heads/main'
     uses: ./.github/workflows/github-pages.yml
     with:
       sha: ${{ needs.orchestrate-tests.outputs.commit_sha }}
