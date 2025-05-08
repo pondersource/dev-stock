@@ -147,7 +147,7 @@ export function createShareV29(fileName, username, domain) {
 
   cy.get('#app-sidebar-vue').within(() => {
     // Clear the input field and type the recipient's email
-    cy.get('#sharing-search-input')
+    cy.get('.sharing-search__input input.vs__search')
       .clear()
       .type(`${username}@${domain}`);
   });
