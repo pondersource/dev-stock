@@ -7,7 +7,7 @@ create_cypress_dev() {
     run_docker_container --detach \
         --network="${DOCKER_NETWORK}" \
         --name="cypress.docker" \
-        -e DISPLAY="vnc-server:0.0" \
+        -e DISPLAY="vnc.docker:0.0" \
         -v "${ENV_ROOT}/cypress/ocm-test-suite:/ocm" \
         -v "${X11_SOCKET}:/tmp/.X11-unix" \
         -w /ocm \
