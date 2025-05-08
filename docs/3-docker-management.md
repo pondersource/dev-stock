@@ -146,7 +146,7 @@ flowchart TB
 
     subgraph EFSS["EFSS Platform Images"]
         direction LR
-        NCIMG[pondersource/nextcloud:<br>v27.1.11, v28.0.14, v29.0.10,<br>v30.0.2]
+        NCIMG[pondersource/nextcloud:<br>v27.1.11, v28.0.14, v29.0.16,<br>v30.0.10]
         NCCIIMG[pondersource/nextcloud-ci:latest]
         OCIMG[pondersource/owncloud:v10.15.0]
         OCMSTUB[pondersource/ocmstub:v1.0.0, latest]
@@ -157,7 +157,7 @@ flowchart TB
     subgraph APPS["App‑enabled Images"]
         direction LR
         NCAPP1[pondersource/nextcloud:v27.1.11‑sm]
-        NCAPP2[pondersource/nextcloud:v30.0.2‑contacts]
+        NCAPP2[pondersource/nextcloud:v30.0.10‑contacts]
         OCAPP[pondersource/owncloud:v10.15.0‑sm]
     end
 
@@ -194,7 +194,7 @@ For application-specific images, specialized functions exist:
 ### Key Image Versions
 | Platform      | Supported Versions                              |
 |---------------|-------------------------------------------------|
-| Nextcloud     | v27.1.11, v28.0.14, v29.0.10, v30.0.2           |
+| Nextcloud     | v27.1.11, v28.0.14, v29.0.16, v30.0.10          |
 | ownCloud      | v10.15.0                                        |
 | OCM Stub      | v1.0.0, latest                                  |
 | Revad         | latest                                          |

@@ -5,7 +5,7 @@ create_vnc() {
     run_quietly_if_ci echo "Starting VNC Server..."
 
     # Define path to the X11 socket directory
-    X11_SOCKET="${ENV_ROOT}/${TEMP_DIR}/.X11-unix"
+    X11_SOCKET="${TEMP_DIR}/.X11-unix"
     export X11_SOCKET="${X11_SOCKET}"
 
     # Clean up any previous socket files and create a new directory

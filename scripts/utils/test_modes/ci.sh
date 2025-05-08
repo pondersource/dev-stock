@@ -34,32 +34,9 @@ run_ci() {
     # Construct spec file path based on scenario
     local spec_path
     if [ "${TEST_SCENARIO}" = "login" ]; then
-        # For login tests, we only need one platform version
-        local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
-        local platform_abbr
-        case "${EFSS_PLATFORM_1}" in
-            nextcloud)
-                platform_abbr="nc"
-                ;;
-            owncloud)
-                platform_abbr="oc"
-                ;;
-            ocmstub)
-                platform_abbr="os"
-                ;;
-            seafile)
-                platform_abbr="sf"
-                ;;
-            *)
-                platform_abbr="${EFSS_PLATFORM_1}"
-                ;;
-        esac
-        spec_path="cypress/e2e/${TEST_SCENARIO}/${platform_abbr}-${p1_ver}.cy.js"
+        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}.cy.js"
     else
-        # For share tests, we need both platform versions
-        local p1_ver="${EFSS_PLATFORM_1_VERSION%%.*}"
-        local p2_ver="${EFSS_PLATFORM_2_VERSION%%.*}"
-        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}-${p1_ver}-to-${EFSS_PLATFORM_2}-${p2_ver}.cy.js"
+        spec_path="cypress/e2e/${TEST_SCENARIO}/${EFSS_PLATFORM_1}-to-${EFSS_PLATFORM_2}.cy.js"
     fi
 
     # Run Cypress tests in headless mode

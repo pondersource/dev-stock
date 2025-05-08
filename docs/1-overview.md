@@ -77,10 +77,10 @@ The OCM Test Suite is the central component responsible for orchestrating and ex
 
 | Test Category | Description                                                             | Example Command                                                                                              |
 |---------------|-------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| Login         | Tests basic authentication against an EFSS platform                     | `./dev/ocm-test-suite.sh login nextcloud v30.0.2 dev chrome`                                                 |
-| Share-With    | Tests federated sharing between two EFSS platforms                      | `./dev/ocm-test-suite.sh share-with nextcloud v30.0.2 owncloud v10.x dev chrome`                             |
-| Share-Link    | Tests sharing via public links between platforms                        | `./dev/ocm-test-suite.sh share-link nextcloud v30.0.2 owncloud v10.x dev chrome`                             |
-| Invite-Link   | Tests invitation‑based sharing between platforms                        | `./dev/ocm-test-suite.sh invite-link nextcloud v30.0.2 owncloud v10.x dev chrome`                            |
+| Login         | Tests basic authentication against an EFSS platform                     | `./dev/ocm-test-suite.sh login nextcloud v30.0.10 dev chrome`                                                 |
+| Share-With    | Tests federated sharing between two EFSS platforms                      | `./dev/ocm-test-suite.sh share-with nextcloud v30.0.10 owncloud v10.x dev chrome`                             |
+| Share-Link    | Tests sharing via public links between platforms                        | `./dev/ocm-test-suite.sh share-link nextcloud v30.0.10 owncloud v10.x dev chrome`                             |
+| Invite-Link   | Tests invitation‑based sharing between platforms                        | `./dev/ocm-test-suite.sh invite-link nextcloud v30.0.10 owncloud v10.x dev chrome`                            |
 
 ### 2. Docker Management
 The Docker management system provides containerized environments for various EFSS platforms. This ensures consistent, isolated testing environments and simplifies the setup process.
@@ -171,7 +171,7 @@ cd dev-stock
 ```
 3. Run a test:
 ```sh
-./dev/ocm-test-suite.sh login nextcloud v30.0.2 dev chrome
+./dev/ocm-test-suite.sh login nextcloud v30.0.10 dev chrome
 ```
 
 For more detailed information on setting up and using Development Stock, refer to the [Development Guide](./5-development-guide.md).
