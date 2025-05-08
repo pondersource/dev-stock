@@ -27,15 +27,6 @@ describe('Share Link Federated Sharing Functionality for Nextcloud to OcmStub', 
   const senderUtils = getUtils('nextcloud', senderVersion);
   const recipientUtils = getUtils('ocmstub', recipientVersion);
 
-  // Expected details of the federated share
-  const expectedShareDetails = senderUtils.buildFederatedShareDetails(
-    recipientUsername,
-    recipientUrl,
-    sharedFileName,
-    senderUsername,
-    senderUrl
-  );
-
   /**
    * Test Case: Sending a federated share link from Nextcloud to OcmStub.
    * Validates that a file can be successfully shared via link from Nextcloud to OcmStub.
@@ -59,6 +50,15 @@ describe('Share Link Federated Sharing Functionality for Nextcloud to OcmStub', 
   it('Receive federated share link of a file from Nextcloud to OcmStub', () => {
     // Step 1: Log in to the recipient's OcmStub instance
     cy.loginOcmStub(recipientUrl);
+
+    // Expected details of the federated share
+    const expectedShareDetails = senderUtils.buildFederatedShareDetails(
+      recipientUsername,
+      recipientUrl,
+      sharedFileName,
+      senderUsername,
+      senderUrl
+    );
 
     // Step 2: Generate assertions for share metadata verification
     const shareAssertions = recipientUtils.generateShareAssertions(expectedShareDetails, true);

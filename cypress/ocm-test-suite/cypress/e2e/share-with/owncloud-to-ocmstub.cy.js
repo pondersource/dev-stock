@@ -26,15 +26,6 @@ describe('Native Federated Sharing Functionality for ownCloud to OcmStub', () =>
   const senderUtils = getUtils('owncloud', senderVersion);
   const recipientUtils = getUtils('ocmstub', recipientVersion);
 
-  // Expected details of the federated share
-  const expectedShareDetails = senderUtils.buildFederatedShareDetails(
-    recipientUsername,
-    recipientUrl,
-    sharedFileName,
-    senderUsername,
-    senderUrl
-  );
-
   /**
    * Test Case: Sending a federated share from one ownCloud to OcmStub.
    * Validates that a file can be successfully shared from ownCloud to OcmStub.
@@ -58,6 +49,15 @@ describe('Native Federated Sharing Functionality for ownCloud to OcmStub', () =>
   it('Receive federated share of a file from from ownCloud v10 to OcmStub v1', () => {
     // Step 1: Log in to the recipient's OcmStub instance
     cy.loginOcmStub(recipientUrl);
+
+    // Expected details of the federated share
+    const expectedShareDetails = senderUtils.buildFederatedShareDetails(
+      recipientUsername,
+      recipientUrl,
+      sharedFileName,
+      senderUsername,
+      senderUrl
+    );
 
     // Step 2: Generate assertions for share metadata verification
     const shareAssertions = recipientUtils.generateShareAssertions(expectedShareDetails, true);
