@@ -15,6 +15,59 @@ import {
 export const platform = 'nextcloud';
 export const version = 'v29';
 
+/**
+ * Login to Nextcloud and navigate to the files app.
+ * Extends the core login functionality by verifying the dashboard and navigating to the files app.
+ *
+ * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} username - The username for login.
+ * @param {string} password - The password for login.
+ */
+export function login({
+  url,
+  username,
+  password,
+}) {
+  loginCore(url, username, password);
+
+  // Verify dashboard visibility
+  cy.url({ timeout: 10000 }).should('match', /apps\/dashboard(\/|$)/);
+
+  // Navigate to the files app
+  cy.get('header[id="header"] nav.app-menu ul.app-menu-main li[data-app-id="files"]')
+    .should('be.visible')
+    .click();
+
+  // Verify files app visibility
+  cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/);
+};
+
+/**
+ * Login to Nextcloud Core.
+ * Logs into Nextcloud using provided credentials, ensuring the login page is visible before interacting with it.
+ *
+ * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} username - The username for login.
+ * @param {string} password - The password for login.
+ */
+export function loginCore({
+  url,
+  username,
+  password,
+}) {
+  cy.visit(url);
+
+  // Ensure the login page is visible
+  cy.get('form[name="login"]', { timeout: 10000 }).should('be.visible');
+
+  // Fill in login credentials and submit
+  cy.get('form[name="login"]').within(() => {
+    cy.get('input[name="user"]').type(username);
+    cy.get('input[name="password"]').type(password);
+    cy.contains('button[data-login-form-submit]', 'Log in').click();
+  });
+};
+
 export function shareViaNativeShareWith({
   senderUrl,
   senderUsername,
@@ -25,7 +78,7 @@ export function shareViaNativeShareWith({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
+  login(senderUrl, senderUsername, senderPassword);
 
   // Step 2: Ensure the original file exists before renaming
   ensureFileExists(originalFileName);
@@ -52,7 +105,7 @@ export function shareViaFederatedLink({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  cy.loginNextcloud(senderUrl, senderUsername, senderPassword);
+  login(senderUrl, senderUsername, senderPassword);
 
   // Step 2: Ensure the original file exists before renaming
   ensureFileExists(originalFileName);
