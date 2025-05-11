@@ -6,6 +6,10 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import {
+  getUtils
+} from '../utils/index.js';
+
 describe('OcmStub Login Tests', () => {
   /**
    * Test Case: Validates successful login to OcmStub.
@@ -13,11 +17,15 @@ describe('OcmStub Login Tests', () => {
    */
   it('should successfully log into OcmStub with valid credentials', () => {
     // Define the OcmStub instance URL and credentials from environment variables or use default values
-    const paltformVersion     = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v1';
-    const ocmstubUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
+    const platform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocmstub';
+    const paltformVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v1';
+    const url = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
     const username = Cypress.env('OCMSTUB1_USERNAME') || 'einstein';
     const password = Cypress.env('OCMSTUB1_PASSWORD') || 'relativity';
 
-    cy.loginOcmStub('https://ocmstub1.docker/?');
+    // Get the right helper set
+    const platformUtils = getUtils(platform, paltformVersion);
+
+    platformUtils.login({ url, username, password });
   });
 });

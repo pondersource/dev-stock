@@ -5,7 +5,7 @@ import * as nc29 from './nextcloud/v29/interface.js';
 // oCIS
 import * as ocis5 from './ocis/v5.js';
 // OcmStub
-import * as os1 from './ocmstub/v1.js';
+import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
 import * as oc10 from './owncloud/v10.js';
 // Seafile
@@ -16,7 +16,7 @@ const REGISTRY = new Map();
 /**
  * Registers a util module (called at module-load time).
  */
-function register (mod) {
+function register(mod) {
   const { platform, version } = mod;
   if (!platform || !version)
     throw new Error('Util file must export { platform, version } metadata');
@@ -33,7 +33,7 @@ function register (mod) {
  * @param {string|number} version e.g. 'v29'
  * @returns {Record<string,Function>}
  */
-export function getUtils (platform, version) {
+export function getUtils(platform, version) {
   const platMap = REGISTRY.get(String(platform));
   if (!platMap) throw new Error(`Unknown platform “${platform}”`);
 
@@ -42,7 +42,7 @@ export function getUtils (platform, version) {
 
   // Optional: fail fast if a util is missing in the module
   return new Proxy(mod, {
-    get (t, prop) {
+    get(t, prop) {
       if (!(prop in t))
         throw new Error(`${platform} ${version} lacks function ${String(prop)}`);
       return t[prop];

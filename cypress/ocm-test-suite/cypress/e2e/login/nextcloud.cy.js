@@ -17,13 +17,15 @@ describe('Nextcloud Login Tests', () => {
    */
   it('should successfully log into Nextcloud with valid credentials', () => {
     // Define the Nextcloud instance URL and credentials from environment variables or use default values
+    const platform = Cypress.env('EFSS_PLATFORM_1') ?? 'nextcloud';
     const paltformVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v27';
     const url = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
     const username = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
     const password = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
 
-    const platformUtils = getUtils('nextcloud', paltformVersion);
+    // Get the right helper set
+    const platformUtils = getUtils(platform, paltformVersion);
 
-    platformUtils.login({url, username, password});
+    platformUtils.login({ url, username, password });
   });
 });

@@ -12,6 +12,8 @@ import {
 
 describe('Native federated sharing functionality for OcmStub', () => {
   // Shared variables to avoid repetition and improve maintainability
+  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocmstub';
+  const recipientPlatform = Cypress.env('EFSS_PLATFORM_2') ?? 'ocmstub';
   const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v1';
   const recipientVersion = Cypress.env('EFSS_PLATFORM_2_VERSION') ?? 'v1';
   const senderUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -21,8 +23,8 @@ describe('Native federated sharing functionality for OcmStub', () => {
   const sharedFileName = 'from-stub.txt';
 
   // Get the right helper set for each side
-  const senderUtils = getUtils('ocmstub', senderVersion);
-  const recipientUtils = getUtils('owncloud', recipientVersion);
+  const senderUtils = getUtils(senderPlatform, senderVersion);
+  const recipientUtils = getUtils(recipientPlatform, recipientVersion);
 
   /**
    * Test Case: Sending a federated share from OcmStub 1.0 to OcmStub 1.0.
@@ -40,25 +42,14 @@ describe('Native federated sharing functionality for OcmStub', () => {
    * 
    */
   it('Receive federated share of a file from from OcmStub v1 to OcmStub v1', () => {
-    // Step 1: Log in to the recipient's OcmStub instance
-    cy.loginOcmStub(recipientUrl);
-
-    // Expected details of the federated share
-    const expectedShareDetails = senderUtils.buildFederatedShareDetails({
-      recipientUsername,
+    recipientUtils.acceptNativeShareWithShare({
+      senderPlatform,
       recipientUrl,
+      recipientUsername,
       sharedFileName,
       senderUsername,
       senderUrl,
-    });
-
-    // Step 2: Generate assertions for share metadata verification
-    const shareAssertions = recipientUtils.generateShareAssertions(expectedShareDetails, true);
-
-    // Step 3: Verify all share metadata is correctly displayed
-    shareAssertions.forEach((assertion) => {
-      cy.contains(assertion, { timeout: 10000 })
-        .should('be.visible');
+      senderUtils,
     });
   });
 })
