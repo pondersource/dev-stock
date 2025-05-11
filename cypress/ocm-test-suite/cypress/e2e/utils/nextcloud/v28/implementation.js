@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * Utility functions for Cypress tests interacting with Nextcloud version 29.
+ * Utility functions for Cypress tests interacting with Nextcloud version 28.
  * These functions provide abstractions for common actions such as sharing files,
  * updating permissions, renaming files, and navigating the UI.
  *
@@ -10,33 +10,7 @@
 
 import {
   escapeCssSelector,
-} from '../general';
-
-export const platform = 'nextcloud';
-export const version = 'v29';
-
-/**
- * Login to Nextcloud and navigate to the files app.
- * Extends the core login functionality by verifying the dashboard and navigating to the files app.
- *
- * @param {string} url - The URL of the Nextcloud instance.
- * @param {string} username - The username for login.
- * @param {string} password - The password for login.
- */
-export function login({url, username, password}) {
-  loginCore({url, username, password});
-
-  // Verify dashboard visibility
-  cy.url({ timeout: 10000 }).should('match', /apps\/dashboard(\/|$)/);
-
-  // Navigate to the files app
-  cy.get('header[id="header"] nav.app-menu ul.app-menu-main li[data-app-id="files"]')
-    .should('be.visible')
-    .click();
-
-  // Verify files app visibility
-  cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/);
-};
+} from '../../general.js';
 
 /**
  * Login to Nextcloud Core.
@@ -59,90 +33,6 @@ export function loginCore({url, username, password}) {
     cy.contains('button[data-login-form-submit]', 'Log in').click();
   });
 };
-
-export function shareViaNativeShareWith({
-  senderUrl,
-  senderUsername,
-  senderPassword,
-  originalFileName,
-  sharedFileName,
-  recipientUsername,
-  recipientUrl,
-}) {
-  // Step 1: Log in to the sender's Nextcloud instance
-  login({senderUrl, senderUsername, senderPassword});
-
-  // Step 2: Ensure the original file exists before renaming
-  ensureFileExists(originalFileName);
-
-  // Step 3: Rename the file to prepare it for sharing
-  renameFile(originalFileName, sharedFileName);
-
-  // Step 4: Verify the file has been renamed
-  ensureFileExists(sharedFileName);
-
-  // Step 5: Create a federated share for the recipient
-  createShare(sharedFileName, recipientUsername, recipientUrl.replace(/^https?:\/\/|\/$/g, ''));
-
-  // TODO @MahdiBaghbani: Verify that the share was created successfully
-}
-
-export function shareViaFederatedLink({
-  senderUrl,
-  senderUsername,
-  senderPassword,
-  originalFileName,
-  sharedFileName,
-  recipientUsername,
-  recipientUrl,
-}) {
-  // Step 1: Log in to the sender's Nextcloud instance
-  login({senderUrl, senderUsername, senderPassword});
-
-  // Step 2: Ensure the original file exists before renaming
-  ensureFileExists(originalFileName);
-
-  // Step 3: Rename the file to prepare it for sharing
-  renameFile(originalFileName, sharedFileName);
-
-  // Step 4: Verify the file has been renamed
-  ensureFileExists(sharedFileName);
-
-  // Step 5: Create and send the share link to the recipient
-  createAndSendShareLink(
-    sharedFileName,
-    recipientUsername,
-    recipientUrl.replace(/^https?:\/\/|\/$/g, '')
-  );
-}
-
-/**
- * Build the federated share details object.
- *
- * @param {string} recipientUsername - Username of the recipient (e.g. "alice")
- * @param {string} recipientUrl - Hostname or URL of the recipient (e.g. "remote.example.com")
- * @param {string} sharedFileName - The name of the file being shared
- * @param {string} senderUsername - Username of the sender (e.g. "bob")
- * @param {string} senderUrl - Full URL of the sender (e.g. "https://my.example.com/")
- * @returns {Object} The federated share details
- */
-export function buildFederatedShareDetails({
-  recipientUsername,
-  recipientUrl,
-  sharedFileName,
-  senderUsername,
-  senderUrl
-}) {
-  return {
-    shareWith: `${recipientUsername}@${recipientUrl}`,
-    fileName: sharedFileName,
-    owner: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    sender: `${senderUsername}@${senderUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    shareType: 'user',
-    resourceType: 'file',
-    protocol: 'webdav'
-  };
-}
 
 /**
  * Ensures that a file with the specified name exists and is visible in the file list.
@@ -279,7 +169,7 @@ export function createShare(fileName, username, domain) {
 
   cy.get('#app-sidebar-vue').within(() => {
     // Clear the input field and type the recipient's email
-    cy.get('.sharing-search__input input.vs__search')
+    cy.get('#sharing-search-input')
       .clear()
       .type(`${username}@${domain}`);
   });

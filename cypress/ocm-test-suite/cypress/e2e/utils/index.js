@@ -1,7 +1,7 @@
 // Nextcloud
-import * as nc27 from './nextcloud/v27.js';
-import * as nc28 from './nextcloud/v28.js';
-import * as nc29 from './nextcloud/v29.js';
+import * as nc27 from './nextcloud/v27/interface.js';
+import * as nc28 from './nextcloud/v28/interface.js';
+import * as nc29 from './nextcloud/v29/interface.js';
 // oCIS
 import * as ocis5 from './ocis/v5.js';
 // OcmStub
@@ -24,6 +24,7 @@ function register (mod) {
   if (!REGISTRY.has(platform)) REGISTRY.set(platform, new Map());
   REGISTRY.get(platform).set(String(version), mod);
 }
+
 // One-liners — pull them up-front
 [nc27, nc28, nc29, ocis5, os1, oc10, sf11].forEach(register);
 
@@ -43,7 +44,7 @@ export function getUtils (platform, version) {
   return new Proxy(mod, {
     get (t, prop) {
       if (!(prop in t))
-        throw new Error(`${platform} v${version} lacks function ${String(prop)}`);
+        throw new Error(`${platform} ${version} lacks function ${String(prop)}`);
       return t[prop];
     },
   });
