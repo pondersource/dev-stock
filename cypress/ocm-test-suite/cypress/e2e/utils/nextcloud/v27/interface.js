@@ -46,7 +46,7 @@ export function shareViaNativeShareWith({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: senderUrl, username: senderUsername, password: senderPassword  });
+  login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Ensure the original file exists before renaming
   implementation.ensureFileExists(originalFileName);
@@ -68,7 +68,7 @@ export function acceptNativeShareWithShare({
   sharedFileName,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword  });
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
   // Step 2: Handle any share acceptance pop-ups and verify the file exists
   implementation.handleShareAcceptance(sharedFileName);
@@ -84,7 +84,7 @@ export function shareViaFederatedLink({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: senderUrl, username: senderUsername, password: senderPassword  });
+  login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Ensure the original file exists before renaming
   implementation.ensureFileExists(originalFileName);
@@ -110,7 +110,7 @@ export function acceptFederatedLinkShare({
   sharedFileName,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword  });
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
   // Step 2: Handle any share acceptance pop-ups and verify the file exists
   implementation.handleShareAcceptance(sharedFileName);
