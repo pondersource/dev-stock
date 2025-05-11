@@ -51,13 +51,13 @@ describe('Native Federated Sharing Functionality for ownCloud to OcmStub', () =>
     cy.loginOcmStub(recipientUrl);
 
     // Expected details of the federated share
-    const expectedShareDetails = senderUtils.buildFederatedShareDetails(
+    const expectedShareDetails = senderUtils.buildFederatedShareDetails({
       recipientUsername,
       recipientUrl,
       sharedFileName,
       senderUsername,
-      senderUrl
-    );
+      senderUrl,
+    });
 
     // Step 2: Generate assertions for share metadata verification
     const shareAssertions = recipientUtils.generateShareAssertions(expectedShareDetails, true);
