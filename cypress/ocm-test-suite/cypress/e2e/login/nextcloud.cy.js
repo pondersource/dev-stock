@@ -6,6 +6,10 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import {
+  getUtils
+} from '../utils/index.js';
+
 describe('Nextcloud Login Tests', () => {
   /**
    * Test Case: Validates successful login to Nextcloud.
@@ -14,12 +18,12 @@ describe('Nextcloud Login Tests', () => {
   it('should successfully log into Nextcloud with valid credentials', () => {
     // Define the Nextcloud instance URL and credentials from environment variables or use default values
     const paltformVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v27';
-    const nextcloudUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
+    const url = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
     const username = Cypress.env('NEXTCLOUD1_USERNAME') || 'einstein';
     const password = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
 
     const platformUtils = getUtils('nextcloud', paltformVersion);
 
-    platformUtils.login(nextcloudUrl, username, password);
+    platformUtils.login({url, username, password});
   });
 });

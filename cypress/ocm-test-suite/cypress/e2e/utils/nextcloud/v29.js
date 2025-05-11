@@ -23,12 +23,8 @@ export const version = 'v29';
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */
-export function login({
-  url,
-  username,
-  password,
-}) {
-  loginCore(url, username, password);
+export function login({url, username, password}) {
+  loginCore({url, username, password});
 
   // Verify dashboard visibility
   cy.url({ timeout: 10000 }).should('match', /apps\/dashboard(\/|$)/);
@@ -50,11 +46,7 @@ export function login({
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */
-export function loginCore({
-  url,
-  username,
-  password,
-}) {
+export function loginCore({url, username, password}) {
   cy.visit(url);
 
   // Ensure the login page is visible
@@ -78,7 +70,7 @@ export function shareViaNativeShareWith({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login(senderUrl, senderUsername, senderPassword);
+  login({senderUrl, senderUsername, senderPassword});
 
   // Step 2: Ensure the original file exists before renaming
   ensureFileExists(originalFileName);
@@ -105,7 +97,7 @@ export function shareViaFederatedLink({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login(senderUrl, senderUsername, senderPassword);
+  login({senderUrl, senderUsername, senderPassword});
 
   // Step 2: Ensure the original file exists before renaming
   ensureFileExists(originalFileName);
