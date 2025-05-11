@@ -34,6 +34,7 @@ RUN find ./dev -type f -name "*.sh" -exec chmod +x {} \; && \
 
 # Put the scripts on the PATH
 RUN ln -s /dev-stock/dev/ocm-test-suite.sh /usr/local/bin/ocm-test-suite
+ENTRYPOINT ["/usr/local/bin/ocm-test-suite"]
 
 # Keep the container alive by default, but allow override
 # either via --entrypoint or directly invoking
