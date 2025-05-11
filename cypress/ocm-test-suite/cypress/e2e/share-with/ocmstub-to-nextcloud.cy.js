@@ -42,10 +42,10 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
    * Validates that the recipient can successfully accept the share and view the shared file.
    */
   it('Receive federated share of a file from OcmStub to Nextcloud', () => {
-    // Step 1: Log in to the recipient's ownCloud instance
-    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
+    // Step 1: Log in to the recipient's Nextcloud instance
+    cy.loginNextcloud(recipientUrl, recipientUsername, recipientPassword);
 
-    // Step 2: Accept the share dialog
+    // Step 2: Handle any share acceptance pop-ups and verify the file exists
     recipientUtils.handleShareAcceptance(sharedFileName);
   });
 });
