@@ -46,7 +46,10 @@ export function acceptNativeShareWithShare({
   senderUrl,
   senderUtils,
 }) {
+  // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl });
+
+  // Step 2: Handle share acceptance
   implementation.acceptShare({
     senderPlatform,
     recipientUrl,
@@ -67,7 +70,10 @@ export function acceptFederatedLinkShare({
   senderUrl,
   senderUtils,
 }) {
+  // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl });
+
+  // Step 2: Handle share acceptance
   implementation.acceptShare({
     senderPlatform,
     recipientUrl,

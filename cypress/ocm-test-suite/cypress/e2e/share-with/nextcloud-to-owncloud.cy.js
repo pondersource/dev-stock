@@ -12,6 +12,8 @@ import {
 
 describe('Native Federated Sharing Functionality for Nextcloud to ownCloud', () => {
   // Shared variables to avoid repetition and improve maintainability
+  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'nextcloud';
+  const recipientPlatform = Cypress.env('EFSS_PLATFORM_2') ?? 'owncloud';
   const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v27';
   const recipientVersion = Cypress.env('EFSS_PLATFORM_2_VERSION') ?? 'v10';
   const senderUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';
@@ -24,8 +26,8 @@ describe('Native Federated Sharing Functionality for Nextcloud to ownCloud', () 
   const sharedFileName = 'share-with-nc1-to-oc1.txt';
 
   // Get the right helper set for each side
-  const senderUtils = getUtils('nextcloud', senderVersion);
-  const recipientUtils = getUtils('owncloud', recipientVersion);
+  const senderUtils = getUtils(senderPlatform, senderVersion);
+  const recipientUtils = getUtils(recipientPlatform, recipientVersion);
 
   /**
    * Test Case: Sending a federated share from one Nextcloud instance to ownCloud.
@@ -48,10 +50,11 @@ describe('Native Federated Sharing Functionality for Nextcloud to ownCloud', () 
    * Validates that the recipient can successfully accept the share and view the shared file.
    */
   it('Receive federated share of a file from Nextcloud to ownCloud', () => {
-    // Step 1: Log in to the recipient's ownCloud instance
-    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
-
-    // Step 2: Handle any share acceptance pop-ups and verify the file exists
-    recipientUtils.handleShareAcceptance(sharedFileName);
+    recipientUtils.acceptNativeShareWithShare({
+      recipientUrl,
+      recipientUsername,
+      recipientPassword,
+      sharedFileName,
+    });
   });
 })

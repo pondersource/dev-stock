@@ -7,7 +7,7 @@ import * as ocis5 from './ocis/v5.js';
 // OcmStub
 import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
-import * as oc10 from './owncloud/v10.js';
+import * as oc10 from './owncloud/v10/interface.js';
 // Seafile
 import * as sf11 from './seafile/v11.js';
 

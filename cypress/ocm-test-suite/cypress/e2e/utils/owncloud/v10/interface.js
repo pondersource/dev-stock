@@ -1,36 +1,32 @@
 /**
  * @fileoverview
- * Utility functions for Cypress tests interacting with Nextcloud version 27.
- * These functions provide abstractions for common actions such as sharing files,
- * updating permissions, renaming files, and navigating the UI.
+ * Utility functions for Cypress tests interacting with ownCloud version 10.
+ * These functions provide abstractions for common actions such as accepting shares,
+ * creating federated shares, renaming files, and interacting with the file menu.
  *
  * @author Michiel B. de Jong <michiel@pondersource.com>
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import {
+  constructFederatedShareUrl,
+} from '../../general.js';
+
 import * as implementation from './implementation.js';
 
-export const platform = 'nextcloud';
-export const version = 'v27';
+export const platform = 'owncloud';
+export const version = 'v10';
 
 /**
- * Login to Nextcloud and navigate to the files app.
- * Extends the core login functionality by verifying the dashboard and navigating to the files app.
+ * Login to ownCloud and navigate to the files app.
+ * Extends the core login functionality by verifying the files app is accessible.
  *
- * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} url - The URL of the ownCloud instance.
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */
 export function login({ url, username, password }) {
   implementation.loginCore({ url, username, password });
-
-  // Verify dashboard visibility
-  cy.url({ timeout: 10000 }).should('match', /apps\/dashboard(\/|$)/);
-
-  // Navigate to the files app
-  cy.get('header[id="header"] nav.app-menu ul.app-menu-main li[data-app-id="files"]')
-    .should('be.visible')
-    .click();
 
   // Verify files app visibility
   cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/);
@@ -45,13 +41,13 @@ export function shareViaNativeShareWith({
   recipientUsername,
   recipientUrl,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
+  // Step 1: Log in to the sender's ownCloud instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
-  // Step 2: Ensure the original file exists before renaming
+  // Step 2: Ensure the original file exists
   implementation.ensureFileExists(originalFileName);
 
-  // Step 3: Rename the file to prepare it for sharing
+  // Step 3: Rename the file
   implementation.renameFile(originalFileName, sharedFileName);
 
   // Step 4: Verify the file has been renamed
@@ -80,10 +76,8 @@ export function shareViaFederatedLink({
   senderPassword,
   originalFileName,
   sharedFileName,
-  recipientUsername,
-  recipientUrl,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
+  // Step 1: Log in to the sender's ownCloud instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Ensure the original file exists before renaming
@@ -95,12 +89,8 @@ export function shareViaFederatedLink({
   // Step 4: Verify the file has been renamed
   implementation.ensureFileExists(sharedFileName);
 
-  // Step 5: Create and send the share link to the recipient
-  implementation.createAndSendShareLink(
-    sharedFileName,
-    recipientUsername,
-    recipientUrl.replace(/^https?:\/\/|\/$/g, '')
-  );
+  // Step 5: Create a share link for the file
+  implementation.createShareLink(sharedFileName);
 }
 
 export function acceptFederatedLinkShare({
@@ -154,10 +144,10 @@ export function buildFederatedShareDetails({
   senderUrl
 }) {
   return {
-    shareWith: `${recipientUsername}@${recipientUrl}`,
+    shareWith: `${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
     fileName: sharedFileName,
-    owner: `${senderUsername}@${senderUrl}/`,
-    sender: `${senderUsername}@${senderUrl}/`,
+    owner: `${senderUsername}@${senderUrl}`,
+    sender: `${senderUsername}@${senderUrl}`,
     shareType: 'user',
     resourceType: 'file',
     protocol: 'webdav'

@@ -10,88 +10,29 @@
 
 import {
   escapeCssSelector,
-} from '../general';
-
-export const platform = 'owncloud';
-export const version = 'v10';
-
-export function shareViaNativeShareWith({
-  senderUrl,
-  senderUsername,
-  senderPassword,
-  originalFileName,
-  sharedFileName,
-  recipientUsername,
-  recipientUrl,
-}) {
-  // Step 1: Log in to the sender's ownCloud instance
-  cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
-
-  // Step 2: Ensure the original file exists
-  ensureFileExists(originalFileName);
-
-  // Step 3: Rename the file
-  renameFile(originalFileName, sharedFileName);
-
-  // Step 4: Verify the file has been renamed
-  ensureFileExists(sharedFileName);
-
-  // Step 5: Create a federated share for the recipient
-  createShare(sharedFileName, recipientUsername, recipientUrl.replace(/^https?:\/\/|\/$/g, ''));
-
-  // TODO @MahdiBaghbani: Verify that the share was created successfully
-}
-
-export function shareViaFederatedLink({
-  senderUrl,
-  senderUsername,
-  senderPassword,
-  originalFileName,
-  sharedFileName,
-}) {
-  // Step 1: Log in to the sender's ownCloud instance
-  cy.loginOwncloud(senderUrl, senderUsername, senderPassword);
-
-  // Step 2: Ensure the original file exists before renaming
-  ensureFileExists(originalFileName);
-
-  // Step 3: Rename the file to prepare it for sharing
-  renameFile(originalFileName, sharedFileName);
-
-  // Step 4: Verify the file has been renamed
-  ensureFileExists(sharedFileName);
-
-  // Step 5: Create a share link for the file
-  createShareLink(sharedFileName);
-}
+} from '../../general.js';
 
 /**
- * Build the federated share details object.
+ * Login to ownCloud Core.
+ * Logs into ownCloud using provided credentials.
  *
- * @param {string} recipientUsername - Username of the recipient (e.g. "alice")
- * @param {string} recipientUrl - Hostname or URL of the recipient (e.g. "remote.example.com")
- * @param {string} sharedFileName - The name of the file being shared
- * @param {string} senderUsername - Username of the sender (e.g. "bob")
- * @param {string} senderUrl - Full URL of the sender (e.g. "https://my.example.com/")
- * @returns {Object} The federated share details
+ * @param {string} url - The URL of the ownCloud instance.
+ * @param {string} username - The username for login.
+ * @param {string} password - The password for login.
  */
-export function buildFederatedShareDetails({
-  recipientUsername,
-  recipientUrl,
-  sharedFileName,
-  senderUsername,
-  senderUrl
-}) {
-  return {
-    shareWith: `${recipientUsername}@${recipientUrl.replace(/^https?:\/\/|\/$/g, '')}`,
-    fileName: sharedFileName,
-    owner: `${senderUsername}@${senderUrl}`,
-    sender: `${senderUsername}@${senderUrl}`,
-    shareType: 'user',
-    resourceType: 'file',
-    protocol: 'webdav'
-  };
-}
+export function loginCore({ url, username, password }) {
+  cy.visit(url);
+
+  // Ensure the login page is visible
+  cy.get('form[name="login"]', { timeout: 10000 }).should('be.visible');
+
+  // Fill in login credentials and submit
+  cy.get('form[name="login"]').within(() => {
+    cy.get('input[name="user"]').type(username);
+    cy.get('input[name="password"]').type(password);
+    cy.get('button[id="submit"]').click();
+  });
+};
 
 /**
  * Ensures that a file with the specified name exists and is visible in the file list.

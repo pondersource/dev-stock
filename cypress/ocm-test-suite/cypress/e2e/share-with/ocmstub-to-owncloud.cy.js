@@ -13,6 +13,8 @@ import {
 
 describe('Federated sharing functionality from OcmStub to ownCloud', () => {
   // Shared variables to avoid repetition and improve maintainability
+  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocmstub';
+  const recipientPlatform = Cypress.env('EFSS_PLATFORM_2') ?? 'owncloud';
   const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v1';
   const recipientVersion = Cypress.env('EFSS_PLATFORM_2_VERSION') ?? 'v10';
   const senderUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -22,8 +24,8 @@ describe('Federated sharing functionality from OcmStub to ownCloud', () => {
   const sharedFileName = 'from-stub.txt';
 
   // Get the right helper set for each side
-  const senderUtils = getUtils('ocmstub', senderVersion);
-  const recipientUtils = getUtils('owncloud', recipientVersion);
+  const senderUtils = getUtils(senderPlatform, senderVersion);
+  const recipientUtils = getUtils(recipientPlatform, recipientVersion);
 
   /**
    * Test Case: Sending a federated share from OcmStub to ownCloud .
@@ -42,10 +44,11 @@ describe('Federated sharing functionality from OcmStub to ownCloud', () => {
    * Validates that the recipient can successfully accept the share and view the shared file.
    */
   it('Receive federated share of a file from OcmStub to ownCloud', () => {
-    // Step 1: Log in to the recipient's ownCloud instance
-    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
-
-    // Step 2: Accept the share dialog
-    recipientUtils.handleShareAcceptance(sharedFileName);
+    recipientUtils.acceptNativeShareWithShare({
+      recipientUrl,
+      recipientUsername,
+      recipientPassword,
+      sharedFileName,
+    });
   });
 });

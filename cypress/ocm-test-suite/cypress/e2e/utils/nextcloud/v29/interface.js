@@ -67,8 +67,8 @@ export function acceptNativeShareWithShare({
   recipientPassword,
   sharedFileName,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword  });
+  // Step 1: Log in to the recipient's instance
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
   // Step 2: Handle any share acceptance pop-ups and verify the file exists
   implementation.handleShareAcceptance(sharedFileName);
@@ -84,7 +84,7 @@ export function shareViaFederatedLink({
   recipientUrl,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: senderUrl, username: senderUsername, password: senderPassword  });
+  login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Ensure the original file exists before renaming
   implementation.ensureFileExists(originalFileName);
@@ -104,15 +104,35 @@ export function shareViaFederatedLink({
 }
 
 export function acceptFederatedLinkShare({
+  senderPlatform,
+  senderUrl,
+  senderUsername,
+  recipientPlatform,
   recipientUrl,
   recipientUsername,
   recipientPassword,
   sharedFileName,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
-  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword  });
+  // Step 1: Log in to the recipient's instance
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
-  // Step 2: Handle any share acceptance pop-ups and verify the file exists
+  if (senderPlatform == 'owncloud') {
+    // Step 2: Read the share URL from file
+    cy.readFile('share-link-url.txt').then((shareUrl) => {
+      // Step 3: Construct the federated share URL
+      const federatedShareUrl = constructFederatedShareUrl({
+        shareUrl,
+        senderUrl,
+        recipientUrl,
+        senderUsername,
+        fileName: sharedFileName,
+        platform: recipientPlatform
+      });
+
+      cy.visit(federatedShareUrl);
+    });
+  };
+
   implementation.handleShareAcceptance(sharedFileName);
 }
 
