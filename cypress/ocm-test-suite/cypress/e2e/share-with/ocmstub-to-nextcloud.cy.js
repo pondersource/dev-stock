@@ -13,6 +13,8 @@ import {
 
 describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
   // Shared variables to avoid repetition and improve maintainability
+  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocmstub';
+  const recipientPlatform = Cypress.env('EFSS_PLATFORM_2') ?? 'nextcloud';
   const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v1';
   const recipientVersion = Cypress.env('EFSS_PLATFORM_2_VERSION') ?? 'v27';
   const senderUrl = Cypress.env('OCMSTUB1_URL') || 'https://ocmstub1.docker';
@@ -22,8 +24,8 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
   const sharedFileName = 'from-stub.txt';
 
   // Get the right helper set for each side
-  const senderUtils = getUtils('ocmstub', senderVersion);
-  const recipientUtils = getUtils('nextcloud', recipientVersion);
+  const senderUtils = getUtils(senderPlatform, senderVersion);
+  const recipientUtils = getUtils(recipientPlatform, recipientVersion);
 
   /**
    * Test Case: Sending a federated share from OcmStub to Nextcloud.
@@ -42,10 +44,11 @@ describe('Federated sharing functionality from OcmStub to Nextcloud', () => {
    * Validates that the recipient can successfully accept the share and view the shared file.
    */
   it('Receive federated share of a file from OcmStub to Nextcloud', () => {
-    // Step 1: Log in to the recipient's Nextcloud instance
-    recipientUtils.login(recipientUrl, recipientUsername, recipientPassword);
-
-    // Step 2: Handle any share acceptance pop-ups and verify the file exists
-    recipientUtils.handleShareAcceptance(sharedFileName);
+    recipientUtils.acceptNativeShareWithShare({
+      recipientUrl,
+      recipientUsername,
+      recipientPassword,
+      sharedFileName,
+    });
   });
 });
