@@ -9,7 +9,7 @@ import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
 import * as oc10 from './owncloud/v10/interface.js';
 // Seafile
-import * as sf11 from './seafile/v11.js';
+import * as sf11 from './seafile/v11/interface.js';
 
 const REGISTRY = new Map();
 

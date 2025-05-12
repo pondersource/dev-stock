@@ -1,17 +1,4 @@
 /**
- * @fileoverview
- * Utility functions for Cypress tests interacting with Seafile version 11.
- * These functions provide abstractions for common actions such as accepting shares,
- * creating federated shares, renaming files, and interacting with the file menu.
- *
- * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
- */
-
-
-export const platform = 'seafile';
-export const version  = 'v11';
-
-/**
  * Dismiss any modal dialogs that might be present (e.g., welcome or info dialogs).
  * Waits up to 3.5 seconds for a modal to appear before attempting to dismiss it.
  */
