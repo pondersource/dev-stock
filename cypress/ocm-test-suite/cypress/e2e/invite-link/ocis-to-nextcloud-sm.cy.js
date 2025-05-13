@@ -13,9 +13,9 @@ import {
 
 describe('Invite link federated sharing via ScienceMesh functionality between oCIS and Nextcloud', () => {
   // Shared variables to avoid repetition and improve maintainability
-  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'nextcloud';
+  const senderPlatform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocis';
   const recipientPlatform = Cypress.env('EFSS_PLATFORM_2') ?? 'nextcloud';
-  const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v27';
+  const senderVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v5';
   const recipientVersion = Cypress.env('EFSS_PLATFORM_2_VERSION') ?? 'v27';
   const senderUrl = Cypress.env('OCIS1_URL') || 'https://ocis1.docker';
   const recipientUrl = Cypress.env('NEXTCLOUD1_URL') || 'https://nextcloud1.docker';

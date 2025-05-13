@@ -40,6 +40,7 @@ export function createInviteLink({
   senderUrl,
   senderUsername,
   senderPassword,
+  recipientPlatform,
   recipientUrl,
   inviteLinkFileName,
 }) {
@@ -49,13 +50,23 @@ export function createInviteLink({
   // Step 2: Navigate to the ScienceMesh app
   cy.visit(`${senderUrl}/index.php/apps/sciencemesh/contacts`);
 
-  // Step 3: Generate the invite link and save it to a file
-  implementation.createInviteLink(recipientUrl).then((inviteLink) => {
-    // Step 4: Ensure the invite link is not empty
-    expect(inviteLink).to.be.a('string').and.not.be.empty;
-    // Step 5: Save the invite link to a file for later use
-    cy.writeFile(inviteLinkFileName, inviteLink);
-  });
+  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+    // Step 3: Generate the invite link and save it to a file
+    implementation.createInviteLink(recipientUrl).then((inviteLink) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteLink);
+    });
+  } else {
+    // Step 3: Generate the invite token and save it to a file
+    implementation.createInviteToken(recipientUrl).then((inviteToken) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteToken).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteToken);
+    });
+  }
 }
 
 export function acceptInviteLink({
@@ -100,10 +111,12 @@ export function shareViaInviteLink({
   senderDomain,
   senderUsername,
   senderPassword,
+  recipientPlatform,
+  recipientUrl,
+  recipientDomain,
+  recipientDisplayName,
   originalFileName,
   sharedFileName,
-  recipientUsername,
-  recipientDomain,
 }) {
   // Step 1: Log in to the sender's Nextcloud instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
@@ -117,14 +130,23 @@ export function shareViaInviteLink({
   // Step 4: Verify the file has been renamed
   implementation.ensureFileExists(sharedFileName);
 
-  // Step 5: Create a federated share for the recipient via ScienceMesh
-  // Note: The 'reva' prefix is added to the recipient domain as per application behavior
-  implementation.createScienceMeshShare(
-    senderDomain,
-    recipientUsername,
-    `reva${recipientDomain}`,
-    sharedFileName
-  );
+  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+    // Step 5: Create a federated share for the recipient via ScienceMesh
+    // Note: The 'reva' prefix is added to the recipient domain as per application behavior
+    implementation.createScienceMeshShare(
+      senderDomain,
+      recipientDisplayName,
+      `reva${recipientDomain}`,
+      sharedFileName
+    );
+  } else {
+    implementation.createScienceMeshShare(
+      senderDomain,
+      recipientDisplayName,
+      recipientUrl,
+      sharedFileName
+    );
+  }
 }
 
 export function acceptInviteLinkShare({

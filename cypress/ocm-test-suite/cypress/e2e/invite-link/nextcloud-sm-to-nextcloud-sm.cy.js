@@ -23,6 +23,8 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
   const senderPassword = Cypress.env('NEXTCLOUD1_PASSWORD') || 'relativity';
   const recipientUsername = Cypress.env('NEXTCLOUD2_USERNAME') || 'michiel';
   const recipientPassword = Cypress.env('NEXTCLOUD2_PASSWORD') || 'dejong';
+  const senderDisplayName = Cypress.env('NEXTCLOUD1_DISPLAY_NAME') || 'einstein';
+  const recipientDisplayName = Cypress.env('NEXTCLOUD2_DISPLAY_NAME') || 'michiel';
   const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
   const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
   const inviteLinkFileName = 'invite-link-nc-nc.txt';
@@ -41,6 +43,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       senderUrl,
       senderUsername,
       senderPassword,
+      recipientPlatform,
       recipientUrl,
       inviteLinkFileName,
     });
@@ -70,10 +73,12 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       senderDomain,
       senderUsername,
       senderPassword,
+      recipientPlatform,
+      recipientUrl,
+      recipientDomain,
+      recipientDisplayName,
       originalFileName,
       sharedFileName,
-      recipientUsername,
-      recipientDomain,
     });
   });
 

@@ -48,6 +48,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
       senderUrl,
       senderUsername,
       senderPassword,
+      recipientPlatform,
       recipientUrl,
       inviteLinkFileName,
     });
@@ -86,10 +87,12 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
       senderDomain,
       senderUsername,
       senderPassword,
+      recipientPlatform,
+      recipientUrl,
+      recipientDomain,
+      recipientDisplayName,
       originalFileName,
       sharedFileName,
-      recipientUsername,
-      recipientDomain,
     });
   });
 
