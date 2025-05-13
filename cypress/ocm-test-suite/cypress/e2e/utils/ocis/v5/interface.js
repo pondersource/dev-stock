@@ -24,7 +24,7 @@ export function createInviteLink({
   senderPassword,
   inviteLinkFileName,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
+  // Step 1: Log in to the sender's instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Navigate to the ScienceMesh app
@@ -79,7 +79,7 @@ export function shareViaInviteLink({
   sharedFileContent,
   recipientUsername,
 }) {
-  // Step 1: Log in to the sender's Nextcloud instance
+  // Step 1: Log in to the sender's instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
 
   // Step 2: Create a text file with content
