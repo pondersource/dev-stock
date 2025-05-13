@@ -6,6 +6,10 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import {
+  getUtils
+} from '../utils/index.js';
+
 describe('oCIS Login Tests', () => {
   /**
    * Test Case: Validates successful login to oCIS.
@@ -13,11 +17,15 @@ describe('oCIS Login Tests', () => {
    */
   it('should successfully log into oCIS with valid credentials', () => {
     // Define the oCIS instance URL and credentials from environment variables or use default values
-    const paltformVersion     = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v5';
-    const ocisUrl = Cypress.env('OCIS1_URL') || 'https://ocis1.docker';
+    const platform = Cypress.env('EFSS_PLATFORM_1') ?? 'ocis';
+    const paltformVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v5';
+    const url = Cypress.env('OCIS1_URL') || 'https://ocis1.docker';
     const username = Cypress.env('OCIS1_USERNAME') || 'einstein';
     const password = Cypress.env('OCIS1_PASSWORD') || 'relativity';
 
-    cy.loginOcis(ocisUrl, username, password);
+    // Get the right helper set
+    const platformUtils = getUtils(platform, paltformVersion);
+
+    platformUtils.login({ url, username, password });
   });
 });

@@ -3,7 +3,7 @@ import * as nc27 from './nextcloud/v27/interface.js';
 import * as nc28 from './nextcloud/v28/interface.js';
 import * as nc29 from './nextcloud/v29/interface.js';
 // oCIS
-import * as ocis5 from './ocis/v5.js';
+import * as ocis5 from './ocis/v5/interface.js';
 // OcmStub
 import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
