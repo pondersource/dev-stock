@@ -54,8 +54,10 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
    */
   it('Accept invitation from Nextcloud to Nextcloud', () => {
     recipientUtils.acceptInviteLink({
+      senderPlatform,
       senderDomain,
       senderUsername,
+      senderDisplayName,
       recipientUrl,
       recipientDomain,
       recipientUsername,

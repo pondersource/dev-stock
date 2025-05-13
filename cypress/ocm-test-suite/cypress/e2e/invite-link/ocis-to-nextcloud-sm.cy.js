@@ -44,8 +44,11 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
   it('Send invitation from oCIS to Nextcloud', () => {
     senderUtils.createInviteLink({
       senderUrl,
+      senderDomain,
       senderUsername,
       senderPassword,
+      recipientPlatform,
+      recipientDomain,
       inviteLinkFileName,
     });
   });
@@ -60,8 +63,10 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
    */
   it('Accept invitation from oCIS to Nextcloud', () => {
     recipientUtils.acceptInviteLink({
+      senderPlatform,
       senderDomain,
       senderUsername,
+      senderDisplayName,
       recipientUrl,
       recipientDomain,
       recipientUsername,

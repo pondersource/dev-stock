@@ -45,8 +45,11 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
   it('Send invitation from oCIS v5 to oCIS v5', () => {
     senderUtils.createInviteLink({
       senderUrl,
+      senderDomain,
       senderUsername,
       senderPassword,
+      recipientPlatform,
+      recipientDomain,
       inviteLinkFileName,
     });
   });

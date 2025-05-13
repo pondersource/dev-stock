@@ -20,8 +20,11 @@ export function login({ url, username, password }) {
 
 export function createInviteLink({
   senderUrl,
+  senderDomain,
   senderUsername,
   senderPassword,
+  recipientPlatform,
+  recipientDomain,
   inviteLinkFileName,
 }) {
   // Step 1: Log in to the sender's instance
@@ -30,14 +33,24 @@ export function createInviteLink({
   // Step 2: Navigate to the ScienceMesh app
   implementation.openScienceMeshApp();
 
-  // Step 3: Generate the invite token and save it to a file
-  implementation.createInviteToken().then((token) => {
-    // Ensure the token is not empty
-    expect(token).to.be.a('string').and.not.be.empty;
-    // Save the token to a file for later use
-    cy.writeFile(inviteLinkFileName, token);
-  });
+  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+    // Step 3: Generate the invite link and save it to a file
+    implementation.createLegacyInviteLink(recipientDomain, senderDomain).then((inviteLink) => {
+      // Ensure the invite link is not empty
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
+      // Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteLink);
+    });
+  } else {
+    // Step 3: Generate the invite token and save it to a file
+    implementation.createInviteToken().then((token) => {
+      // Ensure the token is not empty
+      expect(token).to.be.a('string').and.not.be.empty;
+      // Save the token to a file for later use
+      cy.writeFile(inviteLinkFileName, token);
+    });
 
+  }
   // Wait for the operation to complete
   cy.wait(5000);
 }
