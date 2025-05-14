@@ -185,16 +185,18 @@ main() {
     local platforms=("$@")
 
     # list of singleton tokens (no numeric suffix)
-    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1)
+    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1 [idp]=1)
 
     # fine-grained cleanup
     if [[ ${#platforms[@]} -gt 0 ]]; then
         declare -A COUNTER=()                  # per-base-token index
         for raw in "${platforms[@]}"; do
             # 1. normalise token
-            # drop “-sm” plus trailing digits, e.g. owncloud-sm → owncloud
+            # drop “-sm” or “-vo” plus trailing digits, e.g. owncloud-sm → owncloud
             # revaowncloud-sm       → revaowncloud
+            # nextcloud-vo          → nextcloud
             local token="${raw%%-sm*}"
+            token="${token%%-vo*}"
 
             local idx="" cname=""
 
