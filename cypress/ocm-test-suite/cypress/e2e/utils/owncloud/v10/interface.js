@@ -32,6 +32,129 @@ export function login({ url, username, password }) {
   cy.url({ timeout: 10000 }).should('match', /apps\/files(\/|$)/);
 };
 
+export function createInviteLink({
+  senderUrl,
+  senderUsername,
+  senderPassword,
+  recipientPlatform,
+  recipientUrl,
+  inviteLinkFileName,
+}) {
+  // Step 1: Log in to the sender's instance
+  login({ url: senderUrl, username: senderUsername, password: senderPassword });
+
+  // Step 2: Navigate to the ScienceMesh app
+  cy.visit(`${senderUrl}/index.php/apps/sciencemesh/contacts`);
+
+  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+    // Step 3: Generate the invite link and save it to a file
+    implementation.createInviteLink(recipientUrl).then((inviteLink) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteLink).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteLink);
+    });
+  } else {
+    // Step 3: Generate the invite token and save it to a file
+    implementation.createInviteToken(recipientUrl).then((inviteToken) => {
+      // Step 4: Ensure the invite link is not empty
+      expect(inviteToken).to.be.a('string').and.not.be.empty;
+      // Step 5: Save the invite link to a file for later use
+      cy.writeFile(inviteLinkFileName, inviteToken);
+    });
+  }
+}
+
+export function acceptInviteLink({
+  senderPlatform,
+  senderDomain,
+  senderUsername,
+  senderDisplayName,
+  recipientUrl,
+  recipientDomain,
+  recipientUsername,
+  recipientPassword,
+  inviteLinkFileName,
+}) {
+  // Step 1: Log in to the recipient's instance
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
+
+  const flag = (senderPlatform == 'nextcloud' || senderPlatform == 'owncloud');
+
+  // Step 1: Load the invite link from the saved file
+  cy.readFile(inviteLinkFileName).then((inviteLink) => {
+    // Step 2: Ensure the invite link is valid
+    expect(inviteLink).to.be.a('string').and.not.be.empty;
+
+    // Step 3: visit invite link.
+    cy.visit(inviteLink)
+
+    // Step 4: Accept the invitation
+    implementation.acceptScienceMeshInvitation();
+
+    // Step 5: Verify that the sender is now a contact in the recipient's contacts list
+    implementation.verifyFederatedContact(
+      recipientDomain,
+      flag ? senderUsername : senderDisplayName,
+      flag ? `reva${senderDomain}` : senderDomain,
+    );
+  });
+}
+
+export function shareViaInviteLink({
+  senderUrl,
+  senderDomain,
+  senderUsername,
+  senderPassword,
+  recipientPlatform,
+  recipientUrl,
+  recipientDomain,
+  recipientDisplayName,
+  originalFileName,
+  sharedFileName,
+}) {
+  // Step 1: Log in to the sender's ownCloud instance
+  login({ url: senderUrl, username: senderUsername, password: senderPassword });
+
+  // Step 2: Ensure the original file exists before renaming
+  implementation.ensureFileExists(originalFileName);
+
+  // Step 3: Rename the file to prepare it for sharing
+  implementation.renameFile(originalFileName, sharedFileName);
+
+  // Step 4: Verify the file has been renamed
+  implementation.ensureFileExists(sharedFileName);
+
+  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+    // Step 5: Create a federated share for the recipient via ScienceMesh
+    // Note: The 'reva' prefix is added to the recipient domain as per application behavior
+    implementation.createScienceMeshShare(
+      sharedFileName,
+      recipientDisplayName,
+      `reva${recipientDomain}`,
+    );
+  } else {
+    implementation.createScienceMeshShare(
+      sharedFileName,
+      recipientDisplayName,
+      recipientUrl,
+    );
+  }
+}
+
+export function acceptInviteLinkShare({
+  recipientUrl,
+  recipientUsername,
+  recipientPassword,
+  sharedFileName,
+}) {
+  // Step 1: Log in to the recipient's instance
+  login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
+
+  // Step 2: Handle any share acceptance pop-ups and verify the file exists
+  implementation.handleShareAcceptance(sharedFileName);
+}
+
 export function shareViaNativeShareWith({
   senderUrl,
   senderUsername,

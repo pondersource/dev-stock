@@ -8,13 +8,13 @@
  **********************************************/
 
 const WORKFLOWS_SET = new Set([
-  // 'login-nc-v27.yml',
-  // 'login-nc-v28.yml',
-  // 'login-nc-v29.yml',
-  // 'login-oc-v10.yml',
-  // 'login-ocis-v5.yml',
-  // 'login-os-v1.yml',
-  // 'login-sf-v11.yml',
+  'login-nc-v27.yml',
+  'login-nc-v28.yml',
+  'login-nc-v29.yml',
+  'login-oc-v10.yml',
+  'login-ocis-v5.yml',
+  'login-os-v1.yml',
+  'login-sf-v11.yml',
   // 'share-link-nc-v27-nc-v27.yml',
   // 'share-link-nc-v27-nc-v28.yml',
   // 'share-link-nc-v27-nc-v29.yml',
@@ -61,13 +61,13 @@ const WORKFLOWS_SET = new Set([
   // 'share-with-os-v1-os-v1.yml',
   // 'share-with-sf-v11-sf-v11.yml',
   'invite-link-nc-sm-v27-nc-sm-v27.yml',
-  // 'invite-link-nc-sm-v27-oc-sm-v10.yml',
+  'invite-link-nc-sm-v27-oc-sm-v10.yml',
   'invite-link-nc-sm-v27-ocis-v5.yml',
-  // 'invite-link-oc-sm-v10-nc-sm-v27.yml',
-  // 'invite-link-oc-sm-v10-oc-sm-v10.yml',
-  // 'invite-link-oc-sm-v10-ocis-v5.yml',
+  'invite-link-oc-sm-v10-nc-sm-v27.yml',
+  'invite-link-oc-sm-v10-oc-sm-v10.yml',
+  'invite-link-oc-sm-v10-ocis-v5.yml',
   'invite-link-ocis-v5-nc-sm-v27.yml',
-  // 'invite-link-ocis-v5-oc-sm-v10.yml',
+  'invite-link-ocis-v5-oc-sm-v10.yml',
   'invite-link-ocis-v5-ocis-v5.yml'
 ]);
 
@@ -87,7 +87,7 @@ const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
 const RUN_ID_TIMEOUT = 60000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
-const DEFAULT_BATCH_SIZE = 5;       // Workflows to run concurrently per batch
+const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
 
 /**
  * Pause execution for the given number of milliseconds.

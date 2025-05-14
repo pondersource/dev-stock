@@ -13,11 +13,15 @@ describe('Seafile Login Tests', () => {
    */
   it('should successfully log into Seafile with valid credentials', () => {
     // Define the Seafile instance URL and credentials from environment variables or use default values
-    const paltformVersion     = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v11';
-    const seafileUrl = Cypress.env('SEAFILE1_URL') || 'http://seafile1.docker';
+    const platform = Cypress.env('EFSS_PLATFORM_1') ?? 'seafile';
+    const paltformVersion = Cypress.env('EFSS_PLATFORM_1_VERSION') ?? 'v11';
+    const url = Cypress.env('SEAFILE1_URL') || 'http://seafile1.docker';
     const username = Cypress.env('SEAFILE1_USERNAME') || 'jonathan@seafile.com';
     const password = Cypress.env('SEAFILE1_PASSWORD') || 'xu';
 
-    cy.loginSeafile(seafileUrl, username, password);
+    // Get the right helper set
+    const platformUtils = getUtils(platform, paltformVersion);
+
+    platformUtils.login({ url, username, password });
   });
 });

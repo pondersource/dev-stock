@@ -136,14 +136,14 @@ export function shareViaInviteLink({
       senderDomain,
       recipientDisplayName,
       `reva${recipientDomain}`,
-      sharedFileName
+      sharedFileName,
     );
   } else {
     implementation.createScienceMeshShare(
       senderDomain,
       recipientDisplayName,
       recipientUrl,
-      sharedFileName
+      sharedFileName,
     );
   }
 }
