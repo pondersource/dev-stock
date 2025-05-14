@@ -51,10 +51,15 @@ describe('Share Link Federated Sharing Functionality for Nextcloud to ownCloud',
    * Validates that the recipient can successfully accept the share link and view the shared file.
    */
   it('Receive federated share link of a file from Nextcloud to ownCloud', () => {
-    // Step 1: Log in to the recipient's ownCloud instance
-    cy.loginOwncloud(recipientUrl, recipientUsername, recipientPassword);
-
-    // Step 2: Accept the share dialog
-    recipientUtils.handleShareAcceptance(sharedFileName);
+    recipientUtils.acceptFederatedLinkShare({
+      senderPlatform,
+      senderUrl,
+      senderUsername,
+      recipientPlatform,
+      recipientUrl,
+      recipientUsername,
+      recipientPassword,
+      sharedFileName,
+    });
   });
 });
