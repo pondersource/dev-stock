@@ -97,7 +97,7 @@ ENABLE_OCM = True
 OCM_PROVIDER_ID = "${uuid}"  # Unique ID of this server
 OCM_REMOTE_SERVERS = [
     {
-        "server_name": "${remote_server}",
+        "server_name": "recipient",
         "server_url": "http://${remote_server}.docker/",  # Must end with '/'
     },
 ]
