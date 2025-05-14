@@ -6,6 +6,10 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import {
+  getUtils
+} from '../utils/index.js';
+
 describe('Seafile Login Tests', () => {
   /**
    * Test Case: Validates successful login to Seafile.
