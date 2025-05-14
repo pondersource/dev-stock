@@ -185,7 +185,7 @@ main() {
     local platforms=("$@")
 
     # list of singleton tokens (no numeric suffix)
-    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1)
+    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1 [idp]=1)
 
     # fine-grained cleanup
     if [[ ${#platforms[@]} -gt 0 ]]; then
