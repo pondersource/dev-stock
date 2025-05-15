@@ -10,34 +10,53 @@
 const WORKFLOWS_SET = new Set([
   'login-nc-v27.yml',
   'login-nc-v28.yml',
+  'login-nc-v29.yml',
   'login-oc-v10.yml',
   'login-ocis-v5.yml',
   'login-os-v1.yml',
   'login-sf-v11.yml',
   'share-link-nc-v27-nc-v27.yml',
   'share-link-nc-v27-nc-v28.yml',
+  'share-link-nc-v27-nc-v29.yml',
   'share-link-nc-v27-oc-v10.yml',
   'share-link-nc-v27-os-v1.yml',
   'share-link-nc-v28-nc-v27.yml',
   'share-link-nc-v28-nc-v28.yml',
+  'share-link-nc-v28-nc-v29.yml',
   'share-link-nc-v28-oc-v10.yml',
+  'share-link-nc-v28-os-v1.yml',
+  'share-link-nc-v29-nc-v27.yml',
+  'share-link-nc-v29-nc-v28.yml',
+  'share-link-nc-v29-nc-v29.yml',
+  'share-link-nc-v29-oc-v10.yml',
+  'share-link-nc-v29-os-v1.yml',
   'share-link-oc-v10-nc-v27.yml',
   'share-link-oc-v10-nc-v28.yml',
+  'share-link-oc-v10-nc-v29.yml',
   'share-link-oc-v10-oc-v10.yml',
   'share-with-nc-v27-nc-v27.yml',
   'share-with-nc-v27-nc-v28.yml',
+  'share-with-nc-v27-nc-v29.yml',
   'share-with-nc-v27-oc-v10.yml',
   'share-with-nc-v27-os-v1.yml',
   'share-with-nc-v28-nc-v27.yml',
   'share-with-nc-v28-nc-v28.yml',
+  'share-with-nc-v28-nc-v29.yml',
   'share-with-nc-v28-oc-v10.yml',
   'share-with-nc-v28-os-v1.yml',
+  'share-with-nc-v29-nc-v27.yml',
+  'share-with-nc-v29-nc-v28.yml',
+  'share-with-nc-v29-nc-v29.yml',
+  'share-with-nc-v29-oc-v10.yml',
+  'share-with-nc-v29-os-v1.yml',
   'share-with-oc-v10-nc-v27.yml',
   'share-with-oc-v10-nc-v28.yml',
+  'share-with-oc-v10-nc-v29.yml',
   'share-with-oc-v10-oc-v10.yml',
   'share-with-oc-v10-os-v1.yml',
   'share-with-os-v1-nc-v27.yml',
   'share-with-os-v1-nc-v28.yml',
+  'share-with-os-v1-nc-v29.yml',
   'share-with-os-v1-oc-v10.yml',
   'share-with-os-v1-os-v1.yml',
   'share-with-sf-v11-sf-v11.yml',
@@ -60,6 +79,7 @@ const WORKFLOWS = Array.from(WORKFLOWS_SET);
 const EXPECTED_FAILURES = new Set([
   'share-link-oc-v10-nc-v27.yml',
   'share-link-oc-v10-nc-v28.yml',
+  'share-link-oc-v10-nc-v29.yml',
 ]);
 
 // Constants controlling polling / batching behavior
@@ -67,7 +87,7 @@ const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
 const RUN_ID_TIMEOUT = 60000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
-const DEFAULT_BATCH_SIZE = 5;       // Workflows to run concurrently per batch
+const DEFAULT_BATCH_SIZE = 20;       // Workflows to run concurrently per batch
 
 /**
  * Pause execution for the given number of milliseconds.
