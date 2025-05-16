@@ -1,3 +1,8 @@
+import {
+  isBase64,
+  encodeBase64,
+} from '../../general.js';
+
 import * as implementation from './implementation.js';
 
 export const platform = 'ocis';
@@ -24,6 +29,7 @@ export function createInviteLink({
   senderUsername,
   senderPassword,
   recipientPlatform,
+  recipientVersion,
   recipientDomain,
   inviteLinkFileName,
 }) {
@@ -50,7 +56,6 @@ export function createInviteLink({
       // Save the token to a file for later use
       cy.writeFile(inviteLinkFileName, token);
     });
-
   }
   // Wait for the operation to complete
   cy.wait(5000);
@@ -74,6 +79,13 @@ export function acceptInviteLink({
     expect(token.trim()).to.not.be.empty;
     cy.log('Read token from file:', token);
 
+    // we need a base 64 as input so we try to detect if its already base64 if not we create it.
+    if (!isBase64(token)) {
+      cy.log('Token is not base64:', token);
+      token = encodeBase64(`${token}@${senderDomain}`);
+      cy.log('Converted token to base64:', token);
+    }
+
     // Step 3: Accept the invitation
     implementation.acceptInviteLink(token);
 
@@ -92,6 +104,7 @@ export function shareViaInviteLink({
   sharedFileName,
   sharedFileContent,
   recipientUsername,
+  recipientDisplayName,
 }) {
   // Step 1: Log in to the sender's instance
   login({ url: senderUrl, username: senderUsername, password: senderPassword });
@@ -103,10 +116,10 @@ export function shareViaInviteLink({
   implementation.openFilesApp();
 
   // Step 4: Share the file with the recipient
-  implementation.createShare(sharedFileName, recipientUsername);
+  // implementation.createShare(sharedFileName, recipientUsername, recipientDisplayName);
 
   // Wait for the operation to complete
-  cy.wait(5000);
+  // cy.wait(5000);
 }
 
 export function acceptInviteLinkShare({

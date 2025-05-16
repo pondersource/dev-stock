@@ -48,6 +48,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
       senderUsername,
       senderPassword,
       recipientPlatform,
+      recipientVersion,
       recipientDomain,
       inviteLinkFileName,
     });
@@ -91,6 +92,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
       sharedFileName,
       sharedFileContent,
       recipientUsername,
+      recipientDisplayName,
     });
   });
 

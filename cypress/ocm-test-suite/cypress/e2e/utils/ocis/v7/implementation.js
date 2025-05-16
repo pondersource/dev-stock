@@ -63,6 +63,40 @@ export function createInviteToken() {
     )
 }
 
+export function createInviteBase64() {
+  cy.get('div[id="sciencemesh-invite"]')
+    .get('span')
+    .contains('Generate invitation')
+    .parent()
+    .scrollIntoView()
+    .should('be.visible')
+    .click()
+
+  cy.get('div[id="sciencemesh-invite"]')
+    .get('div[role="dialog"]').within(() => {
+      cy.get('button')
+        .contains('Generate')
+        .scrollIntoView()
+        .should('be.visible')
+        .click()
+    })
+
+  // we want to make sure that code is created and is displayed on the table.
+  return cy.get('div[id="sciencemesh-invite"]')
+    .get('table')
+    .find('tbody>tr')
+    .eq(0)
+    .scrollIntoView()
+    .should('be.visible')
+    .find('.invite-code-wrapper span')
+    .invoke('text')
+    .then(
+      sometext => {
+        return sometext
+      }
+    )
+}
+
 export function createLegacyInviteLink(domain, providerDomain) {
   return createInviteToken().then(
     (token) => {
@@ -87,12 +121,6 @@ export function acceptInviteLink(token) {
   // Wait a bit after token verification
   cy.wait(1000)
 
-  getScienceMeshAcceptInvitePart('label', 'institution').within(() => {
-    cy.get('div[class="vs__actions"').should('be.visible').click()
-
-    cy.get('ul[role="listbox"]').find('li').first().should('be.visible').click()
-  })
-
   // Wait for button to be enabled after valid input
   getScienceMeshAcceptInvitePart('span', 'accept')
     .should('not.be.disabled')
@@ -113,68 +141,112 @@ export function createTextFile(filename, data) {
   cy.get('button[id="new-file-menu-btn"]')
     .scrollIntoView()
     .should('be.visible')
-    .click()
+    .click({ force: true });
 
   cy.get('div[id="new-file-menu-drop"]')
     .scrollIntoView()
     .should('be.visible')
-    .find('ul[id="create-list"]')
     .find('span')
-    .contains('txt')
+    .contains('Plain text file')
     .parent()
-    .click()
+    .click({ force: true });
 
   cy.get('div[class="oc-modal-background"]')
     .scrollIntoView()
     .should('be.visible')
     .within(() => {
-      cy.get('input[id="oc-textinput-10"]').clear()
-
-      cy.get('input[id="oc-textinput-10"]').type(filename)
+      cy.get('input[id^="oc-textinput"]')
+        .clear()
+        .type(filename)
+        .should('have.value', filename);
 
       cy.get('button')
         .contains('Create')
         .scrollIntoView()
         .should('be.visible')
-        .click()
-    })
+        .click({ force: true });
+    });
 
-  cy.get('textarea[id="text-editor-input"]')
+  cy.get('div[role="textbox"]')
     .scrollIntoView()
     .should('be.visible')
-    .type(data)
+    .focus()
+    .type(data, { delay: 100 });
 
   cy.get('button[id="app-save-action"]')
+    .as('saveBtn')
     .scrollIntoView()
     .should('be.visible')
-    .click()
+    .should('be.enabled')
+    .click({ force: true });
+
+  cy.get('@saveBtn')
+    .should('be.disabled');
 }
 
-export function createShare(filename, username) {
+export function createShare(filename, username, recipientDisplayName) {
   triggerActionForFile(filename, 'share')
+
+  ensureSearchScope('External users');
 
   cy.get('div[id="oc-files-sharing-sidebar"]').within(() => {
     cy.get('input[id="files-share-invite-input"]').clear()
-    cy.intercept({ times: 1, method: 'GET', url: '**/apps/files_sharing/api/v1/sharees?*' }).as('userSearch')
+    cy.intercept({ times: 1, method: 'GET', url: '**/graph/v1.0/users?*' }).as('userSearch')
     cy.get('input[id="files-share-invite-input"]').type(username)
-    cy.wait('@userSearch')
-  })
+    cy.wait('@userSearch');
+  });
 
   cy.get('div[id="oc-files-sharing-sidebar"]').within(() => {
     cy.get('ul[role="listbox"]')
       .find('span')
-      .contains('(Federated)')
+      .contains(recipientDisplayName)
       .scrollIntoView()
       .should('be.visible')
-      .click()
-  })
+      .click();
+  });
 
   cy.get('div[id="oc-files-sharing-sidebar"]').within(() => {
     cy.get('button[id="new-collaborators-form-create-button"]')
       .scrollIntoView()
       .should('be.visible')
-      .click()
-  })
+      .click({ force: true });
+  });
+
+  cy.wait(1000);
+
+  cy.get('div[id="oc-files-sharing-sidebar"]').within(() => {
+    cy.get('#files-collaborators-list')
+      .should('be.visible')
+      .within(() => {
+        cy.contains('li', recipientDisplayName)        // collaborator row
+          .as('row')                                   // reuse handle
+          .should('exist')
+          .within(() => {
+            cy.contains('.files-collaborators-collaborator-name', recipientDisplayName)
+              .should('be.visible');
+
+            cy.contains('.files-collaborators-collaborator-role', 'Can view')
+              .should('be.visible');
+          });
+      });
+  });
+}
+
+/**
+ * Make sure the sidebar is set to the wanted directory
+ * (“Internal users” | “External users”) before the search starts.
+ */
+function ensureSearchScope(scope) {
+  cy.get('div[id="oc-files-sharing-sidebar"]').within(() => {
+    // the pill shows the active scope
+    cy.get('.invite-form-share-role-type .oc-pill').then($pill => {
+      const current = $pill.text().trim();              // e.g. “Internal”
+      if (!current.startsWith(scope.split(' ')[0])) {   // already correct? nothing to do
+        cy.wrap($pill).click();                         // open the dropdown
+        cy.contains('.invite-form-share-role-type-item', scope).click();
+      }
+    });
+  });
 }
 
 export function acceptShare(filename) {
@@ -198,13 +270,13 @@ export function acceptShare(filename) {
       cy.get('button[aria-label="Show context menu"]')
         .scrollIntoView()
         .should('be.visible')
-        .click()
+        .click({ force: true })
 
       cy.get('span')
         .contains('Enable sync')
         .scrollIntoView()
         .should('be.visible')
-        .click()
+        .click({ force: true })
     })
 }
 
@@ -227,7 +299,7 @@ export function verifyShare(filename, owner, receiver) {
     .parent()
     .parent().within(() => {
       cy.get(`span[data-test-user-name="${CSS.escape(owner)}"]`).should('exist')
-      cy.get(`div[data-test-item-name="${CSS.escape(receiver)}"]`).should('exist')
+      cy.get(`span[data-test-user-name="${CSS.escape(receiver)}"]`).should('exist')
     })
 }
 
@@ -251,12 +323,10 @@ export const getApplicationMenu = () => cy.get('nav[id="applications-menu"]', { 
 
 // possible partIds are:
 // - token
-// - institution
 // - accept
 export function getScienceMeshAcceptInvitePart(element, partId) {
   const partIdList = new Map([
     ['token', 'Enter invite token'],
-    ['institution', 'Select institution of inviter'],
     ['accept', 'Accept invitation']
   ]);
 
@@ -289,7 +359,7 @@ export function triggerActionForFile(filename, actionId) {
     .should('exist')
     .scrollIntoView()
     .should('be.visible')
-    .click()
+    .click({ force: true })
 }
 
 export const getActionsForFile = (filename) => getRowForFile(filename)
