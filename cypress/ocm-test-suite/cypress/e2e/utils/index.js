@@ -2,6 +2,8 @@
 import * as nc27 from './nextcloud/v27/interface.js';
 import * as nc28 from './nextcloud/v28/interface.js';
 import * as nc29 from './nextcloud/v29/interface.js';
+import * as nc30 from './nextcloud/v30/interface.js';
+import * as nc31 from './nextcloud/v31/interface.js';
 // oCIS
 import * as ocis5 from './ocis/v5/interface.js';
 import * as ocis7 from './ocis/v7/interface.js';
@@ -31,6 +33,8 @@ function register(mod) {
   nc27,
   nc28,
   nc29,
+  nc30,
+  nc31,
   ocis5,
   ocis7,
   os1,
