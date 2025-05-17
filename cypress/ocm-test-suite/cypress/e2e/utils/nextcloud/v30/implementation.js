@@ -149,13 +149,7 @@ export function handleShareAcceptance(fileName, timeout = 10000, appId = 'files'
       // selectAppFromLeftSide(appId);
       // navigationSwitchLeftSide('Close navigation');
 
-      // Reload
-      cy.reload(true).then(() => {
-        // Wait for page load after reload
-        cy.wait(500);
-        // Verify the shared file exists with specified timeout
-        ensureFileExists(fileName, timeout);
-      });
+      ensureFileExists(fileName, timeout);
     }
   });
 }
