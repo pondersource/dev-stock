@@ -8,7 +8,7 @@ LABEL org.opencontainers.image.source="https://github.com/pondersource/dev-stock
 LABEL org.opencontainers.image.authors="Mohammad Mahdi Baghbani Pourvahid"
 
 ARG NEXTCLOUD_REPO=https://github.com/nextcloud/server
-ARG NEXTCLOUD_BRANCH=v30.0.10
+ARG NEXTCLOUD_BRANCH=v30.0.11
 
 # CACHEBUST forces docker to clone fresh source codes from git.
 # example: docker build -t your-image --build-arg CACHEBUST="default" .

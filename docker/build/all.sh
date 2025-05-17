@@ -308,12 +308,12 @@ main() {
 
     # Nextcloud Versions
     # The first element in this array is considered the "latest".
-    nextcloud_versions=("v31.0.4" "v30.0.10" "v29.0.16" "v28.0.14" "v27.1.11")
+    nextcloud_versions=("v31.0.5" "v30.0.11" "v29.0.16" "v28.0.14" "v27.1.11")
 
     # Define contacts app versions for each Nextcloud version
     declare -A contacts_versions=(
-        ["v31.0.4"]="v7.0.6"
-        ["v30.0.10"]="v7.0.6"
+        ["v31.0.5"]="v7.0.6"
+        ["v30.0.11"]="v7.0.6"
         ["v29.0.16"]="v6.0.2"
         ["v28.0.14"]="v5.5.3"
         ["v27.1.11"]="v5.5.3"

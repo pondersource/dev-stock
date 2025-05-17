@@ -37,9 +37,9 @@ set -euo pipefail
 # ------------------------------------------------------------------------------
 
 # Default Nextcloud version for development
-# Format: vX.Y.Z-suffix (e.g., v30.0.10-contacts)
-DEFAULT_EFSS_1_VERSION="v30.0.10-contacts"
-DEFAULT_EFSS_2_VERSION="v30.0.10-contacts"
+# Format: vX.Y.Z-suffix (e.g., v30.0.11-contacts)
+DEFAULT_EFSS_1_VERSION="v30.0.11-contacts"
+DEFAULT_EFSS_2_VERSION="v30.0.11-contacts"
 
 # Volume mounts for development (empty by default)
 # Examples:
