@@ -1,4 +1,4 @@
-name: OCM Test Share with Owncloud v10.15.0 to Nextcloud v29.0.2
+name: OCM Test Share with Owncloud v10.15.0 to Nextcloud v29.0.16
 
 on:
   workflow_dispatch:
@@ -11,4 +11,4 @@ jobs:
       sender_platform:   owncloud
       sender_version:    v10.15.0
       receiver_platform: nextcloud
-      receiver_version:  v29.0.2
+      receiver_version:  v29.0.16

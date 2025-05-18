@@ -1,4 +1,4 @@
-name: OCM Test Share link Nextcloud v29.0.2 to Nextcloud v27.1.11
+name: OCM Test Share link Nextcloud v29.0.16 to Nextcloud v27.1.11
 
 on:
   workflow_dispatch:
@@ -9,6 +9,6 @@ jobs:
     with:
       scenario:          share-link
       sender_platform:   nextcloud
-      sender_version:    v29.0.2
+      sender_version:    v29.0.16
       receiver_platform: nextcloud
       receiver_version:  v27.1.11
