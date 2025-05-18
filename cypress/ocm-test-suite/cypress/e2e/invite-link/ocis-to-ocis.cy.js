@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in oCIS v5.
+ * Cypress test suite for testing invite link federated sharing via ScienceMesh functionality in oCIS.
  * This suite covers sending and accepting invitation links, sharing files via ScienceMesh,
  * and verifying that the shares are received correctly.
  *
@@ -42,13 +42,14 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
    * 2. Navigate to the ScienceMesh app
    * 3. Generate the invite token and save it to a file
    */
-  it('Send invitation from oCIS v5 to oCIS v5', () => {
+  it('Send invitation from oCIS to oCIS', () => {
     senderUtils.createInviteLink({
       senderUrl,
       senderDomain,
       senderUsername,
       senderPassword,
       recipientPlatform,
+      recipientVersion,
       recipientDomain,
       inviteLinkFileName,
     });
@@ -62,7 +63,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
    * 3. Accept the invitation
    * 4. Verify the federated contact is established
    */
-  it('Accept invitation from oCIS v5 to oCIS v5', () => {
+  it('Accept invitation from oCIS to oCIS', () => {
     recipientUtils.acceptInviteLink({
       senderDomain,
       senderDisplayName,
@@ -81,7 +82,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
    * 3. Navigate to the Files app
    * 4. Share the file with the recipient
    */
-  it('Send ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
+  it('Send ScienceMesh share <file> from oCIS to oCIS', () => {
     senderUtils.shareViaInviteLink({
       senderUrl,
       senderUsername,
@@ -89,6 +90,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
       sharedFileName,
       sharedFileContent,
       recipientUsername,
+      recipientDisplayName,
     });
   });
 
@@ -100,7 +102,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for oCIS',
    * 3. Reload the page to refresh the view
    * 4. Verify the share details are correct
    */
-  it('Receive ScienceMesh share <file> from oCIS v5 to oCIS v5', () => {
+  it('Receive ScienceMesh share <file> from oCIS to oCIS', () => {
     recipientUtils.acceptInviteLinkShare({
       senderDisplayName,
       recipientUrl,

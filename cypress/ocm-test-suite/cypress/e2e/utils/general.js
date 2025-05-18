@@ -56,3 +56,84 @@ export function constructFederatedShareUrl(params) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
 }
+
+/**
+ * isBase64(str, { urlSafe = false } = {}) → boolean
+ *
+ * Accepts the RFC-4648 standard alphabet.
+ * Optionally accepts the URL-safe variant ( - _ instead of + / ).
+ * Ignores the amount of trailing '=' padding (0–2).
+ */
+export function isBase64(str, { urlSafe = false } = {}) {
+  if (typeof str !== "string" || str.length === 0 || str.length % 4 !== 0)
+    return false;
+
+  const alphabet = urlSafe
+    ? "A-Za-z0-9-_"
+    : "A-Za-z0-9+/";
+
+  // syntax check
+  const syntax = new RegExp(
+    `^(?:[${alphabet}]{4})*(?:[${alphabet}]{2}==|[${alphabet}]{3}=)?$`
+  );
+  if (!syntax.test(str)) return false;
+
+  // semantic check with padding-insensitive compare
+  try {
+    const bytes =
+      typeof Buffer === "function"
+        ? Buffer.from(str, "base64")
+        : Uint8Array.from(atob(str), c => c.charCodeAt(0));
+
+    // if decoding produced nothing, reject (e.g. "====")
+    if (!bytes.length) return false;
+
+    const reencoded =
+      typeof Buffer === "function"
+        ? Buffer.from(bytes).toString("base64")
+        : btoa(String.fromCharCode(...bytes));
+
+    // strip both variants for a fair match
+    const normalise = s =>
+      (urlSafe ? s.replace(/\+/g, "-").replace(/\//g, "_") : s)
+        .replace(/=+$/, "");
+
+    return normalise(str) === normalise(reencoded);
+  } catch {
+    return false; // atob / Buffer threw – not Base64
+  }
+}
+
+/**
+ * encodeBase64(input, { urlSafe = false } = {}) → string
+ *
+ * Accepts:
+ * string  – treated as UTF-8 text
+ * Uint8Array / ArrayBuffer / Buffer – raw bytes
+ */
+export function encodeBase64(input, { urlSafe = false } = {}) {
+  // convert to Uint8Array
+  let bytes;
+  if (typeof input === "string") {
+    bytes = new TextEncoder().encode(input);
+  } else if (input instanceof ArrayBuffer) {
+    bytes = new Uint8Array(input);
+  } else if (ArrayBuffer.isView(input)) {
+    bytes = new Uint8Array(input.buffer, input.byteOffset, input.byteLength);
+  } else {
+    throw new TypeError("Unsupported input type");
+  }
+
+  //  encode to Base64
+  const b64 =
+    typeof Buffer !== "undefined"
+      ? Buffer.from(bytes).toString("base64")
+      : btoa(
+          Array.from(bytes, b => String.fromCharCode(b)).join("")
+        );
+
+  // URL-safe tweak
+  return urlSafe
+    ? b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
+    : b64;
+}

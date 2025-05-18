@@ -94,7 +94,7 @@ _create_nextcloud_base() {
 #   $7: Indicate if this container is not prebuilt and is from ci pipeline
 #
 # Example:
-#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.10" "-e funny=true -e bugs=bunny"
+#   create_nextcloud 1 "admin" "password" "pondersource/nextcloud" "v30.0.11" "-e funny=true -e bugs=bunny"
 # ------------------------------------------------------------------------------
 create_nextcloud() {
     _create_nextcloud_base "${1}" "${2}" "${3}" "${4}" "${5}" "" "${6:-}" "${7:-}"
@@ -119,7 +119,7 @@ create_nextcloud() {
 #      Example: "apps:/var/www/html/apps,config:/var/www/html/config"
 #
 # Example:
-#   create_nextcloud_dev 1 "admin" "password" "pondersource/nextcloud" "v30.0.10" \
+#   create_nextcloud_dev 1 "admin" "password" "pondersource/nextcloud" "v30.0.11" \
 #       "apps:/var/www/html/apps,config:/var/www/html/config"
 # ------------------------------------------------------------------------------
 create_nextcloud_dev() {

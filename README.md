@@ -36,7 +36,7 @@ cd dev-stock
 ./docker/pull/all.sh
 
 # Run your first test (example with Nextcloud)
-./dev/ocm-test-suite.sh login nextcloud v30.0.10 dev chrome
+./dev/ocm-test-suite.sh login nextcloud v30.0.11 dev chrome
 ```
 
 For detailed setup instructions, see our [Development Guide](./docs/5-development-guide.md).

@@ -2,8 +2,12 @@
 import * as nc27 from './nextcloud/v27/interface.js';
 import * as nc28 from './nextcloud/v28/interface.js';
 import * as nc29 from './nextcloud/v29/interface.js';
+import * as nc30 from './nextcloud/v30/interface.js';
+import * as nc31 from './nextcloud/v31/interface.js';
+import * as nc32 from './nextcloud/v32/interface.js';
 // oCIS
 import * as ocis5 from './ocis/v5/interface.js';
+import * as ocis7 from './ocis/v7/interface.js';
 // OcmStub
 import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
@@ -26,7 +30,19 @@ function register(mod) {
 }
 
 // One-liners — pull them up-front
-[nc27, nc28, nc29, ocis5, os1, oc10, sf11].forEach(register);
+[
+  nc27,
+  nc28,
+  nc29,
+  nc30,
+  nc31,
+  nc32,
+  ocis5,
+  ocis7,
+  os1,
+  oc10,
+  sf11
+].forEach(register);
 
 /**
  * @param {string} platform  e.g. 'nextcloud'

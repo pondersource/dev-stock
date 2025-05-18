@@ -1,4 +1,4 @@
-name: OCM Test Share With SF v11.0.5 to SF v11.0.5
+name: OCM Test Share With SF v11.0.13 to SF v11.0.13
 
 # Controls when the action will run.
 on:
@@ -14,13 +14,13 @@ jobs:
         sender: [
           {
             platform: seafile,
-            version: v11.0.5
+            version: v11.0.13
           },
         ]
         receiver: [
           {
             platform: seafile,
-            version: v11.0.5
+            version: v11.0.13
           },
         ]
 

@@ -273,6 +273,35 @@ build_owncloud_app_image() {
     echo
 }
 
+derive_current_nextcloud_version() {
+  local input="${1:-nextcloud/server}"
+  local ref="${2:-master}"
+  local repo
+
+  # Normalize input: strip protocol, domain, .git suffix, and any trailing slash
+  if [[ "$input" =~ ^https?://github\.com/([^/]+/[^/]+)(\.git)?/?$ ]]; then
+    repo="${BASH_REMATCH[1]}"
+  else
+    repo="$input"
+  fi
+
+  local raw_url="https://raw.githubusercontent.com/${repo}/${ref}/version.php"
+
+  # pull version.php and squeeze out the first three integers of $OC_Version
+  local ver
+  ver="$(curl -fsSL "$raw_url" \
+        | grep -Eo '\$OC_Version\s*=\s*\[[^]]+' \
+        | grep -Eo '[0-9]+' | head -n 3 | paste -sd'.' -)"
+
+  [[ $ver =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+    echo "Could not determine version from $raw_url (got \"$ver\")" >&2
+    exit 1
+  }
+
+  echo "v${ver}"
+}
+
+
 # -----------------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------------
@@ -290,56 +319,61 @@ main() {
     # Build Images
     # -----------------------------------------------------------------------------------
     # Dev Stock (Base development environment)
-    build_docker_image dev-stock.Dockerfile         pondersource/dev-stock          "v1.0.0 latest"            DEFAULT "" ".."
+    build_docker_image dev-stock.Dockerfile         pondersource/dev-stock          "v1.0.0 latest"             DEFAULT "" ".."
 
     # Cypress + OCM test suite files
-    build_docker_image cypress.Dockerfile           pondersource/cypress            "v1.0.0 latest"            DEFAULT "" ".."
+    build_docker_image cypress.Dockerfile           pondersource/cypress            "v1.0.0 latest"             DEFAULT "" ".."
 
     # OCM Stub
-    build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"     DEFAULT
+    build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"             DEFAULT
 
     # Revad
-    build_docker_image revad.Dockerfile             pondersource/revad               "latest"           DEFAULT
+    build_docker_image revad.Dockerfile             pondersource/revad              "latest"                    DEFAULT
 
     # Nextcloud Base
-    build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"           DEFAULT
+    build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"                    DEFAULT
 
-    build_docker_image nextcloud-ci.Dockerfile      pondersource/nextcloud-ci       "latest"           DEFAULT
+    build_docker_image nextcloud-ci.Dockerfile      pondersource/nextcloud-ci       "latest"                    DEFAULT
+
+    # Nextcloud Repo
+    NEXTCLOUD_REPO=https://github.com/nextcloud/server
 
     # Nextcloud Versions
     # The first element in this array is considered the "latest".
-    nextcloud_versions=("v31.0.4" "v30.0.10" "v29.0.16" "v28.0.14" "v27.1.11")
+    nextcloud_versions=("master" "v31.0.5" "v30.0.11" "v29.0.16" "v28.0.14" "v27.1.11")
 
     # Define contacts app versions for each Nextcloud version
     declare -A contacts_versions=(
-        ["v31.0.4"]="v7.0.6"
-        ["v30.0.10"]="v7.0.6"
+        ["master"]="v7.0.6"
+        ["v31.0.5"]="v7.0.6"
+        ["v30.0.11"]="v7.0.6"
         ["v29.0.16"]="v6.0.2"
         ["v28.0.14"]="v5.5.3"
         ["v27.1.11"]="v5.5.3"
     )
 
-    # shellcheck disable=SC2207
-    # TODO @MahdiBaghbani: Decide that if we want to do this automatically or manually. 
-    # Automatically get latest images
-    # nextcloud_versions=($(curl -s https://api.github.com/repos/nextcloud/server/releases?per_page=100 | \
-    #     jq -r '.[].tag_name' | \
-    #     grep -E '^v(2[7-9]|[3-9][0-9])\.[0-9]+\.[0-9]+$' | \
-    #     sort --version-sort -r | \ awk -F '.' '!seen[$1]++'))
-
     # Iterate over the array of versions
     for i in "${!nextcloud_versions[@]}"; do
         version="${nextcloud_versions[i]}"
-        tags="${version}"
-        # If this is the first element (index 0), also add the "latest" tag
-        [[ "$i" -eq 0 ]] && tags="${version} latest"
+
+        if [[ "${version}" == "master" ]]; then
+            resolved="$(derive_current_nextcloud_version "${NEXTCLOUD_REPO}" "${version}")"
+            tags="$resolved latest"
+        else
+            tags="${version}"
+            # If this is the first element (index 0), also add the "latest" tag
+            [[ "$i" -eq 0 ]] && tags+=" latest"
+        fi
+        
+        build_args="--build-arg NEXTCLOUD_REPO=${NEXTCLOUD_REPO}"
+        build_args="${build_args} --build-arg NEXTCLOUD_BRANCH=${version}"
 
         build_docker_image \
             nextcloud.Dockerfile \
             pondersource/nextcloud \
             "${tags}" \
             DEFAULT \
-            "--build-arg NEXTCLOUD_BRANCH=${version}"
+            "${build_args}"
     done
     
     # Build Nextcloud App Variants
@@ -354,18 +388,6 @@ main() {
         "v27.1.11" \
         "sm" \
         DEFAULT
-
-    # Get latest stable contacts app release
-    echo "Fetching latest stable contacts app release..."
-    CONTACTS_RELEASE=$(curl -s https://api.github.com/repos/nextcloud-releases/contacts/releases/latest)
-    CONTACTS_VERSION=$(echo "${CONTACTS_RELEASE}" | grep -oP '"tag_name": "\K[^"]+')
-    CONTACTS_FILENAME=$(echo "${CONTACTS_RELEASE}" | grep -oP '"name": "contacts-[^"]+\.tar\.gz"' | grep -oP 'contacts-[^"]+\.tar\.gz')
-    if [ -z "${CONTACTS_VERSION}" ] || [ -z "${CONTACTS_FILENAME}" ]; then
-        print_error "Failed to fetch latest contacts app version or filename"
-        return 1
-    fi
-    echo "Latest stable contacts app version: ${CONTACTS_VERSION}"
-    echo "Contacts app filename: ${CONTACTS_FILENAME}"
 
     # Build contacts app variant for each supported Nextcloud version
     for version in "${nextcloud_versions[@]}"; do
@@ -385,6 +407,10 @@ main() {
         echo "Using contacts app version: ${contacts_version}"
         echo "Contacts app filename: ${contacts_filename}"
         echo "Download URL: ${contacts_url}"
+
+        if [[ "${version}" == "master" ]]; then
+            version="$(derive_current_nextcloud_version "${NEXTCLOUD_REPO}" "${version}")"
+        fi
 
         build_nextcloud_app_image \
             "contacts" \
