@@ -1,4 +1,4 @@
-name: OCM Test Login Seafile v11.0.5
+name: OCM Test Login Seafile v11.0.13
 
 # Controls when the action will run.
 on:
@@ -14,7 +14,7 @@ jobs:
         efss: [
           {
             platform: seafile,
-            version: v11.0.5
+            version: v11.0.13
           },
         ]
 

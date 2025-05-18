@@ -8,7 +8,7 @@ set -e
 #   - 9.0.10
 #   - 10.0.1
 #   - 11.0.5
-EFSS_PLATFORM_VERSION=${1:-"v11.0.5"}
+EFSS_PLATFORM_VERSION=${1:-"v11.0.13"}
 
 # 3rd party images.
 docker pull mariadb:11.4.2

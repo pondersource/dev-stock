@@ -14,13 +14,13 @@
 #   ./seafile-seafile.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of the first Seafile instance (default: "v11.0.5").
-#   EFSS_PLATFORM_2_VERSION : Version of the second Seafile instance (default: "v11.0.5").
+#   EFSS_PLATFORM_1_VERSION : Version of the first Seafile instance (default: "v11.0.13").
+#   EFSS_PLATFORM_2_VERSION : Version of the second Seafile instance (default: "v11.0.13").
 #   SCRIPT_MODE            : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM       : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 
 # Example:
-#   ./seafile-seafile.sh v11.0.5 v11.0.5 ci electron
+#   ./seafile-seafile.sh v11.0.13 v11.0.13 ci electron
 
 # -----------------------------------------------------------------------------------
 
@@ -33,8 +33,8 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 
 # Default versions
-DEFAULT_EFSS_1_VERSION="v11.0.5"
-DEFAULT_EFSS_2_VERSION="v11.0.5"
+DEFAULT_EFSS_1_VERSION="v11.0.13"
+DEFAULT_EFSS_2_VERSION="v11.0.13"
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
