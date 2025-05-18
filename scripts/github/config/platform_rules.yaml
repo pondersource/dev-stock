@@ -1,9 +1,9 @@
 # List every platform only once
 platforms:
-  nextcloud: [v27.1.11, v28.0.14, v29.0.2]
+  nextcloud: [v27.1.11, v28.0.14, v29.0.2, v30.0.11, v31.0.5, v32.0.0]
   # ScienceMesh flavour
   nextcloud-sm: [v27.1.11]
-  ocis: [v5.0.9]
+  ocis: [v5.0.9, v7.1.2]
   owncloud: [v10.15.0]
   # ScienceMesh flavour
   owncloud-sm: [v10.15.0]
