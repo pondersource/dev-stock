@@ -47,12 +47,20 @@ jobs:
           else
             echo "ref=${{ github.ref }}" >> "${GITHUB_OUTPUT}"
           fi
+      
+      - name: Collect test workflows
+        id: collect
+        run: |
+          list=$(ls .github/workflows | grep -E '^(login|share-(link|with)|invite-link).*\.ya?ml$' \
+                  | paste -sd "," -)
+          echo "matrix=${list}" >> "$GITHUB_OUTPUT"
 
       - name: Trigger and monitor test workflows
         id: run-tests
         uses: actions/github-script@v7
         env:
           WORKFLOW_REF: ${{ steps.set-ref.outputs.ref }}
+          WORKFLOWS_CSV: ${{ steps.collect.outputs.matrix }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
