@@ -10,3 +10,4 @@ EFSS_PLATFORM_VERSION=${1:-"V1.0.0"}
 
 # dev-stock images.
 docker pull "pondersource/ocmstub:${EFSS_PLATFORM_VERSION}"
+docker pull pondersource/cypress:latest
