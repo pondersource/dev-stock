@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
+      workflows: ${{ steps.collect.outputs.matrix }}
       done: ${{ steps.run-tests.outputs.done }}
 
     steps:
@@ -84,3 +85,4 @@ jobs:
     uses: ./.github/workflows/github-pages.yml
     with:
       sha: ${{ needs.orchestrate-tests.outputs.commit_sha }}
+      workflows:  ${{ needs.orchestrate-tests.outputs.workflows }}
