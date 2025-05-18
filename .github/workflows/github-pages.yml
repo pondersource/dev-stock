@@ -9,6 +9,10 @@ on:
         required: true
         type: string
         description: "The commit SHA to download artifacts for"
+      workflows:
+        required: false
+        type: string
+        description: "The commit CSV like list of test workflow names"
   # Keep manual trigger for convenience
   workflow_dispatch:
 
@@ -24,6 +28,8 @@ concurrency:
 jobs:
   fetch-artifacts:
     runs-on: ubuntu-latest
+    env:
+      WORKFLOWS_CSV: ${{ inputs.workflows || '' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

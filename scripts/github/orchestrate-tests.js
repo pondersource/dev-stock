@@ -7,73 +7,19 @@
  * next batch until all workflows finish.
  **********************************************/
 
-const WORKFLOWS_SET = new Set([
-  'login-nc-v27.yml',
-  'login-nc-v28.yml',
-  'login-nc-v29.yml',
-  'login-oc-v10.yml',
-  'login-ocis-v5.yml',
-  'login-os-v1.yml',
-  'login-sf-v11.yml',
-  'share-link-nc-v27-nc-v27.yml',
-  'share-link-nc-v27-nc-v28.yml',
-  'share-link-nc-v27-nc-v29.yml',
-  'share-link-nc-v27-oc-v10.yml',
-  'share-link-nc-v27-os-v1.yml',
-  'share-link-nc-v28-nc-v27.yml',
-  'share-link-nc-v28-nc-v28.yml',
-  'share-link-nc-v28-nc-v29.yml',
-  'share-link-nc-v28-oc-v10.yml',
-  'share-link-nc-v28-os-v1.yml',
-  'share-link-nc-v29-nc-v27.yml',
-  'share-link-nc-v29-nc-v28.yml',
-  'share-link-nc-v29-nc-v29.yml',
-  'share-link-nc-v29-oc-v10.yml',
-  'share-link-nc-v29-os-v1.yml',
-  'share-link-oc-v10-nc-v27.yml',
-  'share-link-oc-v10-nc-v28.yml',
-  'share-link-oc-v10-nc-v29.yml',
-  'share-link-oc-v10-oc-v10.yml',
-  'share-with-nc-v27-nc-v27.yml',
-  'share-with-nc-v27-nc-v28.yml',
-  'share-with-nc-v27-nc-v29.yml',
-  'share-with-nc-v27-oc-v10.yml',
-  'share-with-nc-v27-os-v1.yml',
-  'share-with-nc-v28-nc-v27.yml',
-  'share-with-nc-v28-nc-v28.yml',
-  'share-with-nc-v28-nc-v29.yml',
-  'share-with-nc-v28-oc-v10.yml',
-  'share-with-nc-v28-os-v1.yml',
-  'share-with-nc-v29-nc-v27.yml',
-  'share-with-nc-v29-nc-v28.yml',
-  'share-with-nc-v29-nc-v29.yml',
-  'share-with-nc-v29-oc-v10.yml',
-  'share-with-nc-v29-os-v1.yml',
-  'share-with-oc-v10-nc-v27.yml',
-  'share-with-oc-v10-nc-v28.yml',
-  'share-with-oc-v10-nc-v29.yml',
-  'share-with-oc-v10-oc-v10.yml',
-  'share-with-oc-v10-os-v1.yml',
-  'share-with-os-v1-nc-v27.yml',
-  'share-with-os-v1-nc-v28.yml',
-  'share-with-os-v1-nc-v29.yml',
-  'share-with-os-v1-oc-v10.yml',
-  'share-with-os-v1-os-v1.yml',
-  'share-with-sf-v11-sf-v11.yml',
-  'invite-link-nc-sm-v27-nc-sm-v27.yml',
-  'invite-link-nc-sm-v27-oc-sm-v10.yml',
-  'invite-link-nc-sm-v27-ocis-v5.yml',
-  'invite-link-oc-sm-v10-nc-sm-v27.yml',
-  'invite-link-oc-sm-v10-oc-sm-v10.yml',
-  'invite-link-oc-sm-v10-ocis-v5.yml',
-  'invite-link-ocis-v5-nc-sm-v27.yml',
-  'invite-link-ocis-v5-oc-sm-v10.yml',
-  'invite-link-ocis-v5-ocis-v5.yml'
-]);
+// Parse full matrix collected by the YAML step
+const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
+  .split(',').map(s => s.trim()).filter(Boolean);
 
-// @MahdiBaghbani: Some kind of a safegaurd against accidentally 
-// duplicate values in the above list
-const WORKFLOWS = Array.from(WORKFLOWS_SET);
+// Optional debug list: overrides everything when non-empty
+const DEBUG_ONLY = [];
+
+// Final list to run
+const WORKFLOWS = DEBUG_ONLY.length ? DEBUG_ONLY : ALL_WORKFLOWS;
+
+if (!WORKFLOWS.length) {
+  throw new Error('No workflows to run: check WORKFLOWS_CSV');
+}
 
 // Workflows in this list may fail without marking the whole matrix red
 const EXPECTED_FAILURES = new Set([

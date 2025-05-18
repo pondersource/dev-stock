@@ -1,0 +1,45 @@
+name: Auto-regenerate OCM wrapper workflows
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'scripts/github/config/platforms.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-wrappers:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install yq & jq
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install -y jq
+          sudo wget -qO /usr/local/bin/yq \
+          https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Regenerate platforms.yaml
+        run: bash scripts/github/generate-platforms.sh
+        
+      - name: Regenerate wrapper workflows
+        run: bash scripts/github/generate-wrappers.sh
+        
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore: auto-regenerate OCM wrapper workflows"
+          title: "chore: auto-regenerate OCM wrapper workflows"
+          body: |
+            This pull request was created automatically whenever `scripts/github/config/platforms.yaml`
+            changed. It refreshes all lightweight wrapper workflows so the badge matrix stays
+            in sync with the declared compatibility list.
+          labels: auto-generated
+          branch: chore/auto-wrappers

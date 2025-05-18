@@ -1,43 +1,12 @@
-name: OCM Test Login ownCloud v10.15.0
+name: OCM Test Login Owncloud v10.15.0
 
-# Controls when the action will run.
 on:
-  # Allows you to run this workflow manually from the Actions tab.
   workflow_dispatch:
 
 jobs:
-  login:
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        efss: [
-          {
-            platform: owncloud,
-            version: v10.15.0
-          },
-        ]
-
-    # The OS to run tests on, (I believe for OCM testing OS is really not that important).
-    runs-on: ubuntu-24.04
-
-    # Steps represent a sequence of tasks that will be executed as part of the job.
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it.
-      - name: Checkout.
-        uses: actions/checkout@v4
-
-      - name: Pull images.
-        shell: bash
-        run: ./docker/pull/ocm-test-suite/${{ matrix.efss.platform }}.sh ${{ matrix.efss.version }}
-
-      - name: Run tests.
-        shell: bash
-        run: ./dev/ocm-test-suite.sh login ${{ matrix.efss.platform }} ${{ matrix.efss.version }} ci electron
-
-      - name: Upload Cypress video artifacts.
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: login ${{ matrix.efss.platform }} ${{ matrix.efss.version }}
-          path: ./cypress/ocm-test-suite/cypress/videos
+  call-test-engine:
+    uses: ./.github/workflows/tests-engine.yml
+    with:
+      scenario:          login
+      sender_platform:   owncloud
+      sender_version:    v10.15.0
