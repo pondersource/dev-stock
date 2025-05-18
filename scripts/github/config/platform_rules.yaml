@@ -2,11 +2,11 @@
 platforms:
   nextcloud: [v27.1.11, v28.0.14, v29.0.16, v30.0.11, v31.0.5, v32.0.0]
   # ScienceMesh flavour
-  nextcloud-sm: [v27.1.11]
+  nextcloud-sm: [v27.1.11-sm]
   ocis: [v5.0.9, v7.1.2]
   owncloud: [v10.15.0]
   # ScienceMesh flavour
-  owncloud-sm: [v10.15.0]
+  owncloud-sm: [v10.15.0-sm]
   ocmstub: [v1.0.0]
   seafile: [v11.0.13]
 
@@ -33,8 +33,9 @@ scenarios:
         receiver: [nextcloud, owncloud, ocmstub]
       - sender: [seafile]
         receiver: [seafile]
-
-  invite-link: # ScienceMesh
+  
+  # ScienceMesh and other kinds of invite link federations
+  invite-link:
     include:
       - sender: [nextcloud-sm]
         receiver: [nextcloud-sm, ocis, owncloud-sm]
