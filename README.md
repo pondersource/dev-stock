@@ -65,11 +65,11 @@ For detailed setup instructions, see our [Development Guide](./docs/5-developmen
 
 ## 🔧 Supported Platforms
 
-- **Nextcloud**: v27.x, v28.x, v30.x
+- **Nextcloud**: v27.x, v28.x, v30.x, v31.x, v32.x
 - **ownCloud**: v10.x
 - **OCM Stub**: v1.x
 - **Seafile**: v11.x
-- **OCIS**: v5.x
+- **OCIS**: v5.x v7.x
 
 ## 🤝 Contributing
 
