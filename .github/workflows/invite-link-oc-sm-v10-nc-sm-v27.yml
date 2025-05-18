@@ -1,4 +1,4 @@
-name: OCM Test Invite link Owncloud-sm v10.15.0 to Nextcloud-sm v27.1.11
+name: OCM Test Invite link Owncloud-sm v10.15.0-sm to Nextcloud-sm v27.1.11-sm
 
 on:
   workflow_dispatch:
@@ -9,6 +9,6 @@ jobs:
     with:
       scenario:          invite-link
       sender_platform:   owncloud-sm
-      sender_version:    v10.15.0
+      sender_version:    v10.15.0-sm
       receiver_platform: nextcloud-sm
-      receiver_version:  v27.1.11
+      receiver_version:  v27.1.11-sm

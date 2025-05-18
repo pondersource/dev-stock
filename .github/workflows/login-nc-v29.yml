@@ -1,4 +1,4 @@
-name: OCM Test Login Nextcloud v29.0.2
+name: OCM Test Login Nextcloud v29.0.16
 
 on:
   workflow_dispatch:
@@ -9,4 +9,4 @@ jobs:
     with:
       scenario:          login
       sender_platform:   nextcloud
-      sender_version:    v29.0.2
+      sender_version:    v29.0.16

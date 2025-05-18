@@ -1,4 +1,4 @@
-name: OCM Test Invite link Nextcloud-sm v27.1.11 to Ocis v5.0.9
+name: OCM Test Invite link Nextcloud-sm v27.1.11-sm to Ocis v5.0.9
 
 on:
   workflow_dispatch:
@@ -9,6 +9,6 @@ jobs:
     with:
       scenario:          invite-link
       sender_platform:   nextcloud-sm
-      sender_version:    v27.1.11
+      sender_version:    v27.1.11-sm
       receiver_platform: ocis
       receiver_version:  v5.0.9

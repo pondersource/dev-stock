@@ -1,4 +1,4 @@
-name: OCM Test Invite link Owncloud-sm v10.15.0 to Ocis v5.0.9
+name: OCM Test Invite link Owncloud-sm v10.15.0-sm to Ocis v5.0.9
 
 on:
   workflow_dispatch:
@@ -9,6 +9,6 @@ jobs:
     with:
       scenario:          invite-link
       sender_platform:   owncloud-sm
-      sender_version:    v10.15.0
+      sender_version:    v10.15.0-sm
       receiver_platform: ocis
       receiver_version:  v5.0.9
