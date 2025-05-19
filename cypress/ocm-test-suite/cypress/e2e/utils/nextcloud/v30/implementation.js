@@ -143,12 +143,6 @@ export function handleShareAcceptance(fileName, timeout = 10000, appId = 'files'
       // No more pop-ups, wait for the file list to be loaded
       cy.wait(1000);
 
-      // Navigate to the correct section
-      // TODO @MahdiBaghbani: Implement this
-      // navigationSwitchLeftSide('Open navigation');
-      // selectAppFromLeftSide(appId);
-      // navigationSwitchLeftSide('Close navigation');
-
       ensureFileExists(fileName, timeout);
     }
   });
