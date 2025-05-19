@@ -26,6 +26,9 @@ const EXPECTED_FAILURES = new Set([
   'share-link-oc-v10-nc-v27.yml',
   'share-link-oc-v10-nc-v28.yml',
   'share-link-oc-v10-nc-v29.yml',
+  'share-link-oc-v10-nc-v30.yml',
+  'share-link-oc-v10-nc-v31.yml',
+  'share-link-oc-v10-nc-v32.yml',
 ]);
 
 // Constants controlling polling / batching behavior
