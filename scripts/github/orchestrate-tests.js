@@ -34,7 +34,7 @@ const EXPECTED_FAILURES = new Set([
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
-const RUN_ID_TIMEOUT = 60000;       // ms to wait for a new run to appear
+const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
 const DEFAULT_BATCH_SIZE = 20;       // Workflows to run concurrently per batch
 
