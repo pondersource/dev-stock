@@ -137,6 +137,64 @@ async function triggerWorkflow(github, context, workflow) {
   return { name: workflow, runId };
 }
 
+// utils/parseWorkflows.js
+/**
+ * Parse a workflow filename (without path) into its type, sender, receiver, and original name.
+ * - login-nc-v27.yml { testType: 'login', senders: ['nc v27'], receivers: ['nc v27'] }
+ * - share-with-nc-v28-os-v1.yml { testType: 'share-with', sender: 'nc v28', receiver: 'os v1' }
+ */
+function parseWorkflowName(name) {
+  const base = name.replace(/\.ya?ml$/, '');
+  const parts = base.split('-');
+  if (parts[0] === 'login') {
+    const [, plat, ver] = parts;
+    const label = `${plat} ${ver}`;
+    return {
+      testType: 'login',
+      sender: [label],      // for login we treat sender and receiver the same
+      receiver: [label],
+      name
+    };
+  } else {
+    const testType = parts.slice(0, 2).join('-'); // e.g. 'share-with'
+    const [, , sPlat, sVer, rPlat, rVer] = parts;
+    return {
+      testType,
+      sender: `${sPlat} ${sVer}`,
+      receiver: `${rPlat} ${rVer}`,
+      name
+    };
+  }
+}
+
+/**
+ * Group parsed entries into { [testType]: { senders: Set, receivers: Set, entries: [] } }
+ */
+function groupResults(rawResults) {
+  const groups = {};
+  for (const r of rawResults) {
+    const { testType, sender, receiver, name } = parseWorkflowName(r.name);
+    if (!groups[testType]) {
+      groups[testType] = {
+        senders: new Set(),
+        receivers: new Set(),
+        entries: []
+      };
+    }
+    const grp = groups[testType];
+    // for login, parse returns sender/receiver as arrays
+    if (Array.isArray(sender)) {
+      grp.senders.add(...sender);
+      grp.receivers.add(...receiver);
+    } else {
+      grp.senders.add(sender);
+      grp.receivers.add(receiver);
+    }
+    grp.entries.push({ sender, receiver, name, runId: r.runId, conclusion: r.conclusion });
+  }
+  return groups;
+}
+
 /**
  * Main orchestration entry point.
 * Batches workflows, triggers them in parallel, then waits for completion.
@@ -181,37 +239,81 @@ module.exports = async function orchestrateTests(github, context, core) {
     }));
   }
 
-  // summary 
-  const passed = results.filter(r => r.conclusion === 'success' || EXPECTED_FAILURES.has(r.name)).length;
-  const failed = total - passed;
-  const pct = Math.round((passed / total) * 100);
-  const barUnits = Math.round((passed / total) * 20);
-  const bar = '▉'.repeat(barUnits) + '▏'.repeat(20 - barUnits);
+  const groups = groupResults(results);
 
+  await core.summary.addHeading('🚀 OCM Test Suite Report: Matrix View');
+
+  for (const [testType, { senders, receivers, entries }] of Object.entries(groups)) {
+    // sort labels
+    const senderList = [...senders].sort();
+    const receiverList = [...receivers].sort();
+    const totalCols = receiverList.length;
+
+    // chunk receivers into blocks of 5
+    for (let i = 0; i < totalCols; i += 5) {
+      const chunk = receiverList.slice(i, i + 5);
+      const colStart = i + 1;
+      const colEnd = i + chunk.length;
+
+      // caption
+      await core.summary.addRaw(
+        `<h4>${testType}</h4>` +
+        `<p><em>Showing columns ${colStart}–${colEnd} of ${totalCols} receivers</em></p>`
+      );
+
+      // table header
+      let html = `<table style="border-collapse: collapse; width: 100%;">\n  <thead>\n    <tr>` +
+        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Result' : 'Sender to Receiver'}</th>`;
+      for (const rc of chunk) {
+        html += `<th style="border: 1px solid #ddd; padding: 4px;">${rc}</th>`;
+      }
+      html += `</tr>\n  </thead>\n  <tbody>\n`;
+
+      // rows
+      const rows = testType === 'login' ? ['Result'] : senderList;
+      for (const sd of rows) {
+        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${sd}</td>`;
+        for (const rc of chunk) {
+          // find matching entry
+          const cell = entries.find(e =>
+          (testType === 'login'
+            ? e.receiver === rc
+            : e.sender === sd && e.receiver === rc)
+          );
+          if (cell) {
+            const url = cell.runId
+              ? `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${cell.runId}`
+              : '';
+            const isAllowed = EXPECTED_FAILURES.has(cell.name);
+            const symbol = cell.conclusion === 'success'
+              ? '✅'
+              : isAllowed
+                ? '⚠️'
+                : '❌';
+            const style = isAllowed
+              ? 'background-color: yellow;'
+              : '';
+
+            html += `<td style="border: 1px solid #ddd; padding: 4px; ${style}">` +
+              (url ? `<a href="${url}">${symbol}</a>` : symbol) +
+              `</td>`;
+          } else {
+            html += `<td style="border: 1px solid #ddd; padding: 4px;">—</td>`;
+          }
+        }
+        html += `</tr>\n`;
+      }
+
+      html += `  </tbody>\n</table>\n`;
+      await core.summary.addRaw(html);
+    }
+  }
+
+  // final status
   await core.summary
-    .addHeading('🚀 OCM Test Suite Report')
-    .addRaw(`**${passed}/${total} passed - ${pct}%**  \n`)
-    .addRaw(`\`${bar}\`  \n`)
-    .addTable([
-      [{ header: true, data: 'Workflow' }, { header: true, data: 'Result' }],
-      ...results.map(r => {
-        const link = r.runId
-          ? `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${r.runId}`
-          : '';
-        const label =
-          r.conclusion === 'success' ? '✅ success' :
-            EXPECTED_FAILURES.has(r.name) ? '⚠️ allowed-failure' :
-              '❌ failure';
-        return [link ? `<a href="${link}">${r.name}</a>` : r.name, label];
-      })
-    ])
-    .addBreak()
-    .addRaw(`<details><summary>🔍 Failing workflows (${failed})</summary>\n\n` +
-      results.filter(r => r.conclusion !== 'success')
-        .map(r => `* **${r.name}**`).join('\n') +
-      '\n\n</details>')
-    .addBreak()
-    .addRaw(allSucceeded ? '🎉 **Test Suite succeeded**' : '⚠️ **Failures present**')
+    .addRaw(allSucceeded
+      ? '🎉 **All groups succeeded!**'
+      : '⚠️ **One or more failures detected.**')
     .write();
 
   return results;
