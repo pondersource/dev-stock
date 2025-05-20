@@ -175,58 +175,53 @@ async function triggerWorkflow(github, context, workflow) {
  */
 function parseWorkflowName(name) {
   const base = name.replace(/\.ya?ml$/, '');
-  const tokens = base.split('-');
+  const parts = base.split('-');
 
-  // testType = first two tokens
-  const testType = tokens.slice(0, 2).join('-');
-  console.log(testType);
-
-  // special case login
-  if (testType === 'login') {
-    const [, , plat, ver] = tokens;
+  if (parts[0] === 'login') {
+    const [, plat, ver] = parts;
     const label = `${plat} ${ver}`;
     return {
-      testType, sender: label,
+      testType: 'login',
+      sender: label,
       receiver: label,
       name
     };
-  }
-
-  // for others, parse sender then receiver by version‐marker
-  let i = 2;
-  const senderTokens = [];
-  const receiverTokens = [];
-
-  // accumulate sender until we hit a “vNN” token
-  while (i < tokens.length && !/^v\d+/.test(tokens[i])) {
-    senderTokens.push(tokens[i++]);
-  }
-  // include the version token itself
-  if (i < tokens.length && /^v\d+/.test(tokens[i])) {
-    senderTokens.push(tokens[i++]);
   } else {
-    throw new Error(`Cannot find sender version in ${name}`);
-  }
+    const testType = parts.slice(0, 2).join('-'); // e.g. 'share-with'
+    // for others, parse sender then receiver by version‐marker
+    let i = 2;
+    const senderTokens = [];
+    const receiverTokens = [];
 
-  // now the rest is receiver, up through its version token
-  while (i < tokens.length && !/^v\d+/.test(tokens[i])) {
-    receiverTokens.push(tokens[i++]);
-  }
-  if (i < tokens.length && /^v\d+/.test(tokens[i])) {
-    receiverTokens.push(tokens[i++]);
-  } else {
-    throw new Error(`Cannot find receiver version in ${name}`);
-  }
+    // accumulate sender until we hit a “vNN” token
+    while (i < parts.length && !/^v\d+/.test(parts[i])) {
+      senderTokens.push(parts[i++]);
+    }
+    // include the version token itself
+    if (i < parts.length && /^v\d+/.test(parts[i])) {
+      senderTokens.push(parts[i++]);
+    } else {
+      throw new Error(`Cannot find sender version in ${name}`);
+    }
 
-  return {
-    testType,
-    sender: senderTokens.join(' '),
-    receiver: receiverTokens.join(' '),
-    name
-  };
+    // now the rest is receiver, up through its version token
+    while (i < parts.length && !/^v\d+/.test(parts[i])) {
+      receiverTokens.push(parts[i++]);
+    }
+    if (i < parts.length && /^v\d+/.test(parts[i])) {
+      receiverTokens.push(parts[i++]);
+    } else {
+      throw new Error(`Cannot find receiver version in ${name}`);
+    }
+
+    return {
+      testType,
+      sender: senderTokens.join(' '),
+      receiver: receiverTokens.join(' '),
+      name
+    };
+  }
 }
-
-
 
 /**
  * Group parsed entries into { [testType]: { senders: Set, receivers: Set, entries: [] } }
