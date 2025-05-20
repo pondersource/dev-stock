@@ -12,7 +12,35 @@ const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
   .split(',').map(s => s.trim()).filter(Boolean);
 
 // Optional debug list: overrides everything when non-empty
-const DEBUG_ONLY = [];
+const DEBUG_ONLY = [
+  'login-nc-v27.yml',
+  'login-nc-v28.yml',
+  'login-nc-v29.yml',
+  'login-nc-v30.yml',
+  'login-nc-v31.yml',
+  'login-nc-v32.yml',
+  'login-ocis-v5.yml',
+  'login-ocis-v7.yml',
+  'login-oc-v10.yml',
+  'login-os-v1.yml',
+  'login-sf-v11.yml',
+  'invite-link-nc-sm-v27-nc-sm-v27.yml',
+  'invite-link-nc-sm-v27-ocis-v5.yml',
+  'invite-link-nc-sm-v27-ocis-v7.yml',
+  'invite-link-nc-sm-v27-oc-sm-v10.yml',
+  'invite-link-ocis-v5-nc-sm-v27.yml',
+  'invite-link-ocis-v5-ocis-v5.yml',
+  'invite-link-ocis-v5-ocis-v7.yml',
+  'invite-link-ocis-v5-oc-sm-v10.yml',
+  'invite-link-ocis-v7-nc-sm-v27.yml',
+  'invite-link-ocis-v7-ocis-v5.yml',
+  'invite-link-ocis-v7-ocis-v7.yml',
+  'invite-link-ocis-v7-oc-sm-v10.yml',
+  'invite-link-oc-sm-v10-nc-sm-v27.yml',
+  'invite-link-oc-sm-v10-ocis-v5.yml',
+  'invite-link-oc-sm-v10-ocis-v7.yml',
+  'invite-link-oc-sm-v10-oc-sm-v10.yml',
+];
 
 // Final list to run
 const WORKFLOWS = DEBUG_ONLY.length ? DEBUG_ONLY : ALL_WORKFLOWS;
@@ -140,32 +168,64 @@ async function triggerWorkflow(github, context, workflow) {
 // utils/parseWorkflows.js
 /**
  * Parse a workflow filename (without path) into its type, sender, receiver, and original name.
- * - login-nc-v27.yml { testType: 'login', senders: ['nc v27'], receivers: ['nc v27'] }
+ * - login-nc-v27.yml { testType: 'login', senders: 'nc v27', receivers: 'nc v27' }
  * - share-with-nc-v28-os-v1.yml { testType: 'share-with', sender: 'nc v28', receiver: 'os v1' }
+ * - invite-link-nc-sm-v27-nc-sm-v27.yml { testType: 'invite-link', sender: 'nc sm v27', receiver: 'nc sm v27' }
+ * - invite-link-ocis-v7-oc-sm-v10.yml { testType: 'invite-link', sender: 'ocis v7', receiver: 'oc sm v10' }
  */
 function parseWorkflowName(name) {
   const base = name.replace(/\.ya?ml$/, '');
-  const parts = base.split('-');
-  if (parts[0] === 'login') {
-    const [, plat, ver] = parts;
+  const tokens = base.split('-');
+
+  // testType = first two tokens
+  const testType = tokens.slice(0, 2).join('-');
+
+  // special case login
+  if (testType === 'login') {
+    const [, , plat, ver] = tokens;
     const label = `${plat} ${ver}`;
     return {
-      testType: 'login',
-      sender: [label],      // for login we treat sender and receiver the same
-      receiver: [label],
-      name
-    };
-  } else {
-    const testType = parts.slice(0, 2).join('-'); // e.g. 'share-with'
-    const [, , sPlat, sVer, rPlat, rVer] = parts;
-    return {
-      testType,
-      sender: `${sPlat} ${sVer}`,
-      receiver: `${rPlat} ${rVer}`,
+      testType, sender: label,
+      receiver: label,
       name
     };
   }
+
+  // for others, parse sender then receiver by version‐marker
+  let i = 2;
+  const senderTokens = [];
+  const receiverTokens = [];
+
+  // accumulate sender until we hit a “vNN” token
+  while (i < tokens.length && !/^v\d+/.test(tokens[i])) {
+    senderTokens.push(tokens[i++]);
+  }
+  // include the version token itself
+  if (i < tokens.length && /^v\d+/.test(tokens[i])) {
+    senderTokens.push(tokens[i++]);
+  } else {
+    throw new Error(`Cannot find sender version in ${name}`);
+  }
+
+  // now the rest is receiver, up through its version token
+  while (i < tokens.length && !/^v\d+/.test(tokens[i])) {
+    receiverTokens.push(tokens[i++]);
+  }
+  if (i < tokens.length && /^v\d+/.test(tokens[i])) {
+    receiverTokens.push(tokens[i++]);
+  } else {
+    throw new Error(`Cannot find receiver version in ${name}`);
+  }
+
+  return {
+    testType,
+    sender: senderTokens.join(' '),
+    receiver: receiverTokens.join(' '),
+    name
+  };
 }
+
+
 
 /**
  * Group parsed entries into { [testType]: { senders: Set, receivers: Set, entries: [] } }
