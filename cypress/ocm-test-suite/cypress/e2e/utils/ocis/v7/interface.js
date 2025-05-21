@@ -116,10 +116,10 @@ export function shareViaInviteLink({
   implementation.openFilesApp();
 
   // Step 4: Share the file with the recipient
-  // implementation.createShare(sharedFileName, recipientUsername, recipientDisplayName);
+  implementation.createShare(sharedFileName, recipientUsername, recipientDisplayName);
 
   // Wait for the operation to complete
-  // cy.wait(5000);
+  cy.wait(5000);
 }
 
 export function acceptInviteLinkShare({

@@ -25,7 +25,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
   const recipientUsername = Cypress.env('OWNCLOUD1_USERNAME') || 'marie';
   const recipientPassword = Cypress.env('OWNCLOUD1_PASSWORD') || 'radioactivity';
   const senderDisplayName = Cypress.env('OCIS1_DISPLAY_NAME') || 'Albert Einstein';
-  const recipientDisplayName = Cypress.env('NEXTCLOUD2_DISPLAY_NAME') || 'marie';
+  const recipientDisplayName = Cypress.env('OWNCLOUD1_DISPLAY_NAME') || 'marie';
   const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
   const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
   const inviteLinkFileName = 'invite-link-ocis-oc.txt';

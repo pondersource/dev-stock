@@ -111,7 +111,6 @@ export function shareViaInviteLink({
   senderUsername,
   senderPassword,
   recipientPlatform,
-  recipientUrl,
   recipientDomain,
   recipientDisplayName,
   originalFileName,
@@ -142,7 +141,7 @@ export function shareViaInviteLink({
     implementation.createScienceMeshShare(
       senderDomain,
       recipientDisplayName,
-      recipientUrl,
+      recipientDomain,
       sharedFileName,
     );
   }

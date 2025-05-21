@@ -78,7 +78,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for ownClo
       recipientPlatform,
       recipientUrl,
       recipientDomain,
-      recipientDisplayName,
+      recipientUsername,
       originalFileName,
       sharedFileName,
     });

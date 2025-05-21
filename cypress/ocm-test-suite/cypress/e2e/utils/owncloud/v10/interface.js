@@ -109,7 +109,7 @@ export function shareViaInviteLink({
   recipientPlatform,
   recipientUrl,
   recipientDomain,
-  recipientDisplayName,
+  recipientUsername,
   originalFileName,
   sharedFileName,
 }) {
@@ -130,13 +130,13 @@ export function shareViaInviteLink({
     // Note: The 'reva' prefix is added to the recipient domain as per application behavior
     implementation.createScienceMeshShare(
       sharedFileName,
-      recipientDisplayName,
+      recipientUsername,
       `reva${recipientDomain}`,
     );
   } else {
     implementation.createScienceMeshShare(
       sharedFileName,
-      recipientDisplayName,
+      recipientUsername,
       recipientUrl,
     );
   }

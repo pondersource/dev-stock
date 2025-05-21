@@ -89,7 +89,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between ow
       recipientPlatform,
       recipientUrl,
       recipientDomain,
-      recipientDisplayName,
+      recipientUsername,
       originalFileName,
       sharedFileName,
     });

@@ -25,6 +25,7 @@ jobs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
       workflows: ${{ steps.collect.outputs.matrix }}
       done: ${{ steps.run-tests.outputs.done }}
+      matrix_file:  ${{ steps.run-tests.outputs.matrix_file }}
 
     steps:
       - name: Checkout
@@ -63,14 +64,52 @@ jobs:
             context.ref = process.env.WORKFLOW_REF;
 
             try {
-              // array of {name, conclusion}
-              const results = await orchestrateTests(github, context, core);
+              const matrixFile = await orchestrateTests(github, context, core);
+              core.setOutput('matrix_file', matrixFile);
               core.setOutput('done', 'true');
             } catch (err) {
               // Orchestrator itself failed - mark job red.
               core.setOutput('done', 'false');
               core.setFailed(`orchestrator error: ${err.message}`);
             }
+      
+      - name: Upload compatibility matrix artifact
+        if: steps.run-tests.outputs.done == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-matrix
+          path: ${{ steps.run-tests.outputs.matrix_file }}
+
+  commit-matrix:
+    needs: orchestrate-tests
+    if: needs.orchestrate-tests.outputs.done == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: compatibility-matrix
+
+      - name: Move file into docs tree
+        run: |
+          mkdir -p docs
+          mv compatibility-matrix.md docs/4.2-compatibility-matrix.md
+
+      - name: Commit & push (skip CI re-run)
+        run: |
+          git config user.name  "ci-bot"
+          git config user.email "ci@example.invalid"
+          git add docs/4.2-compatibility-matrix.md
+          if git diff --cached --quiet; then
+            echo "No changes — skipping commit"
+          else
+            git commit -m "docs: update compatibility matrix [skip ci]"
+            git push
+          fi
 
   trigger-pages:
     needs: orchestrate-tests

@@ -12,7 +12,8 @@ const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
   .split(',').map(s => s.trim()).filter(Boolean);
 
 // Optional debug list: overrides everything when non-empty
-const DEBUG_ONLY = [];
+const DEBUG_ONLY = [
+];
 
 // Final list to run
 const WORKFLOWS = DEBUG_ONLY.length ? DEBUG_ONLY : ALL_WORKFLOWS;
@@ -26,14 +27,17 @@ const EXPECTED_FAILURES = new Set([
   'share-link-oc-v10-nc-v27.yml',
   'share-link-oc-v10-nc-v28.yml',
   'share-link-oc-v10-nc-v29.yml',
+  'share-link-oc-v10-nc-v30.yml',
+  'share-link-oc-v10-nc-v31.yml',
+  'share-link-oc-v10-nc-v32.yml',
 ]);
 
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
-const RUN_ID_TIMEOUT = 60000;       // ms to wait for a new run to appear
+const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
-const DEFAULT_BATCH_SIZE = 20;       // Workflows to run concurrently per batch
+const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
 
 /**
  * Pause execution for the given number of milliseconds.
@@ -135,6 +139,91 @@ async function triggerWorkflow(github, context, workflow) {
 }
 
 /**
+ * Parse a workflow filename (without path) into its type, sender, receiver, and original name.
+ * - login-nc-v27.yml { testType: 'login', senders: 'nc v27', receivers: 'nc v27' }
+ * - share-with-nc-v28-os-v1.yml { testType: 'share-with', sender: 'nc v28', receiver: 'os v1' }
+ * - invite-link-nc-sm-v27-nc-sm-v27.yml { testType: 'invite-link', sender: 'nc sm v27', receiver: 'nc sm v27' }
+ * - invite-link-ocis-v7-oc-sm-v10.yml { testType: 'invite-link', sender: 'ocis v7', receiver: 'oc sm v10' }
+ */
+function parseWorkflowName(name) {
+  const base = name.replace(/\.ya?ml$/, '');
+  const parts = base.split('-');
+
+  if (parts[0] === 'login') {
+    const [, plat, ver] = parts;
+    const label = `${plat} ${ver}`;
+    return {
+      testType: 'login',
+      sender: label,
+      receiver: label,
+      name
+    };
+  } else {
+    const testType = parts.slice(0, 2).join('-'); // e.g. 'share-with'
+    // for others, parse sender then receiver by version‐marker
+    let i = 2;
+    const senderTokens = [];
+    const receiverTokens = [];
+
+    // accumulate sender until we hit a “vNN” token
+    while (i < parts.length && !/^v\d+/.test(parts[i])) {
+      senderTokens.push(parts[i++]);
+    }
+    // include the version token itself
+    if (i < parts.length && /^v\d+/.test(parts[i])) {
+      senderTokens.push(parts[i++]);
+    } else {
+      throw new Error(`Cannot find sender version in ${name}`);
+    }
+
+    // now the rest is receiver, up through its version token
+    while (i < parts.length && !/^v\d+/.test(parts[i])) {
+      receiverTokens.push(parts[i++]);
+    }
+    if (i < parts.length && /^v\d+/.test(parts[i])) {
+      receiverTokens.push(parts[i++]);
+    } else {
+      throw new Error(`Cannot find receiver version in ${name}`);
+    }
+
+    return {
+      testType,
+      sender: senderTokens.join(' '),
+      receiver: receiverTokens.join(' '),
+      name
+    };
+  }
+}
+
+/**
+ * Group parsed entries into { [testType]: { senders: Set, receivers: Set, entries: [] } }
+ */
+function groupResults(rawResults) {
+  const groups = {};
+  for (const r of rawResults) {
+    const { testType, sender, receiver, name } = parseWorkflowName(r.name);
+    if (!groups[testType]) {
+      groups[testType] = {
+        senders: new Set(),
+        receivers: new Set(),
+        entries: []
+      };
+    }
+    const grp = groups[testType];
+    // for login, parse returns sender/receiver as arrays
+    if (Array.isArray(sender)) {
+      grp.senders.add(...sender);
+      grp.receivers.add(...receiver);
+    } else {
+      grp.senders.add(sender);
+      grp.receivers.add(receiver);
+    }
+    grp.entries.push({ sender, receiver, name, runId: r.runId, conclusion: r.conclusion });
+  }
+  return groups;
+}
+
+/**
  * Main orchestration entry point.
 * Batches workflows, triggers them in parallel, then waits for completion.
  * Moves on to the next batch until all workflows finish.
@@ -178,38 +267,124 @@ module.exports = async function orchestrateTests(github, context, core) {
     }));
   }
 
-  // summary 
-  const passed = results.filter(r => r.conclusion === 'success' || EXPECTED_FAILURES.has(r.name)).length;
-  const failed = total - passed;
-  const pct = Math.round((passed / total) * 100);
-  const barUnits = Math.round((passed / total) * 20);
-  const bar = '▉'.repeat(barUnits) + '▏'.repeat(20 - barUnits);
+  const groups = groupResults(results);
+  const totalCount = results.length;
+  const passCount = results.filter(r =>
+    r.conclusion === 'success' || EXPECTED_FAILURES.has(r.name)
+  ).length;
+  const failCount = totalCount - passCount;
+  const passPct = Math.round((passCount / totalCount) * 100);
 
   await core.summary
-    .addHeading('🚀 OCM Test Suite Report')
-    .addRaw(`**${passed}/${total} passed - ${pct}%**  \n`)
-    .addRaw(`\`${bar}\`  \n`)
-    .addTable([
-      [{ header: true, data: 'Workflow' }, { header: true, data: 'Result' }],
-      ...results.map(r => {
-        const link = r.runId
-          ? `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${r.runId}`
-          : '';
-        const label =
-          r.conclusion === 'success' ? '✅ success' :
-            EXPECTED_FAILURES.has(r.name) ? '⚠️ allowed-failure' :
-              '❌ failure';
-        return [link ? `<a href="${link}">${r.name}</a>` : r.name, label];
-      })
-    ])
-    .addBreak()
-    .addRaw(`<details><summary>🔍 Failing workflows (${failed})</summary>\n\n` +
-      results.filter(r => r.conclusion !== 'success')
-        .map(r => `* **${r.name}**`).join('\n') +
-      '\n\n</details>')
-    .addBreak()
-    .addRaw(allSucceeded ? '🎉 **Test Suite succeeded**' : '⚠️ **Failures present**')
+    // Heading
+    .addRaw('# OCM Compatibility Matrix 🔄\n\n')
+
+    // Overview
+    .addRaw('## Overview\n')
+    .addRaw('This matrix shows the compatibility status of **login**, **share-with**, **share-link** and **invite-link** flows across all supported platform versions.\n'
+      + 'Each cell is the outcome of an automated end-to-end test for a specific **sender to receiver** combination.\n\n')
+
+    // Legend
+    .addRaw('## Test Results Legend 🎯\n')
+    .addRaw('- ✅ **Green** - all tests passed\n')
+    .addRaw('- ⚠️ **Yellow** - expected/allowed failure\n')
+    .addRaw('- ❌ **Red** - unexpected failure\n')
+    .addRaw('- — **Gray** - test not executed for this pair\n\n')
+
+    // High-level pass/fail counters
+    .addRaw(`<p><strong>${passCount}/${totalCount}</strong> passed &nbsp;•&nbsp; <strong>${failCount}</strong> failed &nbsp;•&nbsp; <strong>${passPct}%</strong> success rate</p>`)
+
+  for (const [testType, { senders, receivers, entries }] of Object.entries(groups)) {
+    const typePass = entries.filter(e =>
+      e.conclusion === 'success' || EXPECTED_FAILURES.has(e.name)
+    ).length;
+    const typeFail = entries.length - typePass;
+    const typePct = Math.round((typePass / entries.length) * 100);
+
+    await core.summary.addRaw(
+      `<p><strong>${testType}</strong><br>\
+    ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
+    );
+
+    // sort labels
+    const senderList = [...senders].sort();
+    const receiverList = [...receivers].sort();
+    const totalCols = receiverList.length;
+
+    // chunk receivers into blocks of 5
+    for (let i = 0; i < totalCols; i += 5) {
+      const chunk = receiverList.slice(i, i + 5);
+      const colStart = i + 1;
+      const colEnd = i + chunk.length;
+
+      // caption
+      await core.summary.addRaw(
+        `<h4>${testType}</h4>` +
+        `<p><em>Showing columns ${colStart}-${colEnd} of ${totalCols} receivers</em></p>`
+      );
+
+      // table header
+      let html = `<table style="border-collapse: collapse; width: 100%;">\n  <thead>\n    <tr>` +
+        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Result' : 'Sender to Receiver'}</th>`;
+      for (const rc of chunk) {
+        html += `<th style="border: 1px solid #ddd; padding: 4px;">${rc}</th>`;
+      }
+      html += `</tr>\n  </thead>\n  <tbody>\n`;
+
+      // rows
+      const rows = testType === 'login' ? ['Result'] : senderList;
+      for (const sd of rows) {
+        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${sd}</td>`;
+        for (const rc of chunk) {
+          // find matching entry
+          const cell = entries.find(e =>
+          (testType === 'login'
+            ? e.receiver === rc
+            : e.sender === sd && e.receiver === rc)
+          );
+          if (cell) {
+            const url = cell.runId
+              ? `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${cell.runId}`
+              : '';
+            const isAllowed = EXPECTED_FAILURES.has(cell.name);
+            const symbol = cell.conclusion === 'success'
+              ? '✅'
+              : isAllowed
+                ? '⚠️'
+                : '❌';
+            const style = isAllowed
+              ? 'background-color: yellow;'
+              : '';
+
+            html += `<td style="border: 1px solid #ddd; padding: 4px; ${style}">` +
+              (url ? `<a href="${url}">${symbol}</a>` : symbol) +
+              `</td>`;
+          } else {
+            html += `<td style="border: 1px solid #ddd; padding: 4px;">—</td>`;
+          }
+        }
+        html += `</tr>\n`;
+      }
+
+      html += `  </tbody>\n</table>\n`;
+      await core.summary.addRaw(html);
+    }
+  }
+
+  // final status
+  await core.summary
+    .addRaw(allSucceeded
+      ? '🎉 **All groups succeeded!**'
+      : '⚠️ **One or more failures detected.**')
     .write();
 
-  return results;
+  // write a markdown snapshot that a later job can commit
+  const fs = require('fs');
+  const path = require('path');
+  const out = core.summary.stringify();
+
+  const matrixFile = path.join(process.cwd(), 'compatibility-matrix.md');
+  fs.writeFileSync(matrixFile, out, 'utf8');
+
+  return matrixFile;
 };

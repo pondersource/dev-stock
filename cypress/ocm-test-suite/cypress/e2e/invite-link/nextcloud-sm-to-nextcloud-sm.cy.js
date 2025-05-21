@@ -76,7 +76,6 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
       senderUsername,
       senderPassword,
       recipientPlatform,
-      recipientUrl,
       recipientDomain,
       recipientDisplayName,
       originalFileName,
