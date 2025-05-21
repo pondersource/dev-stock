@@ -296,10 +296,45 @@ module.exports = async function orchestrateTests(github, context, core) {
   }
 
   const groups = groupResults(results);
+  const totalCount = results.length;
+  const passCount = results.filter(r =>
+    r.conclusion === 'success' || EXPECTED_FAILURES.has(r.name)
+  ).length;
+  const failCount = totalCount - passCount;
+  const passPct = Math.round((passCount / totalCount) * 100);
 
-  await core.summary.addHeading('🚀 OCM Test Suite Report: Matrix View');
+  await core.summary.addHeading('🚀 OCM Test Suite Report: Matrix View')
+    .addRaw(`<p><strong>${passCount}/${totalCount}</strong> passed &nbsp;•&nbsp; \
+    <strong>${failCount}</strong> failed &nbsp;•&nbsp; \
+    <strong>${passPct}%</strong> success rate</p>`)
+    .addRaw(`
+      \`\`\`mermaid
+      pie title Overall outcome
+        "Passed" : ${passCount}
+        "Failed" : ${failCount}
+      \`\`\`
+      `);
 
   for (const [testType, { senders, receivers, entries }] of Object.entries(groups)) {
+    const typePass = entries.filter(e =>
+      e.conclusion === 'success' || EXPECTED_FAILURES.has(e.name)
+    ).length;
+    const typeFail = entries.length - typePass;
+    const typePct = Math.round((typePass / entries.length) * 100);
+
+    await core.summary.addRaw(
+      `<p><strong>${testType}</strong> — \
+    ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
+    );
+
+    await core.summary.addRaw(
+      `\`\`\`mermaid
+      bar
+        title ${testType} outcome
+        Accumulation : ${typePass}, ${typeFail}
+      \`\`\``
+    );
+
     // sort labels
     const senderList = [...senders].sort();
     const receiverList = [...receivers].sort();
@@ -314,7 +349,7 @@ module.exports = async function orchestrateTests(github, context, core) {
       // caption
       await core.summary.addRaw(
         `<h4>${testType}</h4>` +
-        `<p><em>Showing columns ${colStart}–${colEnd} of ${totalCols} receivers</em></p>`
+        `<p><em>Showing columns ${colStart}-${colEnd} of ${totalCols} receivers</em></p>`
       );
 
       // table header
