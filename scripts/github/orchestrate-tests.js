@@ -165,7 +165,6 @@ async function triggerWorkflow(github, context, workflow) {
   return { name: workflow, runId };
 }
 
-// utils/parseWorkflows.js
 /**
  * Parse a workflow filename (without path) into its type, sender, receiver, and original name.
  * - login-nc-v27.yml { testType: 'login', senders: 'nc v27', receivers: 'nc v27' }
@@ -252,6 +251,21 @@ function groupResults(rawResults) {
 }
 
 /**
+ * Create an inline horizontal bar chart using HTML/CSS.
+ * @param {number} passPercent - Percentage of passing tests.
+ * @returns {string} HTML string representing the bar chart.
+ */
+function barChartHTML(passPercent) {
+  const failPercent = 100 - passPercent;
+  return `
+    <div style="display:flex; width:100%; height:18px; border:1px solid #ddd; border-radius:4px; overflow:hidden;">
+      <div style="width:${passPercent}%; background:#4caf50;"></div>
+      <div style="width:${failPercent}%; background:#f44336;"></div>
+    </div>
+  `;
+}
+
+/**
  * Main orchestration entry point.
 * Batches workflows, triggers them in parallel, then waits for completion.
  * Moves on to the next batch until all workflows finish.
@@ -303,17 +317,25 @@ module.exports = async function orchestrateTests(github, context, core) {
   const failCount = totalCount - passCount;
   const passPct = Math.round((passCount / totalCount) * 100);
 
-  await core.summary.addHeading('🚀 OCM Test Suite Report: Matrix View')
-    .addRaw(`<p><strong>${passCount}/${totalCount}</strong> passed &nbsp;•&nbsp; \
-    <strong>${failCount}</strong> failed &nbsp;•&nbsp; \
-    <strong>${passPct}%</strong> success rate</p>`)
-    .addRaw(`
-      \`\`\`mermaid
-      pie title Overall outcome
-        "Passed" : ${passCount}
-        "Failed" : ${failCount}
-      \`\`\`
-      `);
+  await core.summary
+    // Heading
+    .addRaw('# OCM Compatibility Matrix 🔄\n\n')
+
+    // Overview
+    .addRaw('## Overview\n')
+    .addRaw('This matrix shows the compatibility status of **login**, **share-with**, **share-link** and **invite-link** flows across all supported platform versions. '
+      + 'Each cell is the outcome of an automated end-to-end test for a specific **sender → receiver** combination.\n\n')
+
+    // Legend
+    .addRaw('## Test Results Legend 🎯\n')
+    .addRaw('- ✅ **Green** - all tests passed\n')
+    .addRaw('- ⚠️ **Yellow** - expected/allowed failure\n')
+    .addRaw('- ❌ **Red** - unexpected failure\n')
+    .addRaw('- — **Gray** - test not executed for this pair\n\n')
+
+    // High-level pass/fail counters
+    .addRaw(`<p><strong>${passCount}/${totalCount}</strong> passed &nbsp;•&nbsp; <strong>${failCount}</strong> failed &nbsp;•&nbsp; <strong>${passPct}%</strong> success rate</p>`)
+    .addRaw(barChartHTML(passPct));
 
   for (const [testType, { senders, receivers, entries }] of Object.entries(groups)) {
     const typePass = entries.filter(e =>
@@ -327,13 +349,7 @@ module.exports = async function orchestrateTests(github, context, core) {
     ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
     );
 
-    await core.summary.addRaw(
-      `\`\`\`mermaid
-      bar
-        title ${testType} outcome
-        Accumulation : ${typePass}, ${typeFail}
-      \`\`\``
-    );
+    await core.summary.addRaw(barChartHTML(typePct));
 
     // sort labels
     const senderList = [...senders].sort();
