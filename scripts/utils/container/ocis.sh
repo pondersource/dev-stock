@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Create an OCIS container
+# Create an oCIS container
 create_ocis() {
     local number="${1}"
     local image="${2}"
@@ -43,6 +43,8 @@ create_ocis() {
     # Wait for EFSS port to open
     # TODO @MahdiBaghbani: we might need custom images with ss installed.
     # run_quietly_if_ci wait_for_port "ocis${number}.docker" 443
+
+    run_quietly_if_ci echo "oCIS instance ${number} started."
 }
 
 # -----------------------------------------------------------------------------------
