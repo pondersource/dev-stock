@@ -90,7 +90,6 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
       senderUsername,
       senderPassword,
       recipientPlatform,
-      recipientUrl,
       recipientDomain,
       recipientDisplayName,
       originalFileName,
