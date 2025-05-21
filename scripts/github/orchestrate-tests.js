@@ -251,21 +251,6 @@ function groupResults(rawResults) {
 }
 
 /**
- * Create an inline horizontal bar chart using HTML/CSS.
- * @param {number} passPercent - Percentage of passing tests.
- * @returns {string} HTML string representing the bar chart.
- */
-function barChartHTML(passPercent) {
-  const failPercent = 100 - passPercent;
-  return `
-    <div style="display:flex; width:100%; height:18px; border:1px solid #ddd; border-radius:4px; overflow:hidden;">
-      <div style="width:${passPercent}%; background:#4caf50;"></div>
-      <div style="width:${failPercent}%; background:#f44336;"></div>
-    </div>
-  `;
-}
-
-/**
  * Main orchestration entry point.
 * Batches workflows, triggers them in parallel, then waits for completion.
  * Moves on to the next batch until all workflows finish.
@@ -323,8 +308,8 @@ module.exports = async function orchestrateTests(github, context, core) {
 
     // Overview
     .addRaw('## Overview\n')
-    .addRaw('This matrix shows the compatibility status of **login**, **share-with**, **share-link** and **invite-link** flows across all supported platform versions. '
-      + 'Each cell is the outcome of an automated end-to-end test for a specific **sender → receiver** combination.\n\n')
+    .addRaw('This matrix shows the compatibility status of **login**, **share-with**, **share-link** and **invite-link** flows across all supported platform versions.\n'
+      + 'Each cell is the outcome of an automated end-to-end test for a specific **sender to receiver** combination.\n\n')
 
     // Legend
     .addRaw('## Test Results Legend 🎯\n')
@@ -335,7 +320,6 @@ module.exports = async function orchestrateTests(github, context, core) {
 
     // High-level pass/fail counters
     .addRaw(`<p><strong>${passCount}/${totalCount}</strong> passed &nbsp;•&nbsp; <strong>${failCount}</strong> failed &nbsp;•&nbsp; <strong>${passPct}%</strong> success rate</p>`)
-    .addRaw(barChartHTML(passPct));
 
   for (const [testType, { senders, receivers, entries }] of Object.entries(groups)) {
     const typePass = entries.filter(e =>
@@ -345,11 +329,9 @@ module.exports = async function orchestrateTests(github, context, core) {
     const typePct = Math.round((typePass / entries.length) * 100);
 
     await core.summary.addRaw(
-      `<p><strong>${testType}</strong> — \
+      `<p><strong>${testType}</strong><br>\
     ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
     );
-
-    await core.summary.addRaw(barChartHTML(typePct));
 
     // sort labels
     const senderList = [...senders].sort();
@@ -423,5 +405,13 @@ module.exports = async function orchestrateTests(github, context, core) {
       : '⚠️ **One or more failures detected.**')
     .write();
 
-  return results;
+  // write a markdown snapshot that a later job can commit
+  const fs = require('fs');
+  const path = require('path');
+  const out = core.summary.stringify();
+
+  const matrixFile = path.join(process.cwd(), 'compatibility-matrix.md');
+  fs.writeFileSync(matrixFile, out, 'utf8');
+
+  return matrixFile;
 };
