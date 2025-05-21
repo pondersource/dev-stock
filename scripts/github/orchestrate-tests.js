@@ -13,33 +13,6 @@ const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
 
 // Optional debug list: overrides everything when non-empty
 const DEBUG_ONLY = [
-  'login-nc-v27.yml',
-  'login-nc-v28.yml',
-  'login-nc-v29.yml',
-  'login-nc-v30.yml',
-  'login-nc-v31.yml',
-  'login-nc-v32.yml',
-  'login-ocis-v5.yml',
-  'login-ocis-v7.yml',
-  'login-oc-v10.yml',
-  'login-os-v1.yml',
-  'login-sf-v11.yml',
-  'invite-link-nc-sm-v27-nc-sm-v27.yml',
-  'invite-link-nc-sm-v27-ocis-v5.yml',
-  'invite-link-nc-sm-v27-ocis-v7.yml',
-  'invite-link-nc-sm-v27-oc-sm-v10.yml',
-  'invite-link-ocis-v5-nc-sm-v27.yml',
-  'invite-link-ocis-v5-ocis-v5.yml',
-  'invite-link-ocis-v5-ocis-v7.yml',
-  'invite-link-ocis-v5-oc-sm-v10.yml',
-  'invite-link-ocis-v7-nc-sm-v27.yml',
-  'invite-link-ocis-v7-ocis-v5.yml',
-  'invite-link-ocis-v7-ocis-v7.yml',
-  'invite-link-ocis-v7-oc-sm-v10.yml',
-  'invite-link-oc-sm-v10-nc-sm-v27.yml',
-  'invite-link-oc-sm-v10-ocis-v5.yml',
-  'invite-link-oc-sm-v10-ocis-v7.yml',
-  'invite-link-oc-sm-v10-oc-sm-v10.yml',
 ];
 
 // Final list to run
