@@ -25,7 +25,7 @@ jobs:
       commit_sha: ${{ steps.get-sha.outputs.sha }}
       workflows: ${{ steps.collect.outputs.matrix }}
       done: ${{ steps.run-tests.outputs.done }}
-      matrix_file:  ${{ steps.run-tests.outputs.matrix_file }}
+      matrix_file: ${{ steps.run-tests.outputs.matrix_file }}
 
     steps:
       - name: Checkout
@@ -100,16 +100,12 @@ jobs:
           mv compatibility-matrix.md docs/4.2-compatibility-matrix.md
 
       - name: Commit & push (skip CI re-run)
-        run: |
-          git config user.name  "ci-bot"
-          git config user.email "ci@example.invalid"
-          git add docs/4.2-compatibility-matrix.md
-          if git diff --cached --quiet; then
-            echo "No changes — skipping commit"
-          else
-            git commit -m "docs: update compatibility matrix [skip ci]"
-            git push
-          fi
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name:  ci-bot
+          author_email: ci@example.invalid
+          message: "docs: update compatibility matrix [skip ci]"
+          add: "docs/4.2-compatibility-matrix.md"
 
   trigger-pages:
     needs: orchestrate-tests
@@ -118,4 +114,4 @@ jobs:
     uses: ./.github/workflows/github-pages.yml
     with:
       sha: ${{ needs.orchestrate-tests.outputs.commit_sha }}
-      workflows:  ${{ needs.orchestrate-tests.outputs.workflows }}
+      workflows: ${{ needs.orchestrate-tests.outputs.workflows }}
