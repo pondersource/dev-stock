@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test Opencloud to Opencloud OCM invite-link flow tests.
+# Script to Test oCIS to Opencloud OCM invite link flow tests.
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------
 # Description:
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
-#   such as Opencloud, using Cypress, and Docker containers.
+#   specifically oCIS and Opencloud, using ScienceMesh integration and tools like Reva, Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
 # Usage:
-#   ./opencloud-opencloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./ocis-opencloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v2.3.0").
-#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v2.3.0").
+#   EFSS_PLATFORM_1_VERSION : Version of oCIS (default: "v5.0.9").
+#   EFSS_PLATFORM_2_VERSION : Version of Opencloud (default: "v2.3.0").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 # Example:
-#   ./opencloud-opencloud.sh v2.3.0 v2.3.0 ci electron
+#   ./ocis-opencloud.sh v5.0.9 v2.3.0 ci electron
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
@@ -30,7 +30,7 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 
 # Default versions
-DEFAULT_EFSS_1_VERSION="v2.3.0"
+DEFAULT_EFSS_1_VERSION="v5.0.9"
 DEFAULT_EFSS_2_VERSION="v2.3.0"
 
 # -----------------------------------------------------------------------------------
@@ -105,35 +105,29 @@ initialize_environment() {
 
 # -----------------------------------------------------------------------------------
 # Main Execution
-# Purpose :
-#   1) Initialize the environment
-#   2) Parse CLI arguments and validate necessary files
-#   3) Prepare environment (clean up, create Docker network, etc.)
-#   4) Create EFSS containers
-#   5) Run dev or CI mode depending on SCRIPT_MODE
-#
-# Arguments:
-#   All command line arguments are passed to parse_arguments.
-#
-# Returns : None - the script will exit upon errors (via error_exit) or complete normally.
 # -----------------------------------------------------------------------------------
 main() {
     # Initialize environment and parse arguments
     initialize_environment "../../.."
     setup "$@"
+
+    # Configure OCM providers for oCIS
+    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "opencloud1.docker,opencloud1.docker,dav/"
     
     # Configure OCM providers for Opencloud
-    prepare_opencloud_environment "opencloud1.docker,opencloud1.docker,dav/" "opencloud2.docker,opencloud2.docker,dav/"
-    
-    # Create EFSS containers
-    #                # id   # image                                 # tag
-    create_opencloud 1      opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_1_VERSION}"
-    create_opencloud 2      opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_2_VERSION}"
+    prepare_opencloud_environment "ocis1.docker,ocis1.docker,dav/" "opencloud1.docker,opencloud1.docker,dav/"
 
-if [ "${SCRIPT_MODE}" = "dev" ]; then
+    # Create EFSS containers
+    create_ocis       1         owncloud/ocis                           "${EFSS_PLATFORM_1_VERSION}"
+    create_opencloud  1         opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_1_VERSION}"
+    
+    # Start Mesh Directory
+    create_meshdir pondersource/ocmstub v1.0.0
+    
+    if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-            "https://opencloud1.docker (username: alan, password: demo)" \
-            "https://opencloud2.docker (username: lynn, password: demo)"
+          "https://ocis1.docker (username: einstein, password: relativity)" \
+          "https://opencloud1.docker (username: alan, password: demo)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

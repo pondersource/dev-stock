@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test Opencloud to Opencloud OCM invite-link flow tests.
+# Script to Test Opencloud login flow tests.
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
@@ -10,15 +10,23 @@
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
 #   such as Opencloud, using Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
+
 # Usage:
-#   ./opencloud-opencloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./opencloud.sh [EFSS_PLATFORM_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v2.3.0").
-#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v2.3.0").
-#   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
-#   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
+#   EFSS_PLATFORM_VERSION : Version of the EFSS platform (default: "v2.3.0").
+#   SCRIPT_MODE          : Script mode (default: "dev"). Options: dev, ci.
+#   BROWSER_PLATFORM     : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
+
+# Requirements:
+#   - Docker and required images must be installed.
+#   - Test scripts and configurations must be located in the expected directories.
+#   - Ensure that the necessary scripts (e.g., init scripts) and configurations exist.
+
 # Example:
-#   ./opencloud-opencloud.sh v2.3.0 v2.3.0 ci electron
+#   ./opencloud.sh v2.3.0 ci electron
+
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
@@ -31,18 +39,19 @@ set -euo pipefail
 
 # Default versions
 DEFAULT_EFSS_1_VERSION="v2.3.0"
-DEFAULT_EFSS_2_VERSION="v2.3.0"
+# For login tests, we don't need a second platform version
+DEFAULT_EFSS_2_VERSION=""
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
 # Purpose : Resolves the absolute path of the script's directory, handling symlinks.
-# Returns :
+# Returns : 
 #   Exports SOURCE, SCRIPT_DIR
 # Note    : This function relies on BASH_SOURCE, so it must be used in a Bash shell.
 # -----------------------------------------------------------------------------------
 resolve_script_dir() {
     local source="${BASH_SOURCE[0]}"
-    
+
     # Follow symbolic links until we get the real file location
     while [ -L "${source}" ]; do
         # Get the directory path where the symlink is located
@@ -52,10 +61,10 @@ resolve_script_dir() {
         # If the source was a relative symlink, convert it to an absolute path
         [[ "${source}" != /* ]] && source="${dir}/${source}"
     done
-    
+
     # After resolving symlinks, retrieve the directory of the final source
     SCRIPT_DIR="$(cd -P "$(dirname "${source}")" >/dev/null 2>&1 && pwd)"
-    
+
     # Exports
     export SOURCE="${source}"
     export SCRIPT_DIR="${SCRIPT_DIR}"
@@ -80,12 +89,12 @@ resolve_script_dir() {
 initialize_environment() {
     # Resolve script's directory
     resolve_script_dir
-    
+
     # Local variables
     local subdir
     # Check if a subdirectory argument was passed; default to '.' if not
     subdir="${1:-.}"
-    
+
     # Attempt to change into the resolved directory + the subdirectory
     if cd "${SCRIPT_DIR}/${subdir}"; then
         ENV_ROOT="$(pwd)"
@@ -93,7 +102,7 @@ initialize_environment() {
     else
         printf "Error: %s\n" "Failed to change directory to '${SCRIPT_DIR}/${subdir}'." >&2 && exit 1
     fi
-    
+
     # shellcheck source=/dev/null
     # Source utility script (assuming it exists and is required for subsequent commands)
     if [[ -f "${ENV_ROOT}/scripts/utils.sh" ]]; then
@@ -105,7 +114,7 @@ initialize_environment() {
 
 # -----------------------------------------------------------------------------------
 # Main Execution
-# Purpose :
+# Purpose : 
 #   1) Initialize the environment
 #   2) Parse CLI arguments and validate necessary files
 #   3) Prepare environment (clean up, create Docker network, etc.)
@@ -121,21 +130,18 @@ main() {
     # Initialize environment and parse arguments
     initialize_environment "../../.."
     setup "$@"
-    
+
     # Configure OCM providers for Opencloud
     prepare_opencloud_environment "opencloud1.docker,opencloud1.docker,dav/" "opencloud2.docker,opencloud2.docker,dav/"
-    
-    # Create EFSS containers
-    #                # id   # image                                 # tag
-    create_opencloud 1      opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_1_VERSION}"
-    create_opencloud 2      opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_2_VERSION}"
 
-if [ "${SCRIPT_MODE}" = "dev" ]; then
-        run_dev \
-            "https://opencloud1.docker (username: alan, password: demo)" \
-            "https://opencloud2.docker (username: lynn, password: demo)"
+    # Create EFSS containers
+    #                     # id    # image                           # tag
+    create_opencloud      1       opencloudeu/opencloud-rolling     "${EFSS_PLATFORM_1_VERSION}"
+
+    if [ "${SCRIPT_MODE}" = "dev" ]; then
+        run_dev "https://opencloud1.docker (username: alan, password: demo)" ""
     else
-        run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
+        run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}"
     fi
 }
 
