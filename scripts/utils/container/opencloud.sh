@@ -71,7 +71,7 @@ prepare_opencloud_environment() {
     sudo chown -R 1000:1000 "${TEMP_DIR}/opencloud/certificate-authority"
 
     # Configure OCM providers
-    configure_ocm_providers "${instance1_config}" "${instance2_config}"
+    configure_opencloud_ocm_providers "${instance1_config}" "${instance2_config}"
 }
 
 # -----------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ prepare_opencloud_environment() {
 #   - webdav_domain: domain for WebDAV endpoints
 #   - webdav_path: path for WebDAV endpoints
 # -----------------------------------------------------------------------------------
-configure_ocm_providers() {
+configure_opencloud_ocm_providers() {
     local instance1_config="${1:-opencloud1.docker,opencloud1.docker,dav/}"
     local instance2_config="${2:-opencloud2.docker,opencloud2.docker,dav/}"
 

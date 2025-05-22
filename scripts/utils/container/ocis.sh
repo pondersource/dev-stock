@@ -62,7 +62,7 @@ prepare_ocis_environment() {
     cp -fr "${ENV_ROOT}/docker/configs/ocis" "${TEMP_DIR}/ocis"
 
     # Configure OCM providers
-    configure_ocm_providers "${instance1_config}" "${instance2_config}"
+    configure_ocis_ocm_providers "${instance1_config}" "${instance2_config}"
 }
 
 # -----------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ prepare_ocis_environment() {
 #   - webdav_domain: domain for WebDAV endpoints
 #   - webdav_path: path for WebDAV endpoints
 # -----------------------------------------------------------------------------------
-configure_ocm_providers() {
+configure_ocis_ocm_providers() {
     local instance1_config="${1:-ocis1.docker,ocis1.docker,dav/}"
     local instance2_config="${2:-ocis2.docker,ocis2.docker,dav/}"
 
