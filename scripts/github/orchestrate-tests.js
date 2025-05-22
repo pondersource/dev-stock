@@ -378,13 +378,18 @@ module.exports = async function orchestrateTests(github, context, core) {
       : '⚠️ **One or more failures detected.**')
     .write();
 
-  // write a markdown snapshot that a later job can commit
   const fs = require('fs');
   const path = require('path');
-  const out = core.summary.stringify();
-
   const matrixFile = path.join(process.cwd(), 'compatibility-matrix.md');
-  fs.writeFileSync(matrixFile, out, 'utf8');
+
+  // take a copy of the buffer before .write() clears it
+  const snapshot = core.summary.stringify();
+
+  // flush the buffer to the Actions “Step Summary” pane
+  await core.summary.write(); // buffer is now empty
+
+  // persist the snapshot for later jobs or artefacts
+  fs.writeFileSync(matrixFile, snapshot, 'utf8');
 
   return matrixFile;
 };
