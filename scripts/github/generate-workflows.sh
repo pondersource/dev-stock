@@ -72,6 +72,7 @@ abbr_platform() {
     owncloud)       printf "oc"     ;;
     owncloud-sm)    printf "oc-sm"  ;;
     ocis)           printf "ocis"   ;;
+    opencloud)      printf "opcl"   ;;
     ocmstub)        printf "os"     ;;
     seafile)        printf "sf"     ;;
     *)              printf "%s" "${1:0:2}" ;;
