@@ -152,7 +152,7 @@ for efss in "${efss_list[@]}"; do
 done
 
 # Generate certificates for additional EFSS instances
-additional_efss=("seafile" "ocis" "ocmstub")
+additional_efss=("seafile" "ocis" "opencloud" "ocmstub")
 for efss in "${additional_efss[@]}"; do
     for i in {1..4}; do
         create_certificate "${efss}${i}"

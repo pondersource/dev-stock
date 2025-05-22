@@ -1,0 +1,13 @@
+{
+  "apps": [
+    "files",
+    "ocm",
+    "text-editor",
+    "preview",
+    "pdf-viewer",
+    "epub-reader",
+    "search",
+    "admin-settings",
+    "app-store"
+  ]
+}

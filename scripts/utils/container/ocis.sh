@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Create an OCIS container
+# Create an oCIS container
 create_ocis() {
     local number="${1}"
     local image="${2}"
@@ -43,6 +43,8 @@ create_ocis() {
     # Wait for EFSS port to open
     # TODO @MahdiBaghbani: we might need custom images with ss installed.
     # run_quietly_if_ci wait_for_port "ocis${number}.docker" 443
+
+    run_quietly_if_ci echo "oCIS instance ${number} started."
 }
 
 # -----------------------------------------------------------------------------------
@@ -60,7 +62,7 @@ prepare_ocis_environment() {
     cp -fr "${ENV_ROOT}/docker/configs/ocis" "${TEMP_DIR}/ocis"
 
     # Configure OCM providers
-    configure_ocm_providers "${instance1_config}" "${instance2_config}"
+    configure_ocis_ocm_providers "${instance1_config}" "${instance2_config}"
 }
 
 # -----------------------------------------------------------------------------------
@@ -77,7 +79,7 @@ prepare_ocis_environment() {
 #   - webdav_domain: domain for WebDAV endpoints
 #   - webdav_path: path for WebDAV endpoints
 # -----------------------------------------------------------------------------------
-configure_ocm_providers() {
+configure_ocis_ocm_providers() {
     local instance1_config="${1:-ocis1.docker,ocis1.docker,dav/}"
     local instance2_config="${2:-ocis2.docker,ocis2.docker,dav/}"
 

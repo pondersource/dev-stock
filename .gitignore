@@ -36,12 +36,4 @@ site/static/artifacts
 cypress/ocm-test-suite/cypress/videos/*
 cypress/ocm-test-suite/cypress/screenshots/*
 cypress/ocm-test-suite/share-link-url.txt
-cypress/ocm-test-suite/invite-link-nc-nc.txt
-cypress/ocm-test-suite/invite-link-nc-oc.txt
-cypress/ocm-test-suite/invite-link-oc-nc.txt
-cypress/ocm-test-suite/invite-link-oc-oc.txt
-cypress/ocm-test-suite/invite-link-oc-ocis.txt
-cypress/ocm-test-suite/invite-link-nc-ocis.txt
-cypress/ocm-test-suite/invite-link-ocis-nc.txt
-cypress/ocm-test-suite/invite-link-ocis-oc.txt
-cypress/ocm-test-suite/invite-link-ocis-ocis.txt
+cypress/ocm-test-suite/invite-link-*.txt

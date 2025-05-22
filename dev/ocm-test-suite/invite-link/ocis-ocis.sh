@@ -105,17 +105,6 @@ initialize_environment() {
 
 # -----------------------------------------------------------------------------------
 # Main Execution
-# Purpose :
-#   1) Initialize the environment
-#   2) Parse CLI arguments and validate necessary files
-#   3) Prepare environment (clean up, create Docker network, etc.)
-#   4) Create EFSS containers
-#   5) Run dev or CI mode depending on SCRIPT_MODE
-#
-# Arguments:
-#   All command line arguments are passed to parse_arguments.
-#
-# Returns : None - the script will exit upon errors (via error_exit) or complete normally.
 # -----------------------------------------------------------------------------------
 main() {
     # Initialize environment and parse arguments

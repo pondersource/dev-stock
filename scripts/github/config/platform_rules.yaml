@@ -4,6 +4,7 @@ platforms:
   # ScienceMesh flavour
   nextcloud-sm: [v27.1.11-sm]
   ocis: [v5.0.9, v7.1.2]
+  opencloud: [v2.3.0]
   owncloud: [v10.15.0]
   # ScienceMesh flavour
   owncloud-sm: [v10.15.0-sm]
@@ -14,7 +15,7 @@ platforms:
 scenarios:
   login:
     # *: every platform + every version
-    include: [nextcloud, ocis, owncloud, ocmstub, seafile]
+    include: [nextcloud, ocis, opencloud, owncloud, ocmstub, seafile]
 
   share-link:
     include:
@@ -38,8 +39,10 @@ scenarios:
   invite-link:
     include:
       - sender: [nextcloud-sm]
-        receiver: [nextcloud-sm, ocis, owncloud-sm]
+        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [ocis]
-        receiver: [nextcloud-sm, ocis, owncloud-sm]
+        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
+      - sender: [opencloud]
+        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [owncloud-sm]
-        receiver: [nextcloud-sm, ocis, owncloud-sm]
+        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]

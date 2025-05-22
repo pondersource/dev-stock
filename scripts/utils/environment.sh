@@ -25,7 +25,7 @@ ensure_docker_running() {
 remove_directory() {
     local dir="${1}"
     if [ -d "${dir}" ]; then
-        run_quietly_if_ci rm -rf "${dir}" || error_exit "Failed to remove directory: ${dir}"
+        run_quietly_if_ci sudo rm -rf "${dir}" || error_exit "Failed to remove directory: ${dir}"
     fi
 }
 
