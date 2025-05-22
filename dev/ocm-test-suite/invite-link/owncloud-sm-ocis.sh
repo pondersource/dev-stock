@@ -13,12 +13,12 @@
 # Usage:
 #   ./owncloud-ocis.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of ownCloud (default: "v10.15.0").
-#   EFSS_PLATFORM_2_VERSION : Version of oCIS (default: "5.0.9").
+#   EFSS_PLATFORM_1_VERSION : Version of ownCloud (default: "v10.15.0-sm").
+#   EFSS_PLATFORM_2_VERSION : Version of oCIS (default: "v5.0.9").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 # Example:
-#   ./owncloud-ocis.sh v10.15.0 5.0.9 ci electron
+#   ./owncloud-ocis.sh v10.15.0-sm v5.0.9 ci electron
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
@@ -30,8 +30,8 @@ set -euo pipefail
 # -----------------------------------------------------------------------------------
 
 # Default versions
-DEFAULT_EFSS_1_VERSION="v10.15.0"
-DEFAULT_EFSS_2_VERSION="5.0.9"
+DEFAULT_EFSS_1_VERSION="v10.15.0-sm"
+DEFAULT_EFSS_2_VERSION="v5.0.9"
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
@@ -106,7 +106,6 @@ initialize_environment() {
 # -----------------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------------
-
 main() {
     # Initialize environment and parse arguments
     initialize_environment "../../.."

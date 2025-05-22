@@ -14,11 +14,11 @@
 #   ./opencloud-nextcloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 # Arguments:
 #   EFSS_PLATFORM_1_VERSION : Version of Opencloud (default: "v2.3.0").
-#   EFSS_PLATFORM_2_VERSION : Version of Nextcloud (default: "v27.1.11").
+#   EFSS_PLATFORM_2_VERSION : Version of Nextcloud (default: "v27.1.11-sm").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 # Example:
-#   ./opencloud-nextcloud.sh v2.3.0 v27.1.11 ci electron
+#   ./opencloud-nextcloud.sh v2.3.0 v27.1.11-sm ci electron
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
@@ -31,7 +31,7 @@ set -euo pipefail
 
 # Default versions
 DEFAULT_EFSS_1_VERSION="v2.3.0"
-DEFAULT_EFSS_2_VERSION="v27.1.11"
+DEFAULT_EFSS_2_VERSION="v27.1.11-sm"
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir

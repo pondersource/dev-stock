@@ -106,7 +106,6 @@ initialize_environment() {
 # -----------------------------------------------------------------------------------
 # Main Execution
 # -----------------------------------------------------------------------------------
-
 main() {
     # Initialize environment and parse arguments
     initialize_environment "../../.."
