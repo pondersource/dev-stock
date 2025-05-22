@@ -8,6 +8,8 @@ import * as nc32 from './nextcloud/v32/interface.js';
 // oCIS
 import * as ocis5 from './ocis/v5/interface.js';
 import * as ocis7 from './ocis/v7/interface.js';
+// OpenCloud 
+import * as opencloud2 from './opencloud/v2/interface.js';
 // OcmStub
 import * as os1 from './ocmstub/v1/interface.js';
 // ownCloud
@@ -39,6 +41,7 @@ function register(mod) {
   nc32,
   ocis5,
   ocis7,
+  opencloud2,
   os1,
   oc10,
   sf11
