@@ -372,6 +372,9 @@ main() {
             "${build_args}"
     done
 
+    # CERNBox Web
+    build_docker_image cernbox.Dockerfile           pondersource/cernbox            "v1.0.0 latest"             DEFAULT
+
     # Nextcloud Base
     build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"                    DEFAULT
 
