@@ -330,7 +330,7 @@ main() {
     build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"             DEFAULT
 
     # Reva Repo
-    NEXTCLOUD_REPO=https://github.com/cs3org/reva
+    REVA_REPO=https://github.com/cs3org/reva
 
     # Reva Versions
     # The first element in this array is considered the "latest".
@@ -344,7 +344,7 @@ main() {
         # If this is the first element (index 0), also add the "latest" tag
         [[ "$i" -eq 0 ]] && tags+=" latest"
         
-        build_args="--build-arg REVA_REPO=${NEXTCLOUD_REPO}"
+        build_args="--build-arg REVA_REPO=${REVA_REPO}"
         build_args="${build_args} --build-arg REVA_BRANCH=${version}"
         
         # Revad base
@@ -374,6 +374,29 @@ main() {
 
     # CERNBox Web
     build_docker_image cernbox.Dockerfile           pondersource/cernbox            "v1.0.0 latest"             DEFAULT
+
+    # Keycloak Versions
+    # The first element in this array is considered the "latest".
+    keycloak_versions=("26.2.4")
+
+    # Iterate over the array of versions
+    for i in "${!keycloak_versions[@]}"; do
+        version="${keycloak_versions[i]}"
+
+        tags="v${version}"
+        # If this is the first element (index 0), also add the "latest" tag
+        [[ "$i" -eq 0 ]] && tags+=" latest"
+        
+        build_args="--build-arg KEYCLOAK_TAG=${version}"
+        
+        # Revad base
+        build_docker_image \
+            keycloak.Dockerfile \
+            pondersource/keycloak \
+            "${tags}" \
+            DEFAULT \
+            "${build_args}"
+    done
 
     # Nextcloud Base
     build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"                    DEFAULT
