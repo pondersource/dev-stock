@@ -115,7 +115,7 @@ main() {
     prepare_opencloud_environment "opencloud1.docker,opencloud1.docker,dav/" "revanextcloud1.docker,nextcloud1.docker,remote.php/webdav/"
     
     # Create EFSS containers
-    create_opencloud  1                                      opencloudeu/opencloud-rolling          "${EFSS_PLATFORM_2_VERSION}"
+    create_opencloud  1                                      opencloudeu/opencloud-rolling          "${EFSS_PLATFORM_1_VERSION}"
     create_nextcloud  1      "michiel"       "dejong"        pondersource/nextcloud                 "${EFSS_PLATFORM_2_VERSION}"
     
     # Create Reva containers with disabled app configs
