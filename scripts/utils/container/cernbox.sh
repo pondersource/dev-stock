@@ -44,8 +44,9 @@ create_cernbox_nginx() {
         -e HOST="cernbox${number}" \
         -e REVAD="revacernbox${number}.docker" \
         -e CERNBOX="cernbox${number}.docker" \
-        "${image}:${tag}" \
-        || error_exit "Failed to start Nginx container for cernbox ${number}."
+        -e TLS_CRT="/tls/cernbox${number}.crt" \
+        -e TLS_KEY="/tls/cernbox${number}.key" \
+        "${image}:${tag}" || error_exit "Failed to start Nginx container for cernbox ${number}."
 }
 
 # -----------------------------------------------------------------------------------
