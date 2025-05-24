@@ -363,7 +363,7 @@ main() {
             DEFAULT \
             "${build_args}"
 
-        # Revad sciencemesh
+        # Revad ScienceMesh
         build_docker_image \
             revad.Dockerfile \
             pondersource/revad \
