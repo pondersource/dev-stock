@@ -116,9 +116,9 @@ main() {
     create_idp_keycloak         pondersource/keycloak       latest
     
     # Create EFSS containers
-    #           # id   # image              # tag
-    create_cernbox 1 pondersource/cernbox latest pondersource/revad-cernbox v1.28.0
-    create_cernbox 2 pondersource/cernbox latest pondersource/revad-cernbox v1.28.0
+    #               # id    # ui image              # ui tag        # reva image                    # reva tag
+    create_cernbox  1       pondersource/cernbox    latest          pondersource/revad-cernbox      v1.29.0
+    create_cernbox  2       pondersource/cernbox    latest          pondersource/revad-cernbox      v1.29.0
 
 if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
