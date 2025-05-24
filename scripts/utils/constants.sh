@@ -17,8 +17,9 @@ export MARIADB_ROOT_PASSWORD
 TEMP_DIR="${ENV_ROOT}/temp"
 TLS_CA_DIR="${ENV_ROOT}/docker/tls/certificate-authority"
 TLS_CERT_DIR="${ENV_ROOT}/docker/tls/certificates"
+DOCKER_CONFIGS_DIR="${ENV_ROOT}/docker/configs"
 DOCKER_SCRIPTS_DIR="${ENV_ROOT}/docker/scripts"
-export TEMP_DIR TLS_CA_DIR TLS_CERT_DIR DOCKER_SCRIPTS_DIR
+export TEMP_DIR TLS_CA_DIR TLS_CERT_DIR DOCKER_CONFIGS_DIR DOCKER_SCRIPTS_DIR
 
 # 3rd party containers
 CYPRESS_REPO=pondersource/cypress

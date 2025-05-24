@@ -11,5 +11,5 @@ EFSS_PLATFORM_VERSION=${1:-"v10.15.0"}
 docker pull mariadb:11.4.2
 
 # dev-stock images.
-docker pull "pondersource/owncloud:${EFSS_PLATFORM_VERSION}"
 docker pull pondersource/cypress:latest
+docker pull "pondersource/owncloud:${EFSS_PLATFORM_VERSION}"

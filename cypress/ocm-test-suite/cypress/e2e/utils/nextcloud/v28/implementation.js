@@ -35,28 +35,45 @@ export function loginCore({url, username, password}) {
 };
 
 /**
- * Ensures that a file with the specified name exists and is visible in the file list.
+ * Recursively look for a file-row, reloading the view between attempts.
  *
- * This function waits for the file element to appear in the DOM within the specified timeout and checks that it is visible.
- * If the file does not exist or is not visible within the timeout, the test will fail with an appropriate error message.
- *
- * @param {string} fileName - The name of the file to check.
- * @param {number} [timeout=10000] - Optional timeout in milliseconds for the check. Defaults to 10000ms.
+ * @param {string} name      The file name to locate.
+ * @param {number} timeout   Final visible-check timeout (ms). Default 20 000.
+ * @param {number} depth     Current recursion depth — do not set manually.
+ * @param {number} maxDepth  Maximum reload attempts. Default 3.
+ * @param {number} waitMs    Delay between attempts (ms). Default 500.
  *
  * @example
- * // Ensure that the file 'example.txt' exists and is visible
- * ensureFileExists('example.txt');
- *
- * @throws Will cause the test to fail if the file does not exist or is not visible within the timeout.
+ * ensureFileExists('report.pdf');                // default behaviour
+ * ensureFileExists('report.pdf', 30000, 0, 5);   // try 5 times, 30 s final wait
  */
-export function ensureFileExists(fileName, timeout = 10000) {
-  // Escape special characters in the file name to safely use it in a CSS selector
-  const escapedFileName = escapeCssSelector(fileName);
+export function ensureFileExists(
+  name,
+  timeout = 20000,
+  depth = 0,
+  maxDepth = 3,
+  waitMs = 500
+) {
+  cy.wait(waitMs);
 
-  // Wait for the file row to exist in the DOM and be visible
-  cy.get(`[data-cy-files-list-row-name="${escapedFileName}"]`, { timeout })
-    .should('exist')
-    .and('be.visible');
+  const escaped = escapeCssSelector(name);
+
+  return cy.get('body').then(($body) => {
+    if ($body.find(`[data-cy-files-list-row-name="${escaped}"]`).length) {
+      return cy
+        .get(`[data-cy-files-list-row-name="${escaped}"]`, { timeout })
+        .should('be.visible');
+    }
+    if (depth >= maxDepth) {
+      throw new Error(
+        `File "${name}" not found after ${maxDepth} reload attempts`
+      );
+    }
+
+    // Reload, and recurse
+    cy.reload(true);
+    return ensureFileExists(name, timeout, depth + 1, maxDepth, waitMs);
+  });
 }
 
 /**

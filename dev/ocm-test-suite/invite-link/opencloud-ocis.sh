@@ -119,7 +119,7 @@ main() {
 
     # Create EFSS containers
     create_opencloud  1         opencloudeu/opencloud-rolling           "${EFSS_PLATFORM_1_VERSION}"
-    create_ocis       1         owncloud/ocis                           "${EFSS_PLATFORM_1_VERSION}"
+    create_ocis       1         owncloud/ocis                           "${EFSS_PLATFORM_2_VERSION}"
 
     # Start Mesh Directory
     create_meshdir pondersource/ocmstub v1.0.0

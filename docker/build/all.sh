@@ -68,6 +68,8 @@ initialize_environment() {
     ENV_ROOT="$(pwd)"
     export ENV_ROOT="${ENV_ROOT}"
 
+    sudo rm -rf "${ENV_ROOT}/../cypress/ocm-test-suite/cypress/downloads"
+
     # Ensure required commands are available
     for cmd in docker; do
         if ! command_exists "${cmd}"; then
@@ -327,8 +329,74 @@ main() {
     # OCM Stub
     build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"             DEFAULT
 
-    # Revad
-    build_docker_image revad.Dockerfile             pondersource/revad              "latest"                    DEFAULT
+    # Reva Repo
+    REVA_REPO=https://github.com/cs3org/reva
+
+    # Reva Versions
+    # The first element in this array is considered the "latest".
+    reva_versions=("v1.29.0" "v1.28.0")
+
+    # Iterate over the array of versions
+    for i in "${!reva_versions[@]}"; do
+        version="${reva_versions[i]}"
+
+        tags="${version}"
+        # If this is the first element (index 0), also add the "latest" tag
+        [[ "$i" -eq 0 ]] && tags+=" latest"
+        
+        build_args="--build-arg REVA_REPO=${REVA_REPO}"
+        build_args="${build_args} --build-arg REVA_BRANCH=${version}"
+        
+        # Revad base
+        build_docker_image \
+            revad-base.Dockerfile \
+            pondersource/revad-base \
+            "${tags}" \
+            DEFAULT \
+            "${build_args}"
+
+        # Revad CERNBox
+        build_docker_image \
+            revad-cernbox.Dockerfile \
+            pondersource/revad-cernbox \
+            "${tags}" \
+            DEFAULT \
+            "${build_args}"
+
+        # Revad ScienceMesh
+        build_docker_image \
+            revad.Dockerfile \
+            pondersource/revad \
+            "${tags}" \
+            DEFAULT \
+            "${build_args}"
+    done
+
+    # CERNBox Web
+    build_docker_image cernbox.Dockerfile           pondersource/cernbox            "v1.0.0 latest"             DEFAULT
+
+    # Keycloak Versions
+    # The first element in this array is considered the "latest".
+    keycloak_versions=("26.2.4")
+
+    # Iterate over the array of versions
+    for i in "${!keycloak_versions[@]}"; do
+        version="${keycloak_versions[i]}"
+
+        tags="v${version}"
+        # If this is the first element (index 0), also add the "latest" tag
+        [[ "$i" -eq 0 ]] && tags+=" latest"
+        
+        build_args="--build-arg KEYCLOAK_TAG=${version}"
+        
+        # Revad base
+        build_docker_image \
+            keycloak.Dockerfile \
+            pondersource/keycloak \
+            "${tags}" \
+            DEFAULT \
+            "${build_args}"
+    done
 
     # Nextcloud Base
     build_docker_image nextcloud-base.Dockerfile    pondersource/nextcloud-base     "latest"                    DEFAULT

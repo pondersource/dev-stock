@@ -17,14 +17,50 @@ create_reva() {
     local tag="${4}"
     local disabled_configs="${5:-}"
 
-    run_quietly_if_ci echo "Creating Reva instance: ${platform} ${number}"
+    run_quietly_if_ci echo "Creating Reva ScienceMesh instance: ${platform} ${number}"
+
+    # Reva Versions
+    # The first element in this array is considered the "latest".
+    reva_versions=("v1.29.0" "v1.28.0")
+
+    # Always append version-based config files to DISABLED_CONFIGS
+    # Resolve the active version
+    local current_ver
+    if [[ "${tag}" == "latest" ]]; then
+        # first element is the latest
+        current_ver="${reva_versions[0]}"
+    else
+        current_ver="${tag}"
+    fi
+
+    # Build the list of version-specific .toml files to disable
+    local extra_disables=""
+    local ver_suffix
+    for ver in "${reva_versions[@]}"; do
+        # skip the active version
+        [[ "${ver}" == "${current_ver}" ]] && continue
+        # drop “.patch” from the major.minor.patch versions
+        ver_suffix="${ver%.*}"                                  
+        extra_disables+="sciencemesh-${ver_suffix}.toml "
+    done
+
+    # Merge caller-supplied and auto-generated lists, trimming dups
+    disabled_configs="$(
+        printf '%s\n' ${disabled_configs} ${extra_disables} \
+        | awk 'NF&&!seen[$0]++' \
+        | xargs echo
+    )"
+
+    echo "${disabled_configs}"
+
+    run_quietly_if_ci echo "Reva ScienceMesh active version is: ${current_ver}, all other version configs has been disabled"
 
     # Start Reva container
     run_docker_container --detach --network="${DOCKER_NETWORK}" \
         --name="reva${platform}${number}.docker" \
         -e HOST="reva${platform}${number}" \
         -e DISABLED_CONFIGS="${disabled_configs}" \
-        "${image}:${tag}" || error_exit "Failed to start Reva container for ${platform} ${number}."
+        "${image}:${tag}" || error_exit "Failed to start Reva ScienceMesh container for ${platform} ${number}."
 
     # Wait for Reva port to open (assuming Reva uses port 19000)
     wait_for_port "reva${platform}${number}.docker" 19000
@@ -35,7 +71,7 @@ delete_reva() {
     local number="${2}"
     local reva="reva${platform}${number}.docker"
 
-    run_quietly_if_ci echo "Deleting reva${platform} instance ${number} …"
+    run_quietly_if_ci echo "Deleting Reva ScienceMesh reva${platform} instance ${number} …"
 
     # Stop containers if they exist (ignore errors if already gone/stopped)
     run_quietly_if_ci docker stop "${reva}" || true
@@ -57,5 +93,5 @@ delete_reva() {
         run_quietly_if_ci docker volume rm -f ${volumes} || true
     fi
 
-    run_quietly_if_ci echo "reva${platform} instance ${number} removed."
+    run_quietly_if_ci echo "Reva ScienceMesh reva${platform} instance ${number} removed."
 }
