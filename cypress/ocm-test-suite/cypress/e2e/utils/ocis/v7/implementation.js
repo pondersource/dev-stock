@@ -1,8 +1,8 @@
 /**
- * Login to Nextcloud Core.
- * Logs into Nextcloud using provided credentials, ensuring the login page is visible before interacting with it.
+ * Login to oCIS Core.
+ * Logs into oCIS using provided credentials, ensuring the login page is visible before interacting with it.
  *
- * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} url - The URL of the oCIS instance.
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */
