@@ -33,7 +33,7 @@ export function openFilesApp() {
 
 export function openScienceMeshApp() {
   getApplicationSwitcher()
-  getApplication('ocm')
+  getApplication('sciencemesh-app')
 }
 
 export function createInviteToken() {
@@ -77,7 +77,7 @@ export function createLegacyInviteLink(domain, providerDomain) {
   )
 }
 
-export function acceptInviteLink(token) {
+export function acceptInviteLink(token, senderDomain) {
   openScienceMeshApp()
 
   // Log the token for debugging
@@ -95,12 +95,11 @@ export function acceptInviteLink(token) {
 
   getScienceMeshAcceptInvitePart('label', 'institution').within(() => {
     cy.get('div[class="vs__actions"').should('be.visible').click()
-
-    cy.get('ul[role="listbox"]').find('li').first().should('be.visible').click()
+    cy.get('ul[role="listbox"]').find('li').contains(senderDomain).should('be.visible').click()
   })
 
   // Wait for button to be enabled after valid input
-  getScienceMeshAcceptInvitePart('span', 'accept')
+  getScienceMeshAcceptInvitePart('button', 'accept')
     .should('not.be.disabled')
     .click()
 }
@@ -244,7 +243,7 @@ export const getFederatedContactRow = (row) => cy.get('div[id="sciencemesh-conne
   .find('td')
 
 export const getApplication = (appName) => getApplicationMenu()
-  .find(`a[data-test-id="${CSS.escape(appName)}"]`)
+  .find(`a[href="/${appName}"]`)
   .should('be.visible')
   .click()
 
@@ -255,28 +254,30 @@ export const getApplicationSwitcher = () => getApplicationMenu()
 
 export const getApplicationMenu = () => cy.get('nav[id="applications-menu"]').should('be.visible')
 
-// possible partIds are:
-// - token
-// - institution
-// - accept
+const SCIENCEMESH_LABELS = {
+  token: 'Enter invite token',
+  institution: 'Select institution of inviter',
+  accept: ' Accept invitation '
+};
 
-export function getScienceMeshAcceptInvitePart(element, partId) {
-  const partIdList = new Map([
-    ['token', 'Enter invite token'],
-    ['institution', 'Select institution of inviter'],
-    ['accept', 'Accept invitation']
-  ]);
+/**
+ * Returns a Cypress chain pointing at the requested invitation-form part.
+ * @param {string} element  Selector passed to .find()
+ * @param {string} partId   'token' | 'institution' | 'accept'
+ */
+export const getScienceMeshAcceptInvitePart = (element, partId = 'token') => {
+  const label = SCIENCEMESH_LABELS[partId] ?? SCIENCEMESH_LABELS.token;
 
-  const partLabel = partIdList.get(partId) ?? partIdList.get('token');
-
-
-  return cy.get('div[id="sciencemesh-accept-invites"]')
+  // one base query
+  let chain = cy.get('#sciencemesh-accept-invites')
     .find(element)
-    .contains(partLabel)
-    .parent()
-    .scrollIntoView()
-    .should('be.visible')
-}
+    .contains(label);
+
+  // all but the “accept” button need the parent()
+  if (partId !== 'accept') chain = chain.parent();
+
+  return chain.scrollIntoView().should('be.visible');
+};
 
 // possible actionIds are:
 // - share

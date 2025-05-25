@@ -1,3 +1,5 @@
+import * as general from '../../general.js';
+
 import * as implementation from './implementation.js';
 
 export const platform = 'cernbox';
@@ -57,6 +59,7 @@ export function createInviteLink({
 
 export function acceptInviteLink({
   senderDomain,
+  senderPlatform,
   senderDisplayName,
   recipientUrl,
   recipientUsername,
@@ -66,6 +69,8 @@ export function acceptInviteLink({
   // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
+  const flag = general.revaBasedPlatforms.has(senderPlatform);
+
   // Step 2: Load the invite token from the saved file
   cy.readFile(inviteLinkFileName).then((token) => {
     // Verify token exists and is not empty
@@ -74,10 +79,16 @@ export function acceptInviteLink({
     cy.log('Read token from file:', token);
 
     // Step 3: Accept the invitation
-    implementation.acceptInviteLink(token);
+    implementation.acceptInviteLink(
+      token,
+      flag ? `reva${senderDomain}` : senderDomain,
+    );
 
     // Step 4: Verify the federated contact is established
-    implementation.verifyFederatedContact(senderDisplayName, senderDomain);
+    implementation.verifyFederatedContact(
+      senderDisplayName,
+      flag ? `reva${senderDomain}` : senderDomain,
+    );
   });
 
   // Wait for the operation to complete
