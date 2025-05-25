@@ -55,7 +55,7 @@ run_ci() {
         run_quietly_if_ci echo "Cleaning up test environment..."
 
         # Build argument list for the new clean.sh
-        local clean_args=("no" "cypress" "meshdir" "firefox" "vnc" "${EFSS_PLATFORM_1}")
+        local clean_args=("no" "cypress" "meshdir" "firefox" "vnc" "idp" "${EFSS_PLATFORM_1}")
         if [[ "${TEST_SCENARIO}" != "login" ]]; then
             clean_args+=("reva${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}" reva"${EFSS_PLATFORM_2}")
         fi
