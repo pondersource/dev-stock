@@ -64,6 +64,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between ow
   it('Accept invitation from ownCloud to oCIS', () => {
     recipientUtils.acceptInviteLink({
       senderDomain,
+      senderPlatform,
       senderDisplayName,
       recipientUrl,
       recipientUsername,

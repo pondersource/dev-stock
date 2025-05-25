@@ -65,6 +65,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
   it('Accept invitation from Nextcloud to oCIS', () => {
     recipientUtils.acceptInviteLink({
       senderDomain,
+      senderPlatform,
       senderDisplayName,
       recipientUrl,
       recipientUsername,
