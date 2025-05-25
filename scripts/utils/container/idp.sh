@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 # ------------------------------------------------------------------------------
-# Function: delete_idp_keycloak
+# Function: delete_idp
 # Purpose : Stop and remove singleton IdP container
 #
 # Example:
-#   delete_idp_keycloak
+#   delete_idp
 #
 # Notes:
 #   • Anonymous volumes are removed automatically with `docker rm -v`.
 #   • Named volumes are detected via `docker inspect` and removed explicitly.
 #   • Bind-mounts on the host are intentionally not touched.
 # ------------------------------------------------------------------------------
-delete_idp_keycloak() {
+delete_idp() {
     local idp="idp.docker"
 
     run_quietly_if_ci echo "Deleting IdP instance …"
