@@ -1,8 +1,8 @@
 /**
- * Login to Nextcloud Core.
- * Logs into Nextcloud using provided credentials, ensuring the login page is visible before interacting with it.
+ * Login to oCIS Core.
+ * Logs into oCIS using provided credentials, ensuring the login page is visible before interacting with it.
  *
- * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} url - The URL of the oCIS instance.
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */
@@ -71,7 +71,7 @@ export function createLegacyInviteLink(domain, providerDomain) {
   )
 }
 
-export function acceptInviteLink(token) {
+export function acceptInviteLink(token, senderDomain) {
   openScienceMeshApp()
 
   // Log the token for debugging
@@ -90,7 +90,7 @@ export function acceptInviteLink(token) {
   getScienceMeshAcceptInvitePart('label', 'institution').within(() => {
     cy.get('div[class="vs__actions"').should('be.visible').click()
 
-    cy.get('ul[role="listbox"]').find('li').first().should('be.visible').click()
+    cy.get('ul[role="listbox"]').find('li').contains(senderDomain).should('be.visible').click()
   })
 
   // Wait for button to be enabled after valid input
@@ -249,28 +249,30 @@ export const getApplicationSwitcher = () => getApplicationMenu()
 
 export const getApplicationMenu = () => cy.get('nav[id="applications-menu"]').should('be.visible')
 
-// possible partIds are:
-// - token
-// - institution
-// - accept
+const SCIENCEMESH_LABELS = {
+  token: 'Enter invite token',
+  institution: 'Select institution of inviter',
+  accept: 'Accept invitation'
+};
 
-export function getScienceMeshAcceptInvitePart(element, partId) {
-  const partIdList = new Map([
-    ['token', 'Enter invite token'],
-    ['institution', 'Select institution of inviter'],
-    ['accept', 'Accept invitation']
-  ]);
+/**
+ * Returns a Cypress chain pointing at the requested invitation-form part.
+ * @param {string} element  Selector passed to .find()
+ * @param {string} partId   'token' | 'institution' | 'accept'
+ */
+export const getScienceMeshAcceptInvitePart = (element, partId = 'token') => {
+  const label = SCIENCEMESH_LABELS[partId] ?? SCIENCEMESH_LABELS.token;
 
-  const partLabel = partIdList.get(partId) ?? partIdList.get('token');
-
-
-  return cy.get('div[id="sciencemesh-accept-invites"]')
+  // one base query
+  let chain = cy.get('#sciencemesh-accept-invites')
     .find(element)
-    .contains(partLabel)
-    .parent()
-    .scrollIntoView()
-    .should('be.visible')
-}
+    .contains(label);
+
+  // I've done this in a way to be in sync with CERNBox implementation
+  chain = chain.parent();
+
+  return chain.scrollIntoView().should('be.visible');
+};
 
 // possible actionIds are:
 // - share

@@ -75,9 +75,32 @@ run_quietly_if_ci docker push pondersource/cypress:latest
 run_quietly_if_ci docker push pondersource/revad:latest
 
 # OcmStub: push multiple versions of the OcmStub Docker image.
-ocmstub_versions=("latest" "v1.0.0")
-for version in "${ocmstub_versions[@]}"; do
+ocmstub_versions=("v1.0.0")
+for i in "${!ocmstub_versions[@]}"; do
+    version="${ocmstub_versions[i]}"
+
+    # If this is the first element (index 0), also push "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker push "pondersource/ocmstub:latest"
+    fi
+
     run_quietly_if_ci docker push "pondersource/ocmstub:${version}"
+done
+
+reva_versions=("v1.29.0" "v1.28.0")
+for i in "${!reva_versions[@]}"; do
+    version="${reva_versions[i]}"
+
+    # If this is the first element (index 0), also push "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker push "pondersource/revad-base:latest"
+        run_quietly_if_ci docker push "pondersource/revad-cernbox:latest"
+        run_quietly_if_ci docker push "pondersource/revad:latest"
+    fi
+
+    run_quietly_if_ci docker push "pondersource/revad-base:${version}"
+    run_quietly_if_ci docker push "pondersource/revad-cernbox:${version}"
+    run_quietly_if_ci docker push "pondersource/revad:${version}"
 done
 
 # Nextcloud: push multiple versions of the Nextcloud Docker image.

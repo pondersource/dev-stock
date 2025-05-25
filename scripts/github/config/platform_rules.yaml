@@ -1,5 +1,6 @@
 # List every platform only once
 platforms:
+  cernbox: [v1.29.0]
   nextcloud: [v27.1.11, v28.0.14, v29.0.16, v30.0.11, v31.0.5, v32.0.0]
   # ScienceMesh flavour
   nextcloud-sm: [v27.1.11-sm]
@@ -15,7 +16,7 @@ platforms:
 scenarios:
   login:
     # *: every platform + every version
-    include: [nextcloud, ocis, opencloud, owncloud, ocmstub, seafile]
+    include: [cernbox, nextcloud, ocis, opencloud, owncloud, ocmstub, seafile]
 
   share-link:
     include:
@@ -38,11 +39,13 @@ scenarios:
   # ScienceMesh and other kinds of invite link federations
   invite-link:
     include:
+      - sender: [cernbox]
+        receiver: [cernbox, nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [nextcloud-sm]
-        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
+        receiver: [cernbox, nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [ocis]
-        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
+        receiver: [cernbox, nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [opencloud]
-        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
+        receiver: [cernbox, nextcloud-sm, ocis, opencloud, owncloud-sm]
       - sender: [owncloud-sm]
-        receiver: [nextcloud-sm, ocis, opencloud, owncloud-sm]
+        receiver: [cernbox, nextcloud-sm, ocis, opencloud, owncloud-sm]

@@ -8,6 +8,8 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+import * as general from '../../general.js';
+
 import * as implementation from './implementation.js';
 
 export const platform = 'nextcloud';
@@ -83,7 +85,7 @@ export function acceptInviteLink({
   // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
-  const flag = (senderPlatform == 'nextcloud' || senderPlatform == 'owncloud');
+  const flag = general.revaBasedPlatforms.has(senderPlatform);
 
   // Step 1: Load the invite link from the saved file
   cy.readFile(inviteLinkFileName).then((inviteLink) => {

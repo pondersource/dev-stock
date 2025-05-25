@@ -4,9 +4,6 @@
 set -e
 
 # seafile version:
-#   - 8.0.8
-#   - 9.0.10
-#   - 10.0.1
 #   - 11.0.5
 EFSS_PLATFORM_VERSION=${1:-"v11.0.13"}
 
@@ -14,7 +11,6 @@ EFSS_PLATFORM_VERSION=${1:-"v11.0.13"}
 docker pull mariadb:11.4.2
 docker pull memcached:1.6.18
 docker pull "seafileltd/seafile-mc:${EFSS_PLATFORM_VERSION#v}"
-
 
 # dev-stock images.
 docker pull pondersource/cypress:latest

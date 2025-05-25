@@ -1,8 +1,8 @@
 /**
- * Login to Nextcloud Core.
- * Logs into Nextcloud using provided credentials, ensuring the login page is visible before interacting with it.
+ * Login to Opencloud Core.
+ * Logs into Opencloud using provided credentials, ensuring the login page is visible before interacting with it.
  *
- * @param {string} url - The URL of the Nextcloud instance.
+ * @param {string} url - The URL of the Opencloud instance.
  * @param {string} username - The username for login.
  * @param {string} password - The password for login.
  */

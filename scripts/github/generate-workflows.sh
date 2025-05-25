@@ -67,6 +67,7 @@ initialize_environment() {
 
 abbr_platform() {
   case "$1" in
+    cernbox)        printf "crnbx"  ;;
     nextcloud)      printf "nc"     ;;
     nextcloud-sm)   printf "nc-sm"  ;;
     owncloud)       printf "oc"     ;;

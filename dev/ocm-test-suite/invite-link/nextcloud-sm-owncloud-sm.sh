@@ -117,8 +117,8 @@ main() {
     
     # Create Reva containers with disabled app configs
     local disabled_configs="sciencemesh-apps-codimd.toml sciencemesh-apps-collabora.toml"
-    create_reva "nextcloud" 1       pondersource/revad      latest      "${disabled_configs}"
-    create_reva "owncloud"  1       pondersource/revad      latest      "${disabled_configs}"
+    create_reva "nextcloud" 1       pondersource/revad      v1.28.0      "${disabled_configs}"
+    create_reva "owncloud"  1       pondersource/revad      v1.28.0      "${disabled_configs}"
     
     # Configure ScienceMesh integration
     configure_sciencemesh "nextcloud" 1 "https://revanextcloud1.docker/" "shared-secret-1"  "https://meshdir.docker/meshdir" "invite-manager-endpoint"
