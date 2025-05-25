@@ -50,6 +50,9 @@ run_ci() {
         sed -i 's/.*videoCompression: false,.*/  videoCompression: true,/' "${cypress_config}"
     fi
 
+    DEVSTOCK_DEBUG=true
+    export DEVSTOCK_DEBUG=$DEVSTOCK_DEBUG
+
     # Skip cleanup when NO_CLEANING=true
     if [[ "${NO_CLEANING}" != "true" ]]; then
         run_quietly_if_ci echo "Cleaning up test environment..."
