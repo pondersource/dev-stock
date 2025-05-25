@@ -103,6 +103,19 @@ for i in "${!reva_versions[@]}"; do
     run_quietly_if_ci docker push "pondersource/revad:${version}"
 done
 
+keycloak_versions=("26.2.4")
+for i in "${!keycloak_versions[@]}"; do
+    version="${keycloak_versions[i]}"
+
+    # If this is the first element (index 0), also push "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker push "pondersource/keycloak:latest"
+    fi
+
+    run_quietly_if_ci docker push "pondersource/keycloak:${version}"
+done
+
+
 # Nextcloud: push multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker push pondersource/nextcloud-base:latest
 run_quietly_if_ci docker push pondersource/nextcloud-ci:latest
