@@ -103,6 +103,9 @@ for i in "${!reva_versions[@]}"; do
     run_quietly_if_ci docker push "pondersource/revad:${version}"
 done
 
+docker push pondersource/cernbox:latest
+docker push pondersource/cernbox:v1.0.0
+
 keycloak_versions=("26.2.4")
 for i in "${!keycloak_versions[@]}"; do
     version="${keycloak_versions[i]}"
