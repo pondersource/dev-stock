@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
 # -----------------------------------------------------------------------------------
-# Script to Test CERNBox to CERNBox OCM invite-link flow tests.
+# Script to Test CERNBox to Opencloud OCM invite link flow tests.
 # Author: Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
 # -----------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------
 # Description:
 #   This script automates the setup and testing of EFSS (Enterprise File Synchronization and Sharing) platforms
-#   such as CERNBox, using Cypress, and Docker containers.
+#   specifically CERNBox and Opencloud, using ScienceMesh integration and tools like Reva, Cypress, and Docker containers.
 #   It supports both development and CI environments, with optional browser support.
 # Usage:
-#   ./cernbox-cernbox.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
+#   ./cernbox-opencloud.sh [EFSS_PLATFORM_1_VERSION] [EFSS_PLATFORM_2_VERSION] [SCRIPT_MODE] [BROWSER_PLATFORM]
 # Arguments:
-#   EFSS_PLATFORM_1_VERSION : Version of the first EFSS platform (default: "v1.29.0").
-#   EFSS_PLATFORM_2_VERSION : Version of the second EFSS platform (default: "v1.29.0").
+#   EFSS_PLATFORM_1_VERSION : Version of CERNBox (default: "v1.29.0").
+#   EFSS_PLATFORM_2_VERSION : Version of Opencloud (default: "v2.3.0").
 #   SCRIPT_MODE             : Script mode (default: "dev"). Options: dev, ci.
 #   BROWSER_PLATFORM        : Browser platform (default: "electron"). Options: chrome, edge, firefox, electron.
 # Example:
-#   ./cernbox-cernbox.sh v1.29.0 v1.29.0 ci electron
+#   ./cernbox-opencloud.sh v1.29.0 v2.3.0 ci electron
 # -----------------------------------------------------------------------------------
 
 # Exit immediately if a command exits with a non-zero status,
@@ -31,7 +31,7 @@ set -euo pipefail
 
 # Default versions
 DEFAULT_EFSS_1_VERSION="v1.29.0"
-DEFAULT_EFSS_2_VERSION="v1.29.0"
+DEFAULT_EFSS_2_VERSION="v2.3.0"
 
 # -----------------------------------------------------------------------------------
 # Function: resolve_script_dir
@@ -111,19 +111,21 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
-    # Create IdP container
-    #                           # image                     # tag
-    create_idp_keycloak         pondersource/keycloak       latest
-    
-    # Create EFSS containers
-    #               # id    # ui image              # ui tag        # reva image                    # reva tag
-    create_cernbox  1       pondersource/cernbox    latest          pondersource/revad-cernbox      "${EFSS_PLATFORM_1_VERSION}"
-    create_cernbox  2       pondersource/cernbox    latest          pondersource/revad-cernbox      "${EFSS_PLATFORM_2_VERSION}"
+    # Configure OCM providers for Opencloud
+    prepare_opencloud_environment "cernbox1.docker,cernbox1.docker,dav/" "opencloud1.docker,opencloud1.docker,dav/"
 
-if [ "${SCRIPT_MODE}" = "dev" ]; then
+    # Create EFSS containers
+    #                 # id      # ui image                      # ui tag        # reva image                    # reva tag
+    create_cernbox    1         pondersource/cernbox            latest          pondersource/revad-cernbox      "${EFSS_PLATFORM_1_VERSION}"
+    create_opencloud  1         opencloudeu/opencloud-rolling                   "${EFSS_PLATFORM_2_VERSION}"
+    
+    # Start Mesh Directory
+    create_meshdir pondersource/ocmstub v1.0.0
+    
+    if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-            "https://cernbox1.docker (username: einstein, password: relativity)" \
-            "https://cernbox2.docker (username: marie, password: radioactivity)"
+          "https://cernbox1.docker (username: einstein, password: relativity)" \
+          "https://opencloud1.docker (username: alan, password: demo)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi
