@@ -8,9 +8,7 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
-import {
-  constructFederatedShareUrl,
-} from '../../general.js';
+import * as general from '../../general.js';
 
 import * as implementation from './implementation.js';
 
@@ -79,7 +77,7 @@ export function acceptInviteLink({
   // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
-  const flag = (senderPlatform == 'nextcloud' || senderPlatform == 'owncloud');
+  const flag = general.revaBasedPlatforms.has(senderPlatform);
 
   // Step 1: Load the invite link from the saved file
   cy.readFile(inviteLinkFileName).then((inviteLink) => {
@@ -233,7 +231,7 @@ export function acceptFederatedLinkShare({
     // Step 2: Read the share URL from file
     cy.readFile('share-link-url.txt').then((shareUrl) => {
       // Step 3: Construct the federated share URL
-      const federatedShareUrl = constructFederatedShareUrl({
+      const federatedShareUrl = general.constructFederatedShareUrl({
         shareUrl,
         senderUrl,
         recipientUrl,

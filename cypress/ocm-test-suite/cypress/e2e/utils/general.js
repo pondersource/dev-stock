@@ -5,6 +5,8 @@
  * @author Mohammad Mahdi Baghbani Pourvahid <mahdi@pondersource.com>
  */
 
+export const revaBasedPlatforms = new Set(['nextcloud', 'owncloud', 'cernbox']);
+
 /**
  * Escapes special characters in a string to be used in a CSS selector.
  * This is necessary because file names may contain characters that have special meanings in CSS selectors.
