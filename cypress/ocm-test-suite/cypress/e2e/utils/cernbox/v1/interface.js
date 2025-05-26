@@ -82,7 +82,7 @@ export function acceptInviteLink({
     // Step 3: Accept the invitation
     implementation.acceptInviteLink(
       token,
-      flag ? `reva${senderDomain}` : senderDomain,
+      flagReva ? `reva${senderDomain}` : senderDomain,
     );
 
     // Step 4: Verify the federated contact is established
