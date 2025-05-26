@@ -66,6 +66,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between CE
   it('Accept invitation from CERNBox to Opencloud', () => {
     recipientUtils.acceptInviteLink({
       senderDomain,
+      senderPlatform,
       senderUsername,
       senderDisplayName,
       recipientUrl,

@@ -60,6 +60,7 @@ export function createInviteLink({
 
 export function acceptInviteLink({
   senderDomain,
+  senderPlatform,
   senderUsername,
   senderDisplayName,
   recipientUrl,

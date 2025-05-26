@@ -65,6 +65,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
     recipientUtils.acceptInviteLink({
       senderDomain,
       senderPlatform,
+      senderUsername,
       senderDisplayName,
       recipientUrl,
       recipientUsername,
