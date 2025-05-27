@@ -13,17 +13,6 @@ const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
 
 // Optional debug list: overrides everything when non-empty
 const DEBUG_ONLY = [
-  "invite-link-crnbx-v1-crnbx-v1.yml",
-  "invite-link-crnbx-v1-nc-sm-v27.yml",
-  "invite-link-crnbx-v1-ocis-v5.yml",
-  "invite-link-crnbx-v1-ocis-v7.yml",
-  "invite-link-crnbx-v1-oc-sm-v10.yml",
-  "invite-link-crnbx-v1-opcl-v2.yml",
-  "invite-link-nc-sm-v27-crnbx-v1.yml",
-  "invite-link-ocis-v5-crnbx-v1.yml",
-  "invite-link-ocis-v7-crnbx-v1.yml",
-  "invite-link-oc-sm-v10-crnbx-v1.yml",
-  "invite-link-opcl-v2-crnbx-v1.yml",
   "login-crnbx-v1.yml",
 ];
 
@@ -360,7 +349,7 @@ module.exports = async function orchestrateTests(github, context, core) {
 
     // one collapsible section per test-type
     await core.summary.addRaw(
-      `<details>\n<summary><strong>${testType}</strong> - ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</summary>\n\n`
+      `<details open>\n<summary><strong>${testType}</strong> - ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</summary>\n\n`
     );
 
     // sort labels
