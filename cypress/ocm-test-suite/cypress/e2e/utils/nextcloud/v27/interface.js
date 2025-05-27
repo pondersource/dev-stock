@@ -131,7 +131,9 @@ export function shareViaInviteLink({
   // Step 4: Verify the file has been renamed
   implementation.ensureFileExists(sharedFileName);
 
-  if (recipientPlatform == 'nextcloud' || recipientPlatform == 'owncloud') {
+  const flagReva = general.revaBasedPlatforms.has(senderPlatform);
+
+  if (flagReva) {
     // Step 5: Create a federated share for the recipient via ScienceMesh
     // Note: The 'reva' prefix is added to the recipient domain as per application behavior
     implementation.createScienceMeshShare(
