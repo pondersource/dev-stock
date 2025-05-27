@@ -57,13 +57,27 @@ const PLATFORM_NAMES = {
   'sf': 'Seafile'
 };
 
-
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
 const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
 const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
+
+// Run metadata for the summary 
+const RUN_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+const COMMIT_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}`;
+const TIMESTAMP = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'short',
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+  timeZoneName: 'short'
+}).format(new Date());
 
 /**
  * Expand “crnbx v1” to “CERNBox v1”, “nc sm v27” to “Nextcloud ScienceMesh v27”.
@@ -318,6 +332,10 @@ module.exports = async function orchestrateTests(github, context, core) {
   await core.summary
     // Heading
     .addRaw('# OCM Compatibility Matrix 🔄\n\n')
+    .addRaw(
+      `<p><strong>Run&nbsp;time:</strong> <a href="${RUN_URL}">${TIMESTAMP}</a><br>` +
+      `<strong>Commit:</strong> <a href="${COMMIT_URL}">${context.sha.slice(0, 7)}</a></p>\n\n`
+    )
 
     // Overview
     .addRaw('## Overview\n')
