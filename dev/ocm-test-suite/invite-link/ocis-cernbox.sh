@@ -116,7 +116,7 @@ main() {
     create_idp_keycloak         pondersource/keycloak       latest
 
     # Configure OCM providers for oCIS
-    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revacernbox1.docker,cernbox1.docker,remote.php/webdav/"
+    prepare_ocis_environment "ocis1.docker,ocis1.docker,dav/" "revacernbox1.docker,cernbox1.docker,dav/"
     
     # Create EFSS containers
     create_ocis     1       owncloud/ocis          "${EFSS_PLATFORM_1_VERSION}"

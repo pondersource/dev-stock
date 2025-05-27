@@ -154,9 +154,9 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://cernbox1.docker/remote.php/dav/"
+          "path": "https://revacernbox1/dav/"
         },
-        "host": "cernbox1.docker"
+        "host": "revacernbox1"
       }
     ]
   },
@@ -177,9 +177,9 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://cernbox2.docker/remote.php/dav/"
+          "path": "https://revacernbox2.docker/dav/"
         },
-        "host": "cernbox2.docker"
+        "host": "revacernbox2.docker"
       }
     ]
   },
@@ -193,7 +193,7 @@
           },
           "path": "https://ocis1.docker/ocm/"
         },
-        "host": "http://ocis1.docker"
+        "host": "ocis1.docker"
       },
       {
         "endpoint": {
@@ -202,7 +202,7 @@
           },
           "path": "https://ocis1.docker/dav/"
         },
-        "host": "https://ocis1.docker/"
+        "host": "ocis1.docker"
       }
     ]
   },
@@ -216,7 +216,7 @@
           },
           "path": "https://ocis2.docker/ocm/"
         },
-        "host": "http://ocis2.docker"
+        "host": "ocis2.docker"
       },
       {
         "endpoint": {
@@ -225,7 +225,7 @@
           },
           "path": "https://ocis2.docker/dav/"
         },
-        "host": "https://ocis2.docker/"
+        "host": "ocis2.docker"
       }
     ]
   },
@@ -239,7 +239,7 @@
           },
           "path": "https://opencloud1.docker/ocm/"
         },
-        "host": "http://opencloud1.docker"
+        "host": "opencloud1.docker"
       },
       {
         "endpoint": {
@@ -248,7 +248,7 @@
           },
           "path": "https://opencloud1.docker/dav/"
         },
-        "host": "https://opencloud1.docker/"
+        "host": "opencloud1.docker"
       }
     ]
   },
@@ -262,7 +262,7 @@
           },
           "path": "https://opencloud2.docker/ocm/"
         },
-        "host": "http://opencloud2.docker"
+        "host": "opencloud1.docker"
       },
       {
         "endpoint": {
@@ -271,7 +271,7 @@
           },
           "path": "https://opencloud2.docker/dav/"
         },
-        "host": "https://opencloud2.docker/"
+        "host": "opencloud2.docker"
       }
     ]
   }

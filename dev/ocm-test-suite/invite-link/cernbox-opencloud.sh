@@ -116,7 +116,7 @@ main() {
     create_idp_keycloak         pondersource/keycloak       latest
 
     # Configure OCM providers for Opencloud
-    prepare_opencloud_environment "revacernbox1.docker,revacernbox1.docker,remote.php/webdav/" "opencloud1.docker,opencloud1.docker,dav/"
+    prepare_opencloud_environment "revacernbox1.docker,revacernbox1.docker,dav/" "opencloud1.docker,opencloud1.docker,dav/"
 
     # Create EFSS containers
     #                 # id      # ui image                      # ui tag        # reva image                    # reva tag

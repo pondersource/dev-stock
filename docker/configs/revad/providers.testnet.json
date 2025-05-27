@@ -154,9 +154,9 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://cernbox1.docker/remote.php/dav/"
+          "path": "https://revacernbox1/dav/"
         },
-        "host": "cernbox1.docker"
+        "host": "revacernbox1"
       }
     ]
   },
@@ -177,81 +177,101 @@
           "type": {
             "name": "Webdav"
           },
-          "path": "https://cernbox2.docker/remote.php/dav/"
+          "path": "https://revacernbox2.docker/dav/"
         },
-        "host": "cernbox2.docker"
+        "host": "revacernbox2.docker"
       }
     ]
   },
   {
-    "name": "oCIS 1",
-    "full_name": "oCIS 1 provider",
-    "organization": "oCIS 1",
     "domain": "ocis1.docker",
-    "homepage": "https://ocis1.docker",
-    "description": "oCIS 1 cloud storage",
     "services": [
       {
         "endpoint": {
           "type": {
-            "name": "OCM",
-            "description": "ocis1.docker Open Cloud Mesh API"
+            "name": "OCM"
           },
-          "name": "ocis1.docker - OCM API",
-          "path": "https://ocis1.docker/ocm/",
-          "is_monitored": true
+          "path": "https://ocis1.docker/ocm/"
         },
-        "api_version": "0.0.1",
-        "host": "http://ocis1.docker"
+        "host": "ocis1.docker"
       },
       {
         "endpoint": {
           "type": {
-            "name": "Webdav",
-            "description": "ocis1.docker Webdav API"
+            "name": "Webdav"
           },
-          "name": "ocis1.docker - Webdav API",
-          "path": "https://ocis1.docker/dav/",
-          "is_monitored": true
+          "path": "https://ocis1.docker/dav/"
         },
-        "api_version": "0.0.1",
-        "host": "https://ocis1.docker/"
+        "host": "ocis1.docker"
       }
     ]
   },
   {
-    "name": "oCIS 2",
-    "full_name": "oCIS 2 provider",
-    "organization": "oCIS 2",
     "domain": "ocis2.docker",
-    "homepage": "https://ocis2.docker",
-    "description": "oCIS 2 cloud storage",
     "services": [
       {
         "endpoint": {
           "type": {
-            "name": "OCM",
-            "description": "ocis2.docker Open Cloud Mesh API"
+            "name": "OCM"
           },
-          "name": "ocis2.docker - OCM API",
-          "path": "https://ocis2.docker/ocm/",
-          "is_monitored": true
+          "path": "https://ocis2.docker/ocm/"
         },
-        "api_version": "0.0.1",
-        "host": "http://ocis2.docker"
+        "host": "ocis2.docker"
       },
       {
         "endpoint": {
           "type": {
-            "name": "Webdav",
-            "description": "ocis2.docker Webdav API"
+            "name": "Webdav"
           },
-          "name": "ocis2.docker - Webdav API",
-          "path": "https://ocis2.docker/dav/",
-          "is_monitored": true
+          "path": "https://ocis2.docker/dav/"
         },
-        "api_version": "0.0.1",
-        "host": "https://ocis2.docker/"
+        "host": "ocis2.docker"
+      }
+    ]
+  },
+  {
+    "domain": "opencloud1.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://opencloud1.docker/ocm/"
+        },
+        "host": "opencloud1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://opencloud1.docker/dav/"
+        },
+        "host": "opencloud1.docker"
+      }
+    ]
+  },
+  {
+    "domain": "opencloud2.docker",
+    "services": [
+      {
+        "endpoint": {
+          "type": {
+            "name": "OCM"
+          },
+          "path": "https://opencloud2.docker/ocm/"
+        },
+        "host": "opencloud1.docker"
+      },
+      {
+        "endpoint": {
+          "type": {
+            "name": "Webdav"
+          },
+          "path": "https://opencloud2.docker/dav/"
+        },
+        "host": "opencloud2.docker"
       }
     ]
   }
