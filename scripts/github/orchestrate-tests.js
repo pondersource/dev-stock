@@ -341,9 +341,9 @@ module.exports = async function orchestrateTests(github, context, core) {
     const typeFail = entries.length - typePass;
     const typePct = Math.round((typePass / entries.length) * 100);
 
+    // one collapsible section per test-type
     await core.summary.addRaw(
-      `<p><strong>${testType}</strong><br>\
-    ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
+      `<details>\n<summary><strong>${testType}</strong> - ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</summary>\n\n`
     );
 
     // sort labels
@@ -357,10 +357,9 @@ module.exports = async function orchestrateTests(github, context, core) {
       const colStart = i + 1;
       const colEnd = i + chunk.length;
 
-      // caption
+      // caption (just the column range)
       await core.summary.addRaw(
-        `<h4>${testType}</h4>` +
-        `<p><em>Showing columns ${colStart}-${colEnd} of ${totalCols} receivers</em></p>`
+        `<p><em>Columns ${colStart}-${colEnd} of ${totalCols}</em></p>`
       );
 
       // table header
@@ -409,6 +408,9 @@ module.exports = async function orchestrateTests(github, context, core) {
       html += `  </tbody>\n</table>\n`;
       await core.summary.addRaw(html);
     }
+
+    // close the collapsible block
+    await core.summary.addRaw('\n</details>\n');
   }
 
   // final status
