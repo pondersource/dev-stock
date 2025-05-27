@@ -64,21 +64,6 @@ const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
 const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
 
-// Run metadata for the summary 
-const RUN_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-const COMMIT_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}`;
-const TIMESTAMP = new Intl.DateTimeFormat('en-GB', {
-  weekday: 'short',
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  hour12: false,
-  timeZoneName: 'short'
-}).format(new Date());
-
 /**
  * Expand “crnbx v1” to “CERNBox v1”, “nc sm v27” to “Nextcloud ScienceMesh v27”.
  * Works for every sender/receiver label produced by `parseWorkflowName`.
@@ -294,6 +279,20 @@ module.exports = async function orchestrateTests(github, context, core) {
   const results = [];
   let processed = 0;
   let allSucceeded = true;
+  // Run metadata for the summary 
+  const RUN_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+  const COMMIT_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}`;
+  const TIMESTAMP = new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short'
+  }).format(new Date());
 
   console.log(`Orchestrating ${total} workflows in batches of ${batchSize}, ${totalBatches} batches to go …`);
 
