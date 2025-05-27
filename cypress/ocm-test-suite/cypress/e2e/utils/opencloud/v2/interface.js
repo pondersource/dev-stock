@@ -1,7 +1,4 @@
-import {
-  isBase64,
-  encodeBase64,
-} from '../../general.js';
+import * as general from '../../general.js';
 
 import * as implementation from './implementation.js';
 
@@ -63,6 +60,8 @@ export function createInviteLink({
 
 export function acceptInviteLink({
   senderDomain,
+  senderPlatform,
+  senderUsername,
   senderDisplayName,
   recipientUrl,
   recipientUsername,
@@ -72,6 +71,9 @@ export function acceptInviteLink({
   // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
+  const flagReva = general.revaBasedPlatforms.has(senderPlatform);
+  const flagUsername = general.usernameContactPlatforms.has(senderPlatform);
+
   // Step 2: Load the invite token from the saved file
   cy.readFile(inviteLinkFileName).then((token) => {
     // Verify token exists and is not empty
@@ -80,9 +82,9 @@ export function acceptInviteLink({
     cy.log('Read token from file:', token);
 
     // we need a base 64 as input so we try to detect if its already base64 if not we create it.
-    if (!isBase64(token)) {
+    if (!general.isBase64(token)) {
       cy.log('Token is not base64:', token);
-      token = encodeBase64(`${token}@${senderDomain}`);
+      token = general.encodeBase64(`${token}@${senderDomain}`);
       cy.log('Converted token to base64:', token);
     }
 
@@ -90,7 +92,10 @@ export function acceptInviteLink({
     implementation.acceptInviteLink(token);
 
     // Step 4: Verify the federated contact is established
-    implementation.verifyFederatedContact(senderDisplayName, senderDomain);
+    implementation.verifyFederatedContact(
+      flagUsername ? senderUsername : senderDisplayName,
+      flagReva ? `reva${senderDomain}` : senderDomain,
+    );
   });
 
   // Wait for the operation to complete

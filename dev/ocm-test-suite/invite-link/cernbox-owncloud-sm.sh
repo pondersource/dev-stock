@@ -111,6 +111,10 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
+    # Create IdP container
+    #                           # image                     # tag
+    create_idp_keycloak         pondersource/keycloak       latest
+
     # Create EFSS containers
     #                # id    # ui image              # ui tag           # reva image                    # reva tag
     create_cernbox   1       pondersource/cernbox    latest             pondersource/revad-cernbox      "${EFSS_PLATFORM_1_VERSION}"

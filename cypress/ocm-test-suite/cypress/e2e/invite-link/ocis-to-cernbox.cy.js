@@ -67,6 +67,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
     recipientUtils.acceptInviteLink({
       senderDomain,
       senderPlatform,
+      senderUsername,
       senderDisplayName,
       recipientUrl,
       recipientUsername,

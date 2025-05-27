@@ -111,13 +111,17 @@ main() {
     initialize_environment "../../.."
     setup "$@"
 
+    # Create IdP container
+    #                           # image                     # tag
+    create_idp_keycloak         pondersource/keycloak       latest
+
     # Configure OCM providers for oCIS
-    prepare_ocis_environment "cernbox1.docker,cernbox1.docker,dav/" "ocis1.docker,ocis1.docker,dav/"
+    prepare_ocis_environment "revacernbox1.docker,revacernbox1.docker,remote.php/webdav/" "ocis1.docker,ocis1.docker,dav/"
 
     # Create EFSS containers
     #               # id    # ui image              # ui tag        # reva image                    # reva tag
     create_cernbox  1       pondersource/cernbox    latest          pondersource/revad-cernbox      "${EFSS_PLATFORM_1_VERSION}"
-    create_ocis     1       owncloud/ocis          "${EFSS_PLATFORM_1_VERSION}"
+    create_ocis     1       owncloud/ocis          "${EFSS_PLATFORM_2_VERSION}"
     
     # Start Mesh Directory
     create_meshdir pondersource/ocmstub v1.0.0

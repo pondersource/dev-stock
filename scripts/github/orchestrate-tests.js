@@ -32,12 +32,39 @@ const EXPECTED_FAILURES = new Set([
   'share-link-oc-v10-nc-v32.yml',
 ]);
 
+// full platform names for display
+const PLATFORM_NAMES = {
+  'crnbx': 'CERNBox',
+  'nc sm': 'Nextcloud ScienceMesh',
+  'nc': 'Nextcloud',
+  'oc sm': 'ownCloud ScienceMesh',
+  'oc': 'ownCloud',
+  'ocis': 'oCIS',
+  'opcl': 'OpenCloud',
+  'os': 'OCM Stub',
+  'sf': 'Seafile'
+};
+
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
 const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
 const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
+
+/**
+ * Expand “crnbx v1” to “CERNBox v1”, “nc sm v27” to “Nextcloud ScienceMesh v27”.
+ * Works for every sender/receiver label produced by `parseWorkflowName`.
+ */
+function prettyLabel(abbrev) {
+  const parts = abbrev.split(' ');
+  const plat = [];
+  // everything up to the first v-token is the platform key
+  while (parts.length && !/^v\d+/.test(parts[0])) plat.push(parts.shift());
+  const platformKey = plat.join(' ');
+  const platformFull = PLATFORM_NAMES[platformKey] || platformKey;
+  return parts.length ? `${platformFull} ${parts.join(' ')}` : platformFull;
+}
 
 /**
  * Pause execution for the given number of milliseconds.
@@ -240,6 +267,20 @@ module.exports = async function orchestrateTests(github, context, core) {
   const results = [];
   let processed = 0;
   let allSucceeded = true;
+  // Run metadata for the summary 
+  const RUN_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+  const COMMIT_URL = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${context.sha}`;
+  const TIMESTAMP = new Intl.DateTimeFormat('en-GB', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZoneName: 'short'
+  }).format(new Date());
 
   console.log(`Orchestrating ${total} workflows in batches of ${batchSize}, ${totalBatches} batches to go …`);
 
@@ -278,6 +319,10 @@ module.exports = async function orchestrateTests(github, context, core) {
   await core.summary
     // Heading
     .addRaw('# OCM Compatibility Matrix 🔄\n\n')
+    .addRaw(
+      `<p><strong>Run&nbsp;time:</strong> <a href="${RUN_URL}">${TIMESTAMP}</a><br>` +
+      `<strong>Commit:</strong> <a href="${COMMIT_URL}">${context.sha.slice(0, 7)}</a></p>\n\n`
+    )
 
     // Overview
     .addRaw('## Overview\n')
@@ -301,9 +346,9 @@ module.exports = async function orchestrateTests(github, context, core) {
     const typeFail = entries.length - typePass;
     const typePct = Math.round((typePass / entries.length) * 100);
 
+    // one collapsible section per test-type
     await core.summary.addRaw(
-      `<p><strong>${testType}</strong><br>\
-    ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</p>`
+      `<details open>\n<summary><strong>${testType}</strong> - ${typePass}/${entries.length} passed&nbsp;(${typePct}%)</summary>\n\n`
     );
 
     // sort labels
@@ -317,24 +362,23 @@ module.exports = async function orchestrateTests(github, context, core) {
       const colStart = i + 1;
       const colEnd = i + chunk.length;
 
-      // caption
+      // caption (just the column range)
       await core.summary.addRaw(
-        `<h4>${testType}</h4>` +
-        `<p><em>Showing columns ${colStart}-${colEnd} of ${totalCols} receivers</em></p>`
+        `<p><em>Columns ${colStart}-${colEnd} of ${totalCols}</em></p>`
       );
 
       // table header
       let html = `<table style="border-collapse: collapse; width: 100%;">\n  <thead>\n    <tr>` +
-        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Result' : 'Sender to Receiver'}</th>`;
+        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Platform' : 'Sender (Row) to Receiver (Column)'}</th>`;
       for (const rc of chunk) {
-        html += `<th style="border: 1px solid #ddd; padding: 4px;">${rc}</th>`;
+        html += `<th style="border: 1px solid #ddd; padding: 4px;">${prettyLabel(rc)}</th>`;
       }
       html += `</tr>\n  </thead>\n  <tbody>\n`;
 
       // rows
       const rows = testType === 'login' ? ['Result'] : senderList;
       for (const sd of rows) {
-        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${sd}</td>`;
+        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${prettyLabel(sd)}</td>`;
         for (const rc of chunk) {
           // find matching entry
           const cell = entries.find(e =>
@@ -369,14 +413,16 @@ module.exports = async function orchestrateTests(github, context, core) {
       html += `  </tbody>\n</table>\n`;
       await core.summary.addRaw(html);
     }
+
+    // close the collapsible block
+    await core.summary.addRaw('\n</details>\n');
   }
 
   // final status
   await core.summary
     .addRaw(allSucceeded
       ? '🎉 **All groups succeeded!**'
-      : '⚠️ **One or more failures detected.**')
-    .write();
+      : '⚠️ **One or more failures detected.**');
 
   const fs = require('fs');
   const path = require('path');

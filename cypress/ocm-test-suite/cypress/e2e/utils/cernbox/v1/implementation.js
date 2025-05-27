@@ -38,9 +38,8 @@ export function openScienceMeshApp() {
 
 export function createInviteToken() {
   cy.get('div[id="sciencemesh-invite"]')
-    .get('span')
+    .get('button')
     .contains('Generate invitation')
-    .parent()
     .scrollIntoView()
     .should('be.visible')
     .click()

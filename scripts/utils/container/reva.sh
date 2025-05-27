@@ -51,9 +51,8 @@ create_reva() {
         | xargs echo
     )"
 
-    echo "${disabled_configs}"
-
     run_quietly_if_ci echo "Reva ScienceMesh active version is: ${current_ver}, all other version configs has been disabled"
+    run_quietly_if_ci echo "disabled configs are: ${disabled_configs}"
 
     # Start Reva container
     run_docker_container --detach --network="${DOCKER_NETWORK}" \

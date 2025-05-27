@@ -60,6 +60,7 @@ export function createInviteLink({
 export function acceptInviteLink({
   senderDomain,
   senderPlatform,
+  senderUsername,
   senderDisplayName,
   recipientUrl,
   recipientUsername,
@@ -69,7 +70,8 @@ export function acceptInviteLink({
   // Step 1: Log in to the recipient's instance
   login({ url: recipientUrl, username: recipientUsername, password: recipientPassword });
 
-  const flag = general.revaBasedPlatforms.has(senderPlatform);
+  const flagReva = general.revaBasedPlatforms.has(senderPlatform);
+  const flagUsername = general.usernameContactPlatforms.has(senderPlatform);
 
   // Step 2: Load the invite token from the saved file
   cy.readFile(inviteLinkFileName).then((token) => {
@@ -81,13 +83,13 @@ export function acceptInviteLink({
     // Step 3: Accept the invitation
     implementation.acceptInviteLink(
       token,
-      flag ? `reva${senderDomain}` : senderDomain,
+      flagReva ? `reva${senderDomain}` : senderDomain,
     );
 
     // Step 4: Verify the federated contact is established
     implementation.verifyFederatedContact(
-      senderDisplayName,
-      flag ? `reva${senderDomain}` : senderDomain,
+      flagUsername ? senderUsername : senderDisplayName,
+      flagReva ? `reva${senderDomain}` : senderDomain,
     );
   });
 
