@@ -44,12 +44,40 @@ const EXPECTED_FAILURES = new Set([
   'share-link-oc-v10-nc-v32.yml',
 ]);
 
+// full platform names for display
+const PLATFORM_NAMES = {
+  'crnbx': 'CERNBox',
+  'nc sm': 'Nextcloud ScienceMesh',
+  'nc': 'Nextcloud',
+  'oc sm': 'ownCloud ScienceMesh',
+  'oc': 'ownCloud',
+  'ocis': 'oCIS',
+  'opcl': 'OpenCloud',
+  'os': 'OCM Stub',
+  'sf': 'Seafile'
+};
+
+
 // Constants controlling polling / batching behavior
 const POLL_INTERVAL_STATUS = 30000; // ms between each run status check
 const POLL_INTERVAL_RUN_ID = 5000;  // ms between each new run ID check
 const RUN_ID_TIMEOUT = 600000;       // ms to wait for a new run to appear
 const INITIAL_RUN_ID_DELAY = 5000;  // ms initial wait before checking for run ID
 const DEFAULT_BATCH_SIZE = 10;       // Workflows to run concurrently per batch
+
+/**
+ * Expand “crnbx v1” to “CERNBox v1”, “nc sm v27” to “Nextcloud ScienceMesh v27”.
+ * Works for every sender/receiver label produced by `parseWorkflowName`.
+ */
+function prettyLabel(abbrev) {
+  const parts = abbrev.split(' ');
+  const plat = [];
+  // everything up to the first v-token is the platform key
+  while (parts.length && !/^v\d+/.test(parts[0])) plat.push(parts.shift());
+  const platformKey = plat.join(' ');
+  const platformFull = PLATFORM_NAMES[platformKey] || platformKey;
+  return parts.length ? `${platformFull} ${parts.join(' ')}` : platformFull;
+}
 
 /**
  * Pause execution for the given number of milliseconds.
@@ -337,16 +365,16 @@ module.exports = async function orchestrateTests(github, context, core) {
 
       // table header
       let html = `<table style="border-collapse: collapse; width: 100%;">\n  <thead>\n    <tr>` +
-        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Result' : 'Sender to Receiver'}</th>`;
+        `<th style="border: 1px solid #ddd; padding: 4px;">${testType === 'login' ? 'Platform' : 'Sender (Row) to Receiver (Column)'}</th>`;
       for (const rc of chunk) {
-        html += `<th style="border: 1px solid #ddd; padding: 4px;">${rc}</th>`;
+        html += `<th style="border: 1px solid #ddd; padding: 4px;">${prettyLabel(rc)}</th>`;
       }
       html += `</tr>\n  </thead>\n  <tbody>\n`;
 
       // rows
       const rows = testType === 'login' ? ['Result'] : senderList;
       for (const sd of rows) {
-        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${sd}</td>`;
+        html += `    <tr><td style="border: 1px solid #ddd; padding: 4px;">${prettyLabel(sd)}</td>`;
         for (const rc of chunk) {
           // find matching entry
           const cell = entries.find(e =>
