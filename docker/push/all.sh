@@ -108,7 +108,7 @@ docker push pondersource/cernbox:v1.0.0
 
 keycloak_versions=("26.2.4")
 for i in "${!keycloak_versions[@]}"; do
-    version="${keycloak_versions[i]}"
+    version="v${keycloak_versions[i]}"
 
     # If this is the first element (index 0), also push "latest" tag
     if [[ "$i" -eq 0 ]]; then
