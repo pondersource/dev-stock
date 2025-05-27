@@ -300,7 +300,7 @@ export function verifyFederatedContact(domain, displayName, contactDomain) {
     .invoke('text') // Extract the username and domain text
     .then((usernameWithDomain) => {
       const extractedDomain = usernameWithDomain.split('@').pop(); // Extract domain after '@'
-      expect(extractedDomain).to.equal(contactDomain); // Assert the domain matches
+      expect(extractedDomain.replace(/^https?:\/\/|\/$/g, '')).to.equal(contactDomain); // Assert the domain matches
     });
 }
 
