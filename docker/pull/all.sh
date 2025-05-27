@@ -56,8 +56,6 @@ parse_arguments() {
 # -----------------------------------------------------------------------------------
 # Third-Party Docker Image Repositories and Tags
 # -----------------------------------------------------------------------------------
-CYPRESS_REPO="cypress/included"
-CYPRESS_TAG="13.13.1"
 FIREFOX_REPO="jlesage/firefox"
 FIREFOX_TAG="v24.11.1"
 MARIADB_REPO="mariadb"
@@ -75,9 +73,7 @@ COLLABORA_TAG="latest"
 WOPISERVER_REPO="cs3org/wopiserver"
 WOPISERVER_TAG="latest"
 SEAFILE_MC_REPO="seafileltd/seafile-mc"
-SEAFILE_MC_TAG="11.0.5"
-KEYCLOAK_REPO="quay.io/keycloak/keycloak"
-KEYCLOAK_TAG="latest"
+SEAFILE_MC_TAG="11.0.13"
 
 # -----------------------------------------------------------------------------------
 # Parse Command-Line Arguments
@@ -95,35 +91,106 @@ run_quietly_if_ci docker pull "${MEMCACHED_REPO}:${MEMCACHED_TAG}"
 run_quietly_if_ci docker pull "${RCLONE_REPO}:${RCLONE_TAG}"
 run_quietly_if_ci docker pull "${COLLABORA_REPO}:${COLLABORA_TAG}"
 run_quietly_if_ci docker pull "${VNC_REPO}:${VNC_TAG}"
-run_quietly_if_ci docker pull "${CYPRESS_REPO}:${CYPRESS_TAG}"
 run_quietly_if_ci docker pull "${MARIADB_REPO}:${MARIADB_TAG}"
 run_quietly_if_ci docker pull "${FIREFOX_REPO}:${FIREFOX_TAG}"
 run_quietly_if_ci docker pull "${WOPISERVER_REPO}:${WOPISERVER_TAG}"
 run_quietly_if_ci docker pull "${SEAFILE_MC_REPO}:${SEAFILE_MC_TAG}"
-run_quietly_if_ci docker pull "${KEYCLOAK_REPO}:${KEYCLOAK_TAG}"
 
 # -----------------------------------------------------------------------------------
 # Pull PonderSource-Specific Docker Images
 # -----------------------------------------------------------------------------------
 run_quietly_if_ci echo "Pulling PonderSource-specific Docker images..."
 
-run_quietly_if_ci docker pull pondersource/revad:latest
-run_quietly_if_ci docker pull pondersource/ocmstub:latest
-run_quietly_if_ci docker pull pondersource/ocmstub:v1.0.0
+# pull the core PonderSource images.
+run_quietly_if_ci docker pull pondersource/dev-stock:latest
+run_quietly_if_ci docker pull pondersource/cypress:latest
 
-# Nextcloud: Pull multiple versions of the Nextcloud Docker image.
+ocmstub_versions=("v1.0.0")
+for i in "${!ocmstub_versions[@]}"; do
+    version="${ocmstub_versions[i]}"
+
+    # If this is the first element (index 0), also pull "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker pull "pondersource/ocmstub:latest"
+    fi
+
+    run_quietly_if_ci docker pull "pondersource/ocmstub:${version}"
+done
+
+reva_versions=("v1.29.0" "v1.28.0")
+for i in "${!reva_versions[@]}"; do
+    version="${reva_versions[i]}"
+
+    # If this is the first element (index 0), also pull "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker pull "pondersource/revad-base:latest"
+        run_quietly_if_ci docker pull "pondersource/revad-cernbox:latest"
+        run_quietly_if_ci docker pull "pondersource/revad:latest"
+    fi
+
+    run_quietly_if_ci docker pull "pondersource/revad-base:${version}"
+    run_quietly_if_ci docker pull "pondersource/revad-cernbox:${version}"
+    run_quietly_if_ci docker pull "pondersource/revad:${version}"
+done
+
+docker pull pondersource/cernbox:latest
+docker pull pondersource/cernbox:v1.0.0
+
+keycloak_versions=("26.2.4")
+for i in "${!keycloak_versions[@]}"; do
+    version="v${keycloak_versions[i]}"
+
+    # If this is the first element (index 0), also pull "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker pull "pondersource/keycloak:latest"
+    fi
+
+    run_quietly_if_ci docker pull "pondersource/keycloak:${version}"
+done
+
+# Nextcloud: pull multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker pull pondersource/nextcloud-base:latest
-nextcloud_versions=("latest" "v30.0.11" "v29.0.16" "v28.0.14" "v27.1.11")
-for version in "${nextcloud_versions[@]}"; do
+run_quietly_if_ci docker pull pondersource/nextcloud-ci:latest
+
+nextcloud_versions=("v32.0.0" "v31.0.5" "v30.0.11" "v29.0.16" "v28.0.14" "v27.1.11")
+
+for i in "${!nextcloud_versions[@]}"; do
+    version="${nextcloud_versions[i]}"
+
+    # If this is the first element (index 0), also pull "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker pull "pondersource/nextcloud:latest"
+    fi
+
     run_quietly_if_ci docker pull "pondersource/nextcloud:${version}"
 done
 
-# ownCloud: Pull multiple versions of the ownCloud Docker image.
+# pull Nextcloud app variants
+# ScienceMesh variant
+run_quietly_if_ci docker pull pondersource/nextcloud:v27.1.11-sm
+
+# Contacts app variants for each Nextcloud version
+for version in "${nextcloud_versions[@]}"; do
+    run_quietly_if_ci docker pull "pondersource/nextcloud:${version}-contacts"
+done
+
+# ownCloud: pull multiple versions of the ownCloud Docker image.
 run_quietly_if_ci docker pull pondersource/owncloud-base:latest
-owncloud_versions=("latest" "v10.15.0")
-for version in "${owncloud_versions[@]}"; do
+owncloud_versions=("v10.15.0")
+
+for i in "${!owncloud_versions[@]}"; do
+    version="${owncloud_versions[i]}"
+
+    # If this is the first element (index 0), also pull "latest" tag
+    if [[ "$i" -eq 0 ]]; then
+        run_quietly_if_ci docker pull "pondersource/owncloud:latest"
+    fi
+
     run_quietly_if_ci docker pull "pondersource/owncloud:${version}"
 done
+
+# pull ownCloud app variants
+run_quietly_if_ci docker pull pondersource/owncloud:v10.15.0-sm
 
 # -----------------------------------------------------------------------------------
 # End of Docker Pulls

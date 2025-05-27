@@ -72,7 +72,6 @@ run_quietly_if_ci echo "Pushing PonderSource-specific Docker images..."
 # Push the core PonderSource images.
 run_quietly_if_ci docker push pondersource/dev-stock:latest
 run_quietly_if_ci docker push pondersource/cypress:latest
-run_quietly_if_ci docker push pondersource/revad:latest
 
 # OcmStub: push multiple versions of the OcmStub Docker image.
 ocmstub_versions=("v1.0.0")
@@ -108,7 +107,7 @@ docker push pondersource/cernbox:v1.0.0
 
 keycloak_versions=("26.2.4")
 for i in "${!keycloak_versions[@]}"; do
-    version="${keycloak_versions[i]}"
+    version="v${keycloak_versions[i]}"
 
     # If this is the first element (index 0), also push "latest" tag
     if [[ "$i" -eq 0 ]]; then
@@ -117,7 +116,6 @@ for i in "${!keycloak_versions[@]}"; do
 
     run_quietly_if_ci docker push "pondersource/keycloak:${version}"
 done
-
 
 # Nextcloud: push multiple versions of the Nextcloud Docker image.
 run_quietly_if_ci docker push pondersource/nextcloud-base:latest
