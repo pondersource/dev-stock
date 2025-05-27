@@ -13,7 +13,6 @@ const ALL_WORKFLOWS = (process.env.WORKFLOWS_CSV || '')
 
 // Optional debug list: overrides everything when non-empty
 const DEBUG_ONLY = [
-  "login-crnbx-v1.yml",
 ];
 
 // Final list to run
