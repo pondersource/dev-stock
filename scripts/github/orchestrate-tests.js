@@ -387,8 +387,7 @@ module.exports = async function orchestrateTests(github, context, core) {
   await core.summary
     .addRaw(allSucceeded
       ? '🎉 **All groups succeeded!**'
-      : '⚠️ **One or more failures detected.**')
-    .write();
+      : '⚠️ **One or more failures detected.**');
 
   const fs = require('fs');
   const path = require('path');
