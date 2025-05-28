@@ -32,7 +32,7 @@ RUN apt-get update && apt-get install --no-install-recommends --assume-yes \
 # ----------------------------------------------------------------------------
 # These allow customizing which repository and branch to clone at build time.
 # CACHEBUST is used to force rebuild steps when needed.
-ARG OCMSTUB_REPO=https://github.com/pondersource/ocm-stub
+ARG OCMSTUB_REPO=https://github.com/cs3org/OCM-stub
 ARG OCMSTUB_BRANCH=main
 ARG CACHEBUST="default"
 
