@@ -326,8 +326,13 @@ main() {
     # Cypress + OCM test suite files
     build_docker_image cypress.Dockerfile           pondersource/cypress            "v1.0.0 latest"             DEFAULT "" ".."
 
+    # OCM Stub Repo
+    OCMSTUB_REPO=https://github.com/cs3org/OCM-stub
+    OCMSTUB_BRANCH=main
+    build_args="--build-arg OCMSTUB_REPO=${OCMSTUB_REPO} --build-arg OCMSTUB_BRANCH=${OCMSTUB_BRANCH}"
+
     # OCM Stub
-    build_docker_image ocmstub.Dockerfile           pondersource/ocmstub            "v1.0.0 latest"             DEFAULT
+    build_docker_image ocmstub.Dockerfile   pondersource/ocmstub    "v1.0.0 latest" DEFAULT "${build_args}"
 
     # Reva Repo
     REVA_REPO=https://github.com/cs3org/reva
