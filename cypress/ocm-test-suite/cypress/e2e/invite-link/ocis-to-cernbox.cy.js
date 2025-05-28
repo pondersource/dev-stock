@@ -24,7 +24,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between oC
   const recipientUsername = Cypress.env('CERNBOX1_USERNAME') || 'marie';
   const recipientPassword = Cypress.env('CERNBOX1_PASSWORD') || 'radioactivity';
   const senderDisplayName = Cypress.env('OCIS1_DISPLAY_NAME') || 'Albert Einstein';
-  const recipientDisplayName = Cypress.env('CERNBOX1_DISPLAY_NAME') || 'Marie Cury';
+  const recipientDisplayName = Cypress.env('CERNBOX1_DISPLAY_NAME') || 'Marie Curie';
   const senderDomain = senderUrl.replace(/^https?:\/\/|\/$/g, '');
   const recipientDomain = recipientUrl.replace(/^https?:\/\/|\/$/g, '');
   const inviteLinkFileName = 'invite-link-ocis-cernbox.txt';
