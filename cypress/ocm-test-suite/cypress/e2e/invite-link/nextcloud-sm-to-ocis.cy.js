@@ -87,6 +87,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between Ne
     senderUtils.shareViaInviteLink({
       senderUrl,
       senderDomain,
+      senderPlatform,
       senderUsername,
       senderPassword,
       recipientPlatform,

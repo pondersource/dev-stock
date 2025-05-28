@@ -103,6 +103,7 @@ export function acceptInviteLink({
 export function shareViaInviteLink({
   senderUrl,
   senderDomain,
+  senderPlatform,
   senderUsername,
   senderPassword,
   recipientPlatform,

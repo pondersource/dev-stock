@@ -73,6 +73,7 @@ describe('Invite link federated sharing via ScienceMesh functionality for Nextcl
     senderUtils.shareViaInviteLink({
       senderUrl,
       senderDomain,
+      senderPlatform,
       senderUsername,
       senderPassword,
       recipientPlatform,

@@ -86,6 +86,7 @@ describe('Invite link federated sharing via ScienceMesh functionality between ow
   //   senderUtils.shareViaInviteLink({
   //     senderUrl,
   //     senderDomain,
+  //     senderPlatform,
   //     senderUsername,
   //     senderPassword,
   //     recipientPlatform,
