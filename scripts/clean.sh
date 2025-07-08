@@ -184,56 +184,9 @@ main() {
 
     local platforms=("$@")
 
-    # list of singleton tokens (no numeric suffix)
-    local -A SINGLETON=([cypress]=1 [meshdir]=1 [firefox]=1 [vnc]=1 [idp]=1)
-
-    # fine-grained cleanup
-    if [[ ${#platforms[@]} -gt 0 ]]; then
-        declare -A COUNTER=()                  # per-base-token index
-        for raw in "${platforms[@]}"; do
-            # 1. normalise token
-            # drop “-sm” plus trailing digits, e.g. owncloud-sm → owncloud
-            # revaowncloud-sm       → revaowncloud
-            local token="${raw%%-sm*}"
-
-            local idx="" cname=""
-
-            if [[ ${SINGLETON[$token]+yes} ]]; then
-                cname="${token}.docker"                # singleton
-            else
-                COUNTER["$token"]=$(( COUNTER["$token"] + 1 ))
-                idx="${COUNTER[$token]}"
-                cname="${token}${idx}.docker"          # numbered
-            fi
-
-            # 2. skip if container absent
-            if ! docker ps -a --format '{{.Names}}' | grep -qx "${cname}"; then
-                run_quietly_if_ci echo "Container ${cname} not found - cleaning skipped."
-                continue
-            fi
-
-            # 3. reva or plain delete
-            if [[ "${token}" =~ ^reva(.+)$ ]]; then
-                local inner_platform="${BASH_REMATCH[1]}"
-                if declare -f delete_reva >/dev/null; then
-                    delete_reva "${inner_platform}" "${idx:-1}"
-                else
-                    run_quietly_if_ci printf "Warning: delete_reva function not present - cleaning skipped.\n" >&2
-                fi
-            else
-                local fn="delete_${token}"
-                if declare -f "${fn}" >/dev/null; then
-                    [[ -n "${idx}" ]] && "${fn}" "${idx}" || "${fn}"
-                else
-                    run_quietly_if_ci printf "Warning: no %s function found - cleaning skipped.\n" "${fn}" >&2
-                fi
-            fi
-        done
-    else
         # Big Hammer for Nuking the system to the oblivion
         stop_and_remove_docker_containers
         docker_cleanup
-    fi
 
     # @MahdiBaghbani: Couldn't decide if this is necessary or not
     recreate_docker_network "testnet"
