@@ -138,8 +138,8 @@ main() {
 
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-            "https://ocmstub1.docker (just click 'Log in')" \
-            "https://ocmstub2.docker (just click 'Log in')"
+            "https://ocmstub1.docker/? (just click 'Log in')" \
+            "https://ocmstub2.docker/? (just click 'Log in')"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
     fi

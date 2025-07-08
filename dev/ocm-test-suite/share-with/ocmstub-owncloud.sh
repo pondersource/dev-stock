@@ -139,7 +139,7 @@ main() {
     create_owncloud 1      "einstein"    "relativity"     pondersource/owncloud  "${EFSS_PLATFORM_2_VERSION}"
     if [ "${SCRIPT_MODE}" = "dev" ]; then
         run_dev \
-            "https://ocmstub1.docker (just click 'Log in')" \
+            "https://ocmstub1.docker/? (just click 'Log in')" \
             "https://owncloud1.docker (username: einstein, password: relativity)"
     else
         run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
