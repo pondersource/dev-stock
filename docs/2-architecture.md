@@ -245,7 +245,7 @@ Tests can be executed in two modes:
 ```sh
 if [ "${SCRIPT_MODE}" = "dev" ]; then
     run_dev \
-        "https://ocmstub1.docker (just click 'Log in')" \
+        "https://ocmstub1.docker/? (just click 'Log in')" \
         "https://nextcloud1.docker (username: einstein, password: relativity)"
 else
     run_ci "${TEST_SCENARIO}" "${EFSS_PLATFORM_1}" "${EFSS_PLATFORM_2}"
