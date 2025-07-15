@@ -167,7 +167,7 @@ fetch_workflow_artifacts() {
     # Get the latest run for this workflow
     local runs_json
     debug "Fetching workflow runs for $workflow_name"
-    runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?per_page=20" \
+    runs_json=$(gh api "repos/cs3org/ocm-test-suite/actions/workflows/$workflow/runs?per_page=20" \
         --jq ".workflow_runs[] | select(.head_sha == \"${COMMIT_SHA}\" or .head_sha == \"${COMMIT_SHA:0:7}\")" | head -n 1) || {
         error "Failed to fetch runs for workflow $workflow"
         return 1
@@ -175,7 +175,7 @@ fetch_workflow_artifacts() {
 
     if [[ -z "$runs_json" ]]; then
         warn "No runs found for workflow $workflow with commit ${COMMIT_SHA}, trying latest run instead"
-        runs_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?per_page=1" \
+        runs_json=$(gh api "repos/cs3org/ocm-test-suite/actions/workflows/$workflow/runs?per_page=1" \
             --jq ".workflow_runs[0]") || {
             error "Failed to fetch latest run for workflow $workflow"
             return 1
@@ -192,7 +192,7 @@ fetch_workflow_artifacts() {
     # Get artifacts with count information
     local artifacts_json artifact_count
     debug "Fetching artifacts for run $run_id"
-    artifacts_json=$(gh api "repos/pondersource/dev-stock/actions/runs/$run_id/artifacts") || {
+    artifacts_json=$(gh api "repos/cs3org/ocm-test-suite/actions/runs/$run_id/artifacts") || {
         error "Failed to fetch artifacts for run $run_id"
         return 1
     }
@@ -220,7 +220,7 @@ fetch_workflow_artifacts() {
 
         # Download with progress indication and error checking
         debug "Downloading to temporary directory: $tmp_dir"
-        if ! gh api "repos/pondersource/dev-stock/actions/artifacts/$id/zip" \
+        if ! gh api "repos/cs3org/ocm-test-suite/actions/artifacts/$id/zip" \
             -H "Accept: application/vnd.github+json" >"$tmp_dir/artifact.zip"; then
             error "Failed to download artifact $id"
             rm -rf "$tmp_dir"
@@ -299,7 +299,7 @@ fetch_workflow_status() {
     local workflow="$1"
     local status_json
 
-    status_json=$(gh api "repos/pondersource/dev-stock/actions/workflows/$workflow/runs?branch=main&per_page=1" \
+    status_json=$(gh api "repos/cs3org/ocm-test-suite/actions/workflows/$workflow/runs?branch=main&per_page=1" \
         --jq '{
             name: .workflow_runs[0].name,
             status: .workflow_runs[0].status,
@@ -962,7 +962,7 @@ main() {
 
         if [[ -z "${COMMIT_SHA}" ]]; then
             info "Git rev-parse failed, trying GitHub API"
-            COMMIT_SHA=$(gh api repos/pondersource/dev-stock/commits/main --jq '.sha' 2>/dev/null || true)
+            COMMIT_SHA=$(gh api repos/cs3org/ocm-test-suite/commits/main --jq '.sha' 2>/dev/null || true)
 
             if [[ -z "${COMMIT_SHA}" ]]; then
                 error "Could not determine COMMIT_SHA. Please set it manually or ensure you're in a git repository."

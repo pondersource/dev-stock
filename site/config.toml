@@ -4,7 +4,7 @@ description = "Compatibility status of various file sharing and collaboration fe
 default_language = "en"
 
 # Theme settings
-theme = "devstockly"
+theme = "PonderMatrix"
 compile_sass = true
 
 # Markdown settings

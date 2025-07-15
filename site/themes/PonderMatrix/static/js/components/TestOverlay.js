@@ -116,7 +116,7 @@ export class TestOverlay {
         this.overlay.querySelector('.test-overlay__title').textContent = formattedTitle;
 
         this.overlay.querySelector('.test-overlay__ci-link').href =
-            `https://github.com/pondersource/dev-stock/actions/workflows/${workflowName}.yml`;
+            `https://github.com/cs3org/ocm-test-suite/actions/workflows/${workflowName}.yml`;
 
         // Set up video if available
         const video = this.overlay.querySelector('video');
