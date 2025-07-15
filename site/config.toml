@@ -1,4 +1,4 @@
-base_url = "https://pondersource.github.io/dev-stock"
+base_url = "https://cs3org.github.io/ocm-test-suite"
 title = "OCM Test Suite"
 description = "Compatibility status of various file sharing and collaboration features across different platforms"
 default_language = "en"
