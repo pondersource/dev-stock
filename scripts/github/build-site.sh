@@ -15,7 +15,7 @@ fi
 # Verify required directories exist
 required_dirs=(
     "site/templates"
-    "site/themes/devstockly/templates"
+    "site/themes/PonderMatrix/templates"
     "site/content"
     "site/static"
     "site/static/artifacts"
@@ -29,8 +29,8 @@ for dir in "${required_dirs[@]}"; do
 done
 
 # Verify required theme files exist
-if [ ! -f "site/themes/devstockly/theme.toml" ]; then
-    echo "Error: Theme configuration file not found at site/themes/devstockly/theme.toml"
+if [ ! -f "site/themes/PonderMatrix/theme.toml" ]; then
+    echo "Error: Theme configuration file not found at site/themes/PonderMatrix/theme.toml"
     exit 1
 fi
 
