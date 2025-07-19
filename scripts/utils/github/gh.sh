@@ -3,18 +3,54 @@
 
 set -euo pipefail
 
-# Return the JSON blob for the most relevant workflow run.
+# Select the single most relevant workflow‑run JSON blob.
+#
+# Cascade (stop on the first non‑empty match):
+#   1. Exact head_sha match (if <commit_sha> supplied, 7/40‑char prefix OK).
+#   2. Newest completed run on the current git branch.
+#   3. Newest completed run on main.
+#   4. Newest completed run overall (safety net).
+#
 # Usage: gh_get_run <repo> <workflow_file> [<commit_sha>]
-# If <commit_sha> is provided, tries to match first 7/40‑char prefix.
-# Falls back to the latest run when nothing matches.
 gh_get_run() {
     local _repo=$1 _workflow=$2 _sha=${3:-}
-    local _api="repos/${_repo}/actions/workflows/${_workflow}/runs?per_page=20"
-    local _filter='.workflow_runs[0]'
-    if [[ -n $_sha ]]; then
-        _filter=".workflow_runs[] | select(.head_sha|startswith(\"${_sha}\")) | ."
+    local _api_base="repos/${_repo}/actions/workflows/${_workflow}/runs"
+    local _per_page="per_page=50"
+    local _status="status=completed"
+
+    # 1. exact head_sha (prefix)
+    if [[ -n ${_sha} ]]; then
+        local _match
+        _match=$(gh api "${_api_base}?${_status}&${_per_page}" \
+                 --jq ".workflow_runs[] | select(.head_sha|startswith(\"${_sha}\"))" \
+                 | head -n1 || true)
+        [[ -n ${_match} ]] && { echo "${_match}"; return 0; }
     fi
-    gh api "${_api}" --jq "${_filter}"
+
+    # Detect current branch (empty if not in a git repo).
+    local _branch
+    _branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
+    # Helper: fetch newest run for a given branch slug.
+    _get_branch_run() {
+        local _b=$1
+        gh api "${_api_base}?branch=${_b}&${_status}&per_page=1" --jq '.workflow_runs[0]' 2>/dev/null || true
+    }
+
+    # 2. newest run on current branch
+    if [[ -n ${_branch} && ${_branch} != "HEAD" ]]; then
+        local _cur
+        _cur=$(_get_branch_run "${_branch}")
+        [[ -n ${_cur} && ${_cur} != "null" ]] && { echo "${_cur}"; return 0; }
+    fi
+
+    # 3. newest run on main
+    local _main
+    _main=$(_get_branch_run "main")
+    [[ -n ${_main} && ${_main} != "null" ]] && { echo "${_main}"; return 0; }
+
+    # 4. newest run overall (fallback)
+    gh api "${_api_base}?${_status}&per_page=1" --jq '.workflow_runs[0]'
 }
 
 # Echo run‑ID only (helper)
