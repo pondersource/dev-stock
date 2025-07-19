@@ -984,12 +984,12 @@ main() {
     fi
 
     if [[ -z ${WORKFLOWS_CSV:-} ]]; then
-        shopt -s nullglob extglob      # allow optional patterns
+        shopt -s nullglob
         WORKFLOW_LIST=(
-            .github/workflows/login-*.y?(a)ml
-            .github/workflows/share-link-*.y?(a)ml
-            .github/workflows/share-with-*.y?(a)ml
-            .github/workflows/invite-link-*.y?(a)ml
+            .github/workflows/login-*.yml
+            .github/workflows/share-link-*.yml
+            .github/workflows/share-with-*.yml
+            .github/workflows/invite-link-*.yml
         )
         shopt -u extglob
         # Basename‐only
