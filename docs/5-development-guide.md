@@ -163,6 +163,10 @@ Examples:
 
 # Run share-with test between Nextcloud v27.1.11 and ownCloud v10.12.1
 ./dev/ocm-test-suite.sh share-with nextcloud v27.1.11 dev chrome owncloud v10.12.1
+
+# Run share-with federated group sharing test with Nextcloud v31.0.0beta5-1278-g28adcc3d33a-vo-v0.5.0
+# Uses custom Nextcloud server build with vo_federation app
+./dev/ocm-test-suite.sh share-with nextcloud-vo v31.0.0beta5-1278-g28adcc3d33a-vo-v0.5.0 dev chrome nextcloud-vo v31.0.0beta5-1278-g28adcc3d33a-vo-v0.5.0
 ```
 
 ### Test Case Compatibility Matrix

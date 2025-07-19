@@ -192,9 +192,11 @@ main() {
         declare -A COUNTER=()                  # per-base-token index
         for raw in "${platforms[@]}"; do
             # 1. normalise token
-            # drop “-sm” plus trailing digits, e.g. owncloud-sm → owncloud
+            # drop “-sm” or “-vo” plus trailing digits, e.g. owncloud-sm → owncloud
             # revaowncloud-sm       → revaowncloud
+            # nextcloud-vo          → nextcloud
             local token="${raw%%-sm*}"
+            token="${token%%-vo*}"
 
             local idx="" cname=""
 
