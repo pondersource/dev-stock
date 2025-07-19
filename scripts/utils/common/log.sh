@@ -18,7 +18,8 @@ _log() {
     local _stamp
     _stamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-    local _clr_var="_CLR_${_level^^}"  # INFO _CLR_INFO
+    # example: INFO _CLR_INFO
+    local _clr_var="_CLR_${_level^^}"
     # shellcheck disable=SC2086
     printf "%s %b%-7s%b %s\n" "${_stamp}" "${!_clr_var}" "${_level}" "${_CLR_RESET}" "${_msg}"
 }

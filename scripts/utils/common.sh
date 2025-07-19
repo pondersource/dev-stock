@@ -76,36 +76,7 @@ require() {
     fi
 }
 
-# -----------------------------------------------------------------------------------
-# Function: main
-# Purpose: Main function to manage the flow of the script.
-# -----------------------------------------------------------------------------------
-main() {
-    initialize_environment "../.."
-    # Foundation
-    require "${ENV_ROOT}/scripts/utils" common.sh
+initialize_environment "../.."
 
-    # Domain logic
-    require "${ENV_ROOT}/scripts/utils" github.sh
-
-    parse_cli "$@"
-
-    info "Repository      : ${REPO}"
-    info "Commit SHA      : ${COMMIT_SHA}"
-    info "Output dir      : ${OUTDIR}"
-    info "Workflows (${#WORKFLOWS[@]}) : ${WORKFLOWS[*]}"
-
-    _timer_start
-    ensure_dir "${OUTDIR}"
-    WORKDIR=$(mk_tmp)
-    info "Temporary dir   : ${WORKDIR}"
-    _timer_end "Bootstrap"
-
-    for wf in "${WORKFLOWS[@]}"; do
-        process_workflow "${REPO}" "${wf}" "${COMMIT_SHA}" "${OUTDIR}"
-    done
-
-    success "All workflows processed. Artifacts at: ${OUTDIR}"
-}
-
-main "$@"
+require "${ENV_ROOT}/scripts/utils/common" fs.sh
+require "${ENV_ROOT}/scripts/utils/common" log.sh
