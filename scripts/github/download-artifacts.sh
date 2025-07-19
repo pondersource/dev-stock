@@ -984,14 +984,14 @@ main() {
     fi
 
     if [[ -z ${WORKFLOWS_CSV:-} ]]; then
-        shopt -s nullglob
+        shopt -s nullglob extglob      # allow optional patterns
         WORKFLOW_LIST=(
-            .github/workflows/login-*.[yY][aA]ml
-            .github/workflows/share-link-*.[yY][aA]ml
-            .github/workflows/share-with-*.[yY][aA]ml
-            .github/workflows/invite-link-*.[yY][aA]ml
+            .github/workflows/login-*.y?(a)ml
+            .github/workflows/share-link-*.y?(a)ml
+            .github/workflows/share-with-*.y?(a)ml
+            .github/workflows/invite-link-*.y?(a)ml
         )
-        shopt -u nullglob
+        shopt -u extglob
         # Basename‐only
         for i in "${!WORKFLOW_LIST[@]}"; do
             WORKFLOW_LIST[$i]=$(basename "${WORKFLOW_LIST[$i]}")
