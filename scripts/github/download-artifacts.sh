@@ -983,13 +983,21 @@ main() {
         exit 1
     fi
 
-    IFS=',' read -r -a WORKFLOW_LIST <<<"${WORKFLOWS_CSV:-}"
-
-    # If the caller didn’t set WORKFLOWS_CSV, fall back to scanning .github/workflows
-    if [[ ${#WORKFLOW_LIST[@]} -eq 0 ]]; then
-        while IFS='' read -r file; do WORKFLOW_LIST+=("$(basename "$file")"); done \
-            < <(find ".github/workflows" -maxdepth 1 -type f \
-                -regex '.*/\(login\|share-\(link\|with\)\|invite-link\).*\.ya\?ml')
+    if [[ -z ${WORKFLOWS_CSV:-} ]]; then
+        shopt -s nullglob
+        WORKFLOW_LIST=(
+            .github/workflows/login-*.[yY][aA]ml
+            .github/workflows/share-link-*.[yY][aA]ml
+            .github/workflows/share-with-*.[yY][aA]ml
+            .github/workflows/invite-link-*.[yY][aA]ml
+        )
+        shopt -u nullglob
+        # Basename‐only
+        for i in "${!WORKFLOW_LIST[@]}"; do
+            WORKFLOW_LIST[$i]=$(basename "${WORKFLOW_LIST[$i]}")
+        done
+    else
+        IFS=',' read -r -a WORKFLOW_LIST <<<"${WORKFLOWS_CSV}"
     fi
 
     declare -a workflow_files=("${WORKFLOW_LIST[@]}")
