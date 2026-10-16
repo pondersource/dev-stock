@@ -1,12 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import {
-  isLauncherForm, nextReplayHop, readCernboxLaunchPayload, readLauncherPage, verifyLaunchForm, verifyLauncherForm,
+  nextReplayHop, readLauncherPage, verifyLauncherForm, type LaunchPayload,
 } from "./cernbox-launch-replay";
 
 const secret = "SYNTHETIC-LAUNCH-SECRET";
-const payload = readCernboxLaunchPayload({
-  app_url: "https://jupyterhub1.docker/services/ocm/open", access_token: secret,
-});
+const payload: LaunchPayload = {
+  appUrl: "https://jupyterhub1.docker/services/ocm/open", accessToken: secret, hubOrigin: "https://jupyterhub1.docker",
+};
 const post = { url: payload.appUrl, method: "POST" as const, body: { access_token: secret } };
 function form(attributes: Record<string, string>, fields: Array<Record<string, any>>) {
   return {
@@ -19,54 +19,6 @@ function documentWith(forms: HTMLFormElement[]) {
 }
 const noForms = () => documentWith([]);
 
-describe("launch payload", () => {
-  test("object and JSON preserve the token only in the payload", () => {
-    expect(readCernboxLaunchPayload(JSON.stringify({ app_url: payload.appUrl, access_token: secret }))).toEqual(payload);
-  });
-  test("rejects every malformed shape, URL scheme, credentials and token query", () => {
-    for (const value of [
-      undefined, null, [], {}, "not JSON",
-      { app_url: payload.appUrl, access_token: "" },
-      { app_url: payload.appUrl, access_token: " " },
-      { app_url: payload.appUrl, access_token: 4 },
-      { app_url: "javascript:alert(1)", access_token: secret },
-      { app_url: "http://jupyterhub1.docker/services/ocm/open", access_token: secret },
-      { app_url: "https://user:pass@jupyterhub1.docker/services/ocm/open", access_token: secret },
-      { app_url: payload.appUrl + "?access_token=" + secret, access_token: secret },
-      { app_url: payload.appUrl + "/share-id", access_token: secret },
-    ]) {
-      try { readCernboxLaunchPayload(value); throw new Error("accepted"); }
-      catch (error) {
-        expect((error as Error).message).toBe("Invalid CERNBox webapp launch handoff");
-        expect((error as Error).message).not.toContain(secret);
-      }
-    }
-  });
-});
-describe("native form is verified before being stubbed", () => {
-  const input = { name: "access_token", type: "hidden", value: secret };
-  function submitted(overrides: any = {}) {
-    return {
-      method: "post", action: payload.appUrl, target: "ocm-remote-123",
-      querySelectorAll: () => [input], ...overrides,
-    } as unknown as HTMLFormElement;
-  }
-  test("exact method, URL, named window and hidden body pass", () => {
-    expect(() => verifyLaunchForm(submitted(), payload, "ocm-remote-123")).not.toThrow();
-  });
-  test("wrong target, action, method or token fails without a secret echo", () => {
-    for (const value of [
-      submitted({ target: "_self" }), submitted({ action: payload.appUrl + "/share-id" }),
-      submitted({ method: "get" }),
-      submitted({ querySelectorAll: () => [{ ...input, value: "wrong" }] }),
-      submitted({ querySelectorAll: () => [{ ...input, type: "text" }] }),
-      submitted({ querySelectorAll: () => [] }),
-      submitted({ querySelectorAll: () => [input, input] }),
-    ]) {
-      expect(() => verifyLaunchForm(value, payload, "ocm-remote-123")).toThrow("Invalid CERNBox webapp launch handoff");
-    }
-  });
-});
 describe("request replay handoff", () => {
   test("HTTP 200 auto-submit becomes a POST with every hidden field", () => {
     const html = '<form method="POST" action="/hub/ocm-login"></form>';
@@ -144,13 +96,6 @@ describe("served launcher form is verified before being stubbed", () => {
   }
   const withFields = (fields: any[]) => submitted({ querySelectorAll: () => fields });
 
-  test("only the same-origin launcher path selects the launcher shape", () => {
-    expect(isLauncherForm(submitted(), receiver)).toBe(true);
-    for (const action of [payload.appUrl, "https://other.docker/sciencemesh/webapp-launch",
-      receiver + "/sciencemesh/open-in-app", ""]) {
-      expect(isLauncherForm(submitted({ action }), receiver)).toBe(false);
-    }
-  });
   test("exact form passes and keeps every field for the launcher POST", () => {
     expect(verifyLauncherForm(submitted(), receiver, "ocm-remote-123")).toEqual({
       url: launcherAction,
@@ -166,6 +111,9 @@ describe("served launcher form is verified before being stubbed", () => {
   test("wrong origin, path, method, target or fields fail without a secret echo", () => {
     const [file, redirect, dashed, underscored] = spaFields;
     for (const [form, windowName] of [
+      [submitted({ action: payload.appUrl }), "ocm-remote-123"],
+      [submitted({ action: receiver + "/sciencemesh/open-in-app" }), "ocm-remote-123"],
+      [submitted({ action: "" }), "ocm-remote-123"],
       [submitted({ action: "https://other.docker/sciencemesh/webapp-launch" }), "ocm-remote-123"],
       [submitted({ action: launcherAction + "?file=1" }), "ocm-remote-123"],
       [submitted({ action: "http://cernbox1.docker/sciencemesh/webapp-launch" }), "ocm-remote-123"],

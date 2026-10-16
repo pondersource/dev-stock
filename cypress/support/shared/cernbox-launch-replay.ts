@@ -29,27 +29,6 @@ function checkedUrl(raw: string, base?: string): URL {
   } catch { return reject(); }
 }
 
-export function readCernboxLaunchPayload(body: unknown): LaunchPayload {
-  let value: any;
-  try { value = typeof body === "string" ? JSON.parse(body) : body; } catch { return reject(); }
-  if (!value || typeof value !== "object" || Array.isArray(value) ||
-      typeof value.app_url !== "string" || typeof value.access_token !== "string" ||
-      value.access_token.trim() === "") reject();
-  const url = checkedUrl(value.app_url);
-  if (url.pathname !== "/services/ocm/open" || url.hash) reject();
-  return { appUrl: url.href, accessToken: value.access_token, hubOrigin: url.origin };
-}
-
-export function verifyLaunchForm(form: HTMLFormElement, payload: LaunchPayload, windowName: string): void {
-  const inputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="access_token"]'));
-  if (form.method.toUpperCase() !== "POST" ||
-      form.action !== payload.appUrl ||
-      !/^ocm-remote-\d+$/.test(form.target) || form.target !== windowName ||
-      inputs.length !== 1 || inputs[0].type !== "hidden" ||
-      inputs[0].value !== payload.accessToken ||
-      form.querySelectorAll("input").length !== 1) reject();
-}
-
 function hiddenFields(inputs: HTMLInputElement[], allowed: ReadonlySet<string>): Record<string, string> {
   const fields: Record<string, string> = {};
   for (const input of inputs) {
@@ -59,15 +38,8 @@ function hiddenFields(inputs: HTMLInputElement[], allowed: ReadonlySet<string>):
   return fields;
 }
 
-// The served launcher shape: the SPA posts its own token to Reva on the same
-// origin, and Reva answers with a page that posts the exchanged token onward.
-export function isLauncherForm(form: HTMLFormElement, receiverOrigin: string): boolean {
-  try {
-    const url = new URL(form.action);
-    return url.origin === receiverOrigin && url.pathname === launcherPath;
-  } catch { return false; }
-}
-
+// The SPA posts its own token to Reva's same-origin launcher, and Reva answers
+// with a page that posts the exchanged token onward.
 export function verifyLauncherForm(form: HTMLFormElement, receiverOrigin: string, windowName: string): LauncherRequest {
   const url = checkedUrl(form.action);
   if (form.method.toUpperCase() !== "POST" || url.origin !== receiverOrigin ||
