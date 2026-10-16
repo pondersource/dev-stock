@@ -4,14 +4,14 @@ import type { WebappShareFlowReceiverAdapter } from "../../../contracts/webapp-s
 import type { CernboxWebappShareLaunchArtifact } from "../../../shared/webapp-share-launch-artifact";
 import {
   assertHubLaunchOrigin,
-  extractHubLaunchOriginFromOpenInApp,
+  extractHubLaunchOriginFromRedirectHtml,
 } from "../../../shared/webapp-share-launch-artifact";
 import { cssEscapeAttributeValue } from "../../../shared/selectors";
 import {
-  readCernboxLaunchPayload,
   replayCernboxLaunch,
-  verifyLaunchForm,
-  type LaunchPayload,
+  requestCernboxLauncher,
+  verifyLauncherForm,
+  type LauncherRequest,
 } from "../../../shared/cernbox-launch-replay";
 import { makeCernboxFilesHelpers } from "../shared/files";
 import { makeCernboxSharingHelpers } from "../shared/sharing";
@@ -37,8 +37,8 @@ export const cernboxV11WebappShareFlowReceiverAdapter: WebappShareFlowReceiverAd
   {
     key: "cernbox/v11",
     // Browser launch and request replay bypass the server-to-server OCM MITM.
-    // The real open-in-app response, verified form and cookie-authenticated Lab
-    // are gated separately from the terminal UI proof.
+    // The served launcher page, the verified form and the cookie-authenticated
+    // Lab are gated separately from the terminal UI proof.
     mitmLaunchExpectations: [],
 
     acceptIncomingWebappShare({ sharedFolderName }) {
@@ -53,9 +53,9 @@ export const cernboxV11WebappShareFlowReceiverAdapter: WebappShareFlowReceiverAd
         // window so the POST targets this tab.
         files.stubWindowOpenForInTabNavigation();
 
-        // Observe (do not modify) the open-in-app response; the app_url in its
-        // JSON body is the cross-origin remote hub the browser then POSTs into.
-        cy.intercept("POST", "**/sciencemesh/open-in-app").as("cernboxOpenInApp");
+        // Observe (do not modify) the served launcher page; its form action is
+        // the cross-origin remote hub the page then auto-submits into.
+        cy.intercept("POST", "**/sciencemesh/webapp-launch").as("cernboxWebappLaunch");
 
         openReceivedFolderMenu(sharedFolderName);
 
@@ -71,16 +71,14 @@ export const cernboxV11WebappShareFlowReceiverAdapter: WebappShareFlowReceiverAd
         const receiverOrigin = new URL(String(Cypress.config("baseUrl"))).origin;
 
         return cy
-          .wait("@cernboxOpenInApp", { timeout: launchTimeoutMs })
+          .wait("@cernboxWebappLaunch", { timeout: launchTimeoutMs })
           .then((interception) => {
             const statusCode = interception.response?.statusCode;
-            expect(statusCode, "CERNBox open-in-app status code").to.be.oneOf([
-              200, 201, 204,
-            ]);
+            expect(statusCode, "CERNBox webapp launch status code").to.equal(200);
 
-            const hubOrigin = extractHubLaunchOriginFromOpenInApp(
-              interception.response?.body,
-            );
+            const body = interception.response?.body;
+            const hubOrigin =
+              typeof body === "string" ? extractHubLaunchOriginFromRedirectHtml(body) : null;
             assertHubLaunchOrigin(hubOrigin, receiverOrigin);
 
             const artifact: CernboxWebappShareLaunchArtifact = {
@@ -93,22 +91,27 @@ export const cernboxV11WebappShareFlowReceiverAdapter: WebappShareFlowReceiverAd
       }
 
       // Preserve the named-window setup; the form submission itself is stubbed.
+      // The SPA form-POSTs to Reva's same-origin served launcher, which the
+      // replay then requests itself.
       files.stubWindowOpenForInTabNavigation();
-      let payload: LaunchPayload | null = null;
+      const receiverOrigin = new URL(String(Cypress.config("baseUrl"))).origin;
+      let launcher: LauncherRequest | null = null;
+      let handoffError: Error | null = null;
       let submitted = 0;
       let parseHtml: (html: string) => Document;
-      cy.intercept("POST", "**/sciencemesh/open-in-app", (request) => {
-        request.continue((response) => {
-          payload = readCernboxLaunchPayload(response.body);
-        });
-      }).as("cernboxOpenInApp");
       openReceivedFolderMenu(sharedFolderName);
       cy.window({ log: false }).then((win) => {
         parseHtml = (html) => new win.DOMParser().parseFromString(html, "text/html");
         // Stub, never observe/pass through: no top-level form navigation occurs.
         cy.stub(win.HTMLFormElement.prototype, "submit").callsFake(function(this: HTMLFormElement) {
-          if (!payload) throw new Error("Missing CERNBox launch payload");
-          verifyLaunchForm(this, payload, win.name);
+          // The SPA catches submit errors to show a toast, so keep the
+          // rejection and fail the step with it instead of timing out.
+          try {
+            launcher = verifyLauncherForm(this, receiverOrigin, win.name);
+          } catch (error) {
+            handoffError = error as Error;
+            throw error;
+          }
           submitted += 1;
         }).log(false);
       });
@@ -118,20 +121,21 @@ export const cernboxV11WebappShareFlowReceiverAdapter: WebappShareFlowReceiverAd
         })
         .should("be.visible")
         .click({ force: true });
-      const receiverOrigin = new URL(String(Cypress.config("baseUrl"))).origin;
-      return cy.wait("@cernboxOpenInApp", { timeout: launchTimeoutMs, log: false })
-        .then((interception) => {
-          expect(interception.response?.statusCode, "CERNBox open-in-app status code").to.equal(200);
-          return cy.wrap(null, { log: false }).should(() => {
-            expect(payload !== null, "validated launch payload exists").to.equal(true);
-            expect(submitted, "native launch POST was stubbed exactly once").to.equal(1);
+      return cy.wrap(null, { log: false, timeout: launchTimeoutMs })
+        .should(() => {
+          expect(submitted + (handoffError ? 1 : 0), "native launch POST was stubbed exactly once").to.equal(1);
+        })
+        .then(() => {
+          if (handoffError) throw handoffError;
+        })
+        .then(() => cy.window({ log: false }))
+        .then((win) => {
+          expect(win.location.origin, "receiver did not navigate on form submission").to.equal(receiverOrigin);
+          return requestCernboxLauncher(launcher!, parseHtml).then((launch) => {
+            assertHubLaunchOrigin(launch.hubOrigin, receiverOrigin);
+            return replayCernboxLaunch(launch, parseHtml);
           });
         })
-        .then(() => cy.window({ log: false }).then((win) => {
-          expect(win.location.origin, "receiver did not navigate on form submission").to.equal(receiverOrigin);
-          assertHubLaunchOrigin(payload!.hubOrigin, receiverOrigin);
-          return replayCernboxLaunch(payload!, parseHtml);
-        }))
         .then((result) => {
           const artifact: CernboxWebappShareLaunchArtifact = {
             receiverKind: "cernbox",

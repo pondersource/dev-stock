@@ -1,8 +1,20 @@
 /// <reference types="cypress" />
 
-export type LaunchPayload = { appUrl: string; accessToken: string; hubOrigin: string };
+export type LaunchPayload = {
+  appUrl: string; accessToken: string; hubOrigin: string; expiredSessionRedirectUri?: string;
+};
+export type LauncherRequest = { url: string; fields: Record<string, string> };
 export type ReplayHop = { url: string; method: "GET" | "POST"; body?: Record<string, string> };
 export type ReplayResponse = { status: number; headers: Record<string, unknown>; body: unknown };
+
+// The first hop blocks while the sender hub starts the named server, for up to
+// JUPYTERHUB_SLOW_SPAWN_TIMEOUT_SEC in config/compose/cookbooks/nextcloud.webapp-hub.yml.
+export const REPLAY_REQUEST_TIMEOUT_MS = 40000;
+const REPLAY_DEADLINE_MS = 90000;
+
+const launcherPath = "/sciencemesh/webapp-launch";
+const launcherFormFields = new Set(["file", "expired_session_redirect_uri", "access-token", "access_token"]);
+const launcherPageFields = new Set(["access_token", "expired_session_redirect_uri"]);
 
 function reject(): never {
   throw new Error("Invalid CERNBox webapp launch handoff");
@@ -17,25 +29,79 @@ function checkedUrl(raw: string, base?: string): URL {
   } catch { return reject(); }
 }
 
-export function readCernboxLaunchPayload(body: unknown): LaunchPayload {
-  let value: any;
-  try { value = typeof body === "string" ? JSON.parse(body) : body; } catch { return reject(); }
-  if (!value || typeof value !== "object" || Array.isArray(value) ||
-      typeof value.app_url !== "string" || typeof value.access_token !== "string" ||
-      value.access_token.trim() === "") reject();
-  const url = checkedUrl(value.app_url);
-  if (url.pathname !== "/services/ocm/open" || url.hash) reject();
-  return { appUrl: url.href, accessToken: value.access_token, hubOrigin: url.origin };
+function hiddenFields(inputs: HTMLInputElement[], allowed: ReadonlySet<string>): Record<string, string> {
+  const fields: Record<string, string> = {};
+  for (const input of inputs) {
+    if (!allowed.has(input.name) || input.type !== "hidden" || input.disabled || input.name in fields) reject();
+    fields[input.name] = input.value;
+  }
+  return fields;
 }
 
-export function verifyLaunchForm(form: HTMLFormElement, payload: LaunchPayload, windowName: string): void {
-  const inputs = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="access_token"]'));
-  if (form.method.toUpperCase() !== "POST" ||
-      form.action !== payload.appUrl ||
-      !/^ocm-remote-\d+$/.test(form.target) || form.target !== windowName ||
-      inputs.length !== 1 || inputs[0].type !== "hidden" ||
-      inputs[0].value !== payload.accessToken ||
-      form.querySelectorAll("input").length !== 1) reject();
+// The SPA posts its own token to Reva's same-origin launcher, and Reva answers
+// with a page that posts the exchanged token onward.
+export function verifyLauncherForm(form: HTMLFormElement, receiverOrigin: string, windowName: string): LauncherRequest {
+  const url = checkedUrl(form.action);
+  if (form.method.toUpperCase() !== "POST" || url.origin !== receiverOrigin ||
+      url.pathname !== launcherPath || url.search || url.hash ||
+      !/^ocm-remote-\d+$/.test(form.target) || form.target !== windowName) reject();
+  const fields = hiddenFields(Array.from(form.querySelectorAll<HTMLInputElement>("input")), launcherFormFields);
+  const token = fields.access_token;
+  if (typeof token !== "string" || token.trim() === "" || fields["access-token"] !== token ||
+      typeof fields.file !== "string" || fields.file.trim() === "") reject();
+  const redirect = fields.expired_session_redirect_uri;
+  if (redirect !== undefined && checkedUrl(redirect).origin !== receiverOrigin) reject();
+  return { url: url.href, fields };
+}
+
+function headerValue(headers: Record<string, unknown>, name: string): string {
+  const entries = Object.entries(headers).filter(([key]) => key.toLowerCase() === name);
+  if (entries.length !== 1 || typeof entries[0][1] !== "string") reject();
+  return entries[0][1] as string;
+}
+
+// A comma would mean a second policy stacked on Reva's, which is exactly what
+// the launcher must not get from an edge proxy.
+function launcherPolicy(raw: string): { formAction: string; nonce: string } {
+  if (raw.includes(",")) reject();
+  const directives = new Map<string, string[]>();
+  for (const part of raw.split(";")) {
+    const [name, ...sources] = part.trim().split(/\s+/);
+    if (!name) continue;
+    if (directives.has(name.toLowerCase())) reject();
+    directives.set(name.toLowerCase(), sources);
+  }
+  const only = (name: string) => {
+    const sources = directives.get(name);
+    if (!sources || sources.length !== 1) reject();
+    return sources[0];
+  };
+  if (only("default-src") !== "'none'") reject();
+  const formAction = only("form-action");
+  if (!/^https:\/\/[^/\s'*]+$/.test(formAction)) reject();
+  const nonce = only("script-src").match(/^'nonce-([A-Za-z0-9_-]+)'$/)?.[1];
+  if (!nonce) reject();
+  return { formAction: checkedUrl(formAction).origin, nonce };
+}
+
+export function readLauncherPage(response: ReplayResponse, parseHtml: (html: string) => Document): LaunchPayload {
+  if (response.status !== 200 || typeof response.body !== "string") reject();
+  const policy = launcherPolicy(headerValue(response.headers, "content-security-policy"));
+  const document = parseHtml(response.body);
+  const forms = Array.from(document.querySelectorAll<HTMLFormElement>("form"));
+  const scripts = Array.from(document.querySelectorAll<HTMLScriptElement>("script"));
+  if (forms.length !== 1 || forms[0].getAttribute("id") !== "launch" ||
+      (forms[0].getAttribute("method") || "").toUpperCase() !== "POST" ||
+      scripts.length !== 1 || scripts[0].getAttribute("nonce") !== policy.nonce) reject();
+  const url = checkedUrl(forms[0].getAttribute("action") || "");
+  if (url.pathname !== "/services/ocm/open" || url.hash || url.origin !== policy.formAction) reject();
+  const fields = hiddenFields(Array.from(forms[0].querySelectorAll<HTMLInputElement>("input")), launcherPageFields);
+  if (typeof fields.access_token !== "string" || fields.access_token.trim() === "") reject();
+  return {
+    appUrl: url.href, accessToken: fields.access_token, hubOrigin: url.origin,
+    ...(fields.expired_session_redirect_uri !== undefined
+      ? { expiredSessionRedirectUri: fields.expired_session_redirect_uri } : {}),
+  };
 }
 
 export function nextReplayHop(
@@ -97,7 +163,7 @@ export function replayCernboxLaunch(
   payload: LaunchPayload,
   parseHtml: (html: string) => Document,
 ): Cypress.Chainable<{ hubOrigin: string; labUrl: string }> {
-  const deadline = Date.now() + 90000;
+  const deadline = Date.now() + REPLAY_DEADLINE_MS;
   const redactedFailure = () => { throw new Error("CERNBox webapp launch replay failed"); };
   Cypress.once("fail", redactedFailure);
 
@@ -110,7 +176,7 @@ export function replayCernboxLaunch(
       failOnStatusCode: false,
       retryOnNetworkFailure: false,
       log: false,
-      timeout: Math.max(1, Math.min(15000, deadline - Date.now())),
+      timeout: Math.max(1, Math.min(REPLAY_REQUEST_TIMEOUT_MS, deadline - Date.now())),
     }).then((response) => {
       const next = nextReplayHop(hop, response, payload.hubOrigin, parseHtml);
       if ("hop" in next) return request(next.hop, count + 1);
@@ -119,7 +185,7 @@ export function replayCernboxLaunch(
       return cy.request({
         method: "GET", url: contentsUrl, followRedirect: false,
         failOnStatusCode: false, retryOnNetworkFailure: false, log: false,
-        timeout: Math.max(1, Math.min(15000, deadline - Date.now())),
+        timeout: Math.max(1, Math.min(REPLAY_REQUEST_TIMEOUT_MS, deadline - Date.now())),
       }).then((contents) => {
         const value = contents.body as { content?: Array<{ name?: string }> };
         const notebookPresent = contents.status === 200 && Array.isArray(value?.content) &&
@@ -137,5 +203,30 @@ export function replayCernboxLaunch(
     });
   }
 
-  return request({ url: payload.appUrl, method: "POST", body: { access_token: payload.accessToken } }, 0);
+  const body: Record<string, string> = { access_token: payload.accessToken };
+  if (payload.expiredSessionRedirectUri !== undefined) {
+    body.expired_session_redirect_uri = payload.expiredSessionRedirectUri;
+  }
+  return request({ url: payload.appUrl, method: "POST", body }, 0);
+}
+
+export function requestCernboxLauncher(
+  launcher: LauncherRequest,
+  parseHtml: (html: string) => Document,
+): Cypress.Chainable<LaunchPayload> {
+  const redactedFailure = () => { throw new Error("CERNBox webapp launch replay failed"); };
+  Cypress.once("fail", redactedFailure);
+  return cy.request({
+    method: "POST", url: launcher.url, body: launcher.fields,
+    form: true,
+    followRedirect: false,
+    failOnStatusCode: false,
+    retryOnNetworkFailure: false,
+    log: false,
+    timeout: 15000,
+  }).then((response) => {
+    const payload = readLauncherPage(response, parseHtml);
+    Cypress.off("fail", redactedFailure);
+    return cy.wrap(payload, { log: false });
+  });
 }

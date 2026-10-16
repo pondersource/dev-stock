@@ -35,6 +35,11 @@ services:
       - JUPYTERHUB_OCM_API_KEY=${SENDER_HUB_OCM_API_KEY}
       - OCM_TRUSTED_BACK_CHANNEL_DOMAINS=${SENDER_PARTY_HOST}
       - OCM_TRUSTED_ISSUER_DOMAINS=${SENDER_PARTY_HOST}
+      # Wait out cold spawns instead of answering 202 with the spawn-pending
+      # page, which the CERNBox launch replay cannot follow. Must stay below the
+      # hub OCM service's 30 s hub API timeout, and the replay's per-request
+      # timeout in cypress/support/shared/cernbox-launch-replay.ts must outlast it.
+      - JUPYTERHUB_SLOW_SPAWN_TIMEOUT_SEC=25
       # OAuth client id/secret are provisioned by the sender NC post-install hook
       # and handed off via this shared file.
       - NEXTCLOUD_OAUTH_ENV_FILE=/oauth-handoff/oauth.env

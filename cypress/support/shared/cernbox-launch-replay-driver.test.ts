@@ -1,5 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
-import { replayCernboxLaunch } from "./cernbox-launch-replay";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { REPLAY_REQUEST_TIMEOUT_MS, replayCernboxLaunch, requestCernboxLauncher } from "./cernbox-launch-replay";
 const globals = globalThis as any;
 const priorCy = globals.cy;
 const priorCypress = globals.Cypress;
@@ -55,6 +57,75 @@ test("missing cookie or unauthorized contents cannot become success", async () =
     expect(() => state.listeners.get("fail")({ message: payload.accessToken }))
       .toThrow("CERNBox webapp launch replay failed");
   }
+});
+test("requests outlast the sender hub spawn wait", async () => {
+  const cookbook = readFileSync(
+    resolve(import.meta.dir, "../../../config/compose/cookbooks/nextcloud.webapp-hub.yml"), "utf8");
+  const declared = cookbook.match(/JUPYTERHUB_SLOW_SPAWN_TIMEOUT_SEC=(\d+)/);
+  expect(declared).not.toBeNull();
+  const hubWaitMs = Number(declared![1]) * 1000;
+  expect(REPLAY_REQUEST_TIMEOUT_MS).toBeGreaterThan(hubWaitMs);
+  const state = driver([
+    { status: 303, headers: { location: "/user/demo/share-1/lab" }, body: "" },
+    { status: 200, headers: {}, body: "jupyterlab" },
+    { status: 200, headers: {}, body: { content: [{ name: "notebook.ipynb" }] } },
+  ]);
+  await (replayCernboxLaunch(payload, emptyDocument) as any);
+  expect(state.requests[0].timeout).toBeGreaterThan(hubWaitMs);
+});
+const launcher = {
+  url: "https://cernbox.test/sciencemesh/webapp-launch",
+  fields: {
+    file: "storage$space!share-1", expired_session_redirect_uri: "https://cernbox.test",
+    "access-token": "SYNTHETIC-RECEIVER-TOKEN", access_token: "SYNTHETIC-RECEIVER-TOKEN",
+  },
+};
+const launcherPolicy = "default-src 'none'; base-uri 'none'; frame-ancestors 'none'; " +
+  "form-action https://hub.test; script-src 'nonce-c3ludGhldGlj'";
+function launcherDocument(html: string) {
+  if (html !== "<launcher>") return emptyDocument();
+  const attributes: Record<string, string> = { id: "launch", method: "post", action: payload.appUrl };
+  const inputs = [
+    { name: "access_token", type: "hidden", value: payload.accessToken, disabled: false },
+    { name: "expired_session_redirect_uri", type: "hidden", value: "https://cernbox.test", disabled: false },
+  ];
+  const form = { getAttribute: (name: string) => attributes[name] ?? null, querySelectorAll: () => inputs };
+  const script = { getAttribute: (name: string) => name === "nonce" ? "c3ludGhldGlj" : null };
+  return {
+    querySelectorAll: (selector: string) => selector === "form" ? [form] : selector === "script" ? [script] : [],
+  } as unknown as Document;
+}
+test("served launcher POST hands the page token and redirect to the hub replay", async () => {
+  const state = driver([
+    { status: 200, headers: { "content-security-policy": launcherPolicy }, body: "<launcher>" },
+    { status: 303, headers: { location: "/user/demo/share-1/lab" }, body: "" },
+    { status: 200, headers: {}, body: "jupyterlab" },
+    { status: 200, headers: {}, body: { content: [{ name: "notebook.ipynb" }] } },
+  ]);
+  const launch = await (requestCernboxLauncher(launcher, launcherDocument) as any);
+  expect(state.listeners.size).toBe(0);
+  const result = await (replayCernboxLaunch(launch, launcherDocument) as any);
+  expect(result).toEqual({ hubOrigin: payload.hubOrigin, labUrl: "https://hub.test/user/demo/share-1/lab" });
+  expect(JSON.stringify(result)).not.toContain(payload.accessToken);
+  expect(state.requests[0]).toMatchObject({
+    method: "POST", url: launcher.url, body: launcher.fields, form: true, followRedirect: false,
+  });
+  expect(state.requests[1]).toMatchObject({
+    method: "POST", url: payload.appUrl, form: true,
+    body: { access_token: payload.accessToken, expired_session_redirect_uri: "https://cernbox.test" },
+  });
+  expect(state.requests.every((request) => request.log === false)).toBe(true);
+  expect(state.listeners.size).toBe(0);
+});
+test("launcher error page cannot reach the hub and fails redacted", async () => {
+  const state = driver([
+    { status: 400, headers: { "content-security-policy": launcherPolicy }, body: "<p>missing file</p>" },
+  ]);
+  await expect(requestCernboxLauncher(launcher, launcherDocument) as any)
+    .rejects.toThrow("Invalid CERNBox webapp launch handoff");
+  expect(state.requests).toHaveLength(1);
+  expect(() => state.listeners.get("fail")({ message: launcher.fields.access_token }))
+    .toThrow("CERNBox webapp launch replay failed");
 });
 test("redirect cycle stops at 12 requests", async () => {
   const state = driver(Array.from({ length: 12 }, () => ({
