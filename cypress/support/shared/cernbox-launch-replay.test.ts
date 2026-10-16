@@ -1,5 +1,7 @@
 import { describe, expect, test } from "bun:test";
-import { readCernboxLaunchPayload, verifyLaunchForm, nextReplayHop } from "./cernbox-launch-replay";
+import {
+  isLauncherForm, nextReplayHop, readCernboxLaunchPayload, readLauncherPage, verifyLaunchForm, verifyLauncherForm,
+} from "./cernbox-launch-replay";
 
 const secret = "SYNTHETIC-LAUNCH-SECRET";
 const payload = readCernboxLaunchPayload({
@@ -115,5 +117,136 @@ describe("request replay handoff", () => {
     ])]);
     expect(() => nextReplayHop(post, { status: 200, headers: {}, body: "form" }, payload.hubOrigin, duplicate))
       .toThrow("Invalid CERNBox webapp launch handoff");
+  });
+});
+
+const receiver = "https://cernbox1.docker";
+const launcherAction = receiver + "/sciencemesh/webapp-launch";
+const hidden = (name: string, value: string) => ({ name, type: "hidden", value, disabled: false });
+function expectHandoffRejected(run: () => unknown) {
+  try { run(); throw new Error("accepted"); }
+  catch (error) {
+    expect((error as Error).message).toBe("Invalid CERNBox webapp launch handoff");
+    expect((error as Error).message).not.toContain(secret);
+  }
+}
+
+describe("served launcher form is verified before being stubbed", () => {
+  const spaFields = [
+    hidden("file", "storage$space!share-1"), hidden("expired_session_redirect_uri", receiver),
+    hidden("access-token", secret), hidden("access_token", secret),
+  ];
+  function submitted(overrides: any = {}) {
+    return {
+      method: "post", action: launcherAction, target: "ocm-remote-123",
+      querySelectorAll: () => spaFields, ...overrides,
+    } as unknown as HTMLFormElement;
+  }
+  const withFields = (fields: any[]) => submitted({ querySelectorAll: () => fields });
+
+  test("only the same-origin launcher path selects the launcher shape", () => {
+    expect(isLauncherForm(submitted(), receiver)).toBe(true);
+    for (const action of [payload.appUrl, "https://other.docker/sciencemesh/webapp-launch",
+      receiver + "/sciencemesh/open-in-app", ""]) {
+      expect(isLauncherForm(submitted({ action }), receiver)).toBe(false);
+    }
+  });
+  test("exact form passes and keeps every field for the launcher POST", () => {
+    expect(verifyLauncherForm(submitted(), receiver, "ocm-remote-123")).toEqual({
+      url: launcherAction,
+      fields: {
+        file: "storage$space!share-1", expired_session_redirect_uri: receiver,
+        "access-token": secret, access_token: secret,
+      },
+    });
+    expect(verifyLauncherForm(withFields(spaFields.filter((field) =>
+      field.name !== "expired_session_redirect_uri")), receiver, "ocm-remote-123").fields)
+      .not.toHaveProperty("expired_session_redirect_uri");
+  });
+  test("wrong origin, path, method, target or fields fail without a secret echo", () => {
+    const [file, redirect, dashed, underscored] = spaFields;
+    for (const [form, windowName] of [
+      [submitted({ action: "https://other.docker/sciencemesh/webapp-launch" }), "ocm-remote-123"],
+      [submitted({ action: launcherAction + "?file=1" }), "ocm-remote-123"],
+      [submitted({ action: "http://cernbox1.docker/sciencemesh/webapp-launch" }), "ocm-remote-123"],
+      [submitted({ method: "get" }), "ocm-remote-123"],
+      [submitted({ target: "_self" }), "_self"],
+      [submitted(), "ocm-remote-456"],
+      [withFields([redirect, dashed, underscored]), "ocm-remote-123"],
+      [withFields([hidden("file", " "), redirect, dashed, underscored]), "ocm-remote-123"],
+      [withFields([file, redirect, hidden("access-token", "other"), underscored]), "ocm-remote-123"],
+      [withFields([file, redirect, hidden("access-token", ""), hidden("access_token", "")]), "ocm-remote-123"],
+      [withFields([file, redirect, dashed, { ...underscored, type: "text" }]), "ocm-remote-123"],
+      [withFields([file, redirect, dashed, { ...underscored, disabled: true }]), "ocm-remote-123"],
+      [withFields([file, redirect, dashed, underscored, underscored]), "ocm-remote-123"],
+      [withFields([...spaFields, hidden("next", "/lab")]), "ocm-remote-123"],
+      [withFields([file, hidden("expired_session_redirect_uri", "https://other.docker"), dashed, underscored]),
+        "ocm-remote-123"],
+    ] as Array<[HTMLFormElement, string]>) {
+      expectHandoffRejected(() => verifyLauncherForm(form, receiver, windowName));
+    }
+  });
+});
+
+describe("served launcher page becomes the hub launch payload", () => {
+  const hub = "https://jupyterhub1.docker";
+  const nonce = "c3ludGhldGljLW5vbmNl";
+  const policy = `default-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action ${hub}; ` +
+    `script-src 'nonce-${nonce}'`;
+  const pageFields = [hidden("access_token", secret), hidden("expired_session_redirect_uri", receiver)];
+  type Page = { forms?: HTMLFormElement[]; scripts?: Array<Record<string, string>> };
+  const launchForm = (attributes: Record<string, string> = {}, fields: any[] = pageFields) =>
+    form({ id: "launch", method: "post", action: hub + "/services/ocm/open", ...attributes }, fields);
+  function page({ forms = [launchForm()], scripts = [{ nonce }] }: Page = {}) {
+    const elements = scripts.map((attributes) => ({ getAttribute: (name: string) => attributes[name] ?? null }));
+    return () => ({
+      querySelectorAll: (selector: string) => selector === "form" ? forms : selector === "script" ? elements : [],
+    } as unknown as Document);
+  }
+  const response = (headers: Record<string, unknown> = { "content-security-policy": policy }, extra: any = {}) =>
+    ({ status: 200, headers, body: "<launcher>", ...extra });
+
+  test("form action, exchanged token and redirect are taken from the page", () => {
+    expect(readLauncherPage(response(), page())).toEqual({
+      appUrl: hub + "/services/ocm/open", accessToken: secret, hubOrigin: hub, expiredSessionRedirectUri: receiver,
+    });
+    expect(readLauncherPage(response({ "Content-Security-Policy": policy }),
+      page({ forms: [launchForm({}, [pageFields[0]])] }))).toEqual({
+      appUrl: hub + "/services/ocm/open", accessToken: secret, hubOrigin: hub,
+    });
+  });
+  test("policy drift fails closed", () => {
+    for (const headers of [
+      {},
+      { "content-security-policy": [policy] },
+      { "content-security-policy": policy, "Content-Security-Policy": policy },
+      { "content-security-policy": policy + ", form-action 'self'" },
+      { "content-security-policy": policy.replace(hub, "https://other.docker") },
+      { "content-security-policy": policy.replace(hub, hub + " https://other.docker") },
+      { "content-security-policy": policy.replace(hub, "https://*.docker") },
+      { "content-security-policy": policy.replace(hub, "'self'") },
+      { "content-security-policy": policy.replace("default-src 'none'; ", "") },
+      { "content-security-policy": policy.replace(`'nonce-${nonce}'`, "'none'") },
+      { "content-security-policy": policy + "; form-action " + hub },
+    ]) {
+      expectHandoffRejected(() => readLauncherPage(response(headers), page()));
+    }
+  });
+  test("page drift and non-200 responses fail closed", () => {
+    expectHandoffRejected(() => readLauncherPage(response(undefined, { status: 400 }), page()));
+    expectHandoffRejected(() => readLauncherPage(response(undefined, { body: { access_token: secret } }), page()));
+    for (const parsed of [
+      page({ scripts: [{ nonce: "other" }] }), page({ scripts: [] }), page({ scripts: [{ nonce }, { nonce }] }),
+      page({ forms: [] }), page({ forms: [launchForm(), launchForm()] }),
+      page({ forms: [launchForm({ id: "other" })] }), page({ forms: [launchForm({ method: "get" })] }),
+      page({ forms: [launchForm({ action: "/services/ocm/open" })] }),
+      page({ forms: [launchForm({ action: "https://other.docker/services/ocm/open" })] }),
+      page({ forms: [launchForm({ action: hub + "/services/ocm/open/share-1" })] }),
+      page({ forms: [launchForm({}, [...pageFields, hidden("next", "/lab")])] }),
+      page({ forms: [launchForm({}, [hidden("access_token", " ")])] }),
+      page({ forms: [launchForm({}, [pageFields[0], pageFields[0]])] }),
+    ]) {
+      expectHandoffRejected(() => readLauncherPage(response(), parsed));
+    }
   });
 });
