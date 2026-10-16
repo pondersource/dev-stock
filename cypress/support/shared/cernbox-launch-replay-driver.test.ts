@@ -1,5 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
-import { replayCernboxLaunch } from "./cernbox-launch-replay";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { REPLAY_REQUEST_TIMEOUT_MS, replayCernboxLaunch } from "./cernbox-launch-replay";
 const globals = globalThis as any;
 const priorCy = globals.cy;
 const priorCypress = globals.Cypress;
@@ -55,6 +57,21 @@ test("missing cookie or unauthorized contents cannot become success", async () =
     expect(() => state.listeners.get("fail")({ message: payload.accessToken }))
       .toThrow("CERNBox webapp launch replay failed");
   }
+});
+test("requests outlast the sender hub spawn wait", async () => {
+  const cookbook = readFileSync(
+    resolve(import.meta.dir, "../../../config/compose/cookbooks/nextcloud.webapp-hub.yml"), "utf8");
+  const declared = cookbook.match(/JUPYTERHUB_SLOW_SPAWN_TIMEOUT_SEC=(\d+)/);
+  expect(declared).not.toBeNull();
+  const hubWaitMs = Number(declared![1]) * 1000;
+  expect(REPLAY_REQUEST_TIMEOUT_MS).toBeGreaterThan(hubWaitMs);
+  const state = driver([
+    { status: 303, headers: { location: "/user/demo/share-1/lab" }, body: "" },
+    { status: 200, headers: {}, body: "jupyterlab" },
+    { status: 200, headers: {}, body: { content: [{ name: "notebook.ipynb" }] } },
+  ]);
+  await (replayCernboxLaunch(payload, emptyDocument) as any);
+  expect(state.requests[0].timeout).toBeGreaterThan(hubWaitMs);
 });
 test("redirect cycle stops at 12 requests", async () => {
   const state = driver(Array.from({ length: 12 }, () => ({

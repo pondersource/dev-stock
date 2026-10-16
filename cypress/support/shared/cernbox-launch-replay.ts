@@ -4,6 +4,11 @@ export type LaunchPayload = { appUrl: string; accessToken: string; hubOrigin: st
 export type ReplayHop = { url: string; method: "GET" | "POST"; body?: Record<string, string> };
 export type ReplayResponse = { status: number; headers: Record<string, unknown>; body: unknown };
 
+// The first hop blocks while the sender hub starts the named server, for up to
+// JUPYTERHUB_SLOW_SPAWN_TIMEOUT_SEC in config/compose/cookbooks/nextcloud.webapp-hub.yml.
+export const REPLAY_REQUEST_TIMEOUT_MS = 40000;
+const REPLAY_DEADLINE_MS = 90000;
+
 function reject(): never {
   throw new Error("Invalid CERNBox webapp launch handoff");
 }
@@ -97,7 +102,7 @@ export function replayCernboxLaunch(
   payload: LaunchPayload,
   parseHtml: (html: string) => Document,
 ): Cypress.Chainable<{ hubOrigin: string; labUrl: string }> {
-  const deadline = Date.now() + 90000;
+  const deadline = Date.now() + REPLAY_DEADLINE_MS;
   const redactedFailure = () => { throw new Error("CERNBox webapp launch replay failed"); };
   Cypress.once("fail", redactedFailure);
 
@@ -110,7 +115,7 @@ export function replayCernboxLaunch(
       failOnStatusCode: false,
       retryOnNetworkFailure: false,
       log: false,
-      timeout: Math.max(1, Math.min(15000, deadline - Date.now())),
+      timeout: Math.max(1, Math.min(REPLAY_REQUEST_TIMEOUT_MS, deadline - Date.now())),
     }).then((response) => {
       const next = nextReplayHop(hop, response, payload.hubOrigin, parseHtml);
       if ("hop" in next) return request(next.hop, count + 1);
@@ -119,7 +124,7 @@ export function replayCernboxLaunch(
       return cy.request({
         method: "GET", url: contentsUrl, followRedirect: false,
         failOnStatusCode: false, retryOnNetworkFailure: false, log: false,
-        timeout: Math.max(1, Math.min(15000, deadline - Date.now())),
+        timeout: Math.max(1, Math.min(REPLAY_REQUEST_TIMEOUT_MS, deadline - Date.now())),
       }).then((contents) => {
         const value = contents.body as { content?: Array<{ name?: string }> };
         const notebookPresent = contents.status === 200 && Array.isArray(value?.content) &&
