@@ -108,7 +108,8 @@ function submitWebappShareDialog(): void {
     expect(statusCode, "Nextcloud webapp-share API status code").to.be.oneOf([200, 201]);
   });
 
-  cy.contains('[role="alert"], .toast, .toastify', /Shared .+ with /i, {
+  // @nextcloud/dialogs 7.5+ renders success toasts as role="status" with hashed classes.
+  cy.contains('[role="status"], [role="alert"], .toast, .toastify', /Shared .+ with /i, {
     timeout: 20000,
   }).should("be.visible");
 }
